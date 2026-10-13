@@ -70,3 +70,28 @@ export function formatCurrency(value: number | null | undefined, fallback = "—
 export function formatNumber(value: number | null | undefined, fallback = "—"): string {
   return value === null || value === undefined ? fallback : numberFormatter.format(value);
 }
+
+const isoDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: APP_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+const longDateFormatter = new Intl.DateTimeFormat(APP_LOCALE, {
+  timeZone: APP_TIME_ZONE,
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
+/** Ngày hôm nay theo giờ Việt Nam, dạng "yyyy-MM-dd" (khớp LocalDate của backend). */
+export function todayIsoDate(now: Date = new Date()): string {
+  return isoDateFormatter.format(now);
+}
+
+/** Thứ Ba, 13 tháng 10 */
+export function formatLongDate(value: DateInput, fallback = "—"): string {
+  const date = toDate(value);
+  return date ? longDateFormatter.format(date) : fallback;
+}

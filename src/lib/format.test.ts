@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCurrency, formatDate, formatDateTime, formatTime } from "./format";
+import { formatCurrency, formatDate, formatDateTime, formatLongDate, formatTime, todayIsoDate } from "./format";
 
 // Kết quả không phụ thuộc múi giờ của máy chạy test: luôn hiển thị theo giờ Việt Nam.
 describe("format", () => {
@@ -22,5 +22,16 @@ describe("format", () => {
 
   it("tiền VND", () => {
     expect(formatCurrency(15_500_000).replace(/\s/g, " ")).toBe("15.500.000 ₫");
+  });
+});
+
+describe("ngày theo giờ Việt Nam", () => {
+  it("todayIsoDate lấy ngày theo giờ Việt Nam, không theo UTC", () => {
+    expect(todayIsoDate(new Date("2026-10-12T18:30:00Z"))).toBe("2026-10-13");
+    expect(todayIsoDate(new Date("2026-10-13T16:59:00Z"))).toBe("2026-10-13");
+  });
+
+  it("formatLongDate", () => {
+    expect(formatLongDate("2026-10-13")).toBe("Thứ Ba, 13 tháng 10");
   });
 });
