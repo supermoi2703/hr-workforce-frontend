@@ -43,7 +43,7 @@ export function BackendStatusCard() {
           </>
         ) : (
           <>
-            <Badge variant={isUp ? "default" : "destructive"}>{isUp ? "Đang hoạt động" : health.data.status}</Badge>
+            <Badge variant={isUp ? "success" : "destructive"}>{isUp ? "Đang hoạt động" : health.data.status}</Badge>
             <p className="text-muted-foreground">Cập nhật lúc {formatTime(health.dataUpdatedAt)}</p>
           </>
         )}

@@ -88,6 +88,14 @@ export default function DevUiPage() {
                 <Button size="sm">Duyệt lương</Button>
               </RequireAccess>
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span>Badge trạng thái:</span>
+              <Badge variant="success">Đúng giờ</Badge>
+              <Badge variant="warning">Đi muộn</Badge>
+              <Badge variant="info">WFH</Badge>
+              <Badge variant="destructive">Vắng</Badge>
+              <Badge variant="secondary">Nháp</Badge>
+            </div>
             <ul className="space-y-1 text-muted-foreground">
               <li>formatDate: {formatDate("2026-10-13")}</li>
               <li>formatDateTime: {formatDateTime("2026-10-13T01:30:00Z")}</li>
