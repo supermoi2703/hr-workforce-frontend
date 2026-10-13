@@ -4,6 +4,7 @@ import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserAvatar } from "@/components/shared/user-avatar";
 import { createDataTableColumns, DataTable, useDataTableState } from "@/components/shared/data-table/data-table";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { fetchDemoEmployees, type DemoEmployee, type DemoMode } from "./demo-api";
@@ -12,7 +13,15 @@ import { fetchDemoEmployees, type DemoEmployee, type DemoMode } from "./demo-api
 const col = createDataTableColumns<DemoEmployee>();
 const columns = col.columns([
   col.accessor("code", { header: "Mã NV" }),
-  col.accessor("fullName", { header: "Họ tên", cell: (c) => <span className="font-medium">{c.getValue()}</span> }),
+  col.accessor("fullName", {
+    header: "Họ tên",
+    cell: (c) => (
+      <span className="flex items-center gap-2.5">
+        <UserAvatar name={c.getValue()} seed={c.row.original.code} size="sm" />
+        <span className="font-medium">{c.getValue()}</span>
+      </span>
+    ),
+  }),
   col.accessor("office", { header: "Văn phòng" }),
   col.accessor("position", { header: "Chức danh", cell: (c) => <Badge variant="secondary">{c.getValue()}</Badge> }),
   col.accessor("joinedAt", { header: "Ngày vào", cell: (c) => formatDate(c.getValue()) }),

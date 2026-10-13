@@ -1,7 +1,6 @@
 "use client";
 
 import { LogOutIcon } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,15 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthMode, useCurrentUser } from "@/lib/auth/auth-provider";
-
-function initials(name: string): string {
-  const words = name.replace(/\(.*\)/, "").trim().split(/\s+/);
-  return words
-    .slice(-2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-}
+import { UserAvatar } from "../user-avatar";
 
 export function UserMenu() {
   const { user } = useCurrentUser();
@@ -31,9 +22,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" aria-label="Tài khoản" />}>
-        <Avatar className="size-8">
-          <AvatarFallback>{initials(user.displayName)}</AvatarFallback>
-        </Avatar>
+        <UserAvatar name={user.displayName} seed={user.id} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuGroup>
