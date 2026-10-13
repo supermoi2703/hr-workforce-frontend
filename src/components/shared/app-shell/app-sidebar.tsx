@@ -17,6 +17,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
+import { DOMAIN_TONE_TEXT } from "../icon-tile";
 import { findNavMatch, getNavGroups } from "./navigation";
 
 export function AppSidebar() {
@@ -29,7 +30,7 @@ export function AppSidebar() {
     .filter((group) => group.items.length > 0);
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -39,7 +40,7 @@ export function AppSidebar() {
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate font-semibold">HRM Workforce</span>
-                <span className="truncate text-xs text-muted-foreground">Quản lý & điều phối nhân lực</span>
+                <span className="truncate text-xs text-muted-foreground">Quản lý và điều phối nhân lực</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -51,19 +52,25 @@ export function AppSidebar() {
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      render={<Link href={item.href} />}
-                      isActive={item.href === activeHref}
-                      tooltip={item.title}
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                    {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>}
-                  </SidebarMenuItem>
-                ))}
+                {group.items.map((item) => {
+                  const isActive = item.href === activeHref;
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        render={<Link href={item.href} />}
+                        isActive={isActive}
+                        tooltip={item.title}
+                      >
+                        {/* Icon mang màu nhóm chức năng; mục đang mở dùng màu thương hiệu. */}
+                        <item.icon className={isActive ? undefined : DOMAIN_TONE_TEXT[item.tone ?? group.tone]} />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                      {item.badge && (
+                        <SidebarMenuBadge className="text-[0.7rem] font-normal text-muted-foreground">{item.badge}</SidebarMenuBadge>
+                      )}
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

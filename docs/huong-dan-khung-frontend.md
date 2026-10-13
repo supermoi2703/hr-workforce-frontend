@@ -103,11 +103,18 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
 - Thao tác khó hoàn tác: `<ConfirmDialog>`.
 - Trạng thái: `LoadingState`, `ErrorState`, `EmptyState` trong `components/shared/states`.
 - Không đặt màu/kích thước cứng trong màn hình nghiệp vụ; dùng biến theme (`globals.css`) và component chung.
-
-## 8. Đăng nhập thật (phần của Cường)
-
-Khung đang dùng đăng nhập giả lập. Phần thật cắm vào mà các màn hình khác không phải sửa:
-
-- `lib/auth/auth-adapter.ts`: interface `AuthAdapter` mà HTTP client dùng (lấy token, refresh, báo hết phiên).
-- `lib/auth/auth-provider.tsx`: `BackendAuthProvider` (đang để TODO), giữ nguyên kiểu trả về của `useCurrentUser`.
-- Trang `(auth)/login`: khi chưa đăng nhập, khung tự chuyển tới `/login?next=...`.
+- Bảng màu sáng: nền trang xám nhạt, nội dung trong khối trắng (`Card` hoặc `rounded-xl border bg-card`),
+  một màu thương hiệu xanh dương (`primary`) chỉ dùng cho hành động chính, link và mục đang chọn.
+- Trạng thái: `<Badge variant="success | warning | info | destructive">` cho đúng giờ/đã duyệt, đi muộn/chờ duyệt,
+  WFH/nghỉ có phép, vắng/từ chối.
+- Mỗi nhóm chức năng một màu cố định (`DomainTone` trong `components/shared/icon-tile.tsx`): `time` chấm công/bảng công,
+  `leave` nghỉ phép/WFH, `approval` việc cần duyệt, `project` tổng quan/dự án/phân bổ/kỹ năng, `people` nhân viên/tổ chức,
+  `money` lương, `neutral` quản trị. Icon trên sidebar tô theo màu này (khai báo `tone` của nhóm/mục trong
+  `navigation.ts`). Dùng `<IconTile icon={...} tone="leave" />` và cùng tông đó cho badge/biểu đồ của module.
+- Có người trong danh sách thì dùng `<UserAvatar name={...} seed={mã nhân viên hoặc id} />`: hiện chữ cái đầu trên màu
+  riêng của từng người (cùng người luôn cùng màu), có ảnh thì truyền thêm `imageUrl`.
+- Font Be Vietnam Pro, 3 độ đậm 400/500/600. Bảng và thẻ `<time>` tự dùng chữ số đều chiều rộng.
+- Trang chủ (`src/app/(dashboard)/page.tsx`) có chỗ chờ sẵn cho dữ liệu thật:
+  - Hàng chỉ số (`METRICS`): truyền `value` và `detail` khi module có dữ liệu, vd. giờ vào hôm nay, số ngày phép còn lại.
+  - Dải tuần (`_components/week-strip.tsx`): gắn trạng thái từng ngày qua prop `dayContent` (theo ngày `yyyy-MM-dd`).
+  - Không đặt số liệu giả: chưa có dữ liệu thì để trống, ô tự hiện "Chưa có dữ liệu".
