@@ -169,3 +169,14 @@
     scroll-behavior: auto !important;
   }
 }
+/* Sidebar: hiện thanh cuộn mảnh (shadcn mặc định ẩn hẳn), để người dùng biết menu còn mục bên dưới.
+   Đặt ngoài @layer để thắng tiện ích no-scrollbar của component. */
+[data-slot="sidebar-content"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Chế độ chỉ có icon: cột hẹp, vệt mờ ở mép đã đủ báo hiệu nên ẩn thanh cuộn. */
+[data-collapsible="icon"] [data-slot="sidebar-content"] {
+  scrollbar-width: none;
+}

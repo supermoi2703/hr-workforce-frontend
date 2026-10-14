@@ -25,7 +25,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { Access } from "@/lib/auth/types";
-import type { DomainTone } from "../icon-tile";
 
 export type NavItem = {
   title: string;
@@ -38,8 +37,6 @@ export type NavItem = {
   badge?: string;
   /** Người phụ trách mục này, khi khác người phụ trách cả nhóm. */
   owner?: Owner;
-  /** Màu icon, khi khác màu của cả nhóm. */
-  tone?: DomainTone;
 };
 
 type Owner = "cuongvv" | "truongnd" | "quangnn";
@@ -48,11 +45,14 @@ export type NavGroup = {
   label: string;
   /** Người phụ trách nhóm menu: chỉ người này sửa các mục trong nhóm. */
   owner: Owner;
-  /** Màu icon của nhóm chức năng (xem DomainTone). */
-  tone: DomainTone;
   items: NavItem[];
   /** Chỉ hiện khi chạy dev (`next dev`). */
   devOnly?: boolean;
+  /**
+   * Nhóm ít dùng: thu gọn được, mặc định đóng (tự mở khi đang ở trang thuộc nhóm). Nhóm dùng hằng ngày
+   * để luôn mở.
+   */
+  collapsible?: boolean;
 };
 
 const MANAGEMENT: Access = { roles: ["ADMIN", "HR", "MANAGER"] };
@@ -67,17 +67,15 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Tổng quan",
     owner: "quangnn",
-    tone: "project",
     items: [
       { title: "Trang chủ", href: "/", icon: HouseIcon },
       { title: "Dashboard", href: "/dashboard", icon: GaugeIcon, access: MANAGEMENT, task: "3.6" },
-      { title: "Việc cần duyệt", href: "/approvals", icon: ClipboardCheckIcon, task: "1.6.2", owner: "cuongvv", tone: "approval" },
+      { title: "Việc cần duyệt", href: "/approvals", icon: ClipboardCheckIcon, task: "1.6.2", owner: "cuongvv" },
     ],
   },
   {
     label: "Nhân sự",
     owner: "cuongvv",
-    tone: "people",
     items: [
       { title: "Nhân viên", href: "/employees", icon: UsersIcon, access: MANAGEMENT, task: "1.4" },
       { title: "Hợp đồng", href: "/contracts", icon: FileSignatureIcon, access: HR_ONLY, task: "1.5" },
@@ -86,22 +84,20 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Công & Lương",
     owner: "truongnd",
-    tone: "time",
     items: [
       { title: "Chấm công", href: "/attendance", icon: TimerIcon, task: "2.2" },
       { title: "Bảng công", href: "/timesheets", icon: CalendarDaysIcon, task: "2.3" },
-      { title: "Nghỉ phép & WFH", href: "/leave", icon: TreePalmIcon, task: "2.4, 2.5", tone: "leave" },
-      { title: "Lương", href: "/payroll", icon: WalletIcon, access: HR_ONLY, task: "2.7, 2.8", tone: "money" },
-      { title: "Phiếu lương", href: "/payslips", icon: ReceiptTextIcon, task: "2.9", tone: "money" },
+      { title: "Nghỉ phép & WFH", href: "/leave", icon: TreePalmIcon, task: "2.4, 2.5" },
+      { title: "Lương", href: "/payroll", icon: WalletIcon, access: HR_ONLY, task: "2.7, 2.8" },
+      { title: "Phiếu lương", href: "/payslips", icon: ReceiptTextIcon, task: "2.9" },
     ],
   },
   {
     label: "Tổ chức & Workforce",
     owner: "quangnn",
-    tone: "project",
     items: [
-      { title: "Tổ chức", href: "/organization", icon: NetworkIcon, task: "1.3", tone: "people" },
-      { title: "Lịch văn phòng", href: "/office-calendar", icon: CalendarClockIcon, access: HR_ONLY, task: "2.1", tone: "time" },
+      { title: "Tổ chức", href: "/organization", icon: NetworkIcon, task: "1.3" },
+      { title: "Lịch văn phòng", href: "/office-calendar", icon: CalendarClockIcon, access: HR_ONLY, task: "2.1" },
       { title: "Kỹ năng", href: "/skills", icon: BadgeCheckIcon, task: "3.9" },
       { title: "Dự án", href: "/projects", icon: BriefcaseBusinessIcon, task: "3.1, 3.2" },
       { title: "Phân bổ nhân sự", href: "/allocations", icon: LayersIcon, access: MANAGEMENT, task: "3.4" },
@@ -110,7 +106,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Thử nghiệm AI",
     owner: "cuongvv",
-    tone: "people",
+    collapsible: true,
     items: [
       { title: "Chấm công khuôn mặt", href: "/lab/face", icon: ScanFaceIcon, access: HR_ONLY, task: "AI-1", badge: "Lab", owner: "truongnd" },
       { title: "Hỏi đáp chính sách", href: "/lab/policy-qa", icon: MessageSquareTextIcon, access: HR_ONLY, task: "AI-2", badge: "Lab" },
@@ -121,7 +117,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Quản trị",
     owner: "cuongvv",
-    tone: "neutral",
+    collapsible: true,
     items: [
       { title: "Tài khoản", href: "/admin/users", icon: UserCogIcon, access: { permissions: ["user:read"] }, task: "1.1" },
       { title: "Vai trò & quyền", href: "/admin/roles", icon: KeyRoundIcon, access: { permissions: ["role:read"] }, task: "1.2" },
@@ -130,8 +126,8 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Phát triển",
     owner: "quangnn",
-    tone: "neutral",
     devOnly: true,
+    collapsible: true,
     items: [
       { title: "Component mẫu", href: "/dev/ui", icon: PaletteIcon },
       { title: "Trang lỗi mẫu", href: "/dev/error", icon: FlaskConicalIcon },

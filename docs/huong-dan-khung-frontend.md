@@ -24,7 +24,8 @@ Ví dụ màn hình "Nghỉ phép" (`/leave`):
 
 1. **Menu**: mục đã có sẵn trong `src/components/shared/app-shell/navigation.ts`, nhóm của người phụ
    trách. Chưa có trang thật thì mục menu tự mở trang "Đang phát triển". Sửa tên, icon, quyền (`access`)
-   trong nhóm của mình nếu cần.
+   trong nhóm của mình nếu cần. Nhóm ít dùng đặt `collapsible: true` để thu gọn được (mặc định đóng, tự mở
+   khi đang ở trang thuộc nhóm, nhớ trạng thái đóng/mở). Nhóm dùng hằng ngày để luôn mở, tránh menu quá dài.
 2. **Trang**: tạo `src/app/(dashboard)/leave/page.tsx`. Trang thật tự thay trang "Đang phát triển".
    Bọc nội dung bằng `<RequireAccess access={...}>` nếu trang giới hạn quyền, mở đầu bằng `<PageHeader>`.
 3. **Logic theo domain** trong `src/features/leave/`:
@@ -109,8 +110,8 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   WFH/nghỉ có phép, vắng/từ chối.
 - Mỗi nhóm chức năng một màu cố định (`DomainTone` trong `components/shared/icon-tile.tsx`): `time` chấm công/bảng công,
   `leave` nghỉ phép/WFH, `approval` việc cần duyệt, `project` tổng quan/dự án/phân bổ/kỹ năng, `people` nhân viên/tổ chức,
-  `money` lương, `neutral` quản trị. Icon trên sidebar tô theo màu này (khai báo `tone` của nhóm/mục trong
-  `navigation.ts`). Dùng `<IconTile icon={...} tone="leave" />` và cùng tông đó cho badge/biểu đồ của module.
+  `money` lương, `neutral` quản trị. Dùng `<IconTile icon={...} tone="leave" />` và cùng tông đó cho badge/biểu đồ
+  của module. Riêng icon trên sidebar để một màu xám (chỉ mục đang chọn có màu xanh), không tô theo nhóm.
 - Có người trong danh sách thì dùng `<UserAvatar name={...} seed={mã nhân viên hoặc id} />`: hiện chữ cái đầu trên màu
   riêng của từng người (cùng người luôn cùng màu), có ảnh thì truyền thêm `imageUrl`.
 - Font Be Vietnam Pro, 3 độ đậm 400/500/600. Bảng và thẻ `<time>` tự dùng chữ số đều chiều rộng.
