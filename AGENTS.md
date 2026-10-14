@@ -27,6 +27,8 @@ npm run build     # production build (also type-checks)
 - `docs/01-quy-uoc-du-an-va-cau-truc-file.md` — conventions and folder structure (frontend: §3).
 - `docs/02-quy-trinh-git.md` — branches `<github>/<type>/<short-desc>`, Conventional Commits, PR flow.
 - `docs/03-quy-trinh-su-dung-ai-agent.md` — rules for AI-generated code.
+- `docs/huong-dan-khung-frontend.md` — how to build a screen on this skeleton: shared HTTP client, DataTable,
+  forms, `useCurrentUser`/`RequireAccess`, formatting, theme colors. Working examples: `src/app/(dashboard)/dev/ui/`.
 - Overview (`00`) and task assignment (`04`: module owners, shared-code owners, open decisions) live
   in the backend repo — see `docs/README.md`.
 

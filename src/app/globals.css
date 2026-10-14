@@ -27,6 +27,12 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -49,72 +55,90 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Bảng màu sáng: nền xám rất nhạt, khối nội dung trắng, một màu thương hiệu xanh dương.
+     Màu "tươi" đến từ icon theo nhóm chức năng (xem components/shared/icon-tile.tsx), không từ mảng màu lớn.
+     Màn hình nghiệp vụ chỉ dùng các biến này, không đặt mã màu cứng. */
+  --background: oklch(0.97 0.006 264); /* canvas #F4F6FA */
+  --foreground: oklch(0.24 0.035 265); /* ink #172033 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.24 0.035 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.24 0.035 265);
+  --primary: oklch(0.546 0.245 262.881); /* blue-600 #2563EB, chữ trắng đạt 5.2:1 */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.955 0.01 264);
+  --secondary-foreground: oklch(0.3 0.04 265);
+  --muted: oklch(0.955 0.01 264);
+  --muted-foreground: oklch(0.5 0.03 262);
+  --accent: oklch(0.955 0.025 255); /* blue-50: hover, mục đang chọn */
+  --accent-foreground: oklch(0.488 0.217 264);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: oklch(0.925 0.01 262); /* line #E3E7EE */
+  --input: oklch(0.9 0.012 262);
+  --ring: oklch(0.623 0.214 259.815);
+  /* Trạng thái: success = đúng giờ/đã duyệt, warning = đi muộn/chờ duyệt, info = WFH/nghỉ có phép.
+     Sắc 700: chữ nhỏ trên nền trắng đạt >= 5:1. */
+  --success: oklch(0.508 0.118 165.612);
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.555 0.163 48.998);
+  --warning-foreground: oklch(1 0 0);
+  --info: oklch(0.5 0.134 242.749);
+  --info-foreground: oklch(1 0 0);
+  /* Biểu đồ: xanh thương hiệu, teal, amber, rose, violet */
+  --chart-1: oklch(0.546 0.245 262.881);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.666 0.179 58.318);
+  --chart-4: oklch(0.645 0.246 16.439);
+  --chart-5: oklch(0.541 0.247 293.009);
+  --radius: 0.5rem;
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.33 0.035 265);
+  --sidebar-primary: oklch(0.546 0.245 262.881);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.955 0.025 255);
+  --sidebar-accent-foreground: oklch(0.488 0.217 264);
+  --sidebar-border: oklch(0.925 0.01 262);
+  --sidebar-ring: oklch(0.623 0.214 259.815);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.17 0.02 262);
+  --foreground: oklch(0.94 0.008 262);
+  --card: oklch(0.21 0.022 262);
+  --card-foreground: oklch(0.94 0.008 262);
+  --popover: oklch(0.21 0.022 262);
+  --popover-foreground: oklch(0.94 0.008 262);
+  --primary: oklch(0.623 0.214 259.815); /* blue-500 */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.26 0.025 262);
+  --secondary-foreground: oklch(0.94 0.008 262);
+  --muted: oklch(0.26 0.025 262);
+  --muted-foreground: oklch(0.71 0.025 262);
+  --accent: oklch(0.29 0.06 262);
+  --accent-foreground: oklch(0.85 0.09 255);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.623 0.214 259.815);
+  --success: oklch(0.765 0.177 163.223);
+  --success-foreground: oklch(0.262 0.051 172.552);
+  --warning: oklch(0.828 0.189 84.429);
+  --warning-foreground: oklch(0.279 0.077 45.635);
+  --info: oklch(0.746 0.16 232.661);
+  --info-foreground: oklch(0.293 0.066 243.157);
+  --chart-1: oklch(0.707 0.165 254.624);
+  --chart-2: oklch(0.777 0.152 181.912);
+  --chart-3: oklch(0.828 0.189 84.429);
+  --chart-4: oklch(0.712 0.194 13.428);
+  --chart-5: oklch(0.702 0.183 293.541);
+  --sidebar: oklch(0.2 0.022 262);
+  --sidebar-foreground: oklch(0.86 0.015 262);
+  --sidebar-primary: oklch(0.623 0.214 259.815);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.28 0.06 262);
+  --sidebar-accent-foreground: oklch(0.88 0.08 255);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.623 0.214 259.815);
 }
 
 @layer base {
@@ -127,4 +151,32 @@
   html {
     @apply font-sans;
   }
+  /* Con số (giờ công, %, tiền, ngày) luôn thẳng cột. */
+  table,
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Tôn trọng thiết lập "giảm chuyển động" của hệ điều hành. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* Sidebar: hiện thanh cuộn mảnh (shadcn mặc định ẩn hẳn), để người dùng biết menu còn mục bên dưới.
+   Đặt ngoài @layer để thắng tiện ích no-scrollbar của component. */
+[data-slot="sidebar-content"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Chế độ chỉ có icon: cột hẹp, vệt mờ ở mép đã đủ báo hiệu nên ẩn thanh cuộn. */
+[data-collapsible="icon"] [data-slot="sidebar-content"] {
+  scrollbar-width: none;
 }
