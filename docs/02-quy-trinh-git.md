@@ -10,19 +10,25 @@ thêm bước merge thừa:
 
 - **`main`** — nhánh bảo vệ (protected branch). Luôn ở trạng thái chạy được, không push thẳng.
   Merge vào `main` sẽ tự động deploy (xem CI/CD trong tài liệu hạ tầng).
-- **`feature/<domain>-<mo-ta-ngan>`** — nhánh làm tính năng mới, tách từ `main`.
-  Ví dụ: `feature/leave-approval-flow`, `feature/payroll-run-period`.
-- **`fix/<mo-ta-ngan>`** — sửa lỗi phát hiện trong lúc phát triển (chưa lên `main`/đã lên nhưng
-  không khẩn cấp).
-- **`hotfix/<mo-ta-ngan>`** — sửa lỗi khẩn cấp đang ảnh hưởng bản đã deploy, xem mục 5.
-- **`chore/<mo-ta-ngan>`** — việc không phải tính năng/lỗi: cấu hình CI, nâng cấp dependency,
-  dọn code.
+Mọi nhánh làm việc đặt tên theo dạng **`<github>/<loai>/<mo-ta-ngan>`**, trong đó `<github>` là
+tiền tố của từng thành viên (`cuongvv`, `truongnd`, `quangnn` — xem `04-phan-cong-nhiem-vu.md`), để
+nhìn tên nhánh là biết của ai. Tên nhánh gợi ý cho từng việc có sẵn trong `04` mục 2.
 
-Không đặt tên nhánh chung chung kiểu `fix-bug`, `update`, `test123`.
+- **`<github>/feature/<mo-ta-ngan>`** — nhánh làm tính năng mới, tách từ `main`.
+  Ví dụ: `truongnd/feature/leave-request`, `quangnn/feature/org-office`.
+- **`<github>/fix/<mo-ta-ngan>`** — sửa lỗi phát hiện trong lúc phát triển (chưa lên `main`/đã lên
+  nhưng không khẩn cấp).
+- **`<github>/hotfix/<mo-ta-ngan>`** — sửa lỗi khẩn cấp đang ảnh hưởng bản đã deploy, xem mục 5.
+- **`<github>/chore/<mo-ta-ngan>`** — việc không phải tính năng/lỗi: cấu hình CI, nâng cấp
+  dependency, dọn code.
+- **`docs`** — nhánh chung tạm thời cho tài liệu dự án, merge vào `main` qua PR như bình thường.
+
+Không đặt tên nhánh chung chung kiểu `fix-bug`, `update`, `test123`. Nhánh đã tạo trước quy ước này
+(vd. `cuongvv/features/authentication`) giữ nguyên tên, áp dụng từ nhánh mới.
 
 ## 2. Quy trình làm một tính năng
 
-1. Cập nhật `main` mới nhất, tạo nhánh từ đó: `git checkout main && git pull && git checkout -b feature/...`.
+1. Cập nhật `main` mới nhất, tạo nhánh từ đó: `git checkout main && git pull && git checkout -b <github>/feature/...`.
 2. Commit theo [Conventional Commits](https://www.conventionalcommits.org/):
    `feat(leave): thêm luồng duyệt cấp 2`, `fix(payroll): sửa sai số làm tròn lương`,
    `docs: cập nhật hướng dẫn cài đặt`. Prefix phổ biến: `feat`, `fix`, `refactor`, `test`,
@@ -42,7 +48,8 @@ Không đặt tên nhánh chung chung kiểu `fix-bug`, `update`, `test123`.
 
 Với nhóm 3 người, áp dụng luân phiên: mỗi PR domain của người A được review chính bởi 1 trong 2
 người còn lại, xoay vòng đều để cả 3 người đều nắm được toàn bộ hệ thống chứ không chỉ domain của
-mình — điều này quan trọng vì hội đồng bảo vệ có thể hỏi bất kỳ ai về bất kỳ phần nào.
+mình — điều này quan trọng vì hội đồng bảo vệ có thể hỏi bất kỳ ai về bất kỳ phần nào. Người review
+chính cho từng thành viên và khi nào cần thêm người thứ hai: xem `04-phan-cong-nhiem-vu.md` mục 4.3.
 
 Checklist tối thiểu khi review một PR (dù reviewer không rành sâu domain đó):
 
@@ -66,12 +73,12 @@ Checklist tối thiểu khi review một PR (dù reviewer không rành sâu doma
 
 ## 5. Quy trình sửa lỗi (bug thường vs hotfix)
 
-**Bug phát hiện trong lúc phát triển, chưa gấp:** tạo nhánh `fix/...` từ `main`, đi qua PR/review
+**Bug phát hiện trong lúc phát triển, chưa gấp:** tạo nhánh `<github>/fix/...` từ `main`, đi qua PR/review
 bình thường như mục 2.
 
 **Hotfix khẩn cấp** (lỗi đang ảnh hưởng bản demo/production đã deploy):
 
-1. Tạo nhánh `hotfix/<mo-ta>` từ `main`.
+1. Tạo nhánh `<github>/hotfix/<mo-ta>` từ `main`.
 2. Sửa tối thiểu đúng phạm vi lỗi, không tiện tay refactor thêm.
 3. Vẫn bắt buộc mở PR và có review — được phép rút gọn xuống review nhanh (1 người xác nhận qua
    PR hoặc gọi nhanh trong nhóm) nhưng **không bỏ qua PR/review hoàn toàn**, trừ trường hợp
