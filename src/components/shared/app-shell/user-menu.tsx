@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOutIcon } from "lucide-react";
+import Link from "next/link";
+import { LogOutIcon, UserRoundIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +36,10 @@ export function UserMenu() {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {/* TODO(cuongvv): trang tài khoản (đổi mật khẩu, thiết bị đang đăng nhập). Chế độ mock không có phiên để đăng xuất. */}
+        <DropdownMenuItem render={<Link href="/account" />}>
+          <UserRoundIcon /> {t("account")}
+        </DropdownMenuItem>
+        {/* Chế độ mock không có phiên để đăng xuất. */}
         <DropdownMenuItem disabled={mode === "mock"} onClick={() => void signOut()}>
           <LogOutIcon /> {t("signOut")}
         </DropdownMenuItem>

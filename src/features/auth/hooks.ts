@@ -2,9 +2,32 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import type { PageParams } from "@/lib/api/types";
 import { useAuthActions, useCurrentUser } from "@/lib/auth/auth-provider";
-import { login } from "./api";
+import { getMyActivity, getMySessions, login } from "./api";
 import { safeNextPath } from "./next-path";
+
+/** Query key của trang tài khoản. Bắt đầu bằng "account" để invalidate cả nhóm khi cần. */
+export const accountKeys = {
+  all: ["account"] as const,
+  sessions: ["account", "sessions"] as const,
+  activity: (params: PageParams) => ["account", "activity", params] as const,
+};
+
+/** Thiết bị đang đăng nhập của chính mình. */
+export function useMySessions() {
+  return useQuery({ queryKey: accountKeys.sessions, queryFn: getMySessions });
+}
+
+/** Hoạt động bảo mật của chính mình (phân trang phía server). */
+export function useMyActivity(params: PageParams) {
+  return useQuery({
+    queryKey: accountKeys.activity(params),
+    queryFn: () => getMyActivity(params),
+    placeholderData: keepPreviousData,
+  });
+}
 
 /**
  * Các trang đăng nhập / quên mật khẩu / kích hoạt: đã có phiên thì rời trang. Gồm: vừa đăng nhập xong, mở trang

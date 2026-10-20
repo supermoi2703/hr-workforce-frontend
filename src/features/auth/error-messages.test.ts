@@ -4,6 +4,7 @@ import en from "../../../messages/en.json";
 import vi from "../../../messages/vi.json";
 import { ApiError } from "@/lib/api/errors";
 import {
+  getChangePasswordError,
   getCodeFlowAlert,
   getCodeFlowError,
   getGoogleErrorMessage,
@@ -90,6 +91,31 @@ describe("getCodeFlowError / getCodeFlowAlert (đặt lại mật khẩu, kích 
     expect(alert(validation)).toBeNull();
     expect(alert(null)).toBeNull();
     expect(alert(apiError(0, "NETWORK_ERROR"))).toContain("Can't reach the server");
+  });
+});
+
+describe("getChangePasswordError", () => {
+  const change = (error: unknown) => getChangePasswordError(error, t.auth, t.errors);
+
+  it("gắn lỗi vào đúng ô", () => {
+    expect(change(apiError(400, "CURRENT_PASSWORD_INCORRECT"))).toEqual({
+      field: "currentPassword",
+      message: "Your current password is incorrect.",
+    });
+    expect(change(apiError(400, "WEAK_PASSWORD"))).toMatchObject({ field: "newPassword" });
+    expect(change(apiError(400, "PASSWORD_REUSED"))).toMatchObject({ field: "newPassword" });
+  });
+
+  it("tài khoản chỉ đăng nhập Google: Alert kèm cờ để hiện link đặt mật khẩu", () => {
+    expect(change(apiError(400, "NO_PASSWORD_SET"))).toMatchObject({ field: null, noPassword: true });
+  });
+
+  it("quá nhiều lần (không có Retry-After) và lỗi mạng hiện Alert", () => {
+    expect(change(apiError(429, "TOO_MANY_REQUESTS"))).toEqual({
+      field: null,
+      message: "Too many attempts. Try again in a few minutes.",
+    });
+    expect(change(apiError(0, "NETWORK_ERROR")).field).toBeNull();
   });
 });
 

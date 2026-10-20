@@ -119,6 +119,83 @@
     "up": "Đang hoạt động",
     "updatedAt": "Cập nhật lúc {time}"
   },
+  "Account": {
+    "metaTitle": "Tài khoản",
+    "title": "Tài khoản",
+    "description": "Thông tin cá nhân, mật khẩu và bảo mật đăng nhập.",
+    "Tabs": {
+      "profile": "Thông tin",
+      "password": "Mật khẩu",
+      "devices": "Thiết bị",
+      "activity": "Hoạt động"
+    },
+    "Profile": {
+      "name": "Họ tên",
+      "email": "Email",
+      "roles": "Vai trò",
+      "status": "Trạng thái",
+      "note": "Liên hệ bộ phận nhân sự nếu cần đổi họ tên hoặc email.",
+      "statuses": {
+        "ACTIVE": "Đang hoạt động",
+        "PENDING": "Chờ kích hoạt",
+        "LOCKED": "Đang bị khóa",
+        "DISABLED": "Đã vô hiệu hóa"
+      }
+    },
+    "Password": {
+      "description": "Sau khi đổi, các thiết bị khác sẽ bị đăng xuất. Thiết bị này vẫn giữ đăng nhập.",
+      "current": "Mật khẩu hiện tại",
+      "submit": "Đổi mật khẩu",
+      "success": "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất.",
+      "setPassword": "Đặt mật khẩu"
+    },
+    "Devices": {
+      "description": "Các thiết bị đang đăng nhập vào tài khoản của bạn. Hãy đăng xuất thiết bị bạn không nhận ra.",
+      "thisDevice": "Thiết bị này",
+      "unknownDevice": "Thiết bị không xác định",
+      "unknownIp": "Không rõ IP",
+      "lastActive": "Hoạt động lần cuối {time}",
+      "signOut": "Đăng xuất",
+      "signOutOthers": "Đăng xuất các thiết bị khác",
+      "signOutOthersTitle": "Đăng xuất tất cả thiết bị khác?",
+      "signOutOthersDescription": "Mọi thiết bị trừ thiết bị này sẽ phải đăng nhập lại.",
+      "signedOut": "Đã đăng xuất thiết bị.",
+      "signedOutOthers": "Đã đăng xuất các thiết bị khác.",
+      "onlyThisDevice": "Bạn chỉ đang đăng nhập trên thiết bị này."
+    },
+    "Activity": {
+      "description": "Các lần đăng nhập, đổi mật khẩu và thay đổi tài khoản gần đây.",
+      "time": "Thời gian",
+      "event": "Sự kiện",
+      "result": "Kết quả",
+      "device": "Thiết bị",
+      "ip": "Địa chỉ IP",
+      "succeeded": "Thành công",
+      "failed": "Thất bại",
+      "empty": "Chưa có hoạt động",
+      "actions": {
+        "LOGIN_SUCCESS": "Đăng nhập",
+        "LOGIN_FAILED": "Thử đăng nhập",
+        "LOGIN_LOCKED_OUT": "Tạm chặn đăng nhập",
+        "LOGOUT": "Đăng xuất",
+        "LOGOUT_ALL": "Đăng xuất mọi thiết bị",
+        "SESSION_REVOKED": "Đăng xuất một thiết bị",
+        "SESSIONS_REVOKED_BY_ADMIN": "Bị quản trị viên đăng xuất",
+        "REFRESH_TOKEN_REUSE_DETECTED": "Chặn phiên đăng nhập đáng ngờ",
+        "ACCOUNT_ACTIVATED": "Kích hoạt tài khoản",
+        "GOOGLE_LINKED": "Liên kết tài khoản Google",
+        "PASSWORD_RESET_REQUESTED": "Yêu cầu mã đặt lại mật khẩu",
+        "PASSWORD_RESET": "Đặt lại mật khẩu",
+        "PASSWORD_CHANGED": "Đổi mật khẩu",
+        "PASSWORD_CHANGE_FAILED": "Thử đổi mật khẩu",
+        "USER_LOCKED": "Tài khoản bị khóa",
+        "USER_UNLOCKED": "Tài khoản được mở khóa",
+        "USER_DISABLED": "Tài khoản bị vô hiệu hóa",
+        "USER_ENABLED": "Tài khoản được kích hoạt lại",
+        "USER_ROLES_CHANGED": "Thay đổi vai trò"
+      }
+    }
+  },
   "Auth": {
     "Login": {
       "metaTitle": "Đăng nhập",
@@ -196,7 +273,9 @@
       "weakPassword": "Mật khẩu chưa đạt yêu cầu.",
       "passwordReused": "Hãy chọn mật khẩu khác với mật khẩu hiện tại.",
       "tooManyRequests": "Bạn thử quá nhiều lần. Vui lòng thử lại sau {minutes} phút.",
-      "tooManyRequestsSoon": "Bạn thử quá nhiều lần. Vui lòng thử lại sau ít phút."
+      "tooManyRequestsSoon": "Bạn thử quá nhiều lần. Vui lòng thử lại sau ít phút.",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng.",
+      "noPasswordSet": "Tài khoản chưa có mật khẩu vì bạn đăng nhập bằng Google. Hãy đặt mật khẩu bằng mã xác thực gửi tới email."
     },
     "Callback": {
       "signingIn": "Đang đăng nhập..."

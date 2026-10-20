@@ -67,6 +67,32 @@ export function getCodeFlowAlert(error: unknown, t: AuthErrorsTranslator, tError
   return field ? null : message;
 }
 
+/** Lỗi khi đổi mật khẩu: gắn vào ô nào, hoặc `null` = Alert chung. `noPassword`: tài khoản chưa có mật khẩu. */
+export type ChangePasswordError = {
+  field: "currentPassword" | "newPassword" | null;
+  message: string;
+  noPassword?: boolean;
+};
+
+/** Phân loại lỗi của POST /api/auth/password/change. */
+export function getChangePasswordError(
+  error: unknown,
+  t: AuthErrorsTranslator,
+  tErrors: ErrorsTranslator,
+): ChangePasswordError {
+  if (isApiError(error)) {
+    switch (error.code) {
+      case "CURRENT_PASSWORD_INCORRECT":
+        return { field: "currentPassword", message: t("currentPasswordIncorrect") };
+      case "NO_PASSWORD_SET":
+        return { field: null, message: t("noPasswordSet"), noPassword: true };
+    }
+  }
+  // Mật khẩu yếu / trùng, quá nhiều lần: cùng cách xử lý với form dùng mã xác thực.
+  const { field, message } = getCodeFlowError(error, t, tErrors);
+  return { field: field === "password" ? "newPassword" : null, message };
+}
+
 const GOOGLE_KEYS: Record<string, AuthErrorKey> = {
   ...ACCOUNT_KEYS,
   ACCOUNT_NOT_FOUND: "googleAccountNotFound",

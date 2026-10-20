@@ -22,6 +22,7 @@ import { UserMenu } from "./user-menu";
 
 function AppBreadcrumbs() {
   const t = useTranslations("Nav");
+  const tShell = useTranslations("Shell");
   const pathname = usePathname();
   const match = findNavMatch(pathname);
   const crumbs: { label: string; href?: string }[] = [];
@@ -33,6 +34,9 @@ function AppBreadcrumbs() {
     });
   } else if (pathname === "/") {
     crumbs.push({ label: t("items.home") });
+  } else if (pathname === "/account") {
+    // Trang tài khoản mở từ menu avatar, không nằm trong menu bên trái.
+    crumbs.push({ label: tShell("account") });
   }
 
   return (

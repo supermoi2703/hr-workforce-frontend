@@ -119,6 +119,83 @@
     "up": "Running",
     "updatedAt": "Updated at {time}"
   },
+  "Account": {
+    "metaTitle": "Account",
+    "title": "Account",
+    "description": "Your profile, password and sign-in security.",
+    "Tabs": {
+      "profile": "Profile",
+      "password": "Password",
+      "devices": "Devices",
+      "activity": "Activity"
+    },
+    "Profile": {
+      "name": "Name",
+      "email": "Email",
+      "roles": "Roles",
+      "status": "Status",
+      "note": "Contact HR to change your name or email.",
+      "statuses": {
+        "ACTIVE": "Active",
+        "PENDING": "Pending activation",
+        "LOCKED": "Locked",
+        "DISABLED": "Disabled"
+      }
+    },
+    "Password": {
+      "description": "Your other devices are signed out after the change. This device stays signed in.",
+      "current": "Current password",
+      "submit": "Change password",
+      "success": "Password changed. Your other devices were signed out.",
+      "setPassword": "Set a password"
+    },
+    "Devices": {
+      "description": "Devices currently signed in to your account. Sign out any device you don't recognize.",
+      "thisDevice": "This device",
+      "unknownDevice": "Unknown device",
+      "unknownIp": "Unknown IP",
+      "lastActive": "Last active {time}",
+      "signOut": "Sign out",
+      "signOutOthers": "Sign out other devices",
+      "signOutOthersTitle": "Sign out of all other devices?",
+      "signOutOthersDescription": "Every device except this one will have to sign in again.",
+      "signedOut": "The device was signed out.",
+      "signedOutOthers": "Your other devices were signed out.",
+      "onlyThisDevice": "You're only signed in on this device."
+    },
+    "Activity": {
+      "description": "Recent sign-ins, password changes and changes to your account.",
+      "time": "Time",
+      "event": "Event",
+      "result": "Result",
+      "device": "Device",
+      "ip": "IP address",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "empty": "No activity yet",
+      "actions": {
+        "LOGIN_SUCCESS": "Signed in",
+        "LOGIN_FAILED": "Sign-in attempt",
+        "LOGIN_LOCKED_OUT": "Sign-in temporarily blocked",
+        "LOGOUT": "Signed out",
+        "LOGOUT_ALL": "Signed out of all devices",
+        "SESSION_REVOKED": "Signed out a device",
+        "SESSIONS_REVOKED_BY_ADMIN": "Signed out by an administrator",
+        "REFRESH_TOKEN_REUSE_DETECTED": "Suspicious session use blocked",
+        "ACCOUNT_ACTIVATED": "Account activated",
+        "GOOGLE_LINKED": "Google account linked",
+        "PASSWORD_RESET_REQUESTED": "Password reset code requested",
+        "PASSWORD_RESET": "Password reset",
+        "PASSWORD_CHANGED": "Password changed",
+        "PASSWORD_CHANGE_FAILED": "Password change attempt",
+        "USER_LOCKED": "Account locked",
+        "USER_UNLOCKED": "Account unlocked",
+        "USER_DISABLED": "Account disabled",
+        "USER_ENABLED": "Account re-enabled",
+        "USER_ROLES_CHANGED": "Roles changed"
+      }
+    }
+  },
   "Auth": {
     "Login": {
       "metaTitle": "Sign in",
@@ -196,7 +273,9 @@
       "weakPassword": "Password doesn't meet the requirements.",
       "passwordReused": "Choose a password different from your current one.",
       "tooManyRequests": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
-      "tooManyRequestsSoon": "Too many attempts. Try again in a few minutes."
+      "tooManyRequestsSoon": "Too many attempts. Try again in a few minutes.",
+      "currentPasswordIncorrect": "Your current password is incorrect.",
+      "noPasswordSet": "Your account doesn't have a password yet because you sign in with Google. Set one with a verification code sent to your email."
     },
     "Callback": {
       "signingIn": "Signing you in..."

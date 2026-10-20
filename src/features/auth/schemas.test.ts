@@ -1,7 +1,7 @@
 import { createTranslator } from "next-intl";
 import { describe, expect, it } from "vitest";
 import en from "../../../messages/en.json";
-import { createActivateSchema, createResetPasswordSchema } from "./schemas";
+import { createActivateSchema, createChangePasswordSchema, createResetPasswordSchema } from "./schemas";
 
 const t = createTranslator({ locale: "en", messages: en, namespace: "Auth.Validation" });
 
@@ -31,6 +31,28 @@ describe("createResetPasswordSchema", () => {
       newPassword: "Password doesn't meet the requirements",
     });
     expect(errorsOf(schema.safeParse({ ...valid, confirmPassword: "NewPass2025" }))).toEqual({
+      confirmPassword: "Passwords don't match",
+    });
+  });
+});
+
+describe("createChangePasswordSchema", () => {
+  const schema = createChangePasswordSchema(t);
+  const valid = { currentPassword: "Admin12345", newPassword: "NewPass2026", confirmPassword: "NewPass2026" };
+
+  it("hợp lệ; mật khẩu hiện tại chỉ cần không rỗng (không áp quy tắc độ mạnh)", () => {
+    expect(schema.safeParse(valid).success).toBe(true);
+    expect(schema.safeParse({ ...valid, currentPassword: "old" }).success).toBe(true);
+  });
+
+  it("thiếu mật khẩu hiện tại, mật khẩu mới yếu, nhập lại không khớp", () => {
+    expect(errorsOf(schema.safeParse({ ...valid, currentPassword: "" }))).toMatchObject({
+      currentPassword: "Enter your password",
+    });
+    expect(errorsOf(schema.safeParse({ ...valid, newPassword: "abc", confirmPassword: "abc" }))).toMatchObject({
+      newPassword: "Password doesn't meet the requirements",
+    });
+    expect(errorsOf(schema.safeParse({ ...valid, confirmPassword: "Other2026" }))).toEqual({
       confirmPassword: "Passwords don't match",
     });
   });

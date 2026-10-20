@@ -77,3 +77,17 @@ export function createActivateSchema(t: ValidationTranslator) {
 }
 
 export type ActivateFormValues = z.infer<ReturnType<typeof createActivateSchema>>;
+
+/** Đổi mật khẩu khi đang đăng nhập. Khớp ChangePasswordRequest {currentPassword, newPassword}. */
+export function createChangePasswordSchema(t: ValidationTranslator) {
+  const rules = withNewPassword("newPassword", t);
+  return z
+    .object({
+      currentPassword: z.string().min(1, t("passwordRequired")).max(128, t("passwordTooLong")),
+      newPassword: rules.password,
+      confirmPassword: z.string(),
+    })
+    .superRefine(rules.confirm);
+}
+
+export type ChangePasswordFormValues = z.infer<ReturnType<typeof createChangePasswordSchema>>;
