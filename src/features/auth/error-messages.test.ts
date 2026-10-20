@@ -3,7 +3,13 @@ import { describe, expect, it } from "vitest";
 import en from "../../../messages/en.json";
 import vi from "../../../messages/vi.json";
 import { ApiError } from "@/lib/api/errors";
-import { getGoogleErrorMessage, getLoginErrorMessage, getSessionEndNotice } from "./error-messages";
+import {
+  getCodeFlowAlert,
+  getCodeFlowError,
+  getGoogleErrorMessage,
+  getLoginErrorMessage,
+  getSessionEndNotice,
+} from "./error-messages";
 
 function translators(locale: "en" | "vi", messages: typeof en) {
   return {
@@ -52,6 +58,41 @@ describe("getLoginErrorMessage", () => {
   });
 });
 
+describe("getCodeFlowError / getCodeFlowAlert (đặt lại mật khẩu, kích hoạt)", () => {
+  const flow = (error: unknown) => getCodeFlowError(error, t.auth, t.errors);
+  const alert = (error: unknown) => getCodeFlowAlert(error, t.auth, t.errors);
+
+  it("mã sai về ô mã, mật khẩu yếu / trùng về ô mật khẩu, không hiện Alert", () => {
+    expect(flow(apiError(400, "INVALID_OTP"))).toEqual({
+      field: "otp",
+      message: "The code is incorrect or has expired. Request a new code.",
+    });
+    expect(flow(apiError(400, "WEAK_PASSWORD"))).toMatchObject({ field: "password" });
+    expect(flow(apiError(400, "PASSWORD_REUSED"))).toMatchObject({
+      field: "password",
+      message: "Choose a password different from your current one.",
+    });
+    expect(alert(apiError(400, "INVALID_OTP"))).toBeNull();
+  });
+
+  it("429 hiện Alert kèm số phút", () => {
+    expect(alert(apiError(429, "TOO_MANY_REQUESTS", 3600))).toBe("Too many attempts. Try again in 60 minutes.");
+    expect(alert(apiError(429, "TOO_MANY_REQUESTS"))).toBe("Too many attempts. Try again in a few minutes.");
+  });
+
+  it("lỗi validation theo từng ô không hiện Alert; không có lỗi thì không có Alert", () => {
+    const validation = new ApiError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "x",
+      fieldErrors: [{ field: "otp", message: "must be 6 digits" }],
+    });
+    expect(alert(validation)).toBeNull();
+    expect(alert(null)).toBeNull();
+    expect(alert(apiError(0, "NETWORK_ERROR"))).toContain("Can't reach the server");
+  });
+});
+
 describe("getSessionEndNotice", () => {
   it("hết phiên là thông tin, tài khoản bị khóa / vô hiệu hóa là lỗi", () => {
     expect(getSessionEndNotice("session_expired", t.auth)).toEqual({
@@ -60,6 +101,11 @@ describe("getSessionEndNotice", () => {
     });
     expect(getSessionEndNotice("ACCOUNT_LOCKED", t.auth)).toMatchObject({ tone: "error" });
     expect(getSessionEndNotice("ACCOUNT_DISABLED", t.auth)).toMatchObject({ tone: "error" });
+  });
+
+  it("sau khi đặt lại mật khẩu / kích hoạt mà tự đăng nhập không được", () => {
+    expect(getSessionEndNotice("password_reset", t.auth)).toMatchObject({ tone: "info" });
+    expect(getSessionEndNotice("account_activated", t.auth)).toMatchObject({ tone: "info" });
   });
 
   it("không có hoặc giá trị lạ trên URL thì không báo", () => {

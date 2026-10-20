@@ -1,20 +1,17 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { CircleAlertIcon, InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { isApiError } from "@/lib/api/errors";
-import { useAuthActions, useCurrentUser } from "@/lib/auth/auth-provider";
+import { useAuthActions } from "@/lib/auth/auth-provider";
 import { applyServerFieldErrors } from "@/lib/forms";
 import { login } from "../api";
 import {
@@ -23,8 +20,9 @@ import {
   getSessionEndNotice,
   type LoginNotice,
 } from "../error-messages";
-import { safeNextPath } from "../next-path";
-import { createLoginSchema, type LoginFormValues } from "../schemas";
+import { useRedirectIfAuthenticated } from "../hooks";
+import { createEmailSchema, createLoginSchema, type LoginFormValues } from "../schemas";
+import { AuthFormHeader, AuthNotice, authLinkClassName } from "./auth-form-header";
 import { GoogleSignInButton } from "./google-sign-in-button";
 import { PasswordInput } from "./password-input";
 
@@ -33,42 +31,42 @@ type LoginFormProps = {
   next?: string;
   /** `?error=`: mã lỗi backend gắn lên URL khi đăng nhập Google thất bại. */
   googleError?: string;
-  /** `?reason=`: AppShell gắn khi phiên đang dùng bị kết thúc (hết hạn, tài khoản bị khóa...). */
+  /** `?reason=`: vì sao phải đăng nhập (phiên hết hạn, tài khoản bị khóa, vừa đặt lại mật khẩu...). */
   reason?: string;
+  /** `?email=`: điền sẵn email (sau khi đặt lại mật khẩu / kích hoạt). */
+  initialEmail?: string;
 };
 
-export function LoginForm({ next, googleError, reason }: LoginFormProps) {
+export function LoginForm({ next, googleError, reason, initialEmail }: LoginFormProps) {
   const t = useTranslations("Auth.Login");
   const tAuthErrors = useTranslations("Auth.Errors");
   const tErrors = useTranslations("Errors");
   const tValidation = useTranslations("Auth.Validation");
-  const router = useRouter();
-  const { status } = useCurrentUser();
   const { signIn } = useAuthActions();
-
-  // Đã có phiên thì rời trang đăng nhập: vừa đăng nhập xong, mở /login khi đang đăng nhập (F5 lấy lại phiên),
-  // tab khác vừa đăng nhập, hoặc chế độ mock (luôn coi là đã đăng nhập).
-  useEffect(() => {
-    if (status === "authenticated") router.replace(safeNextPath(next));
-  }, [status, next, router]);
+  useRedirectIfAuthenticated(next);
 
   // Tạo lại schema khi đổi ngôn ngữ để câu báo lỗi của lần kiểm tra sau theo ngôn ngữ mới.
   const schema = useMemo(() => createLoginSchema(tValidation), [tValidation]);
+  const prefilledEmail = useMemo(
+    () =>
+      initialEmail && createEmailSchema(tValidation).safeParse({ email: initialEmail }).success ? initialEmail : "",
+    [initialEmail, tValidation],
+  );
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: prefilledEmail, password: "" },
   });
 
   const mutation = useMutation({
     mutationFn: login,
-    // Lưu phiên; effect ở trên thấy status = authenticated sẽ chuyển trang.
+    // Lưu phiên; useRedirectIfAuthenticated thấy status = authenticated sẽ chuyển trang.
     onSuccess: (response) => signIn(response),
     onError: (error) => {
       applyServerFieldErrors(error, form.setError);
     },
   });
 
-  // Lỗi theo từng ô đã hiện dưới ô; Alert chỉ cho lỗi chung. Thông báo từ URL (lỗi Google, lý do hết phiên)
+  // Lỗi theo từng ô đã hiện dưới ô; Alert chỉ cho lỗi chung. Thông báo từ URL (lỗi Google, lý do phải đăng nhập)
   // ẩn đi sau lần bấm đăng nhập đầu tiên.
   const hasFieldErrors = isApiError(mutation.error) && mutation.error.fieldErrors.length > 0;
   let notice: LoginNotice | null = null;
@@ -77,6 +75,11 @@ export function LoginForm({ next, googleError, reason }: LoginFormProps) {
     notice = googleMessage ? { message: googleMessage, tone: "error" } : getSessionEndNotice(reason, tAuthErrors);
   } else if (mutation.isError && !hasFieldErrors) {
     notice = { message: getLoginErrorMessage(mutation.error, tAuthErrors, tErrors), tone: "error" };
+    // Mật khẩu đúng nhưng tài khoản chưa kích hoạt: dẫn sang trang kích hoạt với email vừa nhập.
+    if (isApiError(mutation.error) && mutation.error.code === "ACCOUNT_NOT_ACTIVATED") {
+      const email = mutation.variables?.email ?? "";
+      notice.action = { href: `/activate?${new URLSearchParams({ email })}`, label: t("activateAccount") };
+    }
   }
 
   const { errors } = form.formState;
@@ -84,17 +87,8 @@ export function LoginForm({ next, googleError, reason }: LoginFormProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="mb-2 flex flex-col gap-1.5">
-        <h1 className="font-heading text-2xl leading-tight font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-      </div>
-
-      {notice && (
-        <Alert variant={notice.tone === "error" ? "destructive" : "default"}>
-          {notice.tone === "error" ? <CircleAlertIcon /> : <InfoIcon />}
-          <AlertDescription>{notice.message}</AlertDescription>
-        </Alert>
-      )}
+      <AuthFormHeader title={t("title")} description={t("subtitle")} />
+      <AuthNotice notice={notice} />
 
       <GoogleSignInButton next={next} />
 
@@ -120,10 +114,7 @@ export function LoginForm({ next, googleError, reason }: LoginFormProps) {
           <Field data-invalid={!!errors.password}>
             <div className="flex items-center">
               <FieldLabel htmlFor="login-password">{t("password")}</FieldLabel>
-              <Link
-                href="/forgot-password"
-                className="ml-auto rounded-sm text-sm text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
-              >
+              <Link href="/forgot-password" className={`${authLinkClassName} ml-auto`}>
                 {t("forgotPassword")}
               </Link>
             </div>
@@ -132,6 +123,7 @@ export function LoginForm({ next, googleError, reason }: LoginFormProps) {
               autoComplete="current-password"
               className="h-9"
               aria-invalid={!!errors.password}
+              autoFocus={!!prefilledEmail}
               {...form.register("password")}
             />
             <FieldError errors={[errors.password]} />

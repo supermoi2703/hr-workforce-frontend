@@ -133,13 +133,49 @@
       "showPassword": "Hiện mật khẩu",
       "hidePassword": "Ẩn mật khẩu",
       "submit": "Đăng nhập",
-      "noAccount": "Chưa có tài khoản? Liên hệ bộ phận nhân sự để được cấp."
+      "noAccount": "Chưa có tài khoản? Liên hệ bộ phận nhân sự để được cấp.",
+      "activateAccount": "Kích hoạt tài khoản"
+    },
+    "ForgotPassword": {
+      "metaTitle": "Đặt lại mật khẩu",
+      "title": "Đặt lại mật khẩu",
+      "requestDescription": "Nhập email công ty, chúng tôi sẽ gửi mã xác thực cho bạn.",
+      "sendCode": "Gửi mã",
+      "codeSent": "Nếu {email} có tài khoản trong hệ thống, mã xác thực đã được gửi tới email này. Mã hết hạn sau vài phút.",
+      "resetDescription": "Nhập mã đã gửi tới {email} và chọn mật khẩu mới.",
+      "submit": "Đặt lại mật khẩu"
+    },
+    "Activate": {
+      "metaTitle": "Kích hoạt tài khoản",
+      "title": "Kích hoạt tài khoản",
+      "description": "Nhập mã trong email mời và đặt mật khẩu cho tài khoản.",
+      "descriptionFor": "Nhập mã đã gửi tới {email} và đặt mật khẩu cho tài khoản.",
+      "submit": "Kích hoạt tài khoản"
+    },
+    "CodeFlow": {
+      "code": "Mã xác thực",
+      "resend": "Gửi lại mã",
+      "resendIn": "Gửi lại mã sau {time}",
+      "resent": "Nếu tài khoản tồn tại, mã mới đã được gửi.",
+      "changeEmail": "Dùng email khác",
+      "backToSignIn": "Quay lại đăng nhập",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Nhập lại mật khẩu"
+    },
+    "PasswordRules": {
+      "title": "Mật khẩu cần có:",
+      "length": "Từ 8 đến 72 ký tự",
+      "letter": "Ít nhất một chữ cái",
+      "digit": "Ít nhất một chữ số"
     },
     "Validation": {
       "emailInvalid": "Email không hợp lệ",
       "emailTooLong": "Email quá dài",
       "passwordRequired": "Vui lòng nhập mật khẩu",
-      "passwordTooLong": "Mật khẩu tối đa 128 ký tự"
+      "passwordTooLong": "Mật khẩu tối đa 128 ký tự",
+      "otpInvalid": "Nhập đủ mã 6 số",
+      "passwordWeak": "Mật khẩu chưa đạt yêu cầu",
+      "passwordMismatch": "Mật khẩu nhập lại không khớp"
     },
     "Errors": {
       "invalidCredentials": "Email hoặc mật khẩu không đúng.",
@@ -153,7 +189,14 @@
       "googleAccountConflict": "Tài khoản này đã liên kết với một tài khoản Google khác. Hãy đăng nhập bằng đúng tài khoản Google đó hoặc bằng mật khẩu.",
       "googleTooManyRequests": "Bạn đã thử đăng nhập Google quá nhiều lần. Vui lòng thử lại sau ít phút.",
       "googleFailed": "Đăng nhập Google không thành công. Vui lòng thử lại.",
-      "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+      "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "passwordResetDone": "Mật khẩu đã được cập nhật. Hãy đăng nhập bằng mật khẩu mới.",
+      "accountActivatedDone": "Tài khoản đã được kích hoạt. Hãy đăng nhập bằng mật khẩu vừa đặt.",
+      "invalidOtp": "Mã không đúng hoặc đã hết hạn. Hãy yêu cầu mã mới.",
+      "weakPassword": "Mật khẩu chưa đạt yêu cầu.",
+      "passwordReused": "Hãy chọn mật khẩu khác với mật khẩu hiện tại.",
+      "tooManyRequests": "Bạn thử quá nhiều lần. Vui lòng thử lại sau {minutes} phút.",
+      "tooManyRequestsSoon": "Bạn thử quá nhiều lần. Vui lòng thử lại sau ít phút."
     },
     "Callback": {
       "signingIn": "Đang đăng nhập..."

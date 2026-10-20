@@ -133,13 +133,49 @@
       "showPassword": "Show password",
       "hidePassword": "Hide password",
       "submit": "Sign in",
-      "noAccount": "Don't have an account? Contact HR to get one."
+      "noAccount": "Don't have an account? Contact HR to get one.",
+      "activateAccount": "Activate account"
+    },
+    "ForgotPassword": {
+      "metaTitle": "Reset password",
+      "title": "Reset your password",
+      "requestDescription": "Enter your work email and we'll send you a verification code.",
+      "sendCode": "Send code",
+      "codeSent": "If an account exists for {email}, we sent a verification code to it. The code expires in a few minutes.",
+      "resetDescription": "Enter the code sent to {email} and choose a new password.",
+      "submit": "Reset password"
+    },
+    "Activate": {
+      "metaTitle": "Activate account",
+      "title": "Activate your account",
+      "description": "Enter the code from your invitation email and choose a password.",
+      "descriptionFor": "Enter the code sent to {email} and choose a password.",
+      "submit": "Activate account"
+    },
+    "CodeFlow": {
+      "code": "Verification code",
+      "resend": "Resend code",
+      "resendIn": "Resend code in {time}",
+      "resent": "If the account exists, a new code has been sent.",
+      "changeEmail": "Use a different email",
+      "backToSignIn": "Back to sign in",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password"
+    },
+    "PasswordRules": {
+      "title": "Your password needs:",
+      "length": "8 to 72 characters",
+      "letter": "At least one letter",
+      "digit": "At least one number"
     },
     "Validation": {
       "emailInvalid": "Enter a valid email address",
       "emailTooLong": "Email is too long",
       "passwordRequired": "Enter your password",
-      "passwordTooLong": "Password must be at most 128 characters"
+      "passwordTooLong": "Password must be at most 128 characters",
+      "otpInvalid": "Enter the 6-digit code",
+      "passwordWeak": "Password doesn't meet the requirements",
+      "passwordMismatch": "Passwords don't match"
     },
     "Errors": {
       "invalidCredentials": "Incorrect email or password.",
@@ -153,7 +189,14 @@
       "googleAccountConflict": "This account is linked to a different Google account. Sign in with that Google account or with your password.",
       "googleTooManyRequests": "Too many Google sign-in attempts. Try again in a few minutes.",
       "googleFailed": "Google sign-in failed. Please try again.",
-      "sessionExpired": "Your session has expired. Please sign in again."
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "passwordResetDone": "Your password has been updated. Sign in with your new password.",
+      "accountActivatedDone": "Your account is activated. Sign in with the password you just set.",
+      "invalidOtp": "The code is incorrect or has expired. Request a new code.",
+      "weakPassword": "Password doesn't meet the requirements.",
+      "passwordReused": "Choose a password different from your current one.",
+      "tooManyRequests": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+      "tooManyRequestsSoon": "Too many attempts. Try again in a few minutes."
     },
     "Callback": {
       "signingIn": "Signing you in..."
