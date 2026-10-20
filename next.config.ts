@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+// Đa ngôn ngữ: cấu hình theo request (đọc cookie ngôn ngữ) ở src/i18n/request.ts.
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 // Backend Spring Boot. Frontend luôn gọi đường dẫn tương đối (/api/...), Next chuyển tiếp sang
 // đây để frontend và backend cùng origin: không cần CORS khi dev, cookie refresh token
@@ -16,4 +20,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

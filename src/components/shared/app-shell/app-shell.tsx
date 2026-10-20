@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { LoadingState } from "../states";
@@ -10,6 +11,7 @@ import { AppSidebar } from "./app-sidebar";
 
 /** Khung trang sau khi đăng nhập: sidebar + header + nội dung. */
 export function AppShell({ children }: { children: ReactNode }) {
+  const t = useTranslations("Shell");
   const { status } = useCurrentUser();
   const router = useRouter();
   const pathname = usePathname();
@@ -22,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [status, router, pathname]);
 
   if (status !== "authenticated") {
-    return <LoadingState className="min-h-svh" label="Đang kiểm tra phiên đăng nhập..." />;
+    return <LoadingState className="min-h-svh" label={t("checkingSession")} />;
   }
 
   return (

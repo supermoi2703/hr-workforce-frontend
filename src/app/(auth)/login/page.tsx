@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/features/auth/components/login-form";
 
-export const metadata: Metadata = {
-  title: "Sign in",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Auth.Login");
+  return { title: t("metaTitle") };
+}
 
 /** `?next=` và `?error=` đọc ở server rồi truyền xuống form, khỏi cần useSearchParams + Suspense. */
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {

@@ -1,4 +1,5 @@
 import { ClipboardCheckIcon, TimerIcon, TreePalmIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { IconTile } from "@/components/shared/icon-tile";
 import { cn } from "@/lib/utils";
@@ -21,8 +22,8 @@ const WEEK = ["done", "done", "done", "today", "future", "future", "future"] as 
  * Hình minh họa nửa phải trang đăng nhập: cửa sổ app HRM thu nhỏ + một thẻ nổi, dựng bằng component thật
  * nên đúng màu theme và tự đổi theo chế độ tối. Toàn bộ phần hình ẩn với trình đọc màn hình.
  */
-// TODO(i18n): tiêu đề và mô tả bên dưới hình.
 export function AuthShowcase() {
+  const t = useTranslations("Auth.Showcase");
   return (
     <div className="flex w-full max-w-lg flex-col gap-10">
       <div aria-hidden className="relative pb-12 pl-12">
@@ -84,15 +85,13 @@ export function AuthShowcase() {
             <Bar className="h-2.5 w-20 bg-muted-foreground/20" />
             <Bar className="w-14" />
           </div>
-          <Badge variant="success">Approved</Badge>
+          <Badge variant="success">{t("approved")}</Badge>
         </div>
       </div>
 
       <div className="flex flex-col gap-2 pl-12">
-        <h2 className="font-heading text-base font-semibold">All your HR work in one place</h2>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          Attendance, leave, payroll and projects for every employee, in a single system.
-        </p>
+        <h2 className="font-heading text-base font-semibold">{t("title")}</h2>
+        <p className="max-w-sm text-sm text-muted-foreground">{t("description")}</p>
       </div>
     </div>
   );

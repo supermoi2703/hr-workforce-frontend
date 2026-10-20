@@ -1,10 +1,17 @@
+import type { Messages } from "next-intl";
 import { z } from "zod";
 
-// Khớp giới hạn của LoginRequest phía backend. Đăng nhập không áp quy tắc độ mạnh mật khẩu.
-// TODO(i18n): chuyển chữ hiển thị sang file dịch khi làm đa ngôn ngữ.
-export const loginSchema = z.object({
-  email: z.email("Enter a valid email address").max(254, "Email is too long"),
-  password: z.string().min(1, "Enter your password").max(128, "Password must be at most 128 characters"),
-});
+type ValidationKey = keyof Messages["Auth"]["Validation"];
 
-export type LoginFormValues = z.infer<typeof loginSchema>;
+/**
+ * Schema form đăng nhập; câu báo lỗi theo ngôn ngữ đang chọn (truyền `useTranslations("Auth.Validation")`).
+ * Khớp giới hạn của LoginRequest phía backend. Đăng nhập không áp quy tắc độ mạnh mật khẩu.
+ */
+export function createLoginSchema(t: (key: ValidationKey) => string) {
+  return z.object({
+    email: z.email(t("emailInvalid")).max(254, t("emailTooLong")),
+    password: z.string().min(1, t("passwordRequired")).max(128, t("passwordTooLong")),
+  });
+}
+
+export type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>;

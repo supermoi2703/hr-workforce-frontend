@@ -2,6 +2,7 @@
 
 import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { PageResponse } from "@/lib/api/types";
@@ -20,6 +21,7 @@ export function DataTablePagination({
   onPaginationChange,
   pageSizeOptions = [10, 20, 50, 100],
 }: DataTablePaginationProps) {
+  const t = useTranslations("DataTable");
   const { pageIndex, pageSize } = pagination;
   const lastPage = Math.max(page.totalPages - 1, 0);
   const from = page.totalElements === 0 ? 0 : pageIndex * pageSize + 1;
@@ -29,16 +31,16 @@ export function DataTablePagination({
   return (
     <div className="flex flex-col-reverse gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
       <p>
-        Hiển thị {formatNumber(from)}–{formatNumber(to)} / {formatNumber(page.totalElements)} dòng
+        {t("summary", { from: formatNumber(from), to: formatNumber(to), total: formatNumber(page.totalElements) })}
       </p>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="hidden sm:inline">Số dòng</span>
+          <span className="hidden sm:inline">{t("rows")}</span>
           <Select
             value={String(pageSize)}
             onValueChange={(value) => onPaginationChange({ pageIndex: 0, pageSize: Number(value) })}
           >
-            <SelectTrigger size="sm" className="w-18" aria-label="Số dòng mỗi trang">
+            <SelectTrigger size="sm" className="w-18" aria-label={t("rowsPerPage")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -51,19 +53,19 @@ export function DataTablePagination({
           </Select>
         </div>
         <span className="whitespace-nowrap">
-          Trang {pageIndex + 1}/{Math.max(page.totalPages, 1)}
+          {t("pageOf", { page: pageIndex + 1, pages: Math.max(page.totalPages, 1) })}
         </span>
         <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon-sm" onClick={() => goTo(0)} disabled={pageIndex === 0} aria-label="Trang đầu">
+          <Button variant="outline" size="icon-sm" onClick={() => goTo(0)} disabled={pageIndex === 0} aria-label={t("firstPage")}>
             <ChevronsLeftIcon />
           </Button>
-          <Button variant="outline" size="icon-sm" onClick={() => goTo(pageIndex - 1)} disabled={pageIndex === 0} aria-label="Trang trước">
+          <Button variant="outline" size="icon-sm" onClick={() => goTo(pageIndex - 1)} disabled={pageIndex === 0} aria-label={t("previousPage")}>
             <ChevronLeftIcon />
           </Button>
-          <Button variant="outline" size="icon-sm" onClick={() => goTo(pageIndex + 1)} disabled={pageIndex >= lastPage} aria-label="Trang sau">
+          <Button variant="outline" size="icon-sm" onClick={() => goTo(pageIndex + 1)} disabled={pageIndex >= lastPage} aria-label={t("nextPage")}>
             <ChevronRightIcon />
           </Button>
-          <Button variant="outline" size="icon-sm" onClick={() => goTo(lastPage)} disabled={pageIndex >= lastPage} aria-label="Trang cuối">
+          <Button variant="outline" size="icon-sm" onClick={() => goTo(lastPage)} disabled={pageIndex >= lastPage} aria-label={t("lastPage")}>
             <ChevronsRightIcon />
           </Button>
         </div>

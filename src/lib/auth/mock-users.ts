@@ -27,13 +27,6 @@ const NAMES: Record<RoleCode, string> = {
   EMPLOYEE: "Nhân viên (demo)",
 };
 
-export const ROLE_LABELS: Record<RoleCode, string> = {
-  ADMIN: "Quản trị",
-  HR: "Nhân sự",
-  MANAGER: "Quản lý",
-  EMPLOYEE: "Nhân viên",
-};
-
 export function createMockUser(role: RoleCode): CurrentUser {
   return {
     id: `00000000-0000-7000-8000-00000000000${["ADMIN", "HR", "MANAGER", "EMPLOYEE"].indexOf(role) + 1}`,

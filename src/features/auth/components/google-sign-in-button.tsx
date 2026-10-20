@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { GOOGLE_LOGIN_URL } from "../api";
@@ -7,6 +8,7 @@ import { GOOGLE_LOGIN_URL } from "../api";
  * xong backend chuyển về /auth/callback hoặc /login?error=CODE.
  */
 export function GoogleSignInButton({ className }: { className?: string }) {
+  const t = useTranslations("Auth.Login");
   return (
     // bg-card: trang đăng nhập nền trắng (card), còn outline mặc định dùng bg-background (xám).
     <a
@@ -14,7 +16,7 @@ export function GoogleSignInButton({ className }: { className?: string }) {
       className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full bg-card", className)}
     >
       <GoogleLogo />
-      Continue with Google
+      {t("google")}
     </a>
   );
 }

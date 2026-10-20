@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { CircleAlertIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -16,7 +18,7 @@ import { applyServerFieldErrors } from "@/lib/forms";
 import { login } from "../api";
 import { getGoogleErrorMessage, getLoginErrorMessage } from "../error-messages";
 import { safeNextPath } from "../next-path";
-import { loginSchema, type LoginFormValues } from "../schemas";
+import { createLoginSchema, type LoginFormValues } from "../schemas";
 import { GoogleSignInButton } from "./google-sign-in-button";
 import { PasswordInput } from "./password-input";
 
@@ -27,11 +29,17 @@ type LoginFormProps = {
   googleError?: string;
 };
 
-// TODO(i18n): chữ hiển thị trong file này.
 export function LoginForm({ next, googleError }: LoginFormProps) {
+  const t = useTranslations("Auth.Login");
+  const tAuthErrors = useTranslations("Auth.Errors");
+  const tErrors = useTranslations("Errors");
+  const tValidation = useTranslations("Auth.Validation");
   const router = useRouter();
+
+  // Tạo lại schema khi đổi ngôn ngữ để câu báo lỗi của lần kiểm tra sau theo ngôn ngữ mới.
+  const schema = useMemo(() => createLoginSchema(tValidation), [tValidation]);
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
   });
 
@@ -51,9 +59,9 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
   const hasFieldErrors = isApiError(mutation.error) && mutation.error.fieldErrors.length > 0;
   const alertMessage =
     mutation.status === "idle"
-      ? getGoogleErrorMessage(googleError)
+      ? getGoogleErrorMessage(googleError, tAuthErrors)
       : mutation.isError && !hasFieldErrors
-        ? getLoginErrorMessage(mutation.error)
+        ? getLoginErrorMessage(mutation.error, tAuthErrors, tErrors)
         : null;
 
   const { errors } = form.formState;
@@ -62,8 +70,8 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
   return (
     <div className="flex flex-col gap-6">
       <div className="mb-2 flex flex-col gap-1.5">
-        <h1 className="font-heading text-2xl leading-tight font-semibold tracking-tight">Sign in</h1>
-        <p className="text-sm text-muted-foreground">Use your work email to continue.</p>
+        <h1 className="font-heading text-2xl leading-tight font-semibold tracking-tight">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {alertMessage && (
@@ -76,17 +84,17 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
       <GoogleSignInButton />
 
       {/* Nền chữ "or" phải trùng nền trang (bg-card) để che đường kẻ. */}
-      <FieldSeparator className="my-0 *:data-[slot=field-separator-content]:bg-card">or</FieldSeparator>
+      <FieldSeparator className="my-0 *:data-[slot=field-separator-content]:bg-card">{t("or")}</FieldSeparator>
 
       <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
         <FieldGroup className="gap-4">
           <Field data-invalid={!!errors.email}>
-            <FieldLabel htmlFor="login-email">Email</FieldLabel>
+            <FieldLabel htmlFor="login-email">{t("email")}</FieldLabel>
             <Input
               id="login-email"
               type="email"
               autoComplete="email"
-              placeholder="name@company.com"
+              placeholder={t("emailPlaceholder")}
               className="h-9"
               aria-invalid={!!errors.email}
               {...form.register("email")}
@@ -96,12 +104,12 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
 
           <Field data-invalid={!!errors.password}>
             <div className="flex items-center">
-              <FieldLabel htmlFor="login-password">Password</FieldLabel>
+              <FieldLabel htmlFor="login-password">{t("password")}</FieldLabel>
               <Link
                 href="/forgot-password"
                 className="ml-auto rounded-sm text-sm text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
               >
-                Forgot password?
+                {t("forgotPassword")}
               </Link>
             </div>
             <PasswordInput
@@ -116,12 +124,12 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
 
           <Button type="submit" size="lg" className="mt-2 w-full" disabled={submitting}>
             {submitting && <Spinner />}
-            Sign in
+            {t("submit")}
           </Button>
         </FieldGroup>
       </form>
 
-      <p className="text-sm text-muted-foreground">Don&apos;t have an account? Contact HR to get one.</p>
+      <p className="text-sm text-muted-foreground">{t("noAccount")}</p>
     </div>
   );
 }

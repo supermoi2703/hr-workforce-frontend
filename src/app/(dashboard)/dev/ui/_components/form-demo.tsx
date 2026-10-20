@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { getErrorMessage } from "@/lib/api/errors";
+import { useErrorMessage } from "@/lib/api/use-error-message";
 import { applyServerFieldErrors } from "@/lib/forms";
 import { createDemoEmployee } from "./demo-api";
 
@@ -22,6 +22,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function FormDemo() {
+  const errorMessage = useErrorMessage();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { fullName: "", email: "" },
@@ -35,7 +36,7 @@ export function FormDemo() {
     },
     onError: (error) => {
       // Lỗi theo từng ô (ApiResponse.errors) gắn vào form; lỗi khác báo bằng toast.
-      if (!applyServerFieldErrors(error, form.setError)) toast.error(getErrorMessage(error));
+      if (!applyServerFieldErrors(error, form.setError)) toast.error(errorMessage(error));
     },
   });
 

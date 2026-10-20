@@ -1,0 +1,163 @@
+{
+  "Metadata": {
+    "title": "HRM Workforce",
+    "description": "HR and workforce management system"
+  },
+  "Common": {
+    "retry": "Try again",
+    "backToHome": "Back to home",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "Language": {
+    "label": "Change language"
+  },
+  "Theme": {
+    "label": "Change theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Nav": {
+    "tagline": "HR and workforce management",
+    "groups": {
+      "overview": "Overview",
+      "people": "People",
+      "timePay": "Time & pay",
+      "organization": "Organization & workforce",
+      "aiLab": "AI lab",
+      "admin": "Administration",
+      "dev": "Development"
+    },
+    "items": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "approvals": "Approvals",
+      "employees": "Employees",
+      "contracts": "Contracts",
+      "attendance": "Attendance",
+      "timesheets": "Timesheets",
+      "leave": "Leave & WFH",
+      "payroll": "Payroll",
+      "payslips": "Payslips",
+      "organization": "Organization",
+      "officeCalendar": "Office calendar",
+      "skills": "Skills",
+      "projects": "Projects",
+      "allocations": "Staff allocation",
+      "faceAttendance": "Face check-in",
+      "policyQa": "Policy Q&A",
+      "allocationSuggest": "Allocation suggestions",
+      "dataQa": "Data Q&A",
+      "users": "Accounts",
+      "roles": "Roles & permissions",
+      "devUi": "UI components",
+      "devError": "Error page demo"
+    }
+  },
+  "Shell": {
+    "checkingSession": "Checking your session...",
+    "account": "Account",
+    "signOut": "Sign out",
+    "roleLabel": "Role:",
+    "demoSignIn": "Demo sign-in"
+  },
+  "Roles": {
+    "ADMIN": "Admin",
+    "HR": "HR",
+    "MANAGER": "Manager",
+    "EMPLOYEE": "Employee"
+  },
+  "States": {
+    "loading": "Loading data...",
+    "errorTitle": "Couldn't load data",
+    "emptyTitle": "No data yet",
+    "forbiddenTitle": "You don't have access to this page",
+    "forbiddenDescription": "Contact an administrator if you need access.",
+    "comingSoonTitle": "In development",
+    "comingSoonDescription": "This feature is being built.",
+    "comingSoonTask": "Task {task}",
+    "comingSoonOwner": "Owner: {owner}"
+  },
+  "DataTable": {
+    "summary": "Showing {from}–{to} of {total} rows",
+    "rows": "Rows",
+    "rowsPerPage": "Rows per page",
+    "pageOf": "Page {page} of {pages}",
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page"
+  },
+  "Errors": {
+    "network": "Can't reach the server. Check your connection and try again.",
+    "unexpectedResponse": "The server returned an invalid response.",
+    "validation": "Some fields are invalid. Please check and try again.",
+    "unauthorized": "Your session has expired. Please sign in again.",
+    "forbidden": "You don't have permission to do this.",
+    "notFound": "The data could not be found.",
+    "conflict": "The data was changed or already exists. Reload and try again.",
+    "tooManyRequests": "Too many requests. Please try again in a few minutes.",
+    "internal": "Something went wrong on the server. Please try again later.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The link doesn't exist or has changed."
+  },
+  "ErrorPage": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred while showing this page.",
+    "code": "Error code: {digest}"
+  },
+  "System": {
+    "title": "Backend connection",
+    "interval": "Checked every 30 seconds",
+    "recheck": "Check again",
+    "checking": "Checking...",
+    "down": "Can't connect",
+    "up": "Running",
+    "updatedAt": "Updated at {time}"
+  },
+  "Auth": {
+    "Login": {
+      "metaTitle": "Sign in",
+      "title": "Sign in",
+      "subtitle": "Use your work email to continue.",
+      "google": "Continue with Google",
+      "or": "or",
+      "email": "Email",
+      "emailPlaceholder": "name@company.com",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account? Contact HR to get one."
+    },
+    "Validation": {
+      "emailInvalid": "Enter a valid email address",
+      "emailTooLong": "Email is too long",
+      "passwordRequired": "Enter your password",
+      "passwordTooLong": "Password must be at most 128 characters"
+    },
+    "Errors": {
+      "invalidCredentials": "Incorrect email or password.",
+      "tooManyAttempts": "Too many failed sign-in attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+      "tooManyAttemptsSoon": "Too many failed sign-in attempts. Try again in a few minutes.",
+      "accountNotActivated": "Your account is not activated yet. Use the code in your invitation email to activate it.",
+      "accountLocked": "Your account is locked. Contact HR to unlock it.",
+      "accountDisabled": "Your account has been disabled. Contact HR if you need access again.",
+      "googleAccountNotFound": "This Google email doesn't have an account. Contact HR to get one.",
+      "googleEmailNotVerified": "Your Google email isn't verified. Verify it with Google, then try again.",
+      "googleAccountConflict": "This account is linked to a different Google account. Sign in with that Google account or with your password.",
+      "googleTooManyRequests": "Too many Google sign-in attempts. Try again in a few minutes.",
+      "googleFailed": "Google sign-in failed. Please try again."
+    },
+    "Showcase": {
+      "title": "All your HR work in one place",
+      "description": "Attendance, leave, payroll and projects for every employee, in a single system.",
+      "approved": "Approved"
+    }
+  }
+}
