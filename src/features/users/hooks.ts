@@ -9,17 +9,22 @@ import { ROLES, type RoleCode } from "@/lib/auth/types";
 import {
   assignRoles,
   changeUserStatus,
+  createRole,
   createUser,
+  deleteRole,
   forceLogout,
+  getPermissions,
+  getRole,
   getRoles,
   getUser,
   getUserSessions,
   resendActivation,
   searchUsers,
+  updateRole,
   updateUser,
   type UserStatusAction,
 } from "./api";
-import type { UserListFilters } from "./types";
+import type { RoleInput, UserListFilters } from "./types";
 
 /** Query key của domain tài khoản. Mọi key bắt đầu bằng "users" để invalidate cả nhóm sau khi sửa. */
 export const userKeys = {
@@ -28,7 +33,46 @@ export const userKeys = {
   detail: (id: string) => ["users", "detail", id] as const,
   sessions: (id: string) => ["users", "sessions", id] as const,
   roles: ["users", "roles"] as const,
+  role: (code: string) => ["users", "roles", code] as const,
+  permissions: ["users", "permissions"] as const,
 };
+
+// ----- Vai trò & quyền -----
+
+export function useRole(code: string) {
+  return useQuery({ queryKey: userKeys.role(code), queryFn: () => getRole(code) });
+}
+
+/** Danh sách quyền: chỉ đổi khi backend thêm migration, nên giữ lâu. */
+export function usePermissions() {
+  return useQuery({ queryKey: userKeys.permissions, queryFn: getPermissions, staleTime: 30 * 60_000 });
+}
+
+// Sửa / tạo / xóa role: invalidate cả nhóm "users" vì nhãn role và số người giữ hiện ở cả bảng tài khoản.
+
+export function useCreateRole() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createRole,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all }),
+  });
+}
+
+export function useUpdateRole(code: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: RoleInput) => updateRole(code, body),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all }),
+  });
+}
+
+export function useDeleteRole() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteRole,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all }),
+  });
+}
 
 /** Khóa / mở khóa / vô hiệu hóa / kích hoạt lại; xong thì tải lại danh sách, chi tiết, phiên (khóa thu hồi phiên). */
 export function useUserStatusAction() {

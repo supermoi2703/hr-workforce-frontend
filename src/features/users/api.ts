@@ -1,6 +1,16 @@
 import { http, toPageQuery } from "@/lib/api/http-client";
 import type { PageParams, PageResponse } from "@/lib/api/types";
-import type { CreateUserRequest, RoleSummary, UserDetail, UserListFilters, UserSession, UserSummary } from "./types";
+import type {
+  CreateRoleInput,
+  CreateUserRequest,
+  PermissionInfo,
+  RoleInput,
+  RoleSummary,
+  UserDetail,
+  UserListFilters,
+  UserSession,
+  UserSummary,
+} from "./types";
 
 /** Tìm kiếm tài khoản (user:read). Sắp xếp được: email, displayName, status, createdAt, lastLoginAt. */
 export const searchUsers = (filters: UserListFilters, params: PageParams) =>
@@ -40,3 +50,20 @@ export const forceLogout = (id: string) => http.post<void>(`/api/users/${encodeU
 
 /** Danh sách role (role:read): cho bộ lọc và ô chọn role. */
 export const getRoles = () => http.get<RoleSummary[]>("/api/roles");
+
+// ----- Vai trò & quyền (/admin/roles) -----
+
+export const getRole = (code: string) => http.get<RoleSummary>(`/api/roles/${encodeURIComponent(code)}`);
+
+/** Danh sách mọi quyền (role:read). */
+export const getPermissions = () => http.get<PermissionInfo[]>("/api/permissions");
+
+/** Tạo role tự đặt (role:manage). */
+export const createRole = (body: CreateRoleInput) => http.post<RoleSummary>("/api/roles", body);
+
+/** Sửa tên, mô tả, toàn bộ quyền (role:manage); role ADMIN bị khóa. Có hiệu lực ngay với người đang giữ role. */
+export const updateRole = (code: string, body: RoleInput) =>
+  http.put<RoleSummary>(`/api/roles/${encodeURIComponent(code)}`, body);
+
+/** Xóa role tự đặt chưa có ai giữ (role:manage). */
+export const deleteRole = (code: string) => http.delete<void>(`/api/roles/${encodeURIComponent(code)}`);

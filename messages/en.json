@@ -263,7 +263,11 @@
       "adminProtected": "Only administrators can change administrator accounts or the Admin role.",
       "invalidStatus": "The account status has changed. Reload and try again.",
       "roleNotFound": "One of the selected roles no longer exists. Reload and try again.",
-      "resendTooSoon": "Wait a minute before sending another code."
+      "resendTooSoon": "Wait a minute before sending another code.",
+      "roleCodeExists": "A role with this code already exists.",
+      "roleInUse": "Some accounts still have this role. Remove it from them first.",
+      "systemRoleProtected": "System roles can't be changed this way.",
+      "permissionNotFound": "A selected permission no longer exists. Reload and try again."
     },
     "Actions": {
       "menu": "Actions",
@@ -311,6 +315,113 @@
       "self": "This is your own account. Manage your password and devices from your",
       "selfLink": "Account page",
       "adminProtected": "Only administrators can manage administrator accounts."
+    }
+  },
+  "RoleAdmin": {
+    "metaTitle": "Roles & permissions",
+    "List": {
+      "title": "Roles & permissions",
+      "description": "Choose what each role can do. Changes apply immediately to everyone with the role.",
+      "create": "Create role",
+      "allPermissions": "All"
+    },
+    "Columns": {
+      "role": "Role",
+      "code": "Code",
+      "type": "Type",
+      "permissions": "Permissions",
+      "people": "People"
+    },
+    "Types": {
+      "system": "System",
+      "custom": "Custom",
+      "locked": "Locked"
+    },
+    "Create": {
+      "title": "Create role",
+      "description": "Choose the permissions on the next screen.",
+      "code": "Code",
+      "codeHint": "Uppercase letters, digits or underscores, e.g. ACCOUNTANT. Can't be changed later.",
+      "name": "Name",
+      "descriptionLabel": "Description",
+      "submit": "Create role",
+      "success": "Role {name} created. Choose its permissions."
+    },
+    "Detail": {
+      "metaTitle": "Role details",
+      "back": "Back to roles",
+      "people": "{count, plural, =0 {No one has this role} one {# person has this role} other {# people have this role}}",
+      "name": "Name",
+      "description": "Description",
+      "permissions": "Permissions",
+      "save": "Save changes",
+      "discard": "Discard",
+      "saved": "Role saved.",
+      "lockedNote": "The Admin role always has every permission and can't be changed.",
+      "readOnlyNote": "You can view this role but not change it.",
+      "delete": "Delete role",
+      "deleted": "Role {name} deleted.",
+      "systemCantDelete": "System roles can't be deleted.",
+      "inUseCantDelete": "Remove this role from {count, plural, one {# account} other {# accounts}} before deleting it.",
+      "notFound": "Role not found",
+      "notFoundDescription": "This role doesn't exist or the link is wrong."
+    },
+    "Confirm": {
+      "removeTitle": "Remove {count, plural, one {# permission} other {# permissions}} from {name}?",
+      "removeDescription": "This takes effect immediately for {people, plural, one {# person} other {# people}} with this role.",
+      "removeConfirm": "Save changes",
+      "deleteTitle": "Delete role {name}?",
+      "deleteDescription": "The role is removed permanently. No account has it right now."
+    },
+    "groups": {
+      "user": "Accounts",
+      "role": "Roles",
+      "session": "Sign-in sessions",
+      "audit": "Audit log"
+    },
+    "Validation": {
+      "codeInvalid": "Use 3–50 uppercase letters, digits or underscores, starting with a letter",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Name must be at most 100 characters",
+      "descriptionTooLong": "Description must be at most 500 characters"
+    }
+  },
+  "Permissions": {
+    "user_read": {
+      "name": "View accounts",
+      "description": "See the account list and account details"
+    },
+    "user_create": {
+      "name": "Create accounts",
+      "description": "Create accounts and resend activation codes"
+    },
+    "user_update": {
+      "name": "Edit accounts",
+      "description": "Change account details such as the display name"
+    },
+    "user_lock": {
+      "name": "Lock accounts",
+      "description": "Lock, unlock or disable accounts and sign people out"
+    },
+    "role_read": {
+      "name": "View roles",
+      "description": "See roles and their permissions"
+    },
+    "role_assign": {
+      "name": "Assign roles",
+      "description": "Change the roles of an account"
+    },
+    "role_manage": {
+      "name": "Manage roles",
+      "description": "Create, edit and delete roles and their permissions"
+    },
+    "session_read_all": {
+      "name": "View everyone's sessions",
+      "description": "See the devices any account is signed in on"
+    },
+    "audit_read": {
+      "name": "View audit log",
+      "description": "See the security and administration audit log"
     }
   },
   "Auth": {

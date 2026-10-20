@@ -75,7 +75,7 @@ export function CreateUserDialog() {
         onError: (error) => {
           if (applyServerFieldErrors(error, form.setError)) return;
           const { field, message } = getUserError(error, tUserErrors, tErrors);
-          if (field) form.setError(field, { type: "server", message }, { shouldFocus: true });
+          if (field === "email") form.setError("email", { type: "server", message }, { shouldFocus: true });
         },
       },
     );

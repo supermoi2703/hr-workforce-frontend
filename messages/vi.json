@@ -263,7 +263,11 @@
       "adminProtected": "Chỉ quản trị viên mới thay đổi được tài khoản quản trị hoặc vai trò Quản trị.",
       "invalidStatus": "Trạng thái tài khoản vừa thay đổi. Hãy tải lại rồi thử lại.",
       "roleNotFound": "Một vai trò đã chọn không còn tồn tại. Hãy tải lại rồi thử lại.",
-      "resendTooSoon": "Hãy chờ một phút trước khi gửi mã mới."
+      "resendTooSoon": "Hãy chờ một phút trước khi gửi mã mới.",
+      "roleCodeExists": "Đã có vai trò dùng mã này.",
+      "roleInUse": "Vẫn còn tài khoản giữ vai trò này. Hãy gỡ khỏi các tài khoản đó trước.",
+      "systemRoleProtected": "Không thể thay đổi vai trò hệ thống theo cách này.",
+      "permissionNotFound": "Một quyền đã chọn không còn tồn tại. Hãy tải lại rồi thử lại."
     },
     "Actions": {
       "menu": "Thao tác",
@@ -311,6 +315,113 @@
       "self": "Đây là tài khoản của bạn. Quản lý mật khẩu và thiết bị tại",
       "selfLink": "trang Tài khoản",
       "adminProtected": "Chỉ quản trị viên mới quản lý được tài khoản quản trị."
+    }
+  },
+  "RoleAdmin": {
+    "metaTitle": "Vai trò & quyền",
+    "List": {
+      "title": "Vai trò & quyền",
+      "description": "Chọn mỗi vai trò được làm gì. Thay đổi có hiệu lực ngay với mọi người giữ vai trò đó.",
+      "create": "Tạo vai trò",
+      "allPermissions": "Tất cả"
+    },
+    "Columns": {
+      "role": "Vai trò",
+      "code": "Mã",
+      "type": "Loại",
+      "permissions": "Quyền",
+      "people": "Số người"
+    },
+    "Types": {
+      "system": "Hệ thống",
+      "custom": "Tự tạo",
+      "locked": "Khóa"
+    },
+    "Create": {
+      "title": "Tạo vai trò",
+      "description": "Chọn quyền cho vai trò ở màn hình tiếp theo.",
+      "code": "Mã",
+      "codeHint": "Chữ HOA, chữ số hoặc dấu gạch dưới, vd KE_TOAN. Không đổi được sau khi tạo.",
+      "name": "Tên",
+      "descriptionLabel": "Mô tả",
+      "submit": "Tạo vai trò",
+      "success": "Đã tạo vai trò {name}. Hãy chọn quyền cho vai trò."
+    },
+    "Detail": {
+      "metaTitle": "Chi tiết vai trò",
+      "back": "Quay lại danh sách",
+      "people": "{count, plural, =0 {Chưa ai có vai trò này} other {# người có vai trò này}}",
+      "name": "Tên",
+      "description": "Mô tả",
+      "permissions": "Quyền",
+      "save": "Lưu thay đổi",
+      "discard": "Hủy thay đổi",
+      "saved": "Đã lưu vai trò.",
+      "lockedNote": "Vai trò Quản trị luôn có mọi quyền và không thể thay đổi.",
+      "readOnlyNote": "Bạn chỉ xem được, không sửa được vai trò này.",
+      "delete": "Xóa vai trò",
+      "deleted": "Đã xóa vai trò {name}.",
+      "systemCantDelete": "Không thể xóa vai trò hệ thống.",
+      "inUseCantDelete": "Hãy gỡ vai trò này khỏi {count} tài khoản trước khi xóa.",
+      "notFound": "Không tìm thấy vai trò",
+      "notFoundDescription": "Vai trò không tồn tại hoặc đường dẫn bị sai."
+    },
+    "Confirm": {
+      "removeTitle": "Bỏ {count} quyền khỏi {name}?",
+      "removeDescription": "Thay đổi có hiệu lực ngay với {people} người đang giữ vai trò này.",
+      "removeConfirm": "Lưu thay đổi",
+      "deleteTitle": "Xóa vai trò {name}?",
+      "deleteDescription": "Vai trò bị xóa vĩnh viễn. Hiện không có tài khoản nào giữ vai trò này."
+    },
+    "groups": {
+      "user": "Tài khoản",
+      "role": "Vai trò",
+      "session": "Phiên đăng nhập",
+      "audit": "Nhật ký hệ thống"
+    },
+    "Validation": {
+      "codeInvalid": "Dùng 3–50 chữ HOA, chữ số hoặc dấu gạch dưới, bắt đầu bằng chữ",
+      "nameRequired": "Vui lòng nhập tên",
+      "nameTooLong": "Tên tối đa 100 ký tự",
+      "descriptionTooLong": "Mô tả tối đa 500 ký tự"
+    }
+  },
+  "Permissions": {
+    "user_read": {
+      "name": "Xem tài khoản",
+      "description": "Xem danh sách và chi tiết tài khoản"
+    },
+    "user_create": {
+      "name": "Tạo tài khoản",
+      "description": "Tạo tài khoản và gửi lại mã kích hoạt"
+    },
+    "user_update": {
+      "name": "Sửa tài khoản",
+      "description": "Sửa thông tin tài khoản như tên hiển thị"
+    },
+    "user_lock": {
+      "name": "Khóa tài khoản",
+      "description": "Khóa, mở khóa, vô hiệu hóa tài khoản và buộc đăng xuất"
+    },
+    "role_read": {
+      "name": "Xem vai trò",
+      "description": "Xem vai trò và quyền của từng vai trò"
+    },
+    "role_assign": {
+      "name": "Gán vai trò",
+      "description": "Đổi vai trò của một tài khoản"
+    },
+    "role_manage": {
+      "name": "Quản lý vai trò",
+      "description": "Tạo, sửa, xóa vai trò và quyền của vai trò"
+    },
+    "session_read_all": {
+      "name": "Xem phiên của mọi người",
+      "description": "Xem các thiết bị mà mọi tài khoản đang đăng nhập"
+    },
+    "audit_read": {
+      "name": "Xem nhật ký hệ thống",
+      "description": "Xem nhật ký bảo mật và quản trị"
     }
   },
   "Auth": {

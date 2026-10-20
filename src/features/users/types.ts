@@ -50,3 +50,20 @@ export type CreateUserRequest = {
   displayName: string;
   roleCodes: string[];
 };
+
+/** Một quyền (PermissionResponse của GET /api/permissions). Tên / mô tả tiếng Anh từ backend, dùng khi chưa có bản dịch. */
+export type PermissionInfo = {
+  code: string;
+  name: string;
+  description: string | null;
+};
+
+/** Body của PUT /api/roles/{code}: thay tên, mô tả và TOÀN BỘ quyền. */
+export type RoleInput = {
+  name: string;
+  description: string | null;
+  permissionCodes: string[];
+};
+
+/** Body của POST /api/roles. Mã viết HOA, không đổi được sau khi tạo. */
+export type CreateRoleInput = RoleInput & { code: string };

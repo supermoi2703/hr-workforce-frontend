@@ -13,15 +13,26 @@ const ERROR_KEYS: Record<string, UsersErrorKey> = {
   INVALID_STATUS_TRANSITION: "invalidStatus",
   ROLE_NOT_FOUND: "roleNotFound",
   ACTIVATION_RESEND_TOO_SOON: "resendTooSoon",
+  // Vai trò
+  ROLE_CODE_EXISTS: "roleCodeExists",
+  ROLE_IN_USE: "roleInUse",
+  SYSTEM_ROLE_PROTECTED: "systemRoleProtected",
+  PERMISSION_NOT_FOUND: "permissionNotFound",
 };
 
-/** Lỗi của form tài khoản: gắn vào ô nào (email trùng → ô email), hoặc `null` = Alert chung. */
-export type UserFormError = { field: "email" | null; message: string };
+/** Mã lỗi gắn vào một ô của form thay vì Alert chung. */
+const FIELD_ERRORS: Record<string, "email" | "code"> = {
+  EMAIL_ALREADY_EXISTS: "email",
+  ROLE_CODE_EXISTS: "code",
+};
+
+/** Lỗi của form tài khoản / vai trò: gắn vào ô nào (email trùng → ô email, mã role trùng → ô mã), hoặc `null` = Alert chung. */
+export type UserFormError = { field: "email" | "code" | null; message: string };
 
 export function getUserError(error: unknown, t: UsersErrorsTranslator, tErrors: ErrorsTranslator): UserFormError {
   if (isApiError(error)) {
     const key = ERROR_KEYS[error.code];
-    if (key) return { field: error.code === "EMAIL_ALREADY_EXISTS" ? "email" : null, message: t(key) };
+    if (key) return { field: FIELD_ERRORS[error.code] ?? null, message: t(key) };
   }
   return { field: null, message: getErrorMessage(error, tErrors) };
 }
