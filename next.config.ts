@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: "/api/:path*", destination: `${backendUrl}/api/:path*` },
+      // Nút "Continue with Google": bắt đầu luồng OAuth2 của backend (Spring tự chuyển sang Google).
+      { source: "/oauth2/:path*", destination: `${backendUrl}/oauth2/:path*` },
       { source: "/actuator/health", destination: `${backendUrl}/actuator/health` },
     ];
   },

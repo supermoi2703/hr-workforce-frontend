@@ -64,9 +64,23 @@ function isApiResponse(value: unknown): value is ApiResponse<unknown> {
   return typeof value === "object" && value !== null && "success" in value && "code" in value;
 }
 
-function toApiError(status: number, body: unknown): ApiError {
+/** Header `Retry-After` dạng số giây (backend không dùng dạng ngày giờ). */
+function readRetryAfter(headers?: Headers): number | undefined {
+  const value = headers?.get("Retry-After");
+  if (!value) return undefined;
+  const seconds = Number(value);
+  return Number.isFinite(seconds) && seconds >= 0 ? seconds : undefined;
+}
+
+function toApiError(status: number, body: unknown, headers?: Headers): ApiError {
   if (isApiResponse(body)) {
-    return new ApiError({ status, code: body.code, message: body.message, fieldErrors: body.errors });
+    return new ApiError({
+      status,
+      code: body.code,
+      message: body.message,
+      fieldErrors: body.errors,
+      retryAfterSeconds: readRetryAfter(headers),
+    });
   }
   // Không phải ApiResponse: thường là backend chưa chạy (proxy trả 500) hoặc lỗi hạ tầng.
   const code = status >= 500 || status === 0 ? CLIENT_ERROR_CODES.NETWORK_ERROR : CLIENT_ERROR_CODES.UNEXPECTED_RESPONSE;
@@ -124,7 +138,7 @@ export async function request<T>(method: string, path: string, options: RequestO
   }
 
   if (!response.ok || (isApiResponse(body) && !body.success)) {
-    throw toApiError(response.status, body);
+    throw toApiError(response.status, body, response.headers);
   }
 
   if (options.envelope === false) return body as T;

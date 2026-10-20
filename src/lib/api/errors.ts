@@ -11,13 +11,22 @@ export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
   readonly fieldErrors: FieldError[];
+  /** Số giây phải chờ (header `Retry-After` của lỗi 429), nếu backend gửi. */
+  readonly retryAfterSeconds?: number;
 
-  constructor(options: { status: number; code: string; message: string; fieldErrors?: FieldError[] }) {
+  constructor(options: {
+    status: number;
+    code: string;
+    message: string;
+    fieldErrors?: FieldError[];
+    retryAfterSeconds?: number;
+  }) {
     super(options.message);
     this.name = "ApiError";
     this.status = options.status;
     this.code = options.code;
     this.fieldErrors = options.fieldErrors ?? [];
+    this.retryAfterSeconds = options.retryAfterSeconds;
   }
 }
 
