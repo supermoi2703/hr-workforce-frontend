@@ -16,9 +16,15 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 type ConfirmDialogProps = {
-  /** Phần tử mở hộp thoại, vd. `<Button variant="destructive" />`. */
-  trigger: ReactElement;
-  triggerLabel: ReactNode;
+  /**
+   * Phần tử mở hộp thoại, vd. `<Button variant="destructive" />`. Bỏ trống khi mở từ nơi khác
+   * (vd. một mục trong DropdownMenu) bằng `open` / `onOpenChange`.
+   */
+  trigger?: ReactElement;
+  triggerLabel?: ReactNode;
+  /** Điều khiển từ ngoài (không có thì hộp thoại tự giữ trạng thái đóng / mở). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   title: string;
   description?: ReactNode;
   confirmLabel?: string;
@@ -35,6 +41,8 @@ type ConfirmDialogProps = {
 export function ConfirmDialog({
   trigger,
   triggerLabel,
+  open: controlledOpen,
+  onOpenChange,
   title,
   description,
   confirmLabel,
@@ -43,8 +51,14 @@ export function ConfirmDialog({
   onConfirm,
 }: ConfirmDialogProps) {
   const t = useTranslations("Common");
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+
+  function setOpen(next: boolean) {
+    if (controlledOpen === undefined) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  }
 
   async function handleConfirm() {
     setPending(true);
@@ -60,7 +74,7 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(next) => !pending && setOpen(next)}>
-      <AlertDialogTrigger render={trigger}>{triggerLabel}</AlertDialogTrigger>
+      {trigger && <AlertDialogTrigger render={trigger}>{triggerLabel}</AlertDialogTrigger>}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

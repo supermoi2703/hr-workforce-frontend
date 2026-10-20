@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { createDataTableColumns, DataTable, useDataTableState } from "@/components/shared/data-table/data-table";
 import { EmptyState } from "@/components/shared/states";
 import { formatDateTime } from "@/lib/format";
+import { formatDevice } from "@/lib/user-agent";
 import { useMyActivity } from "../../hooks";
 import { SECURITY_ACTIONS, type SecurityAction, type SecurityActivity } from "../../types";
-import { formatDevice } from "../../user-agent";
 
 const isKnownAction = (action: string): action is SecurityAction =>
   (SECURITY_ACTIONS as readonly string[]).includes(action);
@@ -16,7 +16,7 @@ const isKnownAction = (action: string): action is SecurityAction =>
 /** Lịch sử bảo mật của chính mình (đăng nhập, đổi mật khẩu, khóa tài khoản...), mới nhất trước, phân trang server. */
 export function ActivityTab() {
   const t = useTranslations("Account.Activity");
-  const tDevices = useTranslations("Account.Devices");
+  const tDevices = useTranslations("Devices");
   const tableState = useDataTableState();
   const query = useMyActivity(tableState.pageParams);
 

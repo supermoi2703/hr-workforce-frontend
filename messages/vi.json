@@ -68,6 +68,18 @@
     "MANAGER": "Quản lý",
     "EMPLOYEE": "Nhân viên"
   },
+  "UserStatus": {
+    "ACTIVE": "Đang hoạt động",
+    "PENDING": "Chờ kích hoạt",
+    "LOCKED": "Đang bị khóa",
+    "DISABLED": "Đã vô hiệu hóa"
+  },
+  "Devices": {
+    "unknownDevice": "Thiết bị không xác định",
+    "unknownIp": "Không rõ IP",
+    "lastActive": "Hoạt động lần cuối {time}",
+    "expires": "Hết hạn {time}"
+  },
   "States": {
     "loading": "Đang tải dữ liệu...",
     "errorTitle": "Không tải được dữ liệu",
@@ -134,13 +146,7 @@
       "email": "Email",
       "roles": "Vai trò",
       "status": "Trạng thái",
-      "note": "Liên hệ bộ phận nhân sự nếu cần đổi họ tên hoặc email.",
-      "statuses": {
-        "ACTIVE": "Đang hoạt động",
-        "PENDING": "Chờ kích hoạt",
-        "LOCKED": "Đang bị khóa",
-        "DISABLED": "Đã vô hiệu hóa"
-      }
+      "note": "Liên hệ bộ phận nhân sự nếu cần đổi họ tên hoặc email."
     },
     "Password": {
       "description": "Sau khi đổi, các thiết bị khác sẽ bị đăng xuất. Thiết bị này vẫn giữ đăng nhập.",
@@ -152,9 +158,6 @@
     "Devices": {
       "description": "Các thiết bị đang đăng nhập vào tài khoản của bạn. Hãy đăng xuất thiết bị bạn không nhận ra.",
       "thisDevice": "Thiết bị này",
-      "unknownDevice": "Thiết bị không xác định",
-      "unknownIp": "Không rõ IP",
-      "lastActive": "Hoạt động lần cuối {time}",
       "signOut": "Đăng xuất",
       "signOutOthers": "Đăng xuất các thiết bị khác",
       "signOutOthersTitle": "Đăng xuất tất cả thiết bị khác?",
@@ -194,6 +197,120 @@
         "USER_ENABLED": "Tài khoản được kích hoạt lại",
         "USER_ROLES_CHANGED": "Thay đổi vai trò"
       }
+    }
+  },
+  "Users": {
+    "metaTitle": "Tài khoản",
+    "List": {
+      "title": "Tài khoản",
+      "description": "Tạo tài khoản, xem ai đăng nhập được và quản lý quyền truy cập.",
+      "create": "Tạo tài khoản",
+      "empty": "Không có tài khoản nào khớp bộ lọc",
+      "never": "Chưa đăng nhập"
+    },
+    "Filters": {
+      "search": "Tìm theo tên hoặc email",
+      "status": "Trạng thái",
+      "allStatuses": "Mọi trạng thái",
+      "role": "Vai trò",
+      "allRoles": "Mọi vai trò"
+    },
+    "Columns": {
+      "account": "Tài khoản",
+      "roles": "Vai trò",
+      "status": "Trạng thái",
+      "lastLogin": "Đăng nhập gần nhất"
+    },
+    "Create": {
+      "title": "Tạo tài khoản",
+      "description": "Người được tạo sẽ nhận email có mã để kích hoạt tài khoản và tự đặt mật khẩu.",
+      "email": "Email công ty",
+      "displayName": "Tên hiển thị",
+      "roles": "Vai trò",
+      "rolesHint": "Để trống thì gán vai trò Nhân viên.",
+      "defaultRole": "Tài khoản mới có vai trò Nhân viên.",
+      "submit": "Tạo tài khoản",
+      "success": "Đã tạo tài khoản. Email kích hoạt đã được gửi tới {email}."
+    },
+    "Edit": {
+      "title": "Sửa tên",
+      "displayName": "Tên hiển thị",
+      "submit": "Lưu",
+      "success": "Đã cập nhật tên."
+    },
+    "Detail": {
+      "metaTitle": "Chi tiết tài khoản",
+      "back": "Quay lại danh sách",
+      "editName": "Sửa tên",
+      "email": "Email",
+      "roles": "Vai trò",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "lastLogin": "Đăng nhập gần nhất",
+      "emailVerified": "Xác minh email",
+      "notVerified": "Chưa xác minh",
+      "notFound": "Không tìm thấy tài khoản",
+      "notFoundDescription": "Tài khoản không tồn tại hoặc đường dẫn bị sai."
+    },
+    "Validation": {
+      "emailInvalid": "Email không hợp lệ",
+      "displayNameRequired": "Vui lòng nhập tên hiển thị",
+      "displayNameTooLong": "Tên hiển thị tối đa 150 ký tự"
+    },
+    "Errors": {
+      "emailExists": "Email này đã có tài khoản.",
+      "cannotModifySelf": "Bạn không thể thực hiện thao tác này trên tài khoản của chính mình.",
+      "adminProtected": "Chỉ quản trị viên mới thay đổi được tài khoản quản trị hoặc vai trò Quản trị.",
+      "invalidStatus": "Trạng thái tài khoản vừa thay đổi. Hãy tải lại rồi thử lại.",
+      "roleNotFound": "Một vai trò đã chọn không còn tồn tại. Hãy tải lại rồi thử lại.",
+      "resendTooSoon": "Hãy chờ một phút trước khi gửi mã mới."
+    },
+    "Actions": {
+      "menu": "Thao tác",
+      "openMenu": "Thao tác cho {name}",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa tài khoản",
+      "disable": "Vô hiệu hóa tài khoản",
+      "enable": "Kích hoạt lại tài khoản",
+      "assignRoles": "Đổi vai trò",
+      "resendActivation": "Gửi lại mã kích hoạt",
+      "forceLogout": "Đăng xuất mọi thiết bị"
+    },
+    "Confirm": {
+      "lockTitle": "Khóa tài khoản của {name}?",
+      "lockDescription": "Người này bị đăng xuất khỏi mọi thiết bị và không đăng nhập được cho tới khi được mở khóa.",
+      "disableTitle": "Vô hiệu hóa tài khoản của {name}?",
+      "disableDescription": "Dùng khi nhân viên nghỉ việc. Người này bị đăng xuất khỏi mọi thiết bị và chỉ quản trị viên mới kích hoạt lại được.",
+      "enableTitle": "Kích hoạt lại tài khoản của {name}?",
+      "enableDescription": "Người này đăng nhập lại được bằng mật khẩu cũ.",
+      "forceLogoutTitle": "Đăng xuất {name} khỏi mọi thiết bị?",
+      "forceLogoutDescription": "Mọi thiết bị đang đăng nhập phải đăng nhập lại. Tài khoản vẫn hoạt động bình thường."
+    },
+    "Toasts": {
+      "locked": "Đã khóa tài khoản.",
+      "unlocked": "Đã mở khóa tài khoản.",
+      "disabled": "Đã vô hiệu hóa tài khoản.",
+      "enabled": "Đã kích hoạt lại tài khoản.",
+      "rolesChanged": "Đã cập nhật vai trò.",
+      "activationSent": "Đã gửi mã kích hoạt.",
+      "signedOutEverywhere": "Đã đăng xuất khỏi mọi thiết bị."
+    },
+    "AssignRoles": {
+      "title": "Đổi vai trò",
+      "description": "Chọn vai trò cho {name}.",
+      "note": "Thay đổi có hiệu lực ở lần làm mới phiên tiếp theo của người này (trong vòng 15 phút).",
+      "required": "Chọn ít nhất một vai trò",
+      "submit": "Lưu vai trò"
+    },
+    "Sessions": {
+      "title": "Thiết bị đang đăng nhập",
+      "empty": "Không đăng nhập trên thiết bị nào.",
+      "forceLogout": "Đăng xuất mọi thiết bị"
+    },
+    "Blocked": {
+      "self": "Đây là tài khoản của bạn. Quản lý mật khẩu và thiết bị tại",
+      "selfLink": "trang Tài khoản",
+      "adminProtected": "Chỉ quản trị viên mới quản lý được tài khoản quản trị."
     }
   },
   "Auth": {

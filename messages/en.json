@@ -68,6 +68,18 @@
     "MANAGER": "Manager",
     "EMPLOYEE": "Employee"
   },
+  "UserStatus": {
+    "ACTIVE": "Active",
+    "PENDING": "Pending activation",
+    "LOCKED": "Locked",
+    "DISABLED": "Disabled"
+  },
+  "Devices": {
+    "unknownDevice": "Unknown device",
+    "unknownIp": "Unknown IP",
+    "lastActive": "Last active {time}",
+    "expires": "Expires {time}"
+  },
   "States": {
     "loading": "Loading data...",
     "errorTitle": "Couldn't load data",
@@ -134,13 +146,7 @@
       "email": "Email",
       "roles": "Roles",
       "status": "Status",
-      "note": "Contact HR to change your name or email.",
-      "statuses": {
-        "ACTIVE": "Active",
-        "PENDING": "Pending activation",
-        "LOCKED": "Locked",
-        "DISABLED": "Disabled"
-      }
+      "note": "Contact HR to change your name or email."
     },
     "Password": {
       "description": "Your other devices are signed out after the change. This device stays signed in.",
@@ -152,9 +158,6 @@
     "Devices": {
       "description": "Devices currently signed in to your account. Sign out any device you don't recognize.",
       "thisDevice": "This device",
-      "unknownDevice": "Unknown device",
-      "unknownIp": "Unknown IP",
-      "lastActive": "Last active {time}",
       "signOut": "Sign out",
       "signOutOthers": "Sign out other devices",
       "signOutOthersTitle": "Sign out of all other devices?",
@@ -194,6 +197,120 @@
         "USER_ENABLED": "Account re-enabled",
         "USER_ROLES_CHANGED": "Roles changed"
       }
+    }
+  },
+  "Users": {
+    "metaTitle": "Accounts",
+    "List": {
+      "title": "Accounts",
+      "description": "Create accounts, check who can sign in and manage access.",
+      "create": "Create account",
+      "empty": "No accounts match your filters",
+      "never": "Never"
+    },
+    "Filters": {
+      "search": "Search by name or email",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "role": "Role",
+      "allRoles": "All roles"
+    },
+    "Columns": {
+      "account": "Account",
+      "roles": "Roles",
+      "status": "Status",
+      "lastLogin": "Last sign-in"
+    },
+    "Create": {
+      "title": "Create account",
+      "description": "The person gets an email with a code to activate the account and set a password.",
+      "email": "Work email",
+      "displayName": "Display name",
+      "roles": "Roles",
+      "rolesHint": "Leave empty to give the Employee role.",
+      "defaultRole": "New accounts get the Employee role.",
+      "submit": "Create account",
+      "success": "Account created. An activation email was sent to {email}."
+    },
+    "Edit": {
+      "title": "Edit name",
+      "displayName": "Display name",
+      "submit": "Save",
+      "success": "Name updated."
+    },
+    "Detail": {
+      "metaTitle": "Account details",
+      "back": "Back to accounts",
+      "editName": "Edit name",
+      "email": "Email",
+      "roles": "Roles",
+      "status": "Status",
+      "createdAt": "Created",
+      "lastLogin": "Last sign-in",
+      "emailVerified": "Email verified",
+      "notVerified": "Not verified",
+      "notFound": "Account not found",
+      "notFoundDescription": "This account doesn't exist or the link is wrong."
+    },
+    "Validation": {
+      "emailInvalid": "Enter a valid email address",
+      "displayNameRequired": "Enter a display name",
+      "displayNameTooLong": "Display name must be at most 150 characters"
+    },
+    "Errors": {
+      "emailExists": "This email already has an account.",
+      "cannotModifySelf": "You can't do this to your own account.",
+      "adminProtected": "Only administrators can change administrator accounts or the Admin role.",
+      "invalidStatus": "The account status has changed. Reload and try again.",
+      "roleNotFound": "One of the selected roles no longer exists. Reload and try again.",
+      "resendTooSoon": "Wait a minute before sending another code."
+    },
+    "Actions": {
+      "menu": "Actions",
+      "openMenu": "Actions for {name}",
+      "lock": "Lock account",
+      "unlock": "Unlock account",
+      "disable": "Disable account",
+      "enable": "Re-enable account",
+      "assignRoles": "Change roles",
+      "resendActivation": "Resend activation code",
+      "forceLogout": "Sign out everywhere"
+    },
+    "Confirm": {
+      "lockTitle": "Lock {name}'s account?",
+      "lockDescription": "They are signed out of every device and can't sign in until the account is unlocked.",
+      "disableTitle": "Disable {name}'s account?",
+      "disableDescription": "Use this when someone leaves the company. They are signed out everywhere, and only an administrator can re-enable the account.",
+      "enableTitle": "Re-enable {name}'s account?",
+      "enableDescription": "They can sign in again with their existing password.",
+      "forceLogoutTitle": "Sign {name} out everywhere?",
+      "forceLogoutDescription": "Every device they are signed in on will have to sign in again. The account stays active."
+    },
+    "Toasts": {
+      "locked": "Account locked.",
+      "unlocked": "Account unlocked.",
+      "disabled": "Account disabled.",
+      "enabled": "Account re-enabled.",
+      "rolesChanged": "Roles updated.",
+      "activationSent": "Activation code sent.",
+      "signedOutEverywhere": "Signed out of all devices."
+    },
+    "AssignRoles": {
+      "title": "Change roles",
+      "description": "Choose the roles for {name}.",
+      "note": "Changes take effect the next time they refresh their session (within 15 minutes).",
+      "required": "Select at least one role",
+      "submit": "Save roles"
+    },
+    "Sessions": {
+      "title": "Signed-in devices",
+      "empty": "Not signed in on any device.",
+      "forceLogout": "Sign out everywhere"
+    },
+    "Blocked": {
+      "self": "This is your own account. Manage your password and devices from your",
+      "selfLink": "Account page",
+      "adminProtected": "Only administrators can manage administrator accounts."
     }
   },
   "Auth": {
