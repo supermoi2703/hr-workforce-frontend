@@ -7,13 +7,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("metaTitle") };
 }
 
-/** `?next=` và `?error=` đọc ở server rồi truyền xuống form, khỏi cần useSearchParams + Suspense. */
+const single = (value: string | string[] | undefined) => (typeof value === "string" ? value : undefined);
+
+/** `?next=`, `?error=`, `?reason=` đọc ở server rồi truyền xuống form, khỏi cần useSearchParams + Suspense. */
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
-  const { next, error } = await searchParams;
-  return (
-    <LoginForm
-      next={typeof next === "string" ? next : undefined}
-      googleError={typeof error === "string" ? error : undefined}
-    />
-  );
+  const { next, error, reason } = await searchParams;
+  return <LoginForm next={single(next)} googleError={single(error)} reason={single(reason)} />;
 }

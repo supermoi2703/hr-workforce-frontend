@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { CircleAlertIcon } from "lucide-react";
+import { CircleAlertIcon, InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,9 +14,15 @@ import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/com
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { isApiError } from "@/lib/api/errors";
+import { useAuthActions, useCurrentUser } from "@/lib/auth/auth-provider";
 import { applyServerFieldErrors } from "@/lib/forms";
 import { login } from "../api";
-import { getGoogleErrorMessage, getLoginErrorMessage } from "../error-messages";
+import {
+  getGoogleErrorMessage,
+  getLoginErrorMessage,
+  getSessionEndNotice,
+  type LoginNotice,
+} from "../error-messages";
 import { safeNextPath } from "../next-path";
 import { createLoginSchema, type LoginFormValues } from "../schemas";
 import { GoogleSignInButton } from "./google-sign-in-button";
@@ -27,14 +33,24 @@ type LoginFormProps = {
   next?: string;
   /** `?error=`: mã lỗi backend gắn lên URL khi đăng nhập Google thất bại. */
   googleError?: string;
+  /** `?reason=`: AppShell gắn khi phiên đang dùng bị kết thúc (hết hạn, tài khoản bị khóa...). */
+  reason?: string;
 };
 
-export function LoginForm({ next, googleError }: LoginFormProps) {
+export function LoginForm({ next, googleError, reason }: LoginFormProps) {
   const t = useTranslations("Auth.Login");
   const tAuthErrors = useTranslations("Auth.Errors");
   const tErrors = useTranslations("Errors");
   const tValidation = useTranslations("Auth.Validation");
   const router = useRouter();
+  const { status } = useCurrentUser();
+  const { signIn } = useAuthActions();
+
+  // Đã có phiên thì rời trang đăng nhập: vừa đăng nhập xong, mở /login khi đang đăng nhập (F5 lấy lại phiên),
+  // tab khác vừa đăng nhập, hoặc chế độ mock (luôn coi là đã đăng nhập).
+  useEffect(() => {
+    if (status === "authenticated") router.replace(safeNextPath(next));
+  }, [status, next, router]);
 
   // Tạo lại schema khi đổi ngôn ngữ để câu báo lỗi của lần kiểm tra sau theo ngôn ngữ mới.
   const schema = useMemo(() => createLoginSchema(tValidation), [tValidation]);
@@ -45,24 +61,23 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
 
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
-      // TODO(cuongvv): lưu phiên (signIn(response)) khi làm BackendAuthProvider. Hiện chỉ chuyển trang:
-      // chế độ mock vào thẳng dashboard, chế độ backend sẽ bị đưa lại về /login cho tới khi nối phiên.
-      router.replace(safeNextPath(next));
-    },
+    // Lưu phiên; effect ở trên thấy status = authenticated sẽ chuyển trang.
+    onSuccess: (response) => signIn(response),
     onError: (error) => {
       applyServerFieldErrors(error, form.setError);
     },
   });
 
-  // Lỗi theo từng ô đã hiện dưới ô; Alert chỉ cho lỗi chung. Lỗi Google ẩn đi sau lần bấm đăng nhập đầu tiên.
+  // Lỗi theo từng ô đã hiện dưới ô; Alert chỉ cho lỗi chung. Thông báo từ URL (lỗi Google, lý do hết phiên)
+  // ẩn đi sau lần bấm đăng nhập đầu tiên.
   const hasFieldErrors = isApiError(mutation.error) && mutation.error.fieldErrors.length > 0;
-  const alertMessage =
-    mutation.status === "idle"
-      ? getGoogleErrorMessage(googleError, tAuthErrors)
-      : mutation.isError && !hasFieldErrors
-        ? getLoginErrorMessage(mutation.error, tAuthErrors, tErrors)
-        : null;
+  let notice: LoginNotice | null = null;
+  if (mutation.status === "idle") {
+    const googleMessage = getGoogleErrorMessage(googleError, tAuthErrors);
+    notice = googleMessage ? { message: googleMessage, tone: "error" } : getSessionEndNotice(reason, tAuthErrors);
+  } else if (mutation.isError && !hasFieldErrors) {
+    notice = { message: getLoginErrorMessage(mutation.error, tAuthErrors, tErrors), tone: "error" };
+  }
 
   const { errors } = form.formState;
   const submitting = mutation.isPending || mutation.isSuccess;
@@ -74,14 +89,14 @@ export function LoginForm({ next, googleError }: LoginFormProps) {
         <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      {alertMessage && (
-        <Alert variant="destructive">
-          <CircleAlertIcon />
-          <AlertDescription>{alertMessage}</AlertDescription>
+      {notice && (
+        <Alert variant={notice.tone === "error" ? "destructive" : "default"}>
+          {notice.tone === "error" ? <CircleAlertIcon /> : <InfoIcon />}
+          <AlertDescription>{notice.message}</AlertDescription>
         </Alert>
       )}
 
-      <GoogleSignInButton />
+      <GoogleSignInButton next={next} />
 
       {/* Nền chữ "or" phải trùng nền trang (bg-card) để che đường kẻ. */}
       <FieldSeparator className="my-0 *:data-[slot=field-separator-content]:bg-card">{t("or")}</FieldSeparator>

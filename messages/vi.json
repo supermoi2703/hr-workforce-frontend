@@ -152,7 +152,11 @@
       "googleEmailNotVerified": "Email Google của bạn chưa được xác minh. Hãy xác minh với Google rồi thử lại.",
       "googleAccountConflict": "Tài khoản này đã liên kết với một tài khoản Google khác. Hãy đăng nhập bằng đúng tài khoản Google đó hoặc bằng mật khẩu.",
       "googleTooManyRequests": "Bạn đã thử đăng nhập Google quá nhiều lần. Vui lòng thử lại sau ít phút.",
-      "googleFailed": "Đăng nhập Google không thành công. Vui lòng thử lại."
+      "googleFailed": "Đăng nhập Google không thành công. Vui lòng thử lại.",
+      "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+    },
+    "Callback": {
+      "signingIn": "Đang đăng nhập..."
     },
     "Showcase": {
       "title": "Mọi công việc nhân sự ở một nơi",

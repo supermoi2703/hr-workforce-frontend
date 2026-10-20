@@ -12,13 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthMode, useCurrentUser } from "@/lib/auth/auth-provider";
+import { useAuthActions, useAuthMode, useCurrentUser } from "@/lib/auth/auth-provider";
 import { UserAvatar } from "../user-avatar";
 
 export function UserMenu() {
   const t = useTranslations("Shell");
   const { user } = useCurrentUser();
   const { mode } = useAuthMode();
+  const { signOut } = useAuthActions();
   if (!user) return null;
 
   return (
@@ -34,8 +35,8 @@ export function UserMenu() {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {/* TODO(cuongvv): đổi mật khẩu, đăng xuất thật (POST /api/auth/logout). */}
-        <DropdownMenuItem disabled={mode === "mock"}>
+        {/* TODO(cuongvv): trang tài khoản (đổi mật khẩu, thiết bị đang đăng nhập). Chế độ mock không có phiên để đăng xuất. */}
+        <DropdownMenuItem disabled={mode === "mock"} onClick={() => void signOut()}>
           <LogOutIcon /> {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>

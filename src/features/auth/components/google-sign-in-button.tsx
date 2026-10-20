@@ -1,18 +1,28 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { GOOGLE_LOGIN_URL } from "../api";
+import { savePendingNext } from "../next-path";
+
+type GoogleSignInButtonProps = {
+  /** Trang quay về sau khi đăng nhập Google xong (giữ qua sessionStorage, /auth/callback đọc lại). */
+  next?: string;
+  className?: string;
+};
 
 /**
  * Link thường (không phải fetch, không phải next/link): trình duyệt rời app sang backend → Google,
  * xong backend chuyển về /auth/callback hoặc /login?error=CODE.
  */
-export function GoogleSignInButton({ className }: { className?: string }) {
+export function GoogleSignInButton({ next, className }: GoogleSignInButtonProps) {
   const t = useTranslations("Auth.Login");
   return (
     // bg-card: trang đăng nhập nền trắng (card), còn outline mặc định dùng bg-background (xám).
     <a
       href={GOOGLE_LOGIN_URL}
+      onClick={() => savePendingNext(next)}
       className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full bg-card", className)}
     >
       <GoogleLogo />

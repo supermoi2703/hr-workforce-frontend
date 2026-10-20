@@ -152,7 +152,11 @@
       "googleEmailNotVerified": "Your Google email isn't verified. Verify it with Google, then try again.",
       "googleAccountConflict": "This account is linked to a different Google account. Sign in with that Google account or with your password.",
       "googleTooManyRequests": "Too many Google sign-in attempts. Try again in a few minutes.",
-      "googleFailed": "Google sign-in failed. Please try again."
+      "googleFailed": "Google sign-in failed. Please try again.",
+      "sessionExpired": "Your session has expired. Please sign in again."
+    },
+    "Callback": {
+      "signingIn": "Signing you in..."
     },
     "Showcase": {
       "title": "All your HR work in one place",

@@ -12,9 +12,12 @@ npm install
 npm run dev                  # http://localhost:3000
 ```
 
-Khi `NEXT_PUBLIC_AUTH_MODE=mock` (mặc định), ứng dụng đăng nhập giả lập: đổi vai trò bằng nút
-**Vai trò** trên header để kiểm tra menu và phân quyền. Backend không chạy thì vẫn dùng được giao
-diện, chỉ các lệnh gọi API báo lỗi kết nối.
+Hai chế độ đăng nhập (`NEXT_PUBLIC_AUTH_MODE` trong `.env.local`, sửa xong chạy lại `npm run dev`):
+
+- `backend` (mặc định): đăng nhập thật ở `/login`. Cần backend + Postgres + Redis đang chạy; tài khoản mẫu
+  `admin@test.com` / `Admin12345` (xem `scripts/sql/` của backend).
+- `mock`: không cần backend, luôn coi như đã đăng nhập; đổi vai trò bằng nút **Role** trên header để kiểm tra
+  menu và phân quyền. Các lệnh gọi API báo lỗi kết nối nếu backend không chạy.
 
 Trước khi mở PR: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
@@ -96,6 +99,9 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
 - Chỉ lấy người dùng qua `useCurrentUser()`, không tự đọc token hay gọi `/api/auth/me`.
 - Ẩn/hiện nút: `<RequireAccess access={{ roles: ["ADMIN", "HR"] }} fallback={null}>...</RequireAccess>`.
 - Ẩn trên giao diện không thay cho kiểm tra quyền ở backend.
+- Phiên đăng nhập do `lib/auth` lo hết: tự lấy lại phiên khi F5, tự làm mới token, hết phiên thì đưa về
+  `/login` kèm lý do, đồng bộ đăng xuất giữa các tab. Màn hình nghiệp vụ không cần làm gì thêm.
+  Cần đăng xuất bằng code (hiếm): `const { signOut } = useAuthActions()`.
 
 ## 7. Hiển thị
 

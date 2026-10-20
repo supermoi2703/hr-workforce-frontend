@@ -3,8 +3,7 @@ import { describe, expect, it } from "vitest";
 import en from "../../../messages/en.json";
 import vi from "../../../messages/vi.json";
 import { ApiError } from "@/lib/api/errors";
-import { getGoogleErrorMessage, getLoginErrorMessage } from "./error-messages";
-import { safeNextPath } from "./next-path";
+import { getGoogleErrorMessage, getLoginErrorMessage, getSessionEndNotice } from "./error-messages";
 
 function translators(locale: "en" | "vi", messages: typeof en) {
   return {
@@ -53,6 +52,23 @@ describe("getLoginErrorMessage", () => {
   });
 });
 
+describe("getSessionEndNotice", () => {
+  it("hết phiên là thông tin, tài khoản bị khóa / vô hiệu hóa là lỗi", () => {
+    expect(getSessionEndNotice("session_expired", t.auth)).toEqual({
+      message: "Your session has expired. Please sign in again.",
+      tone: "info",
+    });
+    expect(getSessionEndNotice("ACCOUNT_LOCKED", t.auth)).toMatchObject({ tone: "error" });
+    expect(getSessionEndNotice("ACCOUNT_DISABLED", t.auth)).toMatchObject({ tone: "error" });
+  });
+
+  it("không có hoặc giá trị lạ trên URL thì không báo", () => {
+    for (const reason of [undefined, null, "", "ACCOUNT_NOT_ACTIVATED", "<script>"]) {
+      expect(getSessionEndNotice(reason, t.auth)).toBeNull();
+    }
+  });
+});
+
 describe("getGoogleErrorMessage", () => {
   it("không có mã hoặc người dùng tự hủy thì không báo", () => {
     expect(getGoogleErrorMessage(undefined, t.auth)).toBeNull();
@@ -67,18 +83,5 @@ describe("getGoogleErrorMessage", () => {
 
   it("mã lạ chỉ hiện câu chung, không lặp lại giá trị trên URL", () => {
     expect(getGoogleErrorMessage("<script>alert(1)</script>", t.auth)).toBe("Google sign-in failed. Please try again.");
-  });
-});
-
-describe("safeNextPath", () => {
-  it("giữ đường dẫn trong app", () => {
-    expect(safeNextPath("/leave")).toBe("/leave");
-    expect(safeNextPath("/admin/users?page=2")).toBe("/admin/users?page=2");
-  });
-
-  it("đường dẫn ra ngoài hoặc rỗng thì về trang chủ", () => {
-    for (const next of [undefined, null, "", "leave", "//evil.com", "/\\evil.com", "https://evil.com"]) {
-      expect(safeNextPath(next)).toBe("/");
-    }
   });
 });

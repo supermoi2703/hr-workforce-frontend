@@ -1,5 +1,6 @@
 import { http } from "@/lib/api/http-client";
-import type { AuthResponse, LoginRequest } from "./types";
+import type { AuthResponse } from "@/lib/auth/types";
+import type { LoginRequest } from "./types";
 
 /** Endpoint công khai: không gắn access token (skipAuth). Refresh token được backend đặt vào cookie HttpOnly. */
 export const login = (body: LoginRequest) => http.post<AuthResponse>("/api/auth/login", body, { skipAuth: true });

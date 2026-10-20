@@ -39,6 +39,18 @@ const GOOGLE_KEYS: Record<string, AuthErrorKey> = {
   TOO_MANY_REQUESTS: "googleTooManyRequests",
 };
 
+export type LoginNotice = { message: string; tone: "info" | "error" };
+
+/**
+ * Thông báo cho `/login?reason=...`: AppShell gắn lý do khi phiên đang dùng bị kết thúc
+ * (hết hạn / bị thu hồi, hoặc tài khoản vừa bị khóa / vô hiệu hóa). Giá trị lạ thì không báo.
+ */
+export function getSessionEndNotice(reason: string | null | undefined, t: AuthErrorsTranslator): LoginNotice | null {
+  if (reason === "session_expired") return { message: t("sessionExpired"), tone: "info" };
+  const key = reason ? ACCOUNT_KEYS[reason] : undefined;
+  return key && reason !== "ACCOUNT_NOT_ACTIVATED" ? { message: t(key), tone: "error" } : null;
+}
+
 /**
  * Thông báo cho mã lỗi backend gắn lên URL sau khi đăng nhập Google thất bại (`/login?error=CODE`).
  * Trả null khi không cần báo gì (không có mã, hoặc người dùng tự bấm Hủy ở Google).
