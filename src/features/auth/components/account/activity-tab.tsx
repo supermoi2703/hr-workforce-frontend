@@ -17,6 +17,7 @@ const isKnownAction = (action: string): action is SecurityAction =>
 export function ActivityTab() {
   const t = useTranslations("Account.Activity");
   const tDevices = useTranslations("Devices");
+  const tActions = useTranslations("AuditActions");
   const tableState = useDataTableState();
   const query = useMyActivity(tableState.pageParams);
 
@@ -31,7 +32,7 @@ export function ActivityTab() {
       col.accessor("action", {
         header: t("event"),
         // Action backend mới thêm mà frontend chưa có bản dịch: hiện nguyên mã.
-        cell: (c) => (isKnownAction(c.getValue()) ? t(`actions.${c.getValue() as SecurityAction}`) : c.getValue()),
+        cell: (c) => (isKnownAction(c.getValue()) ? tActions(c.getValue() as SecurityAction) : c.getValue()),
       }),
       col.accessor("outcome", {
         header: t("result"),
@@ -48,7 +49,7 @@ export function ActivityTab() {
       }),
       col.accessor("ipAddress", { header: t("ip"), cell: (c) => c.getValue() ?? "—" }),
     ]);
-  }, [t, tDevices]);
+  }, [t, tDevices, tActions]);
 
   return (
     <div className="flex flex-col gap-4">

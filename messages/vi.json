@@ -51,6 +51,7 @@
       "dataQa": "Hỏi đáp dữ liệu",
       "users": "Tài khoản",
       "roles": "Vai trò & quyền",
+      "auditLog": "Nhật ký hệ thống",
       "devUi": "Component mẫu",
       "devError": "Trang lỗi mẫu"
     }
@@ -175,28 +176,7 @@
       "ip": "Địa chỉ IP",
       "succeeded": "Thành công",
       "failed": "Thất bại",
-      "empty": "Chưa có hoạt động",
-      "actions": {
-        "LOGIN_SUCCESS": "Đăng nhập",
-        "LOGIN_FAILED": "Thử đăng nhập",
-        "LOGIN_LOCKED_OUT": "Tạm chặn đăng nhập",
-        "LOGOUT": "Đăng xuất",
-        "LOGOUT_ALL": "Đăng xuất mọi thiết bị",
-        "SESSION_REVOKED": "Đăng xuất một thiết bị",
-        "SESSIONS_REVOKED_BY_ADMIN": "Bị quản trị viên đăng xuất",
-        "REFRESH_TOKEN_REUSE_DETECTED": "Chặn phiên đăng nhập đáng ngờ",
-        "ACCOUNT_ACTIVATED": "Kích hoạt tài khoản",
-        "GOOGLE_LINKED": "Liên kết tài khoản Google",
-        "PASSWORD_RESET_REQUESTED": "Yêu cầu mã đặt lại mật khẩu",
-        "PASSWORD_RESET": "Đặt lại mật khẩu",
-        "PASSWORD_CHANGED": "Đổi mật khẩu",
-        "PASSWORD_CHANGE_FAILED": "Thử đổi mật khẩu",
-        "USER_LOCKED": "Tài khoản bị khóa",
-        "USER_UNLOCKED": "Tài khoản được mở khóa",
-        "USER_DISABLED": "Tài khoản bị vô hiệu hóa",
-        "USER_ENABLED": "Tài khoản được kích hoạt lại",
-        "USER_ROLES_CHANGED": "Thay đổi vai trò"
-      }
+      "empty": "Chưa có hoạt động"
     }
   },
   "Users": {
@@ -250,7 +230,8 @@
       "emailVerified": "Xác minh email",
       "notVerified": "Chưa xác minh",
       "notFound": "Không tìm thấy tài khoản",
-      "notFoundDescription": "Tài khoản không tồn tại hoặc đường dẫn bị sai."
+      "notFoundDescription": "Tài khoản không tồn tại hoặc đường dẫn bị sai.",
+      "viewAuditLog": "Xem nhật ký"
     },
     "Validation": {
       "emailInvalid": "Email không hợp lệ",
@@ -422,6 +403,114 @@
     "audit_read": {
       "name": "Xem nhật ký hệ thống",
       "description": "Xem nhật ký bảo mật và quản trị"
+    }
+  },
+  "AuditActions": {
+    "LOGIN_SUCCESS": "Đăng nhập",
+    "LOGIN_FAILED": "Thử đăng nhập",
+    "LOGIN_LOCKED_OUT": "Tạm chặn đăng nhập",
+    "LOGOUT": "Đăng xuất",
+    "LOGOUT_ALL": "Đăng xuất mọi thiết bị",
+    "SESSION_REVOKED": "Đăng xuất một thiết bị",
+    "SESSIONS_REVOKED_BY_ADMIN": "Bị quản trị viên đăng xuất",
+    "REFRESH_TOKEN_REUSE_DETECTED": "Chặn phiên đăng nhập đáng ngờ",
+    "ACCOUNT_ACTIVATED": "Kích hoạt tài khoản",
+    "GOOGLE_LINKED": "Liên kết tài khoản Google",
+    "PASSWORD_RESET_REQUESTED": "Yêu cầu mã đặt lại mật khẩu",
+    "PASSWORD_RESET": "Đặt lại mật khẩu",
+    "PASSWORD_CHANGED": "Đổi mật khẩu",
+    "PASSWORD_CHANGE_FAILED": "Thử đổi mật khẩu",
+    "USER_LOCKED": "Tài khoản bị khóa",
+    "USER_UNLOCKED": "Tài khoản được mở khóa",
+    "USER_DISABLED": "Tài khoản bị vô hiệu hóa",
+    "USER_ENABLED": "Tài khoản được kích hoạt lại",
+    "USER_ROLES_CHANGED": "Thay đổi vai trò",
+    "ACTIVATION_CODE_RESENT": "Gửi lại mã kích hoạt",
+    "USER_CREATED": "Tạo tài khoản",
+    "USER_UPDATED": "Sửa tài khoản",
+    "ROLE_CREATED": "Tạo vai trò",
+    "ROLE_UPDATED": "Sửa vai trò",
+    "ROLE_DELETED": "Xóa vai trò"
+  },
+  "AuditLog": {
+    "metaTitle": "Nhật ký hệ thống",
+    "List": {
+      "title": "Nhật ký hệ thống",
+      "description": "Đăng nhập, thay đổi tài khoản và thao tác quản trị. Sự kiện đăng nhập được giữ 180 ngày, các sự kiện khác 365 ngày.",
+      "empty": "Không có mục nào khớp bộ lọc",
+      "system": "Hệ thống"
+    },
+    "Filters": {
+      "action": "Hành động",
+      "allActions": "Mọi hành động",
+      "outcome": "Kết quả",
+      "allOutcomes": "Mọi kết quả",
+      "dateRange": "Khoảng ngày",
+      "anyDate": "Mọi ngày",
+      "actor": "Người thực hiện: {label}",
+      "target": "Đối tượng: {label}",
+      "removeFilter": "Bỏ lọc",
+      "clear": "Xóa bộ lọc"
+    },
+    "Columns": {
+      "time": "Thời gian",
+      "action": "Hành động",
+      "result": "Kết quả",
+      "actor": "Người thực hiện",
+      "target": "Đối tượng",
+      "ip": "Địa chỉ IP",
+      "filterBy": "Xem các mục của {label}",
+      "openEntry": "Mở mục lúc {time}"
+    },
+    "outcomes": {
+      "SUCCESS": "Thành công",
+      "FAILURE": "Thất bại"
+    },
+    "categories": {
+      "AUTHENTICATION": "Đăng nhập",
+      "ACCOUNT": "Tài khoản",
+      "ADMINISTRATION": "Quản trị"
+    },
+    "Sheet": {
+      "title": "Chi tiết nhật ký",
+      "time": "Thời gian",
+      "action": "Hành động",
+      "category": "Nhóm",
+      "result": "Kết quả",
+      "actor": "Người thực hiện",
+      "target": "Đối tượng",
+      "ip": "Địa chỉ IP",
+      "device": "Thiết bị",
+      "details": "Chi tiết",
+      "noDetails": "Không có thông tin thêm.",
+      "openAccount": "Mở tài khoản",
+      "openRole": "Mở vai trò"
+    },
+    "Meta": {
+      "reason": "Lý do",
+      "method": "Cách đăng nhập",
+      "attemptedEmail": "Email đã nhập",
+      "scope": "Bị chặn theo",
+      "retryAfterSeconds": "Thời gian chặn",
+      "from": "Trước",
+      "to": "Sau",
+      "added": "Đã thêm",
+      "removed": "Đã bỏ",
+      "sessionsRevoked": "Số phiên bị đăng xuất",
+      "sessionId": "Phiên",
+      "familyId": "Họ phiên",
+      "minutes": "{count} phút"
+    },
+    "values": {
+      "BAD_PASSWORD": "Sai mật khẩu",
+      "UNKNOWN_EMAIL": "Email chưa đăng ký",
+      "NO_PASSWORD": "Chưa có mật khẩu",
+      "CURRENT_PASSWORD_INCORRECT": "Sai mật khẩu hiện tại",
+      "PASSWORD": "Mật khẩu",
+      "GOOGLE": "Google",
+      "OTP": "Mã xác thực",
+      "EMAIL": "Địa chỉ email",
+      "IP": "Địa chỉ IP"
     }
   },
   "Auth": {

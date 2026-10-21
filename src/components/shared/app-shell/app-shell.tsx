@@ -34,7 +34,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (status === "unauthenticated") router.replace(loginUrl(pathname, endReason));
+    // Giữ cả query string (vd bộ lọc nhật ký ?action=...) để đăng nhập lại quay về đúng chỗ.
+    if (status === "unauthenticated") router.replace(loginUrl(pathname + window.location.search, endReason));
   }, [status, endReason, router, pathname]);
 
   if (status !== "authenticated") {

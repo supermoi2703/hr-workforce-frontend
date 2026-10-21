@@ -51,6 +51,7 @@
       "dataQa": "Data Q&A",
       "users": "Accounts",
       "roles": "Roles & permissions",
+      "auditLog": "Audit log",
       "devUi": "UI components",
       "devError": "Error page demo"
     }
@@ -175,28 +176,7 @@
       "ip": "IP address",
       "succeeded": "Succeeded",
       "failed": "Failed",
-      "empty": "No activity yet",
-      "actions": {
-        "LOGIN_SUCCESS": "Signed in",
-        "LOGIN_FAILED": "Sign-in attempt",
-        "LOGIN_LOCKED_OUT": "Sign-in temporarily blocked",
-        "LOGOUT": "Signed out",
-        "LOGOUT_ALL": "Signed out of all devices",
-        "SESSION_REVOKED": "Signed out a device",
-        "SESSIONS_REVOKED_BY_ADMIN": "Signed out by an administrator",
-        "REFRESH_TOKEN_REUSE_DETECTED": "Suspicious session use blocked",
-        "ACCOUNT_ACTIVATED": "Account activated",
-        "GOOGLE_LINKED": "Google account linked",
-        "PASSWORD_RESET_REQUESTED": "Password reset code requested",
-        "PASSWORD_RESET": "Password reset",
-        "PASSWORD_CHANGED": "Password changed",
-        "PASSWORD_CHANGE_FAILED": "Password change attempt",
-        "USER_LOCKED": "Account locked",
-        "USER_UNLOCKED": "Account unlocked",
-        "USER_DISABLED": "Account disabled",
-        "USER_ENABLED": "Account re-enabled",
-        "USER_ROLES_CHANGED": "Roles changed"
-      }
+      "empty": "No activity yet"
     }
   },
   "Users": {
@@ -250,7 +230,8 @@
       "emailVerified": "Email verified",
       "notVerified": "Not verified",
       "notFound": "Account not found",
-      "notFoundDescription": "This account doesn't exist or the link is wrong."
+      "notFoundDescription": "This account doesn't exist or the link is wrong.",
+      "viewAuditLog": "View audit log"
     },
     "Validation": {
       "emailInvalid": "Enter a valid email address",
@@ -422,6 +403,114 @@
     "audit_read": {
       "name": "View audit log",
       "description": "See the security and administration audit log"
+    }
+  },
+  "AuditActions": {
+    "LOGIN_SUCCESS": "Signed in",
+    "LOGIN_FAILED": "Sign-in attempt",
+    "LOGIN_LOCKED_OUT": "Sign-in temporarily blocked",
+    "LOGOUT": "Signed out",
+    "LOGOUT_ALL": "Signed out of all devices",
+    "SESSION_REVOKED": "Signed out a device",
+    "SESSIONS_REVOKED_BY_ADMIN": "Signed out by an administrator",
+    "REFRESH_TOKEN_REUSE_DETECTED": "Suspicious session use blocked",
+    "ACCOUNT_ACTIVATED": "Account activated",
+    "GOOGLE_LINKED": "Google account linked",
+    "PASSWORD_RESET_REQUESTED": "Password reset code requested",
+    "PASSWORD_RESET": "Password reset",
+    "PASSWORD_CHANGED": "Password changed",
+    "PASSWORD_CHANGE_FAILED": "Password change attempt",
+    "USER_LOCKED": "Account locked",
+    "USER_UNLOCKED": "Account unlocked",
+    "USER_DISABLED": "Account disabled",
+    "USER_ENABLED": "Account re-enabled",
+    "USER_ROLES_CHANGED": "Roles changed",
+    "ACTIVATION_CODE_RESENT": "Activation code resent",
+    "USER_CREATED": "Account created",
+    "USER_UPDATED": "Account updated",
+    "ROLE_CREATED": "Role created",
+    "ROLE_UPDATED": "Role updated",
+    "ROLE_DELETED": "Role deleted"
+  },
+  "AuditLog": {
+    "metaTitle": "Audit log",
+    "List": {
+      "title": "Audit log",
+      "description": "Sign-ins, account changes and administration actions. Sign-in events are kept for 180 days, other events for 365 days.",
+      "empty": "No entries match your filters",
+      "system": "System"
+    },
+    "Filters": {
+      "action": "Action",
+      "allActions": "All actions",
+      "outcome": "Result",
+      "allOutcomes": "All results",
+      "dateRange": "Date range",
+      "anyDate": "Any date",
+      "actor": "Actor: {label}",
+      "target": "Target: {label}",
+      "removeFilter": "Remove filter",
+      "clear": "Clear filters"
+    },
+    "Columns": {
+      "time": "Time",
+      "action": "Action",
+      "result": "Result",
+      "actor": "Actor",
+      "target": "Target",
+      "ip": "IP address",
+      "filterBy": "Show entries for {label}",
+      "openEntry": "Open entry from {time}"
+    },
+    "outcomes": {
+      "SUCCESS": "Succeeded",
+      "FAILURE": "Failed"
+    },
+    "categories": {
+      "AUTHENTICATION": "Sign-in",
+      "ACCOUNT": "Account",
+      "ADMINISTRATION": "Administration"
+    },
+    "Sheet": {
+      "title": "Log entry",
+      "time": "Time",
+      "action": "Action",
+      "category": "Category",
+      "result": "Result",
+      "actor": "Actor",
+      "target": "Target",
+      "ip": "IP address",
+      "device": "Device",
+      "details": "Details",
+      "noDetails": "No extra details.",
+      "openAccount": "Open account",
+      "openRole": "Open role"
+    },
+    "Meta": {
+      "reason": "Reason",
+      "method": "Method",
+      "attemptedEmail": "Email entered",
+      "scope": "Blocked by",
+      "retryAfterSeconds": "Blocked for",
+      "from": "Before",
+      "to": "After",
+      "added": "Added",
+      "removed": "Removed",
+      "sessionsRevoked": "Sessions signed out",
+      "sessionId": "Session",
+      "familyId": "Session family",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}"
+    },
+    "values": {
+      "BAD_PASSWORD": "Wrong password",
+      "UNKNOWN_EMAIL": "Email not registered",
+      "NO_PASSWORD": "No password set",
+      "CURRENT_PASSWORD_INCORRECT": "Wrong current password",
+      "PASSWORD": "Password",
+      "GOOGLE": "Google",
+      "OTP": "Verification code",
+      "EMAIL": "Email address",
+      "IP": "IP address"
     }
   },
   "Auth": {

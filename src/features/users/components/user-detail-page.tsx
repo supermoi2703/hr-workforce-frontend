@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeftIcon, InfoIcon, UserXIcon } from "lucide-react";
+import { ArrowLeftIcon, InfoIcon, ScrollTextIcon, UserXIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -74,6 +74,15 @@ export function UserDetailPage({ id }: { id: string }) {
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {/* Nhật ký đã lọc sẵn theo tài khoản này (feature users không import audit: chỉ dùng đường dẫn). */}
+          <RequireAccess access={{ permissions: ["audit:read"] }} fallback={null}>
+            <Link
+              href={`/admin/audit-logs?${new URLSearchParams({ targetType: "USER", targetId: user.id, targetLabel: user.email })}`}
+              className={buttonVariants({ variant: "ghost", size: "sm" })}
+            >
+              <ScrollTextIcon /> {t("Detail.viewAuditLog")}
+            </Link>
+          </RequireAccess>
           <RequireAccess access={{ permissions: ["user:update"] }} fallback={null}>
             <EditUserDialog user={user} />
           </RequireAccess>
