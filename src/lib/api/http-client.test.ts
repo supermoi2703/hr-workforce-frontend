@@ -49,6 +49,20 @@ describe("http", () => {
     expect(error).toMatchObject({ status: 400, code: "VALIDATION_ERROR", fieldErrors: [{ field: "email", message: "bad" }] });
   });
 
+  it("đọc header Retry-After của lỗi 429", async () => {
+    const response = fail(429, "TOO_MANY_REQUESTS");
+    response.headers.set("Retry-After", "900");
+    fetchMock.mockResolvedValueOnce(response);
+    await expect(http.post("/api/auth/login", {}, { skipAuth: true })).rejects.toMatchObject({
+      status: 429,
+      code: "TOO_MANY_REQUESTS",
+      retryAfterSeconds: 900,
+    });
+
+    fetchMock.mockResolvedValueOnce(fail(400, "VALIDATION_ERROR"));
+    await expect(http.get("/api/x")).rejects.toHaveProperty("retryAfterSeconds", undefined);
+  });
+
   it("báo NETWORK_ERROR khi không kết nối được hoặc proxy trả lỗi không phải JSON", async () => {
     fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
     await expect(http.get("/api/x")).rejects.toMatchObject({ code: "NETWORK_ERROR", status: 0 });

@@ -1,0 +1,606 @@
+{
+  "Metadata": {
+    "title": "HRM Workforce",
+    "description": "HR and workforce management system"
+  },
+  "Common": {
+    "retry": "Try again",
+    "backToHome": "Back to home",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "Language": {
+    "label": "Change language"
+  },
+  "Theme": {
+    "label": "Change theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Nav": {
+    "tagline": "HR and workforce management",
+    "groups": {
+      "overview": "Overview",
+      "people": "People",
+      "timePay": "Time & pay",
+      "organization": "Organization & workforce",
+      "aiLab": "AI lab",
+      "admin": "Administration",
+      "dev": "Development"
+    },
+    "items": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "approvals": "Approvals",
+      "employees": "Employees",
+      "contracts": "Contracts",
+      "attendance": "Attendance",
+      "timesheets": "Timesheets",
+      "leave": "Leave & WFH",
+      "payroll": "Payroll",
+      "payslips": "Payslips",
+      "organization": "Organization",
+      "officeCalendar": "Office calendar",
+      "skills": "Skills",
+      "projects": "Projects",
+      "allocations": "Staff allocation",
+      "faceAttendance": "Face check-in",
+      "policyQa": "Policy Q&A",
+      "allocationSuggest": "Allocation suggestions",
+      "dataQa": "Data Q&A",
+      "users": "Accounts",
+      "roles": "Roles & permissions",
+      "auditLog": "Audit log",
+      "devUi": "UI components",
+      "devError": "Error page demo"
+    }
+  },
+  "Shell": {
+    "checkingSession": "Checking your session...",
+    "account": "Account",
+    "signOut": "Sign out",
+    "roleLabel": "Role:",
+    "demoSignIn": "Demo sign-in"
+  },
+  "Roles": {
+    "ADMIN": "Admin",
+    "HR": "HR",
+    "MANAGER": "Manager",
+    "EMPLOYEE": "Employee"
+  },
+  "UserStatus": {
+    "ACTIVE": "Active",
+    "PENDING": "Pending activation",
+    "LOCKED": "Locked",
+    "DISABLED": "Disabled"
+  },
+  "Devices": {
+    "unknownDevice": "Unknown device",
+    "unknownIp": "Unknown IP",
+    "lastActive": "Last active {time}",
+    "expires": "Expires {time}"
+  },
+  "States": {
+    "loading": "Loading data...",
+    "errorTitle": "Couldn't load data",
+    "emptyTitle": "No data yet",
+    "forbiddenTitle": "You don't have access to this page",
+    "forbiddenDescription": "Contact an administrator if you need access.",
+    "comingSoonTitle": "In development",
+    "comingSoonDescription": "This feature is being built.",
+    "comingSoonTask": "Task {task}",
+    "comingSoonOwner": "Owner: {owner}"
+  },
+  "DataTable": {
+    "summary": "Showing {from}–{to} of {total} rows",
+    "rows": "Rows",
+    "rowsPerPage": "Rows per page",
+    "pageOf": "Page {page} of {pages}",
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page"
+  },
+  "Errors": {
+    "network": "Can't reach the server. Check your connection and try again.",
+    "unexpectedResponse": "The server returned an invalid response.",
+    "validation": "Some fields are invalid. Please check and try again.",
+    "unauthorized": "Your session has expired. Please sign in again.",
+    "forbidden": "You don't have permission to do this.",
+    "notFound": "The data could not be found.",
+    "conflict": "The data was changed or already exists. Reload and try again.",
+    "tooManyRequests": "Too many requests. Please try again in a few minutes.",
+    "internal": "Something went wrong on the server. Please try again later.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The link doesn't exist or has changed."
+  },
+  "ErrorPage": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred while showing this page.",
+    "code": "Error code: {digest}"
+  },
+  "System": {
+    "title": "Backend connection",
+    "interval": "Checked every 30 seconds",
+    "recheck": "Check again",
+    "checking": "Checking...",
+    "down": "Can't connect",
+    "up": "Running",
+    "updatedAt": "Updated at {time}"
+  },
+  "Account": {
+    "metaTitle": "Account",
+    "title": "Account",
+    "description": "Your profile, password and sign-in security.",
+    "Tabs": {
+      "profile": "Profile",
+      "password": "Password",
+      "devices": "Devices",
+      "activity": "Activity"
+    },
+    "Profile": {
+      "name": "Name",
+      "email": "Email",
+      "roles": "Roles",
+      "status": "Status",
+      "note": "Contact HR to change your name or email."
+    },
+    "Password": {
+      "description": "Your other devices are signed out after the change. This device stays signed in.",
+      "current": "Current password",
+      "submit": "Change password",
+      "success": "Password changed. Your other devices were signed out.",
+      "setPassword": "Set a password"
+    },
+    "Devices": {
+      "description": "Devices currently signed in to your account. Sign out any device you don't recognize.",
+      "thisDevice": "This device",
+      "signOut": "Sign out",
+      "signOutOthers": "Sign out other devices",
+      "signOutOthersTitle": "Sign out of all other devices?",
+      "signOutOthersDescription": "Every device except this one will have to sign in again.",
+      "signedOut": "The device was signed out.",
+      "signedOutOthers": "Your other devices were signed out.",
+      "onlyThisDevice": "You're only signed in on this device."
+    },
+    "Activity": {
+      "description": "Recent sign-ins, password changes and changes to your account.",
+      "time": "Time",
+      "event": "Event",
+      "result": "Result",
+      "device": "Device",
+      "ip": "IP address",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "empty": "No activity yet"
+    }
+  },
+  "Users": {
+    "metaTitle": "Accounts",
+    "List": {
+      "title": "Accounts",
+      "description": "Create accounts, check who can sign in and manage access.",
+      "create": "Create account",
+      "empty": "No accounts match your filters",
+      "never": "Never"
+    },
+    "Filters": {
+      "search": "Search by name or email",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "role": "Role",
+      "allRoles": "All roles"
+    },
+    "Columns": {
+      "account": "Account",
+      "roles": "Roles",
+      "status": "Status",
+      "lastLogin": "Last sign-in"
+    },
+    "Create": {
+      "title": "Create account",
+      "description": "The person gets an email with a code to activate the account and set a password.",
+      "email": "Work email",
+      "displayName": "Display name",
+      "roles": "Roles",
+      "rolesHint": "Leave empty to give the Employee role.",
+      "defaultRole": "New accounts get the Employee role.",
+      "submit": "Create account",
+      "success": "Account created. An activation email was sent to {email}."
+    },
+    "Edit": {
+      "title": "Edit name",
+      "displayName": "Display name",
+      "submit": "Save",
+      "success": "Name updated."
+    },
+    "Detail": {
+      "metaTitle": "Account details",
+      "back": "Back to accounts",
+      "editName": "Edit name",
+      "email": "Email",
+      "roles": "Roles",
+      "status": "Status",
+      "createdAt": "Created",
+      "lastLogin": "Last sign-in",
+      "emailVerified": "Email verified",
+      "notVerified": "Not verified",
+      "notFound": "Account not found",
+      "notFoundDescription": "This account doesn't exist or the link is wrong.",
+      "viewAuditLog": "View audit log"
+    },
+    "Validation": {
+      "emailInvalid": "Enter a valid email address",
+      "displayNameRequired": "Enter a display name",
+      "displayNameTooLong": "Display name must be at most 150 characters"
+    },
+    "Errors": {
+      "emailExists": "This email already has an account.",
+      "cannotModifySelf": "You can't do this to your own account.",
+      "adminProtected": "Only administrators can change administrator accounts or the Admin role.",
+      "invalidStatus": "The account status has changed. Reload and try again.",
+      "roleNotFound": "One of the selected roles no longer exists. Reload and try again.",
+      "resendTooSoon": "Wait a minute before sending another code.",
+      "roleCodeExists": "A role with this code already exists.",
+      "roleInUse": "Some accounts still have this role. Remove it from them first.",
+      "systemRoleProtected": "System roles can't be changed this way.",
+      "permissionNotFound": "A selected permission no longer exists. Reload and try again."
+    },
+    "Actions": {
+      "menu": "Actions",
+      "openMenu": "Actions for {name}",
+      "lock": "Lock account",
+      "unlock": "Unlock account",
+      "disable": "Disable account",
+      "enable": "Re-enable account",
+      "assignRoles": "Change roles",
+      "resendActivation": "Resend activation code",
+      "forceLogout": "Sign out everywhere"
+    },
+    "Confirm": {
+      "lockTitle": "Lock {name}'s account?",
+      "lockDescription": "They are signed out of every device and can't sign in until the account is unlocked.",
+      "disableTitle": "Disable {name}'s account?",
+      "disableDescription": "Use this when someone leaves the company. They are signed out everywhere, and only an administrator can re-enable the account.",
+      "enableTitle": "Re-enable {name}'s account?",
+      "enableDescription": "They can sign in again with their existing password.",
+      "forceLogoutTitle": "Sign {name} out everywhere?",
+      "forceLogoutDescription": "Every device they are signed in on will have to sign in again. The account stays active."
+    },
+    "Toasts": {
+      "locked": "Account locked.",
+      "unlocked": "Account unlocked.",
+      "disabled": "Account disabled.",
+      "enabled": "Account re-enabled.",
+      "rolesChanged": "Roles updated.",
+      "activationSent": "Activation code sent.",
+      "signedOutEverywhere": "Signed out of all devices."
+    },
+    "AssignRoles": {
+      "title": "Change roles",
+      "description": "Choose the roles for {name}.",
+      "note": "Changes take effect the next time they refresh their session (within 15 minutes).",
+      "required": "Select at least one role",
+      "submit": "Save roles"
+    },
+    "Sessions": {
+      "title": "Signed-in devices",
+      "empty": "Not signed in on any device.",
+      "forceLogout": "Sign out everywhere"
+    },
+    "Blocked": {
+      "self": "This is your own account. Manage your password and devices from your",
+      "selfLink": "Account page",
+      "adminProtected": "Only administrators can manage administrator accounts."
+    }
+  },
+  "RoleAdmin": {
+    "metaTitle": "Roles & permissions",
+    "List": {
+      "title": "Roles & permissions",
+      "description": "Choose what each role can do. Changes apply immediately to everyone with the role.",
+      "create": "Create role",
+      "allPermissions": "All"
+    },
+    "Columns": {
+      "role": "Role",
+      "code": "Code",
+      "type": "Type",
+      "permissions": "Permissions",
+      "people": "People"
+    },
+    "Types": {
+      "system": "System",
+      "custom": "Custom",
+      "locked": "Locked"
+    },
+    "Create": {
+      "title": "Create role",
+      "description": "Choose the permissions on the next screen.",
+      "code": "Code",
+      "codeHint": "Uppercase letters, digits or underscores, e.g. ACCOUNTANT. Can't be changed later.",
+      "name": "Name",
+      "descriptionLabel": "Description",
+      "submit": "Create role",
+      "success": "Role {name} created. Choose its permissions."
+    },
+    "Detail": {
+      "metaTitle": "Role details",
+      "back": "Back to roles",
+      "people": "{count, plural, =0 {No one has this role} one {# person has this role} other {# people have this role}}",
+      "name": "Name",
+      "description": "Description",
+      "permissions": "Permissions",
+      "save": "Save changes",
+      "discard": "Discard",
+      "saved": "Role saved.",
+      "lockedNote": "The Admin role always has every permission and can't be changed.",
+      "readOnlyNote": "You can view this role but not change it.",
+      "delete": "Delete role",
+      "deleted": "Role {name} deleted.",
+      "systemCantDelete": "System roles can't be deleted.",
+      "inUseCantDelete": "Remove this role from {count, plural, one {# account} other {# accounts}} before deleting it.",
+      "notFound": "Role not found",
+      "notFoundDescription": "This role doesn't exist or the link is wrong."
+    },
+    "Confirm": {
+      "removeTitle": "Remove {count, plural, one {# permission} other {# permissions}} from {name}?",
+      "removeDescription": "This takes effect immediately for {people, plural, one {# person} other {# people}} with this role.",
+      "removeConfirm": "Save changes",
+      "deleteTitle": "Delete role {name}?",
+      "deleteDescription": "The role is removed permanently. No account has it right now."
+    },
+    "groups": {
+      "user": "Accounts",
+      "role": "Roles",
+      "session": "Sign-in sessions",
+      "audit": "Audit log"
+    },
+    "Validation": {
+      "codeInvalid": "Use 3–50 uppercase letters, digits or underscores, starting with a letter",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Name must be at most 100 characters",
+      "descriptionTooLong": "Description must be at most 500 characters"
+    }
+  },
+  "Permissions": {
+    "user_read": {
+      "name": "View accounts",
+      "description": "See the account list and account details"
+    },
+    "user_create": {
+      "name": "Create accounts",
+      "description": "Create accounts and resend activation codes"
+    },
+    "user_update": {
+      "name": "Edit accounts",
+      "description": "Change account details such as the display name"
+    },
+    "user_lock": {
+      "name": "Lock accounts",
+      "description": "Lock, unlock or disable accounts and sign people out"
+    },
+    "role_read": {
+      "name": "View roles",
+      "description": "See roles and their permissions"
+    },
+    "role_assign": {
+      "name": "Assign roles",
+      "description": "Change the roles of an account"
+    },
+    "role_manage": {
+      "name": "Manage roles",
+      "description": "Create, edit and delete roles and their permissions"
+    },
+    "session_read_all": {
+      "name": "View everyone's sessions",
+      "description": "See the devices any account is signed in on"
+    },
+    "audit_read": {
+      "name": "View audit log",
+      "description": "See the security and administration audit log"
+    }
+  },
+  "AuditActions": {
+    "LOGIN_SUCCESS": "Signed in",
+    "LOGIN_FAILED": "Sign-in attempt",
+    "LOGIN_LOCKED_OUT": "Sign-in temporarily blocked",
+    "LOGOUT": "Signed out",
+    "LOGOUT_ALL": "Signed out of all devices",
+    "SESSION_REVOKED": "Signed out a device",
+    "SESSIONS_REVOKED_BY_ADMIN": "Signed out by an administrator",
+    "REFRESH_TOKEN_REUSE_DETECTED": "Suspicious session use blocked",
+    "ACCOUNT_ACTIVATED": "Account activated",
+    "GOOGLE_LINKED": "Google account linked",
+    "PASSWORD_RESET_REQUESTED": "Password reset code requested",
+    "PASSWORD_RESET": "Password reset",
+    "PASSWORD_CHANGED": "Password changed",
+    "PASSWORD_CHANGE_FAILED": "Password change attempt",
+    "USER_LOCKED": "Account locked",
+    "USER_UNLOCKED": "Account unlocked",
+    "USER_DISABLED": "Account disabled",
+    "USER_ENABLED": "Account re-enabled",
+    "USER_ROLES_CHANGED": "Roles changed",
+    "ACTIVATION_CODE_RESENT": "Activation code resent",
+    "USER_CREATED": "Account created",
+    "USER_UPDATED": "Account updated",
+    "ROLE_CREATED": "Role created",
+    "ROLE_UPDATED": "Role updated",
+    "ROLE_DELETED": "Role deleted"
+  },
+  "AuditLog": {
+    "metaTitle": "Audit log",
+    "List": {
+      "title": "Audit log",
+      "description": "Sign-ins, account changes and administration actions. Sign-in events are kept for 180 days, other events for 365 days.",
+      "empty": "No entries match your filters",
+      "system": "System"
+    },
+    "Filters": {
+      "action": "Action",
+      "allActions": "All actions",
+      "outcome": "Result",
+      "allOutcomes": "All results",
+      "dateRange": "Date range",
+      "anyDate": "Any date",
+      "actor": "Actor: {label}",
+      "target": "Target: {label}",
+      "removeFilter": "Remove filter",
+      "clear": "Clear filters"
+    },
+    "Columns": {
+      "time": "Time",
+      "action": "Action",
+      "result": "Result",
+      "actor": "Actor",
+      "target": "Target",
+      "ip": "IP address",
+      "filterBy": "Show entries for {label}",
+      "openEntry": "Open entry from {time}"
+    },
+    "outcomes": {
+      "SUCCESS": "Succeeded",
+      "FAILURE": "Failed"
+    },
+    "categories": {
+      "AUTHENTICATION": "Sign-in",
+      "ACCOUNT": "Account",
+      "ADMINISTRATION": "Administration"
+    },
+    "Sheet": {
+      "title": "Log entry",
+      "time": "Time",
+      "action": "Action",
+      "category": "Category",
+      "result": "Result",
+      "actor": "Actor",
+      "target": "Target",
+      "ip": "IP address",
+      "device": "Device",
+      "details": "Details",
+      "noDetails": "No extra details.",
+      "openAccount": "Open account",
+      "openRole": "Open role"
+    },
+    "Meta": {
+      "reason": "Reason",
+      "method": "Method",
+      "attemptedEmail": "Email entered",
+      "scope": "Blocked by",
+      "retryAfterSeconds": "Blocked for",
+      "from": "Before",
+      "to": "After",
+      "added": "Added",
+      "removed": "Removed",
+      "sessionsRevoked": "Sessions signed out",
+      "sessionId": "Session",
+      "familyId": "Session family",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}"
+    },
+    "values": {
+      "BAD_PASSWORD": "Wrong password",
+      "UNKNOWN_EMAIL": "Email not registered",
+      "NO_PASSWORD": "No password set",
+      "CURRENT_PASSWORD_INCORRECT": "Wrong current password",
+      "PASSWORD": "Password",
+      "GOOGLE": "Google",
+      "OTP": "Verification code",
+      "EMAIL": "Email address",
+      "IP": "IP address"
+    }
+  },
+  "Auth": {
+    "Login": {
+      "metaTitle": "Sign in",
+      "title": "Sign in",
+      "subtitle": "Use your work email to continue.",
+      "google": "Continue with Google",
+      "or": "or",
+      "email": "Email",
+      "emailPlaceholder": "name@company.com",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account? Contact HR to get one.",
+      "activateAccount": "Activate account"
+    },
+    "ForgotPassword": {
+      "metaTitle": "Reset password",
+      "title": "Reset your password",
+      "requestDescription": "Enter your work email and we'll send you a verification code.",
+      "sendCode": "Send code",
+      "codeSent": "If an account exists for {email}, we sent a verification code to it. The code expires in a few minutes.",
+      "resetDescription": "Enter the code sent to {email} and choose a new password.",
+      "submit": "Reset password"
+    },
+    "Activate": {
+      "metaTitle": "Activate account",
+      "title": "Activate your account",
+      "description": "Enter the code from your invitation email and choose a password.",
+      "descriptionFor": "Enter the code sent to {email} and choose a password.",
+      "submit": "Activate account"
+    },
+    "CodeFlow": {
+      "code": "Verification code",
+      "resend": "Resend code",
+      "resendIn": "Resend code in {time}",
+      "resent": "If the account exists, a new code has been sent.",
+      "changeEmail": "Use a different email",
+      "backToSignIn": "Back to sign in",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password"
+    },
+    "PasswordRules": {
+      "title": "Your password needs:",
+      "length": "8 to 72 characters",
+      "letter": "At least one letter",
+      "digit": "At least one number"
+    },
+    "Validation": {
+      "emailInvalid": "Enter a valid email address",
+      "emailTooLong": "Email is too long",
+      "passwordRequired": "Enter your password",
+      "passwordTooLong": "Password must be at most 128 characters",
+      "otpInvalid": "Enter the 6-digit code",
+      "passwordWeak": "Password doesn't meet the requirements",
+      "passwordMismatch": "Passwords don't match"
+    },
+    "Errors": {
+      "invalidCredentials": "Incorrect email or password.",
+      "tooManyAttempts": "Too many failed sign-in attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+      "tooManyAttemptsSoon": "Too many failed sign-in attempts. Try again in a few minutes.",
+      "accountNotActivated": "Your account is not activated yet. Use the code in your invitation email to activate it.",
+      "accountLocked": "Your account is locked. Contact HR to unlock it.",
+      "accountDisabled": "Your account has been disabled. Contact HR if you need access again.",
+      "googleAccountNotFound": "This Google email doesn't have an account. Contact HR to get one.",
+      "googleEmailNotVerified": "Your Google email isn't verified. Verify it with Google, then try again.",
+      "googleAccountConflict": "This account is linked to a different Google account. Sign in with that Google account or with your password.",
+      "googleTooManyRequests": "Too many Google sign-in attempts. Try again in a few minutes.",
+      "googleFailed": "Google sign-in failed. Please try again.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "passwordResetDone": "Your password has been updated. Sign in with your new password.",
+      "accountActivatedDone": "Your account is activated. Sign in with the password you just set.",
+      "invalidOtp": "The code is incorrect or has expired. Request a new code.",
+      "weakPassword": "Password doesn't meet the requirements.",
+      "passwordReused": "Choose a password different from your current one.",
+      "tooManyRequests": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+      "tooManyRequestsSoon": "Too many attempts. Try again in a few minutes.",
+      "currentPasswordIncorrect": "Your current password is incorrect.",
+      "noPasswordSet": "Your account doesn't have a password yet because you sign in with Google. Set one with a verification code sent to your email."
+    },
+    "Callback": {
+      "signingIn": "Signing you in..."
+    },
+    "Showcase": {
+      "title": "All your HR work in one place",
+      "description": "Attendance, leave, payroll and projects for every employee, in a single system.",
+      "approved": "Approved"
+    }
+  }
+}

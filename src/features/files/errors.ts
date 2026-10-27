@@ -1,4 +1,4 @@
-import { getErrorMessage, isApiError } from "@/lib/api/errors";
+import { getErrorMessage, isApiError, type ErrorsTranslator } from "@/lib/api/errors";
 import { StorageUploadError } from "./api";
 import { FileValidationError } from "./upload";
 
@@ -11,7 +11,8 @@ const MESSAGES: Record<string, string> = {
   STORAGE_UNAVAILABLE: "Kho lưu trữ file đang không hoạt động, vui lòng thử lại sau.",
 };
 
-export function getFileErrorMessage(error: unknown): string {
+/** Mã không thuộc riêng module file (mất mạng, lỗi server...) dùng thông báo chung (namespace "Errors"). */
+export function getFileErrorMessage(error: unknown, tErrors: ErrorsTranslator): string {
   if (error instanceof FileValidationError) return MESSAGES[error.code];
   if (error instanceof StorageUploadError) {
     return error.status === 0
@@ -19,5 +20,5 @@ export function getFileErrorMessage(error: unknown): string {
       : "Kho lưu trữ từ chối file (link tải lên hết hạn hoặc file không khớp), vui lòng thử lại.";
   }
   if (isApiError(error) && MESSAGES[error.code]) return MESSAGES[error.code];
-  return getErrorMessage(error);
+  return getErrorMessage(error, tErrors);
 }

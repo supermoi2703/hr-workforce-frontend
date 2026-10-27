@@ -1,0 +1,606 @@
+{
+  "Metadata": {
+    "title": "HRM Workforce",
+    "description": "Hệ thống quản lý và điều phối nhân lực"
+  },
+  "Common": {
+    "retry": "Thử lại",
+    "backToHome": "Về trang chủ",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy"
+  },
+  "Language": {
+    "label": "Đổi ngôn ngữ"
+  },
+  "Theme": {
+    "label": "Đổi giao diện sáng/tối",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Theo hệ thống"
+  },
+  "Nav": {
+    "tagline": "Quản lý và điều phối nhân lực",
+    "groups": {
+      "overview": "Tổng quan",
+      "people": "Nhân sự",
+      "timePay": "Công & Lương",
+      "organization": "Tổ chức & Workforce",
+      "aiLab": "Thử nghiệm AI",
+      "admin": "Quản trị",
+      "dev": "Phát triển"
+    },
+    "items": {
+      "home": "Trang chủ",
+      "dashboard": "Dashboard",
+      "approvals": "Việc cần duyệt",
+      "employees": "Nhân viên",
+      "contracts": "Hợp đồng",
+      "attendance": "Chấm công",
+      "timesheets": "Bảng công",
+      "leave": "Nghỉ phép & WFH",
+      "payroll": "Lương",
+      "payslips": "Phiếu lương",
+      "organization": "Tổ chức",
+      "officeCalendar": "Lịch văn phòng",
+      "skills": "Kỹ năng",
+      "projects": "Dự án",
+      "allocations": "Phân bổ nhân sự",
+      "faceAttendance": "Chấm công khuôn mặt",
+      "policyQa": "Hỏi đáp chính sách",
+      "allocationSuggest": "Gợi ý phân bổ",
+      "dataQa": "Hỏi đáp dữ liệu",
+      "users": "Tài khoản",
+      "roles": "Vai trò & quyền",
+      "auditLog": "Nhật ký hệ thống",
+      "devUi": "Component mẫu",
+      "devError": "Trang lỗi mẫu"
+    }
+  },
+  "Shell": {
+    "checkingSession": "Đang kiểm tra phiên đăng nhập...",
+    "account": "Tài khoản",
+    "signOut": "Đăng xuất",
+    "roleLabel": "Vai trò:",
+    "demoSignIn": "Đăng nhập giả lập"
+  },
+  "Roles": {
+    "ADMIN": "Quản trị",
+    "HR": "Nhân sự",
+    "MANAGER": "Quản lý",
+    "EMPLOYEE": "Nhân viên"
+  },
+  "UserStatus": {
+    "ACTIVE": "Đang hoạt động",
+    "PENDING": "Chờ kích hoạt",
+    "LOCKED": "Đang bị khóa",
+    "DISABLED": "Đã vô hiệu hóa"
+  },
+  "Devices": {
+    "unknownDevice": "Thiết bị không xác định",
+    "unknownIp": "Không rõ IP",
+    "lastActive": "Hoạt động lần cuối {time}",
+    "expires": "Hết hạn {time}"
+  },
+  "States": {
+    "loading": "Đang tải dữ liệu...",
+    "errorTitle": "Không tải được dữ liệu",
+    "emptyTitle": "Chưa có dữ liệu",
+    "forbiddenTitle": "Bạn không có quyền xem trang này",
+    "forbiddenDescription": "Liên hệ quản trị viên nếu bạn cần được cấp quyền.",
+    "comingSoonTitle": "Đang phát triển",
+    "comingSoonDescription": "Chức năng này đang được xây dựng.",
+    "comingSoonTask": "Việc {task}",
+    "comingSoonOwner": "Phụ trách: {owner}"
+  },
+  "DataTable": {
+    "summary": "Hiển thị {from}–{to} / {total} dòng",
+    "rows": "Số dòng",
+    "rowsPerPage": "Số dòng mỗi trang",
+    "pageOf": "Trang {page}/{pages}",
+    "firstPage": "Trang đầu",
+    "previousPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "lastPage": "Trang cuối"
+  },
+  "Errors": {
+    "network": "Không kết nối được máy chủ. Vui lòng kiểm tra mạng hoặc thử lại sau.",
+    "unexpectedResponse": "Máy chủ trả về dữ liệu không hợp lệ.",
+    "validation": "Dữ liệu chưa hợp lệ, vui lòng kiểm tra lại.",
+    "unauthorized": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+    "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+    "notFound": "Không tìm thấy dữ liệu.",
+    "conflict": "Dữ liệu đã bị thay đổi hoặc bị trùng, vui lòng tải lại và thử lại.",
+    "tooManyRequests": "Bạn thao tác quá nhanh, vui lòng thử lại sau ít phút.",
+    "internal": "Có lỗi xảy ra ở máy chủ, vui lòng thử lại sau.",
+    "generic": "Đã có lỗi xảy ra, vui lòng thử lại."
+  },
+  "NotFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Đường dẫn không tồn tại hoặc đã bị thay đổi."
+  },
+  "ErrorPage": {
+    "title": "Trang gặp lỗi",
+    "description": "Đã có lỗi không mong muốn khi hiển thị trang này.",
+    "code": "Mã lỗi: {digest}"
+  },
+  "System": {
+    "title": "Kết nối backend",
+    "interval": "Kiểm tra mỗi 30 giây",
+    "recheck": "Kiểm tra lại",
+    "checking": "Đang kiểm tra...",
+    "down": "Không kết nối được",
+    "up": "Đang hoạt động",
+    "updatedAt": "Cập nhật lúc {time}"
+  },
+  "Account": {
+    "metaTitle": "Tài khoản",
+    "title": "Tài khoản",
+    "description": "Thông tin cá nhân, mật khẩu và bảo mật đăng nhập.",
+    "Tabs": {
+      "profile": "Thông tin",
+      "password": "Mật khẩu",
+      "devices": "Thiết bị",
+      "activity": "Hoạt động"
+    },
+    "Profile": {
+      "name": "Họ tên",
+      "email": "Email",
+      "roles": "Vai trò",
+      "status": "Trạng thái",
+      "note": "Liên hệ bộ phận nhân sự nếu cần đổi họ tên hoặc email."
+    },
+    "Password": {
+      "description": "Sau khi đổi, các thiết bị khác sẽ bị đăng xuất. Thiết bị này vẫn giữ đăng nhập.",
+      "current": "Mật khẩu hiện tại",
+      "submit": "Đổi mật khẩu",
+      "success": "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất.",
+      "setPassword": "Đặt mật khẩu"
+    },
+    "Devices": {
+      "description": "Các thiết bị đang đăng nhập vào tài khoản của bạn. Hãy đăng xuất thiết bị bạn không nhận ra.",
+      "thisDevice": "Thiết bị này",
+      "signOut": "Đăng xuất",
+      "signOutOthers": "Đăng xuất các thiết bị khác",
+      "signOutOthersTitle": "Đăng xuất tất cả thiết bị khác?",
+      "signOutOthersDescription": "Mọi thiết bị trừ thiết bị này sẽ phải đăng nhập lại.",
+      "signedOut": "Đã đăng xuất thiết bị.",
+      "signedOutOthers": "Đã đăng xuất các thiết bị khác.",
+      "onlyThisDevice": "Bạn chỉ đang đăng nhập trên thiết bị này."
+    },
+    "Activity": {
+      "description": "Các lần đăng nhập, đổi mật khẩu và thay đổi tài khoản gần đây.",
+      "time": "Thời gian",
+      "event": "Sự kiện",
+      "result": "Kết quả",
+      "device": "Thiết bị",
+      "ip": "Địa chỉ IP",
+      "succeeded": "Thành công",
+      "failed": "Thất bại",
+      "empty": "Chưa có hoạt động"
+    }
+  },
+  "Users": {
+    "metaTitle": "Tài khoản",
+    "List": {
+      "title": "Tài khoản",
+      "description": "Tạo tài khoản, xem ai đăng nhập được và quản lý quyền truy cập.",
+      "create": "Tạo tài khoản",
+      "empty": "Không có tài khoản nào khớp bộ lọc",
+      "never": "Chưa đăng nhập"
+    },
+    "Filters": {
+      "search": "Tìm theo tên hoặc email",
+      "status": "Trạng thái",
+      "allStatuses": "Mọi trạng thái",
+      "role": "Vai trò",
+      "allRoles": "Mọi vai trò"
+    },
+    "Columns": {
+      "account": "Tài khoản",
+      "roles": "Vai trò",
+      "status": "Trạng thái",
+      "lastLogin": "Đăng nhập gần nhất"
+    },
+    "Create": {
+      "title": "Tạo tài khoản",
+      "description": "Người được tạo sẽ nhận email có mã để kích hoạt tài khoản và tự đặt mật khẩu.",
+      "email": "Email công ty",
+      "displayName": "Tên hiển thị",
+      "roles": "Vai trò",
+      "rolesHint": "Để trống thì gán vai trò Nhân viên.",
+      "defaultRole": "Tài khoản mới có vai trò Nhân viên.",
+      "submit": "Tạo tài khoản",
+      "success": "Đã tạo tài khoản. Email kích hoạt đã được gửi tới {email}."
+    },
+    "Edit": {
+      "title": "Sửa tên",
+      "displayName": "Tên hiển thị",
+      "submit": "Lưu",
+      "success": "Đã cập nhật tên."
+    },
+    "Detail": {
+      "metaTitle": "Chi tiết tài khoản",
+      "back": "Quay lại danh sách",
+      "editName": "Sửa tên",
+      "email": "Email",
+      "roles": "Vai trò",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "lastLogin": "Đăng nhập gần nhất",
+      "emailVerified": "Xác minh email",
+      "notVerified": "Chưa xác minh",
+      "notFound": "Không tìm thấy tài khoản",
+      "notFoundDescription": "Tài khoản không tồn tại hoặc đường dẫn bị sai.",
+      "viewAuditLog": "Xem nhật ký"
+    },
+    "Validation": {
+      "emailInvalid": "Email không hợp lệ",
+      "displayNameRequired": "Vui lòng nhập tên hiển thị",
+      "displayNameTooLong": "Tên hiển thị tối đa 150 ký tự"
+    },
+    "Errors": {
+      "emailExists": "Email này đã có tài khoản.",
+      "cannotModifySelf": "Bạn không thể thực hiện thao tác này trên tài khoản của chính mình.",
+      "adminProtected": "Chỉ quản trị viên mới thay đổi được tài khoản quản trị hoặc vai trò Quản trị.",
+      "invalidStatus": "Trạng thái tài khoản vừa thay đổi. Hãy tải lại rồi thử lại.",
+      "roleNotFound": "Một vai trò đã chọn không còn tồn tại. Hãy tải lại rồi thử lại.",
+      "resendTooSoon": "Hãy chờ một phút trước khi gửi mã mới.",
+      "roleCodeExists": "Đã có vai trò dùng mã này.",
+      "roleInUse": "Vẫn còn tài khoản giữ vai trò này. Hãy gỡ khỏi các tài khoản đó trước.",
+      "systemRoleProtected": "Không thể thay đổi vai trò hệ thống theo cách này.",
+      "permissionNotFound": "Một quyền đã chọn không còn tồn tại. Hãy tải lại rồi thử lại."
+    },
+    "Actions": {
+      "menu": "Thao tác",
+      "openMenu": "Thao tác cho {name}",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa tài khoản",
+      "disable": "Vô hiệu hóa tài khoản",
+      "enable": "Kích hoạt lại tài khoản",
+      "assignRoles": "Đổi vai trò",
+      "resendActivation": "Gửi lại mã kích hoạt",
+      "forceLogout": "Đăng xuất mọi thiết bị"
+    },
+    "Confirm": {
+      "lockTitle": "Khóa tài khoản của {name}?",
+      "lockDescription": "Người này bị đăng xuất khỏi mọi thiết bị và không đăng nhập được cho tới khi được mở khóa.",
+      "disableTitle": "Vô hiệu hóa tài khoản của {name}?",
+      "disableDescription": "Dùng khi nhân viên nghỉ việc. Người này bị đăng xuất khỏi mọi thiết bị và chỉ quản trị viên mới kích hoạt lại được.",
+      "enableTitle": "Kích hoạt lại tài khoản của {name}?",
+      "enableDescription": "Người này đăng nhập lại được bằng mật khẩu cũ.",
+      "forceLogoutTitle": "Đăng xuất {name} khỏi mọi thiết bị?",
+      "forceLogoutDescription": "Mọi thiết bị đang đăng nhập phải đăng nhập lại. Tài khoản vẫn hoạt động bình thường."
+    },
+    "Toasts": {
+      "locked": "Đã khóa tài khoản.",
+      "unlocked": "Đã mở khóa tài khoản.",
+      "disabled": "Đã vô hiệu hóa tài khoản.",
+      "enabled": "Đã kích hoạt lại tài khoản.",
+      "rolesChanged": "Đã cập nhật vai trò.",
+      "activationSent": "Đã gửi mã kích hoạt.",
+      "signedOutEverywhere": "Đã đăng xuất khỏi mọi thiết bị."
+    },
+    "AssignRoles": {
+      "title": "Đổi vai trò",
+      "description": "Chọn vai trò cho {name}.",
+      "note": "Thay đổi có hiệu lực ở lần làm mới phiên tiếp theo của người này (trong vòng 15 phút).",
+      "required": "Chọn ít nhất một vai trò",
+      "submit": "Lưu vai trò"
+    },
+    "Sessions": {
+      "title": "Thiết bị đang đăng nhập",
+      "empty": "Không đăng nhập trên thiết bị nào.",
+      "forceLogout": "Đăng xuất mọi thiết bị"
+    },
+    "Blocked": {
+      "self": "Đây là tài khoản của bạn. Quản lý mật khẩu và thiết bị tại",
+      "selfLink": "trang Tài khoản",
+      "adminProtected": "Chỉ quản trị viên mới quản lý được tài khoản quản trị."
+    }
+  },
+  "RoleAdmin": {
+    "metaTitle": "Vai trò & quyền",
+    "List": {
+      "title": "Vai trò & quyền",
+      "description": "Chọn mỗi vai trò được làm gì. Thay đổi có hiệu lực ngay với mọi người giữ vai trò đó.",
+      "create": "Tạo vai trò",
+      "allPermissions": "Tất cả"
+    },
+    "Columns": {
+      "role": "Vai trò",
+      "code": "Mã",
+      "type": "Loại",
+      "permissions": "Quyền",
+      "people": "Số người"
+    },
+    "Types": {
+      "system": "Hệ thống",
+      "custom": "Tự tạo",
+      "locked": "Khóa"
+    },
+    "Create": {
+      "title": "Tạo vai trò",
+      "description": "Chọn quyền cho vai trò ở màn hình tiếp theo.",
+      "code": "Mã",
+      "codeHint": "Chữ HOA, chữ số hoặc dấu gạch dưới, vd KE_TOAN. Không đổi được sau khi tạo.",
+      "name": "Tên",
+      "descriptionLabel": "Mô tả",
+      "submit": "Tạo vai trò",
+      "success": "Đã tạo vai trò {name}. Hãy chọn quyền cho vai trò."
+    },
+    "Detail": {
+      "metaTitle": "Chi tiết vai trò",
+      "back": "Quay lại danh sách",
+      "people": "{count, plural, =0 {Chưa ai có vai trò này} other {# người có vai trò này}}",
+      "name": "Tên",
+      "description": "Mô tả",
+      "permissions": "Quyền",
+      "save": "Lưu thay đổi",
+      "discard": "Hủy thay đổi",
+      "saved": "Đã lưu vai trò.",
+      "lockedNote": "Vai trò Quản trị luôn có mọi quyền và không thể thay đổi.",
+      "readOnlyNote": "Bạn chỉ xem được, không sửa được vai trò này.",
+      "delete": "Xóa vai trò",
+      "deleted": "Đã xóa vai trò {name}.",
+      "systemCantDelete": "Không thể xóa vai trò hệ thống.",
+      "inUseCantDelete": "Hãy gỡ vai trò này khỏi {count} tài khoản trước khi xóa.",
+      "notFound": "Không tìm thấy vai trò",
+      "notFoundDescription": "Vai trò không tồn tại hoặc đường dẫn bị sai."
+    },
+    "Confirm": {
+      "removeTitle": "Bỏ {count} quyền khỏi {name}?",
+      "removeDescription": "Thay đổi có hiệu lực ngay với {people} người đang giữ vai trò này.",
+      "removeConfirm": "Lưu thay đổi",
+      "deleteTitle": "Xóa vai trò {name}?",
+      "deleteDescription": "Vai trò bị xóa vĩnh viễn. Hiện không có tài khoản nào giữ vai trò này."
+    },
+    "groups": {
+      "user": "Tài khoản",
+      "role": "Vai trò",
+      "session": "Phiên đăng nhập",
+      "audit": "Nhật ký hệ thống"
+    },
+    "Validation": {
+      "codeInvalid": "Dùng 3–50 chữ HOA, chữ số hoặc dấu gạch dưới, bắt đầu bằng chữ",
+      "nameRequired": "Vui lòng nhập tên",
+      "nameTooLong": "Tên tối đa 100 ký tự",
+      "descriptionTooLong": "Mô tả tối đa 500 ký tự"
+    }
+  },
+  "Permissions": {
+    "user_read": {
+      "name": "Xem tài khoản",
+      "description": "Xem danh sách và chi tiết tài khoản"
+    },
+    "user_create": {
+      "name": "Tạo tài khoản",
+      "description": "Tạo tài khoản và gửi lại mã kích hoạt"
+    },
+    "user_update": {
+      "name": "Sửa tài khoản",
+      "description": "Sửa thông tin tài khoản như tên hiển thị"
+    },
+    "user_lock": {
+      "name": "Khóa tài khoản",
+      "description": "Khóa, mở khóa, vô hiệu hóa tài khoản và buộc đăng xuất"
+    },
+    "role_read": {
+      "name": "Xem vai trò",
+      "description": "Xem vai trò và quyền của từng vai trò"
+    },
+    "role_assign": {
+      "name": "Gán vai trò",
+      "description": "Đổi vai trò của một tài khoản"
+    },
+    "role_manage": {
+      "name": "Quản lý vai trò",
+      "description": "Tạo, sửa, xóa vai trò và quyền của vai trò"
+    },
+    "session_read_all": {
+      "name": "Xem phiên của mọi người",
+      "description": "Xem các thiết bị mà mọi tài khoản đang đăng nhập"
+    },
+    "audit_read": {
+      "name": "Xem nhật ký hệ thống",
+      "description": "Xem nhật ký bảo mật và quản trị"
+    }
+  },
+  "AuditActions": {
+    "LOGIN_SUCCESS": "Đăng nhập",
+    "LOGIN_FAILED": "Thử đăng nhập",
+    "LOGIN_LOCKED_OUT": "Tạm chặn đăng nhập",
+    "LOGOUT": "Đăng xuất",
+    "LOGOUT_ALL": "Đăng xuất mọi thiết bị",
+    "SESSION_REVOKED": "Đăng xuất một thiết bị",
+    "SESSIONS_REVOKED_BY_ADMIN": "Bị quản trị viên đăng xuất",
+    "REFRESH_TOKEN_REUSE_DETECTED": "Chặn phiên đăng nhập đáng ngờ",
+    "ACCOUNT_ACTIVATED": "Kích hoạt tài khoản",
+    "GOOGLE_LINKED": "Liên kết tài khoản Google",
+    "PASSWORD_RESET_REQUESTED": "Yêu cầu mã đặt lại mật khẩu",
+    "PASSWORD_RESET": "Đặt lại mật khẩu",
+    "PASSWORD_CHANGED": "Đổi mật khẩu",
+    "PASSWORD_CHANGE_FAILED": "Thử đổi mật khẩu",
+    "USER_LOCKED": "Tài khoản bị khóa",
+    "USER_UNLOCKED": "Tài khoản được mở khóa",
+    "USER_DISABLED": "Tài khoản bị vô hiệu hóa",
+    "USER_ENABLED": "Tài khoản được kích hoạt lại",
+    "USER_ROLES_CHANGED": "Thay đổi vai trò",
+    "ACTIVATION_CODE_RESENT": "Gửi lại mã kích hoạt",
+    "USER_CREATED": "Tạo tài khoản",
+    "USER_UPDATED": "Sửa tài khoản",
+    "ROLE_CREATED": "Tạo vai trò",
+    "ROLE_UPDATED": "Sửa vai trò",
+    "ROLE_DELETED": "Xóa vai trò"
+  },
+  "AuditLog": {
+    "metaTitle": "Nhật ký hệ thống",
+    "List": {
+      "title": "Nhật ký hệ thống",
+      "description": "Đăng nhập, thay đổi tài khoản và thao tác quản trị. Sự kiện đăng nhập được giữ 180 ngày, các sự kiện khác 365 ngày.",
+      "empty": "Không có mục nào khớp bộ lọc",
+      "system": "Hệ thống"
+    },
+    "Filters": {
+      "action": "Hành động",
+      "allActions": "Mọi hành động",
+      "outcome": "Kết quả",
+      "allOutcomes": "Mọi kết quả",
+      "dateRange": "Khoảng ngày",
+      "anyDate": "Mọi ngày",
+      "actor": "Người thực hiện: {label}",
+      "target": "Đối tượng: {label}",
+      "removeFilter": "Bỏ lọc",
+      "clear": "Xóa bộ lọc"
+    },
+    "Columns": {
+      "time": "Thời gian",
+      "action": "Hành động",
+      "result": "Kết quả",
+      "actor": "Người thực hiện",
+      "target": "Đối tượng",
+      "ip": "Địa chỉ IP",
+      "filterBy": "Xem các mục của {label}",
+      "openEntry": "Mở mục lúc {time}"
+    },
+    "outcomes": {
+      "SUCCESS": "Thành công",
+      "FAILURE": "Thất bại"
+    },
+    "categories": {
+      "AUTHENTICATION": "Đăng nhập",
+      "ACCOUNT": "Tài khoản",
+      "ADMINISTRATION": "Quản trị"
+    },
+    "Sheet": {
+      "title": "Chi tiết nhật ký",
+      "time": "Thời gian",
+      "action": "Hành động",
+      "category": "Nhóm",
+      "result": "Kết quả",
+      "actor": "Người thực hiện",
+      "target": "Đối tượng",
+      "ip": "Địa chỉ IP",
+      "device": "Thiết bị",
+      "details": "Chi tiết",
+      "noDetails": "Không có thông tin thêm.",
+      "openAccount": "Mở tài khoản",
+      "openRole": "Mở vai trò"
+    },
+    "Meta": {
+      "reason": "Lý do",
+      "method": "Cách đăng nhập",
+      "attemptedEmail": "Email đã nhập",
+      "scope": "Bị chặn theo",
+      "retryAfterSeconds": "Thời gian chặn",
+      "from": "Trước",
+      "to": "Sau",
+      "added": "Đã thêm",
+      "removed": "Đã bỏ",
+      "sessionsRevoked": "Số phiên bị đăng xuất",
+      "sessionId": "Phiên",
+      "familyId": "Họ phiên",
+      "minutes": "{count} phút"
+    },
+    "values": {
+      "BAD_PASSWORD": "Sai mật khẩu",
+      "UNKNOWN_EMAIL": "Email chưa đăng ký",
+      "NO_PASSWORD": "Chưa có mật khẩu",
+      "CURRENT_PASSWORD_INCORRECT": "Sai mật khẩu hiện tại",
+      "PASSWORD": "Mật khẩu",
+      "GOOGLE": "Google",
+      "OTP": "Mã xác thực",
+      "EMAIL": "Địa chỉ email",
+      "IP": "Địa chỉ IP"
+    }
+  },
+  "Auth": {
+    "Login": {
+      "metaTitle": "Đăng nhập",
+      "title": "Đăng nhập",
+      "subtitle": "Dùng email công ty để tiếp tục.",
+      "google": "Tiếp tục với Google",
+      "or": "hoặc",
+      "email": "Email",
+      "emailPlaceholder": "ten@congty.com",
+      "password": "Mật khẩu",
+      "forgotPassword": "Quên mật khẩu?",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu",
+      "submit": "Đăng nhập",
+      "noAccount": "Chưa có tài khoản? Liên hệ bộ phận nhân sự để được cấp.",
+      "activateAccount": "Kích hoạt tài khoản"
+    },
+    "ForgotPassword": {
+      "metaTitle": "Đặt lại mật khẩu",
+      "title": "Đặt lại mật khẩu",
+      "requestDescription": "Nhập email công ty, chúng tôi sẽ gửi mã xác thực cho bạn.",
+      "sendCode": "Gửi mã",
+      "codeSent": "Nếu {email} có tài khoản trong hệ thống, mã xác thực đã được gửi tới email này. Mã hết hạn sau vài phút.",
+      "resetDescription": "Nhập mã đã gửi tới {email} và chọn mật khẩu mới.",
+      "submit": "Đặt lại mật khẩu"
+    },
+    "Activate": {
+      "metaTitle": "Kích hoạt tài khoản",
+      "title": "Kích hoạt tài khoản",
+      "description": "Nhập mã trong email mời và đặt mật khẩu cho tài khoản.",
+      "descriptionFor": "Nhập mã đã gửi tới {email} và đặt mật khẩu cho tài khoản.",
+      "submit": "Kích hoạt tài khoản"
+    },
+    "CodeFlow": {
+      "code": "Mã xác thực",
+      "resend": "Gửi lại mã",
+      "resendIn": "Gửi lại mã sau {time}",
+      "resent": "Nếu tài khoản tồn tại, mã mới đã được gửi.",
+      "changeEmail": "Dùng email khác",
+      "backToSignIn": "Quay lại đăng nhập",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Nhập lại mật khẩu"
+    },
+    "PasswordRules": {
+      "title": "Mật khẩu cần có:",
+      "length": "Từ 8 đến 72 ký tự",
+      "letter": "Ít nhất một chữ cái",
+      "digit": "Ít nhất một chữ số"
+    },
+    "Validation": {
+      "emailInvalid": "Email không hợp lệ",
+      "emailTooLong": "Email quá dài",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "passwordTooLong": "Mật khẩu tối đa 128 ký tự",
+      "otpInvalid": "Nhập đủ mã 6 số",
+      "passwordWeak": "Mật khẩu chưa đạt yêu cầu",
+      "passwordMismatch": "Mật khẩu nhập lại không khớp"
+    },
+    "Errors": {
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "tooManyAttempts": "Bạn đã đăng nhập sai nhiều lần. Vui lòng thử lại sau {minutes} phút.",
+      "tooManyAttemptsSoon": "Bạn đã đăng nhập sai nhiều lần. Vui lòng thử lại sau ít phút.",
+      "accountNotActivated": "Tài khoản chưa được kích hoạt. Hãy dùng mã trong email mời để kích hoạt tài khoản.",
+      "accountLocked": "Tài khoản đang bị khóa. Liên hệ bộ phận nhân sự để được mở khóa.",
+      "accountDisabled": "Tài khoản đã bị vô hiệu hóa. Liên hệ bộ phận nhân sự nếu bạn cần dùng lại.",
+      "googleAccountNotFound": "Email Google này chưa có tài khoản trong hệ thống. Liên hệ bộ phận nhân sự để được cấp tài khoản.",
+      "googleEmailNotVerified": "Email Google của bạn chưa được xác minh. Hãy xác minh với Google rồi thử lại.",
+      "googleAccountConflict": "Tài khoản này đã liên kết với một tài khoản Google khác. Hãy đăng nhập bằng đúng tài khoản Google đó hoặc bằng mật khẩu.",
+      "googleTooManyRequests": "Bạn đã thử đăng nhập Google quá nhiều lần. Vui lòng thử lại sau ít phút.",
+      "googleFailed": "Đăng nhập Google không thành công. Vui lòng thử lại.",
+      "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "passwordResetDone": "Mật khẩu đã được cập nhật. Hãy đăng nhập bằng mật khẩu mới.",
+      "accountActivatedDone": "Tài khoản đã được kích hoạt. Hãy đăng nhập bằng mật khẩu vừa đặt.",
+      "invalidOtp": "Mã không đúng hoặc đã hết hạn. Hãy yêu cầu mã mới.",
+      "weakPassword": "Mật khẩu chưa đạt yêu cầu.",
+      "passwordReused": "Hãy chọn mật khẩu khác với mật khẩu hiện tại.",
+      "tooManyRequests": "Bạn thử quá nhiều lần. Vui lòng thử lại sau {minutes} phút.",
+      "tooManyRequestsSoon": "Bạn thử quá nhiều lần. Vui lòng thử lại sau ít phút.",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng.",
+      "noPasswordSet": "Tài khoản chưa có mật khẩu vì bạn đăng nhập bằng Google. Hãy đặt mật khẩu bằng mã xác thực gửi tới email."
+    },
+    "Callback": {
+      "signingIn": "Đang đăng nhập..."
+    },
+    "Showcase": {
+      "title": "Mọi công việc nhân sự ở một nơi",
+      "description": "Chấm công, nghỉ phép, lương và dự án của mọi nhân viên trong một hệ thống.",
+      "approved": "Đã duyệt"
+    }
+  }
+}

@@ -1,6 +1,8 @@
 "use client";
 
-import { LogOutIcon } from "lucide-react";
+import Link from "next/link";
+import { LogOutIcon, UserRoundIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,17 +13,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthMode, useCurrentUser } from "@/lib/auth/auth-provider";
+import { useAuthActions, useAuthMode, useCurrentUser } from "@/lib/auth/auth-provider";
 import { UserAvatar } from "../user-avatar";
 
 export function UserMenu() {
+  const t = useTranslations("Shell");
   const { user } = useCurrentUser();
   const { mode } = useAuthMode();
+  const { signOut } = useAuthActions();
   if (!user) return null;
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" aria-label="Tài khoản" />}>
+      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" aria-label={t("account")} />}>
         <UserAvatar name={user.displayName} seed={user.id} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
@@ -32,9 +36,12 @@ export function UserMenu() {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {/* TODO(cuongvv): đổi mật khẩu, đăng xuất thật (POST /api/auth/logout). */}
-        <DropdownMenuItem disabled={mode === "mock"}>
-          <LogOutIcon /> Đăng xuất
+        <DropdownMenuItem render={<Link href="/account" />}>
+          <UserRoundIcon /> {t("account")}
+        </DropdownMenuItem>
+        {/* Chế độ mock không có phiên để đăng xuất. */}
+        <DropdownMenuItem disabled={mode === "mock"} onClick={() => void signOut()}>
+          <LogOutIcon /> {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

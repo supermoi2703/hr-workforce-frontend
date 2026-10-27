@@ -12,9 +12,12 @@ npm install
 npm run dev                  # http://localhost:3000
 ```
 
-Khi `NEXT_PUBLIC_AUTH_MODE=mock` (mặc định), ứng dụng đăng nhập giả lập: đổi vai trò bằng nút
-**Vai trò** trên header để kiểm tra menu và phân quyền. Backend không chạy thì vẫn dùng được giao
-diện, chỉ các lệnh gọi API báo lỗi kết nối.
+Hai chế độ đăng nhập (`NEXT_PUBLIC_AUTH_MODE` trong `.env.local`, sửa xong chạy lại `npm run dev`):
+
+- `backend` (mặc định): đăng nhập thật ở `/login`. Cần backend + Postgres + Redis đang chạy; tài khoản mẫu
+  `admin@test.com` / `Admin12345` (xem `scripts/sql/` của backend).
+- `mock`: không cần backend, luôn coi như đã đăng nhập; đổi vai trò bằng nút **Role** trên header để kiểm tra
+  menu và phân quyền. Các lệnh gọi API báo lỗi kết nối nếu backend không chạy.
 
 Trước khi mở PR: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
@@ -59,7 +62,8 @@ export const createLeaveRequest = (body: CreateLeaveRequest) =>
   (`code` là ErrorCode của backend, `fieldErrors` là lỗi theo từng ô).
 - Không gọi `fetch` trực tiếp trong feature.
 - Upload file: truyền `FormData` làm body.
-- Hiển thị lỗi cho người dùng: `getErrorMessage(error)` từ `lib/api/errors`.
+- Hiển thị lỗi cho người dùng: `const errorMessage = useErrorMessage()` (từ `lib/api/use-error-message`) rồi
+  `errorMessage(error)`; câu thông báo theo ngôn ngữ đang chọn (xem mục 8).
 
 ## 4. Bảng dữ liệu
 
@@ -95,6 +99,9 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
 - Chỉ lấy người dùng qua `useCurrentUser()`, không tự đọc token hay gọi `/api/auth/me`.
 - Ẩn/hiện nút: `<RequireAccess access={{ roles: ["ADMIN", "HR"] }} fallback={null}>...</RequireAccess>`.
 - Ẩn trên giao diện không thay cho kiểm tra quyền ở backend.
+- Phiên đăng nhập do `lib/auth` lo hết: tự lấy lại phiên khi F5, tự làm mới token, hết phiên thì đưa về
+  `/login` kèm lý do, đồng bộ đăng xuất giữa các tab. Màn hình nghiệp vụ không cần làm gì thêm.
+  Cần đăng xuất bằng code (hiếm): `const { signOut } = useAuthActions()`.
 
 ## 7. Hiển thị
 
@@ -119,3 +126,27 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   - Hàng chỉ số (`METRICS`): truyền `value` và `detail` khi module có dữ liệu, vd. giờ vào hôm nay, số ngày phép còn lại.
   - Dải tuần (`_components/week-strip.tsx`): gắn trạng thái từng ngày qua prop `dayContent` (theo ngày `yyyy-MM-dd`).
   - Không đặt số liệu giả: chưa có dữ liệu thì để trống, ô tự hiện "Chưa có dữ liệu".
+
+## 8. Đa ngôn ngữ (tiếng Anh / tiếng Việt)
+
+Dùng [next-intl](https://next-intl.dev). Mặc định tiếng Anh; người dùng đổi bằng nút ngôn ngữ trên header (hoặc ở trang
+đăng nhập). Lựa chọn lưu ở cookie `NEXT_LOCALE`, URL không đổi (không có `/en`, `/vi`).
+
+- **Không viết chữ cứng** trong component (kể cả `aria-label`, `placeholder`, câu báo lỗi zod). Thêm key vào **cả**
+  `messages/en.json` và `messages/vi.json`; `npm test` báo lỗi nếu hai file lệch key.
+- Mỗi domain một namespace riêng, vd `Leave` (đặt thêm cấp con nếu nhiều màn hình: `Leave.List`, `Leave.Form`). Chữ dùng
+  chung (Lưu, Hủy, Thử lại...) lấy từ `Common`.
+
+```tsx
+// Client Component hoặc Server Component không async
+const t = useTranslations("Leave.List");
+<PageHeader title={t("title")} />
+<p>{t("remaining", { days: 5 })}</p>        // messages: "remaining": "{days} days left"
+
+// Server Component async, generateMetadata
+const t = await getTranslations("Leave.List");
+```
+
+- Key có kiểu theo `en.json`: gõ sai key thì `npm run typecheck` báo lỗi.
+- Mục menu: `navigation.ts` dùng `id` (vd `id: "leave"`), tên hiển thị ở `Nav.items.<id>` trong hai file messages.
+- Định dạng ngày giờ, tiền (`lib/format`) chưa đổi theo ngôn ngữ, vẫn kiểu Việt Nam.

@@ -2,6 +2,7 @@
 
 import { useId, useRef } from "react";
 import { CheckCircle2Icon, PaperclipIcon, RotateCwIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { getFileErrorMessage } from "../errors";
 import { formatFileSize } from "../format";
@@ -25,6 +26,7 @@ type FileUploadFieldProps = {
 export function FileUploadField({ purpose, onUploaded, label = "Đính kèm", disabled, requestHeaders }: FileUploadFieldProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const tErrors = useTranslations("Errors");
   const { state, upload, cancel, reset } = useFileUpload(purpose, requestHeaders);
   const rules = CLIENT_UPLOAD_RULES[purpose];
 
@@ -82,7 +84,7 @@ export function FileUploadField({ purpose, onUploaded, label = "Đính kèm", di
 
       {state.status === "error" && (
         <p className="flex items-center gap-2 text-sm text-destructive" role="alert">
-          {getFileErrorMessage(state.error)}
+          {getFileErrorMessage(state.error, tErrors)}
           <Button type="button" variant="ghost" size="icon-sm" onClick={reset} aria-label="Bỏ qua lỗi">
             <RotateCwIcon />
           </Button>

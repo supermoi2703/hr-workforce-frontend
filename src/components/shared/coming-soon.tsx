@@ -1,4 +1,5 @@
 import { ConstructionIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { PageHeader } from "./page-header";
 
@@ -14,8 +15,14 @@ type ComingSoonProps = {
   task?: string;
 };
 
-/** Trang tạm cho mục menu chưa có màn hình thật. */
+/** Trang tạm cho mục menu chưa có màn hình thật. Dùng được cả ở Server Component. */
 export function ComingSoon({ title, owner, task }: ComingSoonProps) {
+  const t = useTranslations("States");
+  const details = [
+    task && t("comingSoonTask", { task }),
+    owner && t("comingSoonOwner", { owner: OWNER_NAMES[owner] ?? owner }),
+  ].filter(Boolean);
+
   return (
     <div className="space-y-6">
       <PageHeader title={title} />
@@ -24,12 +31,10 @@ export function ComingSoon({ title, owner, task }: ComingSoonProps) {
           <EmptyMedia variant="icon">
             <ConstructionIcon />
           </EmptyMedia>
-          <EmptyTitle>Đang phát triển</EmptyTitle>
+          <EmptyTitle>{t("comingSoonTitle")}</EmptyTitle>
           <EmptyDescription>
-            Chức năng này đang được xây dựng
-            {task && <> (việc {task}</>}
-            {owner && <>{task ? ", " : " ("}phụ trách: {OWNER_NAMES[owner] ?? owner}</>}
-            {(task || owner) && ")"}.
+            {t("comingSoonDescription")}
+            {details.length > 0 && <span className="block">{details.join(" · ")}</span>}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getNavGroups } from "@/components/shared/app-shell/navigation";
 import { ComingSoon } from "@/components/shared/coming-soon";
 import { RequireAccess } from "@/components/shared/require-access";
@@ -9,13 +10,14 @@ import { RequireAccess } from "@/components/shared/require-access";
 export default async function PlaceholderPage({ params }: PageProps<"/[...slug]">) {
   const { slug } = await params;
   const href = `/${slug.join("/")}`;
+  const t = await getTranslations("Nav");
 
   for (const group of getNavGroups()) {
     const item = group.items.find((candidate) => candidate.href === href);
     if (item) {
       return (
         <RequireAccess access={item.access}>
-          <ComingSoon title={item.title} owner={item.owner ?? group.owner} task={item.task} />
+          <ComingSoon title={t(`items.${item.id}`)} owner={item.owner ?? group.owner} task={item.task} />
         </RequireAccess>
       );
     }

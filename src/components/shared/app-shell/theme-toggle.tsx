@@ -1,6 +1,7 @@
 "use client";
 
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,24 +13,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function ThemeToggle() {
+  const t = useTranslations("Theme");
   const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" aria-label="Đổi giao diện sáng/tối" />}>
+      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" aria-label={t("label")} />}>
         <SunIcon className="dark:hidden" />
         <MoonIcon className="hidden dark:block" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={(value) => setTheme(String(value))}>
           <DropdownMenuRadioItem value="light">
-            <SunIcon /> Sáng
+            <SunIcon /> {t("light")}
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="dark">
-            <MoonIcon /> Tối
+            <MoonIcon /> {t("dark")}
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="system">
-            <MonitorIcon /> Theo hệ thống
+            <MonitorIcon /> {t("system")}
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

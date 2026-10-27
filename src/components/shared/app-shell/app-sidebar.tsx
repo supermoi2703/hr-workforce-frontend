@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon, UsersRoundIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
@@ -23,7 +24,8 @@ import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { cn } from "@/lib/utils";
 import { findNavMatch, getNavGroups, type NavItem } from "./navigation";
 
-// Trạng thái đóng/mở của các nhóm thu gọn được, theo tên nhóm. Lưu ở trình duyệt để giữ khi tải lại trang.
+// Trạng thái đóng/mở của các nhóm thu gọn được, theo id nhóm (không theo tên hiển thị, để đổi ngôn ngữ
+// không làm mất trạng thái). Lưu ở trình duyệt để giữ khi tải lại trang.
 const OPEN_GROUPS_KEY = "hrm.sidebar.openGroups";
 
 function readOpenGroups(): Record<string, boolean> {
@@ -44,6 +46,7 @@ function writeOpenGroups(value: Record<string, boolean>) {
 }
 
 export function AppSidebar() {
+  const t = useTranslations("Nav");
   const pathname = usePathname();
   const { can } = useCurrentUser();
   const { state, isMobile } = useSidebar();
@@ -51,7 +54,7 @@ export function AppSidebar() {
 
   const activeMatch = findNavMatch(pathname);
   const activeHref = activeMatch?.item.href;
-  const activeGroup = activeMatch?.group.label;
+  const activeGroup = activeMatch?.group.id;
 
   // Sidebar chỉ render ở trình duyệt (sau khi xác định đăng nhập) nên đọc localStorage ngay được.
   const [openGroups, setOpenGroups] = useState(() => {
@@ -66,8 +69,8 @@ export function AppSidebar() {
     if (activeGroup && !openGroups[activeGroup]) setOpenGroups({ ...openGroups, [activeGroup]: true });
   }
 
-  function setGroupOpen(label: string, open: boolean) {
-    const next = { ...openGroups, [label]: open };
+  function setGroupOpen(groupId: string, open: boolean) {
+    const next = { ...openGroups, [groupId]: open };
     setOpenGroups(next);
     writeOpenGroups(next);
   }
@@ -91,14 +94,15 @@ export function AppSidebar() {
       <SidebarMenu>
         {items.map((item) => {
           const isActive = item.href === activeHref;
+          const title = t(`items.${item.id}`);
           return (
             <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton render={<Link href={item.href} />} isActive={isActive} tooltip={item.title}>
+              <SidebarMenuButton render={<Link href={item.href} />} isActive={isActive} tooltip={title}>
                 {/* Icon xám; mục đang mở và lúc rê chuột thì theo màu chữ của mục. */}
                 <item.icon
                   className={isActive ? undefined : "text-muted-foreground transition-colors group-hover/menu-button:text-sidebar-accent-foreground"}
                 />
-                <span>{item.title}</span>
+                <span>{title}</span>
               </SidebarMenuButton>
               {item.badge && (
                 <SidebarMenuBadge className="text-[0.7rem] font-normal text-muted-foreground">{item.badge}</SidebarMenuBadge>
@@ -121,7 +125,7 @@ export function AppSidebar() {
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate font-semibold">HRM Workforce</span>
-                <span className="truncate text-xs text-muted-foreground">Quản lý và điều phối nhân lực</span>
+                <span className="truncate text-xs text-muted-foreground">{t("tagline")}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -130,24 +134,25 @@ export function AppSidebar() {
       {/* scroll-fade-y: mép trên/dưới mờ dần khi còn mục bị che, tự hết khi cuộn tới đầu/cuối. */}
       <SidebarContent ref={contentRef} className="scroll-fade-y group-data-[collapsible=icon]:overflow-y-auto">
         {groups.map((group) => {
+          const label = t(`groups.${group.id}`);
           if (!group.collapsible) {
             return (
-              <SidebarGroup key={group.label}>
-                <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarGroup key={group.id}>
+                <SidebarGroupLabel>{label}</SidebarGroupLabel>
                 <SidebarGroupContent>{renderItems(group.items)}</SidebarGroupContent>
               </SidebarGroup>
             );
           }
 
-          const open = iconOnly || (openGroups[group.label] ?? false);
+          const open = iconOnly || (openGroups[group.id] ?? false);
           return (
-            <Collapsible key={group.label} open={open} onOpenChange={(next) => setGroupOpen(group.label, next)}>
+            <Collapsible key={group.id} open={open} onOpenChange={(next) => setGroupOpen(group.id, next)}>
               <SidebarGroup>
                 <SidebarGroupLabel
                   render={<CollapsibleTrigger />}
                   className="w-full cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 >
-                  {group.label}
+                  {label}
                   <ChevronRightIcon className={cn("ml-auto transition-transform", open && "rotate-90")} aria-hidden />
                 </SidebarGroupLabel>
                 <CollapsibleContent>

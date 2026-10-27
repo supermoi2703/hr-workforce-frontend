@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment } from "react";
+import { useTranslations } from "next-intl";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,20 +14,29 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { LanguageToggle } from "../language-toggle";
 import { findNavMatch } from "./navigation";
 import { RoleSwitcher } from "./role-switcher";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
 function AppBreadcrumbs() {
+  const t = useTranslations("Nav");
+  const tShell = useTranslations("Shell");
   const pathname = usePathname();
   const match = findNavMatch(pathname);
   const crumbs: { label: string; href?: string }[] = [];
   if (match && match.item.href !== "/") {
-    crumbs.push({ label: match.group.label });
-    crumbs.push({ label: match.item.title, href: match.item.href !== pathname ? match.item.href : undefined });
+    crumbs.push({ label: t(`groups.${match.group.id}`) });
+    crumbs.push({
+      label: t(`items.${match.item.id}`),
+      href: match.item.href !== pathname ? match.item.href : undefined,
+    });
   } else if (pathname === "/") {
-    crumbs.push({ label: "Trang chủ" });
+    crumbs.push({ label: t("items.home") });
+  } else if (pathname === "/account") {
+    // Trang tài khoản mở từ menu avatar, không nằm trong menu bên trái.
+    crumbs.push({ label: tShell("account") });
   }
 
   return (
@@ -59,6 +69,7 @@ export function AppHeader() {
       <AppBreadcrumbs />
       <div className="ml-auto flex items-center gap-1">
         <RoleSwitcher />
+        <LanguageToggle />
         <ThemeToggle />
         <UserMenu />
       </div>

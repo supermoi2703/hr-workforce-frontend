@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLinkIcon, FileTextIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Spinner } from "@/components/ui/spinner";
 import { getFileErrorMessage } from "../errors";
 import { isImage } from "../format";
@@ -17,6 +18,7 @@ type FilePreviewProps = {
 /** Hiển thị file đã lưu: ảnh thì hiện ảnh, file khác thì hiện link mở. URL có hạn được lấy và làm mới tự động. */
 export function FilePreview({ fileId, contentType, name, className, requestHeaders }: FilePreviewProps) {
   const download = useDownloadUrl(fileId, requestHeaders);
+  const tErrors = useTranslations("Errors");
 
   if (download.isPending) {
     return (
@@ -26,7 +28,7 @@ export function FilePreview({ fileId, contentType, name, className, requestHeade
     );
   }
   if (download.isError) {
-    return <p className="text-sm text-destructive">{getFileErrorMessage(download.error)}</p>;
+    return <p className="text-sm text-destructive">{getFileErrorMessage(download.error, tErrors)}</p>;
   }
 
   if (isImage(contentType)) {

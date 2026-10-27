@@ -14,6 +14,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Spinner } from "@/components/ui/spinner";
 import type { PageParams, PageResponse } from "@/lib/api/types";
@@ -130,6 +131,7 @@ export function DataTable<TData extends RowData>({
   pageSizeOptions,
   className,
 }: DataTableProps<TData>) {
+  const t = useTranslations("States");
   const page = query.data;
   const table = useTable({
     features: dataTableFeatures,
@@ -192,7 +194,7 @@ export function DataTable<TData extends RowData>({
               <TableRow>
                 <TableCell colSpan={columnCount} className="h-32 text-center text-muted-foreground">
                   <span className="inline-flex items-center gap-2">
-                    <Spinner /> Đang tải dữ liệu...
+                    <Spinner /> {t("loading")}
                   </span>
                 </TableCell>
               </TableRow>

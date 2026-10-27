@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ShieldXIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
@@ -10,18 +11,20 @@ import type { Access } from "@/lib/auth/types";
 import { LoadingState } from "./states";
 
 export function ForbiddenState() {
+  const t = useTranslations("States");
+  const tCommon = useTranslations("Common");
   return (
     <Empty className="border border-dashed">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <ShieldXIcon />
         </EmptyMedia>
-        <EmptyTitle>Bạn không có quyền xem trang này</EmptyTitle>
-        <EmptyDescription>Liên hệ quản trị viên nếu bạn cần được cấp quyền.</EmptyDescription>
+        <EmptyTitle>{t("forbiddenTitle")}</EmptyTitle>
+        <EmptyDescription>{t("forbiddenDescription")}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <Link href="/" className={buttonVariants({ variant: "outline", size: "sm" })}>
-          Về trang chủ
+          {tCommon("backToHome")}
         </Link>
       </EmptyContent>
     </Empty>

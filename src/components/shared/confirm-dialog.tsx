@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactElement, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,9 +16,15 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 type ConfirmDialogProps = {
-  /** Phần tử mở hộp thoại, vd. `<Button variant="destructive" />`. */
-  trigger: ReactElement;
-  triggerLabel: ReactNode;
+  /**
+   * Phần tử mở hộp thoại, vd. `<Button variant="destructive" />`. Bỏ trống khi mở từ nơi khác
+   * (vd. một mục trong DropdownMenu) bằng `open` / `onOpenChange`.
+   */
+  trigger?: ReactElement;
+  triggerLabel?: ReactNode;
+  /** Điều khiển từ ngoài (không có thì hộp thoại tự giữ trạng thái đóng / mở). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   title: string;
   description?: ReactNode;
   confirmLabel?: string;
@@ -34,15 +41,24 @@ type ConfirmDialogProps = {
 export function ConfirmDialog({
   trigger,
   triggerLabel,
+  open: controlledOpen,
+  onOpenChange,
   title,
   description,
-  confirmLabel = "Xác nhận",
-  cancelLabel = "Hủy",
+  confirmLabel,
+  cancelLabel,
   destructive = false,
   onConfirm,
 }: ConfirmDialogProps) {
-  const [open, setOpen] = useState(false);
+  const t = useTranslations("Common");
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+
+  function setOpen(next: boolean) {
+    if (controlledOpen === undefined) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  }
 
   async function handleConfirm() {
     setPending(true);
@@ -58,17 +74,17 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(next) => !pending && setOpen(next)}>
-      <AlertDialogTrigger render={trigger}>{triggerLabel}</AlertDialogTrigger>
+      {trigger && <AlertDialogTrigger render={trigger}>{triggerLabel}</AlertDialogTrigger>}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>{cancelLabel ?? t("cancel")}</AlertDialogCancel>
           <AlertDialogAction variant={destructive ? "destructive" : "default"} disabled={pending} onClick={handleConfirm}>
             {pending && <Spinner />}
-            {confirmLabel}
+            {confirmLabel ?? t("confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
