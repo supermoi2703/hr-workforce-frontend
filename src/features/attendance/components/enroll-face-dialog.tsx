@@ -74,14 +74,14 @@ export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFace
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("dialogTitle", { name: employee.fullName })}</DialogTitle>
           <DialogDescription>{t("dialogDescription", { min: MIN_PHOTOS, max: MAX_PHOTOS })}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
-          <CameraView videoRef={camera.videoRef} status={camera.status} error={camera.error} />
+          <CameraView videoRef={camera.videoRef} status={camera.status} error={camera.error} className="mx-auto max-w-[50svh]" />
           <div className="flex flex-col gap-3">
             <Button onClick={capture} disabled={camera.status !== "ready" || shots.length >= MAX_PHOTOS}>
               <CameraIcon /> {t("capture")}

@@ -46,13 +46,13 @@ export function PersonalPunchDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
-        <CameraView videoRef={camera.videoRef} status={camera.status} error={camera.error} />
+        <CameraView videoRef={camera.videoRef} status={camera.status} error={camera.error} className="mx-auto max-w-[50svh]" />
 
         {result && (
           <Alert>
