@@ -19,6 +19,7 @@ import {
   ReceiptTextIcon,
   ScanFaceIcon,
   SparklesIcon,
+  TabletSmartphoneIcon,
   TimerIcon,
   UserCogIcon,
   UsersIcon,
@@ -93,6 +94,8 @@ export const NAV_GROUPS: NavGroup[] = [
     owner: "truongnd",
     items: [
       { id: "attendance", href: "/attendance", icon: TimerIcon, task: "2.2" },
+      { id: "kiosk", href: "/attendance/kiosk", icon: TabletSmartphoneIcon, access: { permissions: ["attendance:kiosk"] }, task: "2.10.2" },
+      { id: "faceProfiles", href: "/attendance/face-profiles", icon: ScanFaceIcon, access: { permissions: ["face:manage"] }, task: "2.10.2" },
       { id: "timesheets", href: "/timesheets", icon: CalendarDaysIcon, task: "2.3" },
       { id: "leave", href: "/leave", icon: TreePalmIcon, task: "2.4, 2.5" },
       { id: "payroll", href: "/payroll", icon: WalletIcon, access: HR_ONLY, task: "2.7, 2.8" },
