@@ -729,5 +729,290 @@
       "employeeProfileRequired": "This account is not linked to an employee profile.",
       "storageUnavailable": "Photo storage is not available, please try again later."
     }
+  },
+  "Timesheet": {
+    "metaTitle": "Timesheet",
+    "title": "Timesheet",
+    "description": "Your month: check-in / check-out, late minutes, approved leave. Click a day for details or to request leave.",
+    "requestLeave": "Request leave",
+    "tabs": {
+      "calendar": "Month",
+      "list": "Timesheet",
+      "team": "Team",
+      "schedule": "My working hours"
+    },
+    "month": {
+      "previous": "Previous month",
+      "next": "Next month",
+      "today": "This month",
+      "label": "{month}/{year}"
+    },
+    "weekdays": {
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday",
+      "sun": "Sunday"
+    },
+    "status": {
+      "WORK": "Full day",
+      "LATE": "Late",
+      "EARLY": "Left early",
+      "LATE_EARLY": "Late and early",
+      "MISSING_OUT": "No check-out",
+      "IN_PROGRESS": "In progress",
+      "ABSENT": "Absent",
+      "UPCOMING": "Upcoming",
+      "HOLIDAY": "Holiday",
+      "OFF": "Day off",
+      "LEAVE_PAID": "Paid leave",
+      "LEAVE_UNPAID": "Unpaid leave"
+    },
+    "dayType": {
+      "WORKING_DAY": "Working day",
+      "WEEKLY_OFF": "Weekly day off",
+      "HOLIDAY": "Holiday"
+    },
+    "source": {
+      "OFFICE": "Office hours",
+      "PERSONAL": "Registered hours"
+    },
+    "leavePart": {
+      "FULL_DAY": "Full-day leave",
+      "MORNING": "Morning off",
+      "AFTERNOON": "Afternoon off"
+    },
+    "calendar": {
+      "pendingLeave": "Leave pending",
+      "lateBy": "{minutes} min late"
+    },
+    "day": {
+      "noData": "Outside the month on screen",
+      "hours": "Expected hours",
+      "status": "Status",
+      "inOut": "In – out",
+      "noOut": "no check-out yet",
+      "lateEarly": "Late / early",
+      "lateEarlyValue": "{late} min late, {early} min early",
+      "worked": "Time present",
+      "workedValue": "{hours} h {minutes} min (lunch excluded)",
+      "paidUnits": "Paid units",
+      "leaveRequests": "Leave requests on this day",
+      "explainLater": "Forgot to check in or out, or on a business trip? Explanations come in a later version; tell HR for now.",
+      "requestLeave": "Request leave for this day",
+      "requestSickLeave": "Send sick leave for this day"
+    },
+    "table": {
+      "date": "Date",
+      "hours": "Expected hours",
+      "in": "In",
+      "out": "Out",
+      "late": "Late (min)",
+      "early": "Early (min)",
+      "status": "Status",
+      "paidUnits": "Paid"
+    },
+    "summary": {
+      "paidUnits": "Paid units: {value}",
+      "late": "Late: {count} times, {minutes} min",
+      "early": "Early: {count} times, {minutes} min",
+      "leave": "Leave: {value} days",
+      "absent": "Absent: {count} days",
+      "missingOut": "No check-out: {count} days"
+    },
+    "team": {
+      "emptyTitle": "No one in your team",
+      "emptyDescription": "You do not manage anyone yet.",
+      "employee": "Employee",
+      "paidUnits": "Paid"
+    },
+    "schedule": {
+      "currentTitle": "Today's working hours",
+      "currentDescription": "In use: {source}",
+      "register": "Register hours",
+      "rule8Hours": "A day is 8 working hours. End time = start time + 9 hours (including a fixed 1-hour lunch).",
+      "ruleLate": "Checking in even 1 second after {start} is late (only the minutes are recorded, no pay cut). Staying later does not make up for it.",
+      "ruleHalfDay": "If you cannot come in the morning or must leave at noon, request half a day off beforehand.",
+      "upcoming": "New hours {start} – {end} apply from {from}.",
+      "pending": "Your request for {start} – {end} is waiting for your manager.",
+      "pendingOffice": "Your request to go back to office hours is waiting for your manager.",
+      "withdraw": "Withdraw",
+      "withdrawTitle": "Withdraw this request?",
+      "withdrawDescription": "Your current hours stay the same. You can send another request later.",
+      "withdrawn": "Request withdrawn.",
+      "historyTitle": "Requests",
+      "historyDescription": "Hours can change once a month (by the date they apply).",
+      "columns": {
+        "sentAt": "Sent",
+        "hours": "Hours",
+        "effectiveFrom": "Applies from",
+        "status": "Status"
+      },
+      "officeHours": "Office hours",
+      "status": {
+        "PENDING": "Pending",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "WITHDRAWN": "Withdrawn"
+      },
+      "historyEmpty": "You have not registered your own hours.",
+      "morning": "Morning",
+      "lunch": "Lunch",
+      "afternoon": "Afternoon",
+      "dialogTitle": "Register working hours",
+      "dialogDescription": "Choose your start time. Your direct manager approves.",
+      "startTime": "Start time",
+      "previewHours": "Morning {start} – {lunchStart}, lunch {lunchStart} – {lunchEnd}, afternoon {lunchEnd} – {end}.",
+      "effectiveRule": "New hours apply from the day after approval. Until then you keep your current hours.",
+      "reason": "Reason",
+      "reasonPlaceholder": "For example: taking my child to school",
+      "cancel": "Cancel",
+      "send": "Send",
+      "sent": "Request sent."
+    },
+    "errors": {
+      "shiftStartOutOfRange": "This start time is not one of the allowed times.",
+      "shiftUnchanged": "These are already your working hours.",
+      "shiftRequestPending": "You already have a request waiting for approval.",
+      "shiftChangeLimit": "You have changed your hours as many times as allowed this month.",
+      "leaveTypeNotFound": "Unknown leave type.",
+      "leaveInvalidRange": "Invalid dates: half a day is for a single day only, and a request is at most 30 days.",
+      "leaveInPast": "Leave cannot be requested for past days (except sick leave within 30 days).",
+      "leaveNoWorkingDay": "There is no working day in these dates (weekend, holiday).",
+      "leaveTypeMaxDays": "This leave type does not allow that many days in one request.",
+      "leaveOverlap": "Another request (pending or approved) already covers this half of the day.",
+      "leaveInsufficientBalance": "Not enough annual leave. Send the rest as unpaid leave.",
+      "leaveNotCancellable": "Only an approved request without a pending cancellation can be cancelled.",
+      "approvalNotPending": "This request is no longer waiting for approval.",
+      "approvalAlreadyDecided": "You have already decided on this request.",
+      "notCurrentApprover": "You are not an approver of the current step.",
+      "employeeProfileRequired": "Your account is not linked to an employee profile.",
+      "unknown": "This request cannot be sent."
+    }
+  },
+  "Leave": {
+    "metaTitle": "Leave",
+    "title": "Leave",
+    "description": "Your leave balance, your requests, and the requests waiting for your approval.",
+    "newRequest": "Request leave",
+    "shortNotice": "Urgent",
+    "tabs": {
+      "mine": "My requests",
+      "inbox": "To approve"
+    },
+    "types": {
+      "ANNUAL": "Annual leave",
+      "PERSONAL_PAID": "Paid personal leave",
+      "SICK": "Sick leave",
+      "UNPAID": "Unpaid leave"
+    },
+    "parts": {
+      "FULL_DAY": "Full day",
+      "MORNING": "Morning",
+      "AFTERNOON": "Afternoon"
+    },
+    "requestStatus": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "WITHDRAWN": "Withdrawn",
+      "CANCELLED": "Cancelled"
+    },
+    "cancelStatus": {
+      "PENDING": "Cancellation pending",
+      "APPROVED": "Cancelled",
+      "REJECTED": "Cancellation rejected",
+      "WITHDRAWN": "Cancellation withdrawn"
+    },
+    "balance": {
+      "available": "Annual leave available",
+      "used": "Taken",
+      "held": "Held for pending requests",
+      "accrued": "Accrued",
+      "availableNote": "Year {year}, after the held days.",
+      "usedNote": "Approved annual leave (cancelled ones excluded).",
+      "heldNote": "Returned if a request is rejected or withdrawn.",
+      "accruedNote": "1 day at the start of each month, {annual} days a year.",
+      "daysValue": "{days} days"
+    },
+    "dialog": {
+      "title": "Request leave",
+      "description": "A full day or half a day. Weekends and holidays are left out of the count.",
+      "type": "Leave type",
+      "paid": "paid",
+      "unpaid": "unpaid",
+      "part": "Leave",
+      "from": "From",
+      "to": "To",
+      "day": "Day",
+      "reason": "Reason",
+      "reasonPlaceholder": "For example: family matters",
+      "reasonUrgentPlaceholder": "Urgent request: explain why so your manager can decide",
+      "cancel": "Cancel",
+      "send": "Send",
+      "sendUrgent": "Send as urgent",
+      "sent": "Request sent, waiting for your manager.",
+      "checking": "Checking...",
+      "days": "Days of leave",
+      "daysValue": "{days} days",
+      "balance": "Annual leave",
+      "balanceValue": "{before} left → {after} after this request",
+      "approvers": "Approvers",
+      "approversWithHr": "Direct manager, then office HR",
+      "approversManager": "Direct manager",
+      "urgentTitle": "Urgent leave",
+      "urgentDescription": "Leave needs at least {days} days of notice (on-time deadline: {deadline}). You can still send it, marked as urgent; your manager may reject it.",
+      "backdated": "Sent after the day: give HR the medical certificate before the month is closed."
+    },
+    "mine": {
+      "emptyTitle": "No leave requests yet",
+      "emptyDescription": "Click Request leave, or pick a day on the Timesheet calendar.",
+      "withdrawn": "Withdrawn.",
+      "columns": {
+        "type": "Type",
+        "when": "When",
+        "days": "Days",
+        "reason": "Reason",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "withdraw": "Withdraw",
+      "withdrawCancel": "Withdraw cancellation",
+      "withdrawTitle": "Withdraw this leave request?",
+      "withdrawCancelTitle": "Withdraw the cancellation? The leave stays approved.",
+      "cancel": "Ask to cancel"
+    },
+    "cancelDialog": {
+      "title": "Cancel an approved leave",
+      "description": "Your direct manager approves the cancellation. Once approved, the days are refunded and the timesheet recomputed.",
+      "reason": "Reason",
+      "back": "Back",
+      "send": "Send cancellation",
+      "sent": "Cancellation sent."
+    },
+    "inbox": {
+      "emptyTitle": "Nothing waiting for you",
+      "emptyDescription": "Leave requests, cancellations and working-hour requests of people you manage show up here.",
+      "types": {
+        "LEAVE": "Leave",
+        "LEAVE_CANCEL": "Leave cancellation",
+        "SHIFT_CHANGE": "Working hours"
+      },
+      "urgent": "Urgent",
+      "meta": "Sent {at} · Step: {step}",
+      "reason": "Reason: {reason}",
+      "noReason": "No reason given.",
+      "reject": "Reject",
+      "approve": "Approve",
+      "approveTitle": "Approve request",
+      "rejectTitle": "Reject request",
+      "rejectReason": "Reason (required)",
+      "comment": "Comment (optional)",
+      "back": "Back",
+      "approved": "Approved.",
+      "rejected": "Rejected."
+    }
   }
 }

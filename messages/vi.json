@@ -729,5 +729,290 @@
       "employeeProfileRequired": "Tài khoản chưa gắn với hồ sơ nhân viên.",
       "storageUnavailable": "Kho lưu ảnh đang không hoạt động, vui lòng thử lại sau."
     }
+  },
+  "Timesheet": {
+    "metaTitle": "Bảng công",
+    "title": "Bảng công",
+    "description": "Lịch tháng của bạn: giờ vào / ra, đi muộn, ngày nghỉ có đơn. Bấm một ngày để xem chi tiết hoặc xin nghỉ.",
+    "requestLeave": "Xin nghỉ",
+    "tabs": {
+      "calendar": "Lịch tháng",
+      "list": "Bảng công",
+      "team": "Lịch đội",
+      "schedule": "Giờ làm của tôi"
+    },
+    "month": {
+      "previous": "Tháng trước",
+      "next": "Tháng sau",
+      "today": "Tháng này",
+      "label": "Tháng {month}/{year}"
+    },
+    "weekdays": {
+      "mon": "Thứ Hai",
+      "tue": "Thứ Ba",
+      "wed": "Thứ Tư",
+      "thu": "Thứ Năm",
+      "fri": "Thứ Sáu",
+      "sat": "Thứ Bảy",
+      "sun": "Chủ nhật"
+    },
+    "status": {
+      "WORK": "Đủ công",
+      "LATE": "Đi muộn",
+      "EARLY": "Về sớm",
+      "LATE_EARLY": "Muộn và sớm",
+      "MISSING_OUT": "Thiếu giờ ra",
+      "IN_PROGRESS": "Đang làm",
+      "ABSENT": "Vắng",
+      "UPCOMING": "Chưa tới",
+      "HOLIDAY": "Ngày lễ",
+      "OFF": "Nghỉ tuần",
+      "LEAVE_PAID": "Nghỉ có lương",
+      "LEAVE_UNPAID": "Nghỉ không lương"
+    },
+    "dayType": {
+      "WORKING_DAY": "Ngày làm việc",
+      "WEEKLY_OFF": "Ngày nghỉ hằng tuần",
+      "HOLIDAY": "Ngày lễ / nghỉ bù"
+    },
+    "source": {
+      "OFFICE": "Giờ văn phòng",
+      "PERSONAL": "Giờ đăng ký riêng"
+    },
+    "leavePart": {
+      "FULL_DAY": "Nghỉ cả ngày",
+      "MORNING": "Nghỉ sáng",
+      "AFTERNOON": "Nghỉ chiều"
+    },
+    "calendar": {
+      "pendingLeave": "Đơn nghỉ chờ duyệt",
+      "lateBy": "Muộn {minutes} phút"
+    },
+    "day": {
+      "noData": "Ngày ngoài tháng đang xem",
+      "hours": "Giờ phải có mặt",
+      "status": "Trạng thái",
+      "inOut": "Vào – ra",
+      "noOut": "chưa chấm ra",
+      "lateEarly": "Muộn / sớm",
+      "lateEarlyValue": "Muộn {late} phút, về sớm {early} phút",
+      "worked": "Thời gian có mặt",
+      "workedValue": "{hours} giờ {minutes} phút (không tính nghỉ trưa)",
+      "paidUnits": "Công",
+      "leaveRequests": "Đơn nghỉ trong ngày",
+      "explainLater": "Quên chấm hoặc đi công tác? Giải trình công sẽ có ở bản sau; tạm thời báo HR.",
+      "requestLeave": "Xin nghỉ ngày này",
+      "requestSickLeave": "Gửi đơn nghỉ ốm cho ngày này"
+    },
+    "table": {
+      "date": "Ngày",
+      "hours": "Giờ phải có mặt",
+      "in": "Vào",
+      "out": "Ra",
+      "late": "Muộn (phút)",
+      "early": "Sớm (phút)",
+      "status": "Trạng thái",
+      "paidUnits": "Công"
+    },
+    "summary": {
+      "paidUnits": "Tổng công: {value}",
+      "late": "Đi muộn: {count} lần, {minutes} phút",
+      "early": "Về sớm: {count} lần, {minutes} phút",
+      "leave": "Nghỉ có đơn: {value} ngày",
+      "absent": "Vắng: {count} ngày",
+      "missingOut": "Thiếu giờ ra: {count} ngày"
+    },
+    "team": {
+      "emptyTitle": "Chưa có ai trong đội",
+      "emptyDescription": "Bạn chưa quản lý nhân viên nào.",
+      "employee": "Nhân viên",
+      "paidUnits": "Công"
+    },
+    "schedule": {
+      "currentTitle": "Giờ làm hôm nay",
+      "currentDescription": "Đang áp dụng: {source}",
+      "register": "Đăng ký giờ làm",
+      "rule8Hours": "Một ngày 8 tiếng làm việc. Giờ kết thúc = giờ bắt đầu + 9 tiếng (gồm 1 tiếng nghỉ trưa cố định).",
+      "ruleLate": "Chấm vào sau {start} dù 1 giây là đi muộn (chỉ ghi lại số phút, không trừ lương). Ở lại muộn không bù đi muộn.",
+      "ruleHalfDay": "Không đến được buổi sáng hoặc phải về từ trưa: xin nghỉ nửa ngày trước.",
+      "upcoming": "Giờ mới {start} – {end} áp dụng từ {from}.",
+      "pending": "Đơn đăng ký giờ {start} – {end} đang chờ quản lý duyệt.",
+      "pendingOffice": "Đơn quay về giờ văn phòng đang chờ quản lý duyệt.",
+      "withdraw": "Rút đơn",
+      "withdrawTitle": "Rút đơn đăng ký giờ làm?",
+      "withdrawDescription": "Giờ làm hiện tại giữ nguyên. Bạn có thể gửi đơn khác sau.",
+      "withdrawn": "Đã rút đơn.",
+      "historyTitle": "Các lần đăng ký",
+      "historyDescription": "Mỗi tháng được đổi giờ một lần (tính theo ngày áp dụng).",
+      "columns": {
+        "sentAt": "Ngày gửi",
+        "hours": "Giờ làm",
+        "effectiveFrom": "Áp dụng từ",
+        "status": "Trạng thái"
+      },
+      "officeHours": "Giờ văn phòng",
+      "status": {
+        "PENDING": "Chờ duyệt",
+        "APPROVED": "Đã duyệt",
+        "REJECTED": "Bị từ chối",
+        "WITHDRAWN": "Đã rút"
+      },
+      "historyEmpty": "Bạn chưa đăng ký giờ làm riêng.",
+      "morning": "Buổi sáng",
+      "lunch": "Nghỉ trưa",
+      "afternoon": "Buổi chiều",
+      "dialogTitle": "Đăng ký giờ làm",
+      "dialogDescription": "Chọn giờ bắt đầu. Quản lý trực tiếp duyệt.",
+      "startTime": "Giờ bắt đầu",
+      "previewHours": "Sáng {start} – {lunchStart}, nghỉ trưa {lunchStart} – {lunchEnd}, chiều {lunchEnd} – {end}.",
+      "effectiveRule": "Giờ mới áp dụng từ ngày hôm sau ngày được duyệt. Trong lúc chờ, bạn vẫn làm theo giờ cũ.",
+      "reason": "Lý do",
+      "reasonPlaceholder": "Ví dụ: đưa con đi học buổi sáng",
+      "cancel": "Hủy",
+      "send": "Gửi đơn",
+      "sent": "Đã gửi đơn đăng ký giờ làm."
+    },
+    "errors": {
+      "shiftStartOutOfRange": "Giờ bắt đầu không nằm trong các giờ được chọn.",
+      "shiftUnchanged": "Đây đã là giờ làm của bạn.",
+      "shiftRequestPending": "Bạn đang có một đơn đăng ký giờ chờ duyệt.",
+      "shiftChangeLimit": "Bạn đã đổi giờ làm đủ số lần cho phép trong tháng.",
+      "leaveTypeNotFound": "Loại nghỉ không hợp lệ.",
+      "leaveInvalidRange": "Ngày không hợp lệ: nghỉ nửa ngày chỉ cho một ngày, và một đơn không dài quá 30 ngày.",
+      "leaveInPast": "Không xin nghỉ cho ngày đã qua (trừ nghỉ ốm trong vòng 30 ngày).",
+      "leaveNoWorkingDay": "Không có ngày làm việc nào trong khoảng này (cuối tuần, ngày lễ).",
+      "leaveTypeMaxDays": "Loại nghỉ này không cho nghỉ nhiều ngày như vậy trong một đơn.",
+      "leaveOverlap": "Đã có đơn khác (chờ duyệt hoặc đã duyệt) cho buổi này.",
+      "leaveInsufficientBalance": "Không đủ phép năm. Phần thiếu hãy gửi đơn nghỉ không lương.",
+      "leaveNotCancellable": "Chỉ hủy được đơn đã duyệt và chưa có yêu cầu hủy đang chờ.",
+      "approvalNotPending": "Đơn không còn chờ duyệt.",
+      "approvalAlreadyDecided": "Bạn đã quyết định đơn này rồi.",
+      "notCurrentApprover": "Bạn không phải người duyệt bước hiện tại.",
+      "employeeProfileRequired": "Tài khoản của bạn chưa gắn hồ sơ nhân viên.",
+      "unknown": "Không gửi được đơn này."
+    }
+  },
+  "Leave": {
+    "metaTitle": "Nghỉ phép",
+    "title": "Nghỉ phép",
+    "description": "Số phép còn lại, đơn nghỉ của bạn, và các đơn đang chờ bạn duyệt.",
+    "newRequest": "Xin nghỉ",
+    "shortNotice": "Gấp",
+    "tabs": {
+      "mine": "Đơn của tôi",
+      "inbox": "Cần tôi duyệt"
+    },
+    "types": {
+      "ANNUAL": "Phép năm",
+      "PERSONAL_PAID": "Việc riêng có lương",
+      "SICK": "Nghỉ ốm",
+      "UNPAID": "Nghỉ không lương"
+    },
+    "parts": {
+      "FULL_DAY": "Cả ngày",
+      "MORNING": "Buổi sáng",
+      "AFTERNOON": "Buổi chiều"
+    },
+    "requestStatus": {
+      "PENDING": "Chờ duyệt",
+      "APPROVED": "Đã duyệt",
+      "REJECTED": "Bị từ chối",
+      "WITHDRAWN": "Đã rút",
+      "CANCELLED": "Đã hủy"
+    },
+    "cancelStatus": {
+      "PENDING": "Đang xin hủy",
+      "APPROVED": "Đã hủy",
+      "REJECTED": "Không được hủy",
+      "WITHDRAWN": "Đã rút yêu cầu hủy"
+    },
+    "balance": {
+      "available": "Phép năm còn dùng được",
+      "used": "Đã nghỉ",
+      "held": "Đang giữ cho đơn chờ duyệt",
+      "accrued": "Đã cộng",
+      "availableNote": "Năm {year}, đã trừ phần đang giữ.",
+      "usedNote": "Đơn phép năm đã duyệt (trừ đơn đã hủy).",
+      "heldNote": "Trả lại nếu đơn bị từ chối hoặc bạn rút đơn.",
+      "accruedNote": "Cộng 1 ngày đầu mỗi tháng, {annual} ngày một năm.",
+      "daysValue": "{days} ngày"
+    },
+    "dialog": {
+      "title": "Xin nghỉ",
+      "description": "Nghỉ cả ngày hoặc một buổi. Hệ thống tự bỏ cuối tuần và ngày lễ khi tính số ngày.",
+      "type": "Loại nghỉ",
+      "paid": "có lương",
+      "unpaid": "không lương",
+      "part": "Nghỉ",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "day": "Ngày",
+      "reason": "Lý do",
+      "reasonPlaceholder": "Ví dụ: việc gia đình",
+      "reasonUrgentPlaceholder": "Đơn gấp: ghi rõ lý do để quản lý xem xét",
+      "cancel": "Hủy",
+      "send": "Gửi đơn",
+      "sendUrgent": "Vẫn gửi đơn gấp",
+      "sent": "Đã gửi đơn, chờ quản lý duyệt.",
+      "checking": "Đang kiểm tra...",
+      "days": "Số ngày nghỉ",
+      "daysValue": "{days} ngày",
+      "balance": "Phép năm",
+      "balanceValue": "còn {before} → sau đơn {after}",
+      "approvers": "Người duyệt",
+      "approversWithHr": "Quản lý trực tiếp, rồi HR văn phòng",
+      "approversManager": "Quản lý trực tiếp",
+      "urgentTitle": "Nghỉ gấp",
+      "urgentDescription": "Quy định báo trước ít nhất {days} ngày (hạn gửi đúng hạn: {deadline}). Đơn vẫn gửi được nhưng được đánh dấu Gấp, quản lý có thể từ chối.",
+      "backdated": "Đơn gửi sau ngày nghỉ: nhớ nộp giấy của cơ sở y tế cho HR trước khi chốt công."
+    },
+    "mine": {
+      "emptyTitle": "Chưa có đơn nghỉ nào",
+      "emptyDescription": "Bấm Xin nghỉ, hoặc chọn một ngày trên lịch ở trang Bảng công.",
+      "withdrawn": "Đã rút.",
+      "columns": {
+        "type": "Loại",
+        "when": "Thời gian",
+        "days": "Số ngày",
+        "reason": "Lý do",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "withdraw": "Rút",
+      "withdrawCancel": "Rút yêu cầu hủy",
+      "withdrawTitle": "Rút đơn nghỉ này?",
+      "withdrawCancelTitle": "Rút yêu cầu hủy? Đơn nghỉ vẫn giữ là đã duyệt.",
+      "cancel": "Xin hủy"
+    },
+    "cancelDialog": {
+      "title": "Xin hủy đơn nghỉ đã duyệt",
+      "description": "Quản lý trực tiếp duyệt yêu cầu hủy. Được duyệt thì phép được hoàn lại và bảng công tính lại.",
+      "reason": "Lý do hủy",
+      "back": "Quay lại",
+      "send": "Gửi yêu cầu hủy",
+      "sent": "Đã gửi yêu cầu hủy."
+    },
+    "inbox": {
+      "emptyTitle": "Không có đơn nào chờ bạn duyệt",
+      "emptyDescription": "Đơn nghỉ, yêu cầu hủy và đơn đăng ký giờ làm của người bạn quản lý sẽ hiện ở đây.",
+      "types": {
+        "LEAVE": "Đơn nghỉ",
+        "LEAVE_CANCEL": "Hủy đơn nghỉ",
+        "SHIFT_CHANGE": "Đăng ký giờ làm"
+      },
+      "urgent": "Gấp",
+      "meta": "Gửi lúc {at} · Bước: {step}",
+      "reason": "Lý do: {reason}",
+      "noReason": "Không ghi lý do.",
+      "reject": "Từ chối",
+      "approve": "Duyệt",
+      "approveTitle": "Duyệt đơn",
+      "rejectTitle": "Từ chối đơn",
+      "rejectReason": "Lý do từ chối (bắt buộc)",
+      "comment": "Ghi chú (không bắt buộc)",
+      "back": "Quay lại",
+      "approved": "Đã duyệt.",
+      "rejected": "Đã từ chối."
+    }
   }
 }
