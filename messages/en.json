@@ -1207,5 +1207,75 @@
       "reasonRequired": "Enter a reason for rejecting",
       "commentTooLong": "Must be at most 1000 characters"
     }
+  },
+  "Organization": {
+    "metaTitle": "Organization",
+    "title": "Organization",
+    "description": "Departments, teams and who leads them. Pick a unit to see its people.",
+    "searchPeople": "Search people",
+    "clearSearch": "Clear search",
+    "officeOption": "{name} ({count})",
+    "View": {
+      "department": "By department",
+      "office": "By office"
+    },
+    "Tree": {
+      "label": "Organization tree",
+      "company": "Whole company",
+      "office": "Office",
+      "filter": "Filter units",
+      "noMatch": "No department or team matches this name.",
+      "withoutTeam": "Not in a team",
+      "expand": "Expand {name}",
+      "collapse": "Collapse {name}"
+    },
+    "Roles": {
+      "director": "Director",
+      "departmentHead": "Head of department",
+      "teamLead": "Team lead"
+    },
+    "Diagram": {
+      "vacant": "No head assigned",
+      "companyLabel": "Company chart: director and departments",
+      "unitLabel": "Chart of {name}",
+      "chainLabel": "Reporting line of {name}"
+    },
+    "Detail": {
+      "overviewSubtitle": "{departments, plural, =0 {No departments yet} one {# department} other {# departments}}",
+      "allMembers": "Everyone",
+      "emptyScope": "Nobody here yet",
+      "members": "Members",
+      "emptyNode": "Nobody in this unit",
+      "withoutTeamSubtitle": "People of {name} who are not in any team",
+      "executiveBadge": "Executive board",
+      "searchTitle": "Results for “{keyword}”",
+      "searchSubtitle": "Searching {scope}",
+      "searchResults": "People found",
+      "emptySearch": "No one matches",
+      "emptySearchHint": "Check the spelling, including Vietnamese accents, or search by employee code.",
+      "people": "{count, plural, one {# person} other {# people}}",
+      "headcount": "<num>{count}</num> {count, plural, one {person} other {people}}"
+    },
+    "Members": {
+      "employee": "Employee",
+      "departmentHead": "Head",
+      "teamLead": "Team lead",
+      "position": "Position",
+      "unit": "Department / team",
+      "office": "Office",
+      "noTeam": "Not in a team",
+      "team": "Team"
+    },
+    "Empty": {
+      "companyTitle": "No departments yet",
+      "companyDescription": "HR or an administrator sets up departments and teams first.",
+      "officeTitle": "Nobody works at this office yet",
+      "officeDescription": "People appear here once their profile is assigned to this office.",
+      "nodeTitle": "This unit is not on the chart",
+      "nodeDescription": "It may have been deactivated. Pick another unit from the tree.",
+      "nodeInOffice": "Nobody from this unit works at {office}.",
+      "backToOverview": "Show the whole chart",
+      "noOffices": "No offices yet."
+    }
   }
 }
