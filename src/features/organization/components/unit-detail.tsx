@@ -5,10 +5,23 @@ import { Building2Icon, ChevronRightIcon, LandmarkIcon, NetworkIcon, UserRoundIc
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { IconTile } from "@/components/shared/icon-tile";
+import { useOrgMembers } from "../hooks";
 import { memberFilters, nodeCount, type OrgPageState, type ResolvedNode } from "../rules";
-import type { OrgChart, OrgChartDepartment, OrgChartPerson, OrgNode } from "../types";
+import type { MemberFilters, OrgChart, OrgChartDepartment, OrgChartPerson, OrgChartTeam, OrgNode } from "../types";
 import { MemberTable } from "./member-table";
-import { OrgDiagram, ReportingChain, UnitCard } from "./org-diagram";
+import { MemberCard, MemberTier, OrgDiagram, ReportingChain, UnitCard } from "./org-diagram";
+import { useOpenPerson } from "./person-sheet";
+import { AddDepartmentButton, UnitActions } from "./unit-actions";
+
+/** Bộ dịch theo nhóm con: cả nhóm "Organization" quá lớn để TypeScript suy ra kiểu khóa (TS2590). */
+function useOrgTranslations() {
+  return {
+    detail: useTranslations("Organization.Detail"),
+    roles: useTranslations("Organization.Roles"),
+    diagram: useTranslations("Organization.Diagram"),
+    tree: useTranslations("Organization.Tree"),
+  };
+}
 
 type DetailProps = {
   chart: OrgChart;
@@ -22,7 +35,7 @@ type DetailProps = {
 
 /** Khi chưa chọn nút: sơ đồ cấp công ty (giám đốc → các phòng) và danh sách mọi người trong phạm vi đang xem. */
 export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }: DetailProps) {
-  const t = useTranslations("Organization");
+  const tt = useOrgTranslations();
   const departments = chart.departments.filter((d) => !d.executive);
   const executive = chart.departments.find((d) => d.executive);
 
@@ -30,17 +43,18 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
     <DetailLayout
       icon={NetworkIcon}
       title={scopeLabel}
-      subtitle={t("Detail.overviewSubtitle", { departments: departments.length })}
+      subtitle={tt.detail("overviewSubtitle", { departments: departments.length })}
       count={chart.employeeCount}
+      actions={state.view === "department" ? <AddDepartmentButton /> : undefined}
       diagram={
         chart.departments.length > 0 && (
           <OrgDiagram
-            label={t("Diagram.companyLabel")}
+            label={tt.diagram("companyLabel")}
             root={
               <UnitCard
                 emphasis
                 person={director}
-                role={t("Roles.director")}
+                role={tt.roles("director")}
                 unit={executive?.name}
                 count={executive?.employeeCount}
                 onClick={executive ? () => onSelect({ kind: "department", id: executive.id }) : undefined}
@@ -51,7 +65,7 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
               node: (
                 <UnitCard
                   person={department.head}
-                  role={t("Roles.departmentHead")}
+                  role={tt.roles("departmentHead")}
                   unit={department.name}
                   count={department.employeeCount}
                   onClick={() => onSelect({ kind: "department", id: department.id })}
@@ -61,24 +75,25 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
           />
         )
       }
-      membersTitle={t("Detail.allMembers")}
+      membersTitle={tt.detail("allMembers")}
     >
       <MemberTable
         filters={memberFilters({ ...state, node: undefined, keyword: undefined })}
+        directorId={director?.id}
         unitColumn="full"
         onSelectUnit={onSelect}
         showOffice={state.view !== "office"}
-        emptyTitle={t("Detail.emptyScope")}
+        emptyTitle={tt.detail("emptyScope")}
       />
     </DetailLayout>
   );
 }
 
-/** Chi tiết một phòng ban, một team hoặc nhóm "chưa thuộc team". */
+/** Chi tiết một phòng ban, một team hoặc nhóm "trực thuộc phòng". */
 export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: DetailProps & { resolved: ResolvedNode }) {
-  const t = useTranslations("Organization");
+  const tt = useOrgTranslations();
   const { department } = resolved;
-  const headRole = department.executive ? t("Roles.director") : t("Roles.departmentHead");
+  const headRole = department.executive ? tt.roles("director") : tt.roles("departmentHead");
   const filters = memberFilters({ ...state, keyword: undefined });
 
   const path: { label: string; node?: OrgNode }[] = [{ label: scopeLabel }];
@@ -92,7 +107,13 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
     title = department.name;
     icon = department.executive ? LandmarkIcon : Building2Icon;
     diagram = (
-      <DepartmentDiagram department={department} headRole={headRole} onSelect={onSelect} label={t("Diagram.unitLabel", { name: title })} />
+      <DepartmentDiagram
+        department={department}
+        headRole={headRole}
+        officeId={filters.officeId}
+        onSelect={onSelect}
+        label={tt.diagram("unitLabel", { name: title })}
+      />
     );
   } else if (resolved.kind === "team") {
     const { team } = resolved;
@@ -101,7 +122,7 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
     const steps: { key: string; node: ReactNode }[] = [];
     // Giám đốc chỉ hiện khi khác trưởng phòng (team thuộc Ban Giám đốc thì trưởng phòng chính là giám đốc)
     if (director && !department.executive) {
-      steps.push({ key: "director", node: <UnitCard wide person={director} role={t("Roles.director")} /> });
+      steps.push({ key: "director", node: <UnitCard wide person={director} role={tt.roles("director")} /> });
     }
     steps.push({
       key: "head",
@@ -116,32 +137,26 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
         />
       ),
     });
-    steps.push({
-      key: "lead",
-      node: <UnitCard wide active person={team.lead} role={t("Roles.teamLead")} unit={team.name} count={team.employeeCount} />,
-    });
-    diagram = <ReportingChain steps={steps} label={t("Diagram.chainLabel", { name: team.name })} />;
+    steps.push({ key: "lead", node: <TeamDiagram team={team} officeId={filters.officeId} label={tt.diagram("unitLabel", { name: team.name })} /> });
+    diagram = <ReportingChain steps={steps} label={tt.diagram("chainLabel", { name: team.name })} />;
   } else {
-    title = t("Tree.withoutTeam");
+    title = tt.tree("withoutTeam");
     icon = UserRoundIcon;
     diagram = (
-      <ReportingChain
-        label={t("Diagram.chainLabel", { name: department.name })}
-        steps={[
-          {
-            key: "head",
-            node: (
-              <UnitCard
-                wide
-                person={department.head}
-                role={headRole}
-                unit={department.name}
-                count={department.employeeCount}
-                onClick={() => onSelect({ kind: "department", id: department.id })}
-              />
-            ),
-          },
-        ]}
+      <LeaderWithMembers
+        label={tt.diagram("chainLabel", { name: department.name })}
+        leaderId={department.head?.id}
+        filters={filters}
+        leader={
+          <UnitCard
+            wide
+            person={department.head}
+            role={headRole}
+            unit={department.name}
+            count={department.employeeCount}
+            onClick={() => onSelect({ kind: "department", id: department.id })}
+          />
+        }
       />
     );
   }
@@ -155,40 +170,91 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
       code={code}
       path={path}
       onSelect={onSelect}
-      subtitle={resolved.kind === "noTeam" ? t("Detail.withoutTeamSubtitle", { name: department.name }) : undefined}
-      badge={department.executive && resolved.kind === "department" ? t("Detail.executiveBadge") : undefined}
+      subtitle={resolved.kind === "noTeam" ? tt.detail("withoutTeamSubtitle", { name: department.name }) : undefined}
+      badge={department.executive && resolved.kind === "department" ? tt.detail("executiveBadge") : undefined}
       count={nodeCount(resolved)}
+      actions={<UnitActions resolved={resolved} onSelect={onSelect} />}
       diagram={diagram}
-      membersTitle={t("Detail.members")}
+      membersTitle={tt.detail("members")}
     >
       <MemberTable
         filters={filters}
+        directorId={director?.id}
         unitColumn={resolved.kind === "department" ? "team" : "none"}
         onSelectUnit={onSelect}
         showOffice={state.view !== "office"}
-        emptyTitle={t("Detail.emptyNode")}
+        emptyTitle={tt.detail("emptyNode")}
       />
     </DetailLayout>
   );
 }
 
+/**
+ * Tầng cuối của sơ đồ: trưởng team và các thành viên (một team thường 5–10 người nên vẽ hết được, giống sơ đồ "cấp dưới
+ * trực tiếp" của Odoo). Tối đa 100 người; đang xem theo văn phòng thì chỉ người của văn phòng đó.
+ */
+function TeamDiagram({ team, officeId, label }: { team: OrgChartTeam; officeId?: string; label: string }) {
+  const tt = useOrgTranslations();
+  return (
+    <LeaderWithMembers
+      label={label}
+      leaderId={team.lead?.id}
+      filters={{ officeId, teamId: team.id }}
+      leader={<UnitCard wide active person={team.lead} role={tt.roles("teamLead")} unit={team.name} count={team.employeeCount} />}
+    />
+  );
+}
+
+/** Ô người đứng đầu + lưới thành viên trực tiếp (tải tối đa 100 người, bỏ chính người đứng đầu ra khỏi lưới). */
+function LeaderWithMembers({
+  leader,
+  leaderId,
+  filters,
+  label,
+}: {
+  leader: ReactNode;
+  leaderId?: string;
+  filters: MemberFilters;
+  label: string;
+}) {
+  const members = useOrgMembers(filters, { page: 0, size: 100 });
+  const openPerson = useOpenPerson();
+  const others = (members.data?.content ?? []).filter((member) => member.id !== leaderId);
+  return (
+    <MemberTier
+      label={label}
+      root={leader}
+      members={others.map((member) => (
+        <MemberCard
+          key={member.id}
+          name={member.fullName}
+          seed={member.employeeCode}
+          position={member.position?.name}
+          onClick={() => openPerson(member)}
+        />
+      ))}
+    />
+  );
+}
+
 /** Kết quả tìm người theo tên / mã trong phạm vi đang xem. */
-export function SearchDetail({ state, scopeLabel, onSelect }: Omit<DetailProps, "chart" | "director">) {
-  const t = useTranslations("Organization");
+export function SearchDetail({ director, state, scopeLabel, onSelect }: Omit<DetailProps, "chart">) {
+  const tt = useOrgTranslations();
   return (
     <DetailLayout
       icon={UsersRoundIcon}
-      title={t("Detail.searchTitle", { keyword: state.keyword ?? "" })}
-      subtitle={t("Detail.searchSubtitle", { scope: scopeLabel })}
-      membersTitle={t("Detail.searchResults")}
+      title={tt.detail("searchTitle", { keyword: state.keyword ?? "" })}
+      subtitle={tt.detail("searchSubtitle", { scope: scopeLabel })}
+      membersTitle={tt.detail("searchResults")}
     >
       <MemberTable
         filters={memberFilters(state)}
+        directorId={director?.id}
         unitColumn="full"
         onSelectUnit={onSelect}
         showOffice={state.view !== "office"}
-        emptyTitle={t("Detail.emptySearch")}
-        emptyDescription={t("Detail.emptySearchHint")}
+        emptyTitle={tt.detail("emptySearch")}
+        emptyDescription={tt.detail("emptySearchHint")}
       />
     </DetailLayout>
   );
@@ -197,28 +263,45 @@ export function SearchDetail({ state, scopeLabel, onSelect }: Omit<DetailProps, 
 function DepartmentDiagram({
   department,
   headRole,
+  officeId,
   onSelect,
   label,
 }: {
   department: OrgChartDepartment;
   headRole: string;
+  officeId?: string;
   onSelect: (node: OrgNode) => void;
   label: string;
 }) {
-  const t = useTranslations("Organization");
+  const tt = useOrgTranslations();
+  const head = (
+    <UnitCard emphasis active person={department.head} role={headRole} unit={department.name} count={department.employeeCount} />
+  );
+  // Phòng không có team (Ban Giám đốc, phòng nhỏ): vẽ luôn nhân sự trực thuộc dưới trưởng phòng
+  if (department.teams.length === 0) {
+    return (
+      <LeaderWithMembers
+        label={label}
+        leader={head}
+        leaderId={department.head?.id}
+        filters={{ officeId, departmentId: department.id, withoutTeam: true }}
+      />
+    );
+  }
   const items = department.teams.map((team) => ({
     key: team.id,
     node: (
       <UnitCard
         person={team.lead}
-        role={t("Roles.teamLead")}
+        role={tt.roles("teamLead")}
         unit={team.name}
         count={team.employeeCount}
         onClick={() => onSelect({ kind: "team", id: team.id })}
       />
     ),
   }));
-  if (department.withoutTeamCount > 0 && department.teams.length > 0) {
+  // Trưởng phòng đã ở ô trên nên ô này đếm directStaffCount (không tính trưởng phòng); không còn ai thì không vẽ
+  if (department.directStaffCount > 0 && department.teams.length > 0) {
     items.push({
       key: "no-team",
       node: (
@@ -227,8 +310,8 @@ function DepartmentDiagram({
           onClick={() => onSelect({ kind: "noTeam", departmentId: department.id })}
           className="flex w-48 flex-col justify-center rounded-lg border border-dashed p-2.5 text-left text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
         >
-          <span className="font-medium text-foreground">{t("Tree.withoutTeam")}</span>
-          <span className="text-xs tabular-nums">{t("Detail.people", { count: department.withoutTeamCount })}</span>
+          <span className="font-medium text-foreground">{tt.tree("withoutTeam")}</span>
+          <span className="text-xs tabular-nums">{tt.detail("people", { count: department.directStaffCount })}</span>
         </button>
       ),
     });
@@ -236,7 +319,7 @@ function DepartmentDiagram({
   return (
     <OrgDiagram
       label={label}
-      root={<UnitCard emphasis active person={department.head} role={headRole} unit={department.name} count={department.employeeCount} />}
+      root={head}
       items={items}
     />
   );
@@ -244,6 +327,8 @@ function DepartmentDiagram({
 
 type DetailLayoutProps = {
   icon: LucideIcon;
+  /** Nút quản trị bên phải tiêu đề (chỉ hiện với người có org:manage). */
+  actions?: ReactNode;
   title: string;
   code?: string;
   subtitle?: string;
@@ -256,7 +341,20 @@ type DetailLayoutProps = {
   children: ReactNode;
 };
 
-function DetailLayout({ icon, title, code, subtitle, badge, count, path, onSelect, diagram, membersTitle, children }: DetailLayoutProps) {
+function DetailLayout({
+  icon,
+  actions,
+  title,
+  code,
+  subtitle,
+  badge,
+  count,
+  path,
+  onSelect,
+  diagram,
+  membersTitle,
+  children,
+}: DetailLayoutProps) {
   const t = useTranslations("Organization.Detail");
   return (
     <div className="flex flex-col">
@@ -292,13 +390,18 @@ function DetailLayout({ icon, title, code, subtitle, badge, count, path, onSelec
             {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
-        {count !== undefined && (
-          <p className="shrink-0 text-sm text-muted-foreground">
-            {t.rich("headcount", {
-              count,
-              num: (chunks) => <span className="text-2xl font-semibold text-foreground tabular-nums">{chunks}</span>,
-            })}
-          </p>
+        {(count !== undefined || actions) && (
+          <div className="flex shrink-0 items-center gap-4">
+            {count !== undefined && (
+              <p className="text-sm text-muted-foreground">
+                {t.rich("headcount", {
+                  count,
+                  num: (chunks) => <span className="text-2xl font-semibold text-foreground tabular-nums">{chunks}</span>,
+                })}
+              </p>
+            )}
+            {actions}
+          </div>
         )}
       </header>
 

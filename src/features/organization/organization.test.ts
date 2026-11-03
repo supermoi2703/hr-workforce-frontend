@@ -5,12 +5,15 @@ import {
   encodeNode,
   filterDepartments,
   foldText,
+  managerOf,
   memberFilters,
   resolveNode,
   stateFromSearchParams,
   stateToSearchParams,
+  unitLedBy,
+  UNIT_CODE_PATTERN,
 } from "./rules";
-import type { OrgChart, OrgChartDepartment } from "./types";
+import type { OrgChart, OrgChartDepartment, OrgChartMember } from "./types";
 
 const person = (id: string, fullName: string) => ({ id, employeeCode: `NV-${id}`, fullName });
 
@@ -22,6 +25,7 @@ const bgd: OrgChartDepartment = {
   head: person("gd", "Giám Đốc"),
   employeeCount: 2,
   withoutTeamCount: 2,
+  directStaffCount: 1,
   teams: [],
 };
 const ptpm: OrgChartDepartment = {
@@ -32,6 +36,7 @@ const ptpm: OrgChartDepartment = {
   head: person("chi", "Chi"),
   employeeCount: 9,
   withoutTeamCount: 2,
+  directStaffCount: 1,
   teams: [
     { id: "be", code: "BACKEND", name: "Team Backend", lead: person("binh", "Bình"), employeeCount: 6 },
     { id: "qa", code: "QA", name: "Đảm bảo chất lượng", lead: null, employeeCount: 1 },
@@ -120,5 +125,55 @@ describe("filterDepartments", () => {
 
   it("returns everything for an empty filter", () => {
     expect(filterDepartments(chart.departments, "  ")).toBe(chart.departments);
+  });
+});
+
+const member = (
+  id: string,
+  departmentId: string,
+  teamId: string | null,
+  flags: Partial<Pick<OrgChartMember, "departmentHead" | "teamLead">> = {},
+): OrgChartMember => ({
+  id,
+  employeeCode: `NV-${id}`,
+  fullName: id,
+  workEmail: `${id}@test.local`,
+  position: null,
+  office: null,
+  department: { id: departmentId, code: departmentId.toUpperCase(), name: departmentId },
+  team: teamId ? { id: teamId, code: teamId.toUpperCase(), name: teamId } : null,
+  departmentHead: flags.departmentHead ?? false,
+  teamLead: flags.teamLead ?? false,
+});
+
+describe("managerOf (same chain as the backend ManagerResolver)", () => {
+  const director = directorOf(chart);
+
+  it("goes team member → team lead → department head → director → nobody", () => {
+    expect(managerOf(member("an", "ptpm", "be"), chart, director)?.id).toBe("binh");
+    expect(managerOf(member("binh", "ptpm", "be", { teamLead: true }), chart, director)?.id).toBe("chi");
+    expect(managerOf(member("chi", "ptpm", null, { departmentHead: true }), chart, director)?.id).toBe("gd");
+    expect(managerOf(member("gd", "bgd", null, { departmentHead: true }), chart, director)).toBeNull();
+  });
+
+  it("skips vacant levels and treats executive board staff as reporting to the director", () => {
+    expect(managerOf(member("em", "ptpm", "qa"), chart, director)?.id).toBe("chi");
+    expect(managerOf(member("pgd", "bgd", null), chart, director)?.id).toBe("gd");
+    const noHead = { ...chart, departments: [bgd, { ...ptpm, head: null }] };
+    expect(managerOf(member("em", "ptpm", "qa"), noHead, director)?.id).toBe("gd");
+    expect(managerOf(member("chi", "ptpm", null, { departmentHead: true }), chart, null)).toBeNull();
+  });
+
+  it("knows which unit a person leads", () => {
+    expect(unitLedBy(member("chi", "ptpm", null, { departmentHead: true }))).toEqual({ kind: "department", id: "ptpm" });
+    expect(unitLedBy(member("binh", "ptpm", "be", { teamLead: true }))).toEqual({ kind: "team", id: "be" });
+    expect(unitLedBy(member("an", "ptpm", "be"))).toBeUndefined();
+  });
+});
+
+describe("UNIT_CODE_PATTERN", () => {
+  it("matches the backend rule: 2–20 letters, digits, - or _, starting with a letter or digit", () => {
+    expect(["HN", "kd-mb", "TEAM_01", "A".repeat(20)].every((code) => UNIT_CODE_PATTERN.test(code))).toBe(true);
+    expect(["H", "-HN", "HÀ NỘI", "A".repeat(21), "HN 2"].some((code) => UNIT_CODE_PATTERN.test(code))).toBe(false);
   });
 });

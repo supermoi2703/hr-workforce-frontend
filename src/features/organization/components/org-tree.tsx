@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
 import { Building2Icon, ChevronRightIcon, LandmarkIcon, NetworkIcon, UserRoundIcon, UsersRoundIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,8 @@ type OrgTreeProps = {
 
 /**
  * Cây phòng ban → team (kiểu cây "Cơ cấu tổ chức" của các phần mềm nhân sự). Phòng đang chứa nút được chọn tự mở.
- * Mỗi dòng là một nút bấm thường (Tab để đi qua), nút mũi tên bên trái chỉ để mở / đóng.
+ * Mỗi dòng là một nút bấm thường (Tab để đi qua), nút mũi tên bên trái chỉ để mở / đóng. Bàn phím như cây chuẩn:
+ * lên / xuống chuyển dòng, Home / End về đầu / cuối, phải mở phòng (hoặc vào team đầu tiên), trái thu gọn (hoặc về phòng).
  */
 export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect, expandAll }: OrgTreeProps) {
   const t = useTranslations("Organization.Tree");
@@ -35,9 +36,49 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
 
   const isOpen = (department: OrgChartDepartment) =>
     expandAll || (toggled[department.id] ?? department.id === selectedDepartmentId);
+  const setOpen = (departmentId: string, open: boolean) => setToggled((current) => ({ ...current, [departmentId]: open }));
+
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    const row = event.target as HTMLElement;
+    if (!row.matches("[data-tree-row]")) return;
+    const rows = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("[data-tree-row]"));
+    const index = rows.indexOf(row);
+    const focusAt = (i: number) => rows[Math.max(0, Math.min(rows.length - 1, i))]?.focus();
+    const { level, departmentId } = row.dataset;
+    const department = departments.find((d) => d.id === departmentId);
+    const expandable = level === "1" && !!department && department.teams.length > 0;
+
+    switch (event.key) {
+      case "ArrowDown":
+        focusAt(index + 1);
+        break;
+      case "ArrowUp":
+        focusAt(index - 1);
+        break;
+      case "Home":
+        focusAt(0);
+        break;
+      case "End":
+        focusAt(rows.length - 1);
+        break;
+      case "ArrowRight":
+        if (!expandable || !department) return;
+        if (isOpen(department)) focusAt(index + 1);
+        else setOpen(department.id, true);
+        break;
+      case "ArrowLeft":
+        if (expandable && department && isOpen(department)) setOpen(department.id, false);
+        else if (level === "2") rows.find((r) => r.dataset.level === "1" && r.dataset.departmentId === departmentId)?.focus();
+        else return;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  }
 
   return (
-    <nav aria-label={t("label")} className="text-sm">
+    <nav aria-label={t("label")} className="text-sm" onKeyDown={handleKeyDown}>
       <TreeRow
         level={0}
         icon={<NetworkIcon />}
@@ -50,11 +91,13 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
       <ul className="mt-1 space-y-0.5">
         {departments.map((department) => {
           const open = isOpen(department);
-          const hasChildren = department.teams.length > 0 || department.withoutTeamCount > 0;
+          // Phòng không có team thì nút "trực thuộc phòng" trùng với chính phòng đó: không hiện
+          const hasChildren = department.teams.length > 0;
           return (
             <li key={department.id}>
               <TreeRow
                 level={1}
+                departmentId={department.id}
                 icon={department.executive ? <LandmarkIcon /> : <Building2Icon />}
                 label={department.name}
                 hint={department.code}
@@ -66,7 +109,7 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
                     ? {
                         open,
                         label: t(open ? "collapse" : "expand", { name: department.name }),
-                        onToggle: () => setToggled((current) => ({ ...current, [department.id]: !open })),
+                        onToggle: () => setOpen(department.id, !open),
                       }
                     : undefined
                 }
@@ -77,6 +120,7 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
                     <li key={team.id}>
                       <TreeRow
                         level={2}
+                        departmentId={department.id}
                         icon={<UsersRoundIcon />}
                         label={team.name}
                         hint={team.code}
@@ -90,6 +134,7 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
                     <li>
                       <TreeRow
                         level={2}
+                        departmentId={department.id}
                         icon={<UserRoundIcon />}
                         label={t("withoutTeam")}
                         count={department.withoutTeamCount}
@@ -111,6 +156,8 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
 
 type TreeRowProps = {
   level: 0 | 1 | 2;
+  /** Phòng của dòng (cấp 1, 2), để phím trái quay về đúng phòng cha. */
+  departmentId?: string;
   icon: ReactNode;
   label: string;
   hint?: string;
@@ -122,7 +169,7 @@ type TreeRowProps = {
   muted?: boolean;
 };
 
-function TreeRow({ level, icon, label, hint, count, active, onClick, toggle, strong, muted }: TreeRowProps) {
+function TreeRow({ level, departmentId, icon, label, hint, count, active, onClick, toggle, strong, muted }: TreeRowProps) {
   return (
     <div
       className={cn(
@@ -148,6 +195,9 @@ function TreeRow({ level, icon, label, hint, count, active, onClick, toggle, str
       <button
         type="button"
         onClick={onClick}
+        data-tree-row
+        data-level={level}
+        data-department-id={departmentId}
         aria-current={active ? "true" : undefined}
         title={hint ? `${label} (${hint})` : label}
         className={cn(

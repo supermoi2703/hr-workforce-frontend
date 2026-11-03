@@ -27,6 +27,8 @@ export type OrgChartDepartment = {
   employeeCount: number;
   /** Người của phòng không thuộc team nào đang dùng. */
   withoutTeamCount: number;
+  /** Như withoutTeamCount nhưng không tính trưởng phòng: số người hiện dưới ô trưởng phòng trên sơ đồ. */
+  directStaffCount: number;
   teams: OrgChartTeam[];
 };
 
@@ -76,10 +78,16 @@ export type MemberFilters = {
 export type OrgView = "department" | "office";
 
 /**
- * Nút đang chọn trên cây. `noTeam` = nhóm "chưa thuộc team" của một phòng.
+ * Nút đang chọn trên cây. `noTeam` = nhóm "trực thuộc phòng" của một phòng.
  * Trên URL: `d:<id>`, `t:<id>`, `n:<departmentId>`.
  */
 export type OrgNode =
   | { kind: "department"; id: string }
   | { kind: "team"; id: string }
   | { kind: "noTeam"; departmentId: string };
+
+/** Body POST / PUT /api/departments (backend tự viết hoa mã). */
+export type DepartmentInput = { code: string; name: string; executive: boolean };
+
+/** Body POST / PUT /api/teams; departmentId không đổi được sau khi tạo. */
+export type TeamInput = { code: string; name: string; departmentId: string };

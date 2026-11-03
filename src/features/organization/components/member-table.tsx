@@ -7,6 +7,7 @@ import { createDataTableColumns, DataTable, useDataTableState } from "@/componen
 import { EmptyState } from "@/components/shared/states";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { useOrgMembers } from "../hooks";
+import { useOpenPerson } from "./person-sheet";
 import type { MemberFilters, OrgChartMember, OrgNode } from "../types";
 
 type MemberTableProps = {
@@ -18,6 +19,8 @@ type MemberTableProps = {
   unitColumn: "full" | "team" | "none";
   /** Ẩn cột văn phòng khi cả danh sách cùng một văn phòng. */
   showOffice?: boolean;
+  /** employees.id của giám đốc: hiện "Giám đốc" thay cho "Trưởng phòng" (giám đốc là trưởng Ban Giám đốc). */
+  directorId?: string;
   /** Bấm tên đơn vị trong cột "Đơn vị" để chọn đơn vị đó trên cây. */
   onSelectUnit?: (node: OrgNode) => void;
   emptyTitle: string;
@@ -25,7 +28,15 @@ type MemberTableProps = {
 };
 
 /** Người của một nút trên cây. Thứ tự do backend: trưởng phòng, trưởng team, rồi theo tên tiếng Việt. */
-export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUnit, emptyTitle, emptyDescription }: MemberTableProps) {
+export function MemberTable({
+  filters,
+  unitColumn,
+  showOffice = true,
+  directorId,
+  onSelectUnit,
+  emptyTitle,
+  emptyDescription,
+}: MemberTableProps) {
   const t = useTranslations("Organization.Members");
   const tableState = useDataTableState({ pageSize: 20 });
 
@@ -40,6 +51,7 @@ export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUn
   }
 
   const query = useOrgMembers(filters, tableState.pageParams);
+  const openPerson = useOpenPerson();
 
   const columns = useMemo(() => {
     const col = createDataTableColumns<OrgChartMember>();
@@ -53,9 +65,17 @@ export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUn
               <UserAvatar name={member.fullName} seed={member.employeeCode} />
               <span className="flex min-w-0 flex-col gap-0.5">
                 <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                  <span className="font-medium">{member.fullName}</span>
+                  <button
+                    type="button"
+                    onClick={() => openPerson(member)}
+                    className="text-left font-medium hover:text-primary hover:underline focus-visible:underline focus-visible:outline-none"
+                  >
+                    {member.fullName}
+                  </button>
                   <span className="text-xs text-muted-foreground tabular-nums">{member.employeeCode}</span>
-                  {member.departmentHead && <Badge variant="info">{t("departmentHead")}</Badge>}
+                  {member.departmentHead && (
+                    <Badge variant="info">{member.id === directorId ? t("director") : t("departmentHead")}</Badge>
+                  )}
                   {member.teamLead && <Badge variant="secondary">{t("teamLead")}</Badge>}
                 </span>
                 <a
@@ -79,7 +99,7 @@ export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUn
             col.accessor((row) => row.department?.name ?? "", {
               id: "unit",
               header: t("unit"),
-              cell: (c) => <UnitCell member={c.row.original} onSelectUnit={onSelectUnit} />,
+              cell: (c) => <UnitCell member={c.row.original} directorId={directorId} onSelectUnit={onSelectUnit} />,
             }),
           ]
         : []),
@@ -88,7 +108,7 @@ export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUn
             col.accessor((row) => row.team?.name ?? "", {
               id: "team",
               header: t("team"),
-              cell: (c) => <TeamCell member={c.row.original} onSelectUnit={onSelectUnit} />,
+              cell: (c) => <TeamCell member={c.row.original} directorId={directorId} onSelectUnit={onSelectUnit} />,
             }),
           ]
         : []),
@@ -102,7 +122,7 @@ export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUn
           ]
         : []),
     ]);
-  }, [t, unitColumn, showOffice, onSelectUnit]);
+  }, [t, unitColumn, showOffice, directorId, onSelectUnit, openPerson]);
 
   return (
     <DataTable
@@ -117,8 +137,19 @@ export function MemberTable({ filters, unitColumn, showOffice = true, onSelectUn
   );
 }
 
-function UnitCell({ member, onSelectUnit }: { member: OrgChartMember; onSelectUnit?: (node: OrgNode) => void }) {
+type CellProps = { member: OrgChartMember; directorId?: string; onSelectUnit?: (node: OrgNode) => void };
+
+/**
+ * Người không thuộc team: trưởng phòng / giám đốc hiện đúng vai trò; người khác là "Trực thuộc phòng" (làm việc trực
+ * tiếp ở cấp phòng, không phải "chưa được xếp").
+ */
+function NoTeamLabel({ member, directorId }: Omit<CellProps, "onSelectUnit">) {
   const t = useTranslations("Organization.Members");
+  if (member.departmentHead) return <>{member.id === directorId ? t("director") : t("departmentHead")}</>;
+  return <>{t("noTeam")}</>;
+}
+
+function UnitCell({ member, directorId, onSelectUnit }: CellProps) {
   const { department, team } = member;
   if (!department) return <span className="text-muted-foreground">—</span>;
   const link = (label: string, node: OrgNode) =>
@@ -133,16 +164,21 @@ function UnitCell({ member, onSelectUnit }: { member: OrgChartMember; onSelectUn
     <span className="flex flex-col">
       {link(department.name, { kind: "department", id: department.id })}
       <span className="text-xs text-muted-foreground">
-        {team ? link(team.name, { kind: "team", id: team.id }) : t("noTeam")}
+        {team ? link(team.name, { kind: "team", id: team.id }) : <NoTeamLabel member={member} directorId={directorId} />}
       </span>
     </span>
   );
 }
 
-function TeamCell({ member, onSelectUnit }: { member: OrgChartMember; onSelectUnit?: (node: OrgNode) => void }) {
-  const t = useTranslations("Organization.Members");
+function TeamCell({ member, directorId, onSelectUnit }: CellProps) {
   const { team } = member;
-  if (!team) return <span className="text-muted-foreground">{t("noTeam")}</span>;
+  if (!team) {
+    return (
+      <span className="text-muted-foreground">
+        <NoTeamLabel member={member} directorId={directorId} />
+      </span>
+    );
+  }
   if (!onSelectUnit) return <span>{team.name}</span>;
   return (
     <button type="button" onClick={() => onSelectUnit({ kind: "team", id: team.id })} className="text-left hover:text-primary hover:underline">

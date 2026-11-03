@@ -1,4 +1,13 @@
-import type { MemberFilters, OrgChart, OrgChartDepartment, OrgChartTeam, OrgNode, OrgView } from "./types";
+import type {
+  MemberFilters,
+  OrgChart,
+  OrgChartDepartment,
+  OrgChartMember,
+  OrgChartPerson,
+  OrgChartTeam,
+  OrgNode,
+  OrgView,
+} from "./types";
 
 /** Trạng thái trang nằm trên URL (gửi link / F5 vẫn giữ). */
 export type OrgPageState = {
@@ -132,3 +141,31 @@ export function nodeCount(resolved: ResolvedNode): number {
       return resolved.department.withoutTeamCount;
   }
 }
+
+/**
+ * Quản lý trực tiếp của một người, cùng luật với ManagerResolver ở backend: thành viên team → trưởng team; trưởng team
+ * hoặc người trực thuộc phòng → trưởng phòng; trưởng phòng → giám đốc; giám đốc → không có. Cấp nào trống thì lên cấp
+ * trên. Chỉ dùng để hiển thị; trưởng trên cây đã là trưởng còn hợp lệ.
+ */
+export function managerOf(
+  member: OrgChartMember,
+  chart: OrgChart | undefined,
+  director: OrgChartPerson | null,
+): OrgChartPerson | null {
+  const notSelf = (person: OrgChartPerson | null | undefined) => (person && person.id !== member.id ? person : null);
+  if (director?.id === member.id) return null;
+  const department = chart?.departments.find((d) => d.id === member.department?.id);
+  if (member.departmentHead) return notSelf(director);
+  const team = department?.teams.find((t) => t.id === member.team?.id);
+  return notSelf(team?.lead) ?? notSelf(department?.head) ?? notSelf(director);
+}
+
+/** Đơn vị người này đứng đầu (để hiện "Phụ trách"): phòng nếu là trưởng phòng, team nếu là trưởng team. */
+export function unitLedBy(member: OrgChartMember): OrgNode | undefined {
+  if (member.departmentHead && member.department) return { kind: "department", id: member.department.id };
+  if (member.teamLead && member.team) return { kind: "team", id: member.team.id };
+  return undefined;
+}
+
+/** Mã đơn vị như backend: 2–20 ký tự, chữ, số, "-" và "_", bắt đầu bằng chữ hoặc số (backend tự viết hoa). */
+export const UNIT_CODE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{1,19}$/;

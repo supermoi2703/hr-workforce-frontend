@@ -14,6 +14,7 @@ import { useOrgChart, useOrgChartOffices, useOrgPageState } from "../hooks";
 import { directorOf, filterDepartments, resolveNode } from "../rules";
 import type { OrgNode, OrgView } from "../types";
 import { OrgTree } from "./org-tree";
+import { PersonSheetProvider } from "./person-sheet";
 import { NodeDetail, OverviewDetail, SearchDetail } from "./unit-detail";
 
 const SEARCH_DELAY_MS = 350;
@@ -60,7 +61,7 @@ export function OrganizationPage() {
   const resolved = resolveNode(chart.data, state.node);
 
   return (
-    <>
+    <PersonSheetProvider chart={chart.data} director={director} onSelectUnit={select}>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -148,7 +149,7 @@ export function OrganizationPage() {
 
         <section className="min-w-0 overflow-hidden rounded-xl border bg-card" aria-live="polite">
           {state.keyword ? (
-            <SearchDetail state={effectiveState} scopeLabel={scopeLabel} onSelect={select} />
+            <SearchDetail director={director} state={effectiveState} scopeLabel={scopeLabel} onSelect={select} />
           ) : chart.isPending ? (
             <DetailSkeleton />
           ) : chart.error && !chart.data ? (
@@ -179,7 +180,7 @@ export function OrganizationPage() {
           )}
         </section>
       </div>
-    </>
+    </PersonSheetProvider>
   );
 }
 
