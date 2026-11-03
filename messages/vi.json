@@ -1238,7 +1238,8 @@
       "vacant": "Chưa có trưởng",
       "companyLabel": "Sơ đồ công ty: giám đốc và các phòng ban",
       "unitLabel": "Sơ đồ {name}",
-      "chainLabel": "Tuyến báo cáo của {name}"
+      "chainLabel": "Tuyến báo cáo của {name}",
+      "moreMembers": "+{count} người khác"
     },
     "Detail": {
       "overviewSubtitle": "{departments, plural, =0 {Chưa có phòng ban} other {# phòng ban}}",
@@ -1320,7 +1321,10 @@
       "deactivateDepartmentHint": "Phòng ban sẽ biến mất khỏi sơ đồ và các danh sách chọn. Phải ngừng dùng các team và chuyển hết nhân sự đi trước. Dữ liệu cũ vẫn giữ tham chiếu.",
       "deactivateTeamHint": "Team sẽ biến mất khỏi sơ đồ và các danh sách chọn. Phải chuyển hết nhân sự đi trước. Dữ liệu cũ vẫn giữ tham chiếu.",
       "deactivateConfirm": "Ngừng dùng",
-      "deactivated": "Đã ngừng dùng {name}"
+      "deactivated": "Đã ngừng dùng {name}",
+      "searchCandidates": "Tìm theo tên hoặc mã",
+      "noCandidates": "Không có ai khớp",
+      "candidatesHint": "Đang hiện {shown}/{total} người. Gõ tên hoặc mã để tìm người khác."
     },
     "Errors": {
       "codeExists": "Mã này đã được đơn vị khác dùng",

@@ -1238,7 +1238,8 @@
       "vacant": "No head assigned",
       "companyLabel": "Company chart: director and departments",
       "unitLabel": "Chart of {name}",
-      "chainLabel": "Reporting line of {name}"
+      "chainLabel": "Reporting line of {name}",
+      "moreMembers": "+{count} more"
     },
     "Detail": {
       "overviewSubtitle": "{departments, plural, =0 {No departments yet} one {# department} other {# departments}}",
@@ -1320,7 +1321,10 @@
       "deactivateDepartmentHint": "The department disappears from the chart and from selection lists. Its teams must be deactivated and its people moved out first. Old records keep referring to it.",
       "deactivateTeamHint": "The team disappears from the chart and from selection lists. Its people must be moved out first. Old records keep referring to it.",
       "deactivateConfirm": "Deactivate",
-      "deactivated": "Deactivated {name}"
+      "deactivated": "Deactivated {name}",
+      "searchCandidates": "Search by name or code",
+      "noCandidates": "Nobody matches",
+      "candidatesHint": "Showing {shown} of {total} people. Type a name or code to find others."
     },
     "Errors": {
       "codeExists": "This code is already used by another unit",

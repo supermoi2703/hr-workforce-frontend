@@ -206,6 +206,9 @@ function TeamDiagram({ team, officeId, label }: { team: OrgChartTeam; officeId?:
 }
 
 /** Ô người đứng đầu + lưới thành viên trực tiếp (tải tối đa 100 người, bỏ chính người đứng đầu ra khỏi lưới). */
+/** Sơ đồ vẽ tối đa chừng này ô thành viên; còn lại xem ở bảng bên dưới (Odoo, MISA cũng rút gọn như vậy). */
+const MAX_DIAGRAM_MEMBERS = 24;
+
 function LeaderWithMembers({
   leader,
   leaderId,
@@ -217,24 +220,35 @@ function LeaderWithMembers({
   filters: MemberFilters;
   label: string;
 }) {
-  const members = useOrgMembers(filters, { page: 0, size: 100 });
+  const tt = useOrgTranslations();
+  // +1: người đứng đầu đứng đầu danh sách (backend xếp trưởng trước) và không vẽ lại trong lưới
+  const members = useOrgMembers(filters, { page: 0, size: MAX_DIAGRAM_MEMBERS + 1 });
   const openPerson = useOpenPerson();
-  const others = (members.data?.content ?? []).filter((member) => member.id !== leaderId);
-  return (
-    <MemberTier
-      label={label}
-      root={leader}
-      members={others.map((member) => (
-        <MemberCard
-          key={member.id}
-          name={member.fullName}
-          seed={member.employeeCode}
-          position={member.position?.name}
-          onClick={() => openPerson(member)}
-        />
-      ))}
+  const content = members.data?.content ?? [];
+  const leaderListed = content.some((member) => member.id === leaderId);
+  const others = content.filter((member) => member.id !== leaderId).slice(0, MAX_DIAGRAM_MEMBERS);
+  const hidden = Math.max(0, (members.data?.totalElements ?? 0) - (leaderListed ? 1 : 0) - others.length);
+  const cards = others.map((member) => (
+    <MemberCard
+      key={member.id}
+      name={member.fullName}
+      seed={member.employeeCode}
+      position={member.position?.name}
+      onClick={() => openPerson(member)}
     />
-  );
+  ));
+  if (hidden > 0) {
+    cards.push(
+      <a
+        key="more"
+        href={`#${MEMBERS_SECTION_ID}`}
+        className="flex w-44 items-center justify-center rounded-lg border border-dashed px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+      >
+        {tt.diagram("moreMembers", { count: hidden })}
+      </a>,
+    );
+  }
+  return <MemberTier label={label} root={leader} members={cards} />;
 }
 
 /** Kết quả tìm người theo tên / mã trong phạm vi đang xem. */
@@ -325,6 +339,9 @@ function DepartmentDiagram({
   );
 }
 
+/** Neo của bảng danh sách, để ô "+N người khác" trên sơ đồ cuộn xuống. */
+const MEMBERS_SECTION_ID = "org-members";
+
 type DetailLayoutProps = {
   icon: LucideIcon;
   /** Nút quản trị bên phải tiêu đề (chỉ hiện với người có org:manage). */
@@ -407,7 +424,7 @@ function DetailLayout({
 
       {diagram && <div className="border-b bg-muted/40 px-4 py-6">{diagram}</div>}
 
-      <section className="flex flex-col gap-3 p-4" aria-label={membersTitle}>
+      <section id={MEMBERS_SECTION_ID} className="flex scroll-mt-4 flex-col gap-3 p-4" aria-label={membersTitle}>
         <h3 className="text-sm font-medium">{membersTitle}</h3>
         {children}
       </section>
