@@ -33,7 +33,7 @@ function label(value: string | null): string | undefined {
 
 /**
  * Đọc bộ lọc từ URL. Giá trị lạ (action không tồn tại, id không phải UUID, ngày sai) bị bỏ qua thay vì để backend trả 400.
- * Mã role không phải UUID nên targetId chỉ bắt buộc dạng UUID khi targetType là USER.
+ * Mã role / khóa chính sách không phải UUID nên targetId chỉ bắt buộc dạng UUID khi targetType là USER.
  */
 export function filtersFromSearchParams(params: { get(name: string): string | null }): AuditFilters {
   const targetType = oneOf<AuditTargetType>(AUDIT_TARGET_TYPES, params.get("targetType"));

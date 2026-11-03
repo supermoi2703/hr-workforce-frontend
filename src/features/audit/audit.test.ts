@@ -53,6 +53,11 @@ describe("filtersFromSearchParams", () => {
     expect([filters.from, filters.to]).toEqual(["2026-10-01", "2026-10-20"]);
   });
 
+  it("lọc theo khóa chính sách (targetId không phải UUID)", () => {
+    const filters = filtersFromSearchParams(params("targetType=POLICY&targetId=leave.annual_days&targetLabel=Annual leave"));
+    expect(filters).toMatchObject({ targetType: "POLICY", targetId: "leave.annual_days", targetLabel: "Annual leave" });
+  });
+
   it("ghi ra URL rồi đọc lại được đúng như cũ", () => {
     const filters = filtersFromSearchParams(params(`action=LOGIN_FAILED&targetType=USER&targetId=${USER_ID}&from=2026-10-01`));
     expect(filtersFromSearchParams(filtersToSearchParams(filters))).toEqual(filters);
@@ -106,7 +111,7 @@ describe("formatMetadata", () => {
 
 describe("bản dịch hành động", () => {
   it("mọi AuditAction đều có nhãn ở cả en và vi", () => {
-    expect(AUDIT_ACTIONS).toHaveLength(25);
+    expect(AUDIT_ACTIONS).toHaveLength(27);
     for (const action of AUDIT_ACTIONS) {
       expect(en.AuditActions).toHaveProperty(action);
       expect(vi.AuditActions).toHaveProperty(action);
