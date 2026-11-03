@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -28,11 +28,12 @@ import { applyServerFieldErrors } from "@/lib/forms";
 import { getUserError } from "../../error-messages";
 import { useCreateRole } from "../../hooks";
 import { createRoleSchema, type CreateRoleFormValues } from "../../schemas";
+import { DataScopeField } from "./data-scope-field";
 
 const FORM_ID = "create-role-form";
 
 /**
- * Nút "Tạo vai trò" + hộp thoại: chỉ nhập mã, tên, mô tả. Tạo với danh sách quyền rỗng rồi chuyển sang trang chi tiết
+ * Nút "Tạo vai trò" + hộp thoại: nhập mã, tên, mô tả, phạm vi dữ liệu. Tạo với danh sách quyền rỗng rồi chuyển sang trang chi tiết
  * để tích quyền (form quyền đầy đủ nằm ở đó, không dồn vào hộp thoại).
  */
 export function CreateRoleDialog() {
@@ -47,7 +48,7 @@ export function CreateRoleDialog() {
   const schema = useMemo(() => createRoleSchema(tValidation), [tValidation]);
   const form = useForm<CreateRoleFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { code: "", name: "", description: "" },
+    defaultValues: { code: "", name: "", description: "", dataScope: "SELF" },
   });
   const mutation = useCreateRole();
 
@@ -133,6 +134,14 @@ export function CreateRoleDialog() {
               />
               <FieldError errors={[errors.description]} />
             </Field>
+
+            <Controller
+              control={form.control}
+              name="dataScope"
+              render={({ field }) => (
+                <DataScopeField id="create-role-data-scope" value={field.value} onChange={field.onChange} />
+              )}
+            />
           </FieldGroup>
         </form>
 

@@ -12,14 +12,14 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states
 import { isApiError } from "@/lib/api/errors";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { getUserError } from "../../error-messages";
-import { useDeleteRole, usePermissions, useRole, useRoleLabel } from "../../hooks";
-import { getRoleRules } from "../../role-rules";
+import { useDeleteRole, usePermissions, useRole, useRoleLabel, useRoles } from "../../hooks";
+import { getRoleRules, HR_COMPANY_ROLE, HR_ROLE } from "../../role-rules";
 import { RolePermissionsForm } from "./role-permissions-form";
 import { RoleTypeBadge } from "./role-type-badge";
 
 const LIST_PATH = "/admin/roles";
 
-/** Chi tiết một vai trò: sửa tên / mô tả / quyền (role:manage), xóa role tự tạo chưa ai giữ. */
+/** Chi tiết một vai trò: sửa tên / mô tả / phạm vi dữ liệu / quyền (role:manage), xóa role tự tạo chưa ai giữ. */
 export function RoleDetailPage({ code }: { code: string }) {
   const t = useTranslations("RoleAdmin");
   const tUserErrors = useTranslations("Users.Errors");
@@ -28,6 +28,7 @@ export function RoleDetailPage({ code }: { code: string }) {
   const { user: actor } = useCurrentUser();
   const roleLabel = useRoleLabel();
   const role = useRole(code);
+  const roles = useRoles();
   const permissions = usePermissions();
   const deleteRole = useDeleteRole();
 
@@ -62,6 +63,9 @@ export function RoleDetailPage({ code }: { code: string }) {
   const data = role.data;
   const rules = getRoleRules(data, actor);
   const name = roleLabel(data.code);
+  // Quyền của HR và HR_COMPANY phải giống nhau (backend không tự đồng bộ): nhắc khi sửa HR.
+  const remindHrCompany =
+    rules.canEdit && data.code === HR_ROLE && !!roles.data?.some((r) => r.code === HR_COMPANY_ROLE);
 
   async function remove() {
     try {
@@ -95,9 +99,21 @@ export function RoleDetailPage({ code }: { code: string }) {
         </Alert>
       )}
 
+      {remindHrCompany && (
+        <Alert className="max-w-2xl">
+          <InfoIcon />
+          <AlertDescription>
+            {t("Detail.hrCompanyReminder")}{" "}
+            <Link href={`/admin/roles/${HR_COMPANY_ROLE}`} className="font-medium underline underline-offset-4">
+              {roleLabel(HR_COMPANY_ROLE)}
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* key: khi dữ liệu role đổi (vừa lưu, tab khác sửa) thì form nhận lại giá trị gốc mới. */}
       <RolePermissionsForm
-        key={`${data.code}:${data.permissionCodes.join(",")}:${data.name}`}
+        key={[data.code, data.name, data.description, data.dataScope, data.permissionCodes.join(",")].join(":")}
         role={data}
         permissions={permissions.data}
         editable={rules.canEdit}

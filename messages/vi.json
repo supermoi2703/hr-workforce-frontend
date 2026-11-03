@@ -69,7 +69,8 @@
     "ADMIN": "Quản trị",
     "HR": "Nhân sự",
     "MANAGER": "Quản lý",
-    "EMPLOYEE": "Nhân viên"
+    "EMPLOYEE": "Nhân viên",
+    "HR_COMPANY": "Nhân sự toàn công ty"
   },
   "UserStatus": {
     "ACTIVE": "Đang hoạt động",
@@ -114,7 +115,8 @@
     "conflict": "Dữ liệu đã bị thay đổi hoặc bị trùng, vui lòng tải lại và thử lại.",
     "tooManyRequests": "Bạn thao tác quá nhanh, vui lòng thử lại sau ít phút.",
     "internal": "Có lỗi xảy ra ở máy chủ, vui lòng thử lại sau.",
-    "generic": "Đã có lỗi xảy ra, vui lòng thử lại."
+    "generic": "Đã có lỗi xảy ra, vui lòng thử lại.",
+    "employeeProfileRequired": "Tài khoản của bạn chưa được gắn với hồ sơ nhân viên. Hãy liên hệ bộ phận nhân sự."
   },
   "NotFound": {
     "title": "Không tìm thấy trang",
@@ -312,6 +314,7 @@
       "role": "Vai trò",
       "code": "Mã",
       "type": "Loại",
+      "dataScope": "Phạm vi dữ liệu",
       "permissions": "Quyền",
       "people": "Số người"
     },
@@ -319,6 +322,26 @@
       "system": "Hệ thống",
       "custom": "Tự tạo",
       "locked": "Khóa"
+    },
+    "DataScope": {
+      "label": "Phạm vi dữ liệu",
+      "hint": "Chỉ áp dụng cho các quyền của vai trò này. Người có nhiều vai trò dùng phạm vi rộng nhất. Tài khoản chưa gắn hồ sơ nhân viên không thấy dữ liệu nào, trừ khi phạm vi là Toàn công ty.",
+      "SELF": {
+        "label": "Bản thân",
+        "description": "Chỉ dữ liệu của chính họ."
+      },
+      "TEAM": {
+        "label": "Cấp dưới",
+        "description": "Dữ liệu của họ và mọi cấp dưới theo sơ đồ tổ chức. Người không làm trưởng đơn vị nào chỉ thấy của mình."
+      },
+      "OFFICE": {
+        "label": "Văn phòng",
+        "description": "Mọi người cùng văn phòng, kể cả người đã nghỉ việc."
+      },
+      "ALL": {
+        "label": "Toàn công ty",
+        "description": "Toàn bộ nhân viên trong công ty."
+      }
     },
     "Create": {
       "title": "Tạo vai trò",
@@ -347,12 +370,17 @@
       "systemCantDelete": "Không thể xóa vai trò hệ thống.",
       "inUseCantDelete": "Hãy gỡ vai trò này khỏi {count} tài khoản trước khi xóa.",
       "notFound": "Không tìm thấy vai trò",
-      "notFoundDescription": "Vai trò không tồn tại hoặc đường dẫn bị sai."
+      "notFoundDescription": "Vai trò không tồn tại hoặc đường dẫn bị sai.",
+      "hrCompanyReminder": "Nhân sự toàn công ty phải có cùng quyền với Nhân sự. Lưu xong, nhớ sửa giống vậy ở"
     },
     "Confirm": {
       "removeTitle": "Bỏ {count} quyền khỏi {name}?",
       "removeDescription": "Thay đổi có hiệu lực ngay với {people} người đang giữ vai trò này.",
       "removeConfirm": "Lưu thay đổi",
+      "widenTitle": "Mở rộng phạm vi dữ liệu của {name}?",
+      "widenDescription": "{people, plural, other {# người}} đang giữ vai trò này sẽ thấy ngay dữ liệu ở phạm vi {scope}.",
+      "bothTitle": "Lưu thay đổi của {name}?",
+      "bothDescription": "Thao tác này bỏ {count, plural, other {# quyền}} và mở rộng phạm vi dữ liệu sang {scope}. Có hiệu lực ngay với {people, plural, other {# người}} đang giữ vai trò này.",
       "deleteTitle": "Xóa vai trò {name}?",
       "deleteDescription": "Vai trò bị xóa vĩnh viễn. Hiện không có tài khoản nào giữ vai trò này."
     },
@@ -498,6 +526,9 @@
       "to": "Sau",
       "added": "Đã thêm",
       "removed": "Đã bỏ",
+      "dataScope": "Phạm vi dữ liệu",
+      "dataScopeFrom": "Phạm vi trước",
+      "dataScopeTo": "Phạm vi sau",
       "sessionsRevoked": "Số phiên bị đăng xuất",
       "sessionId": "Phiên",
       "familyId": "Họ phiên",
@@ -512,7 +543,11 @@
       "GOOGLE": "Google",
       "OTP": "Mã xác thực",
       "EMAIL": "Địa chỉ email",
-      "IP": "Địa chỉ IP"
+      "IP": "Địa chỉ IP",
+      "SELF": "Bản thân",
+      "TEAM": "Cấp dưới",
+      "OFFICE": "Văn phòng",
+      "ALL": "Toàn công ty"
     }
   },
   "Auth": {

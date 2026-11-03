@@ -51,6 +51,8 @@ const ERROR_MESSAGE_KEYS: Record<string, ErrorMessageKey> = {
   CONFLICT: "conflict",
   TOO_MANY_REQUESTS: "tooManyRequests",
   INTERNAL_ERROR: "internal",
+  // Tài khoản chưa gắn hồ sơ nhân viên gọi API nghiệp vụ (chấm công, đơn từ...): gặp ở nhiều module.
+  EMPLOYEE_PROFILE_REQUIRED: "employeeProfileRequired",
 };
 
 /**

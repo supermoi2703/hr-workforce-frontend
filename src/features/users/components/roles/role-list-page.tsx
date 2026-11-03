@@ -9,6 +9,7 @@ import { ErrorState, LoadingState } from "@/components/shared/states";
 import { useRoleLabel, useRoles } from "../../hooks";
 import { ADMIN_ROLE, sortRoles } from "../../role-rules";
 import { CreateRoleDialog } from "./create-role-dialog";
+import { DataScopeBadge } from "./data-scope-badge";
 import { RoleTypeBadge } from "./role-type-badge";
 
 /** Danh sách vai trò (ngắn, không phân trang): role hệ thống trước, role tự tạo sau. */
@@ -41,6 +42,7 @@ export function RoleListPage() {
                 <TableHead>{t("Columns.role")}</TableHead>
                 <TableHead>{t("Columns.code")}</TableHead>
                 <TableHead>{t("Columns.type")}</TableHead>
+                <TableHead>{t("Columns.dataScope")}</TableHead>
                 <TableHead className="text-right">{t("Columns.permissions")}</TableHead>
                 <TableHead className="text-right">{t("Columns.people")}</TableHead>
               </TableRow>
@@ -64,6 +66,9 @@ export function RoleListPage() {
                   </TableCell>
                   <TableCell>
                     <RoleTypeBadge role={role} />
+                  </TableCell>
+                  <TableCell>
+                    <DataScopeBadge scope={role.dataScope} />
                   </TableCell>
                   <TableCell className="text-right">
                     {/* ADMIN luôn có mọi quyền (kể cả quyền module sau này thêm). */}
