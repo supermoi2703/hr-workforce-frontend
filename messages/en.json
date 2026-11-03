@@ -67,7 +67,8 @@
     "ADMIN": "Admin",
     "HR": "HR",
     "MANAGER": "Manager",
-    "EMPLOYEE": "Employee"
+    "EMPLOYEE": "Employee",
+    "HR_COMPANY": "HR (company-wide)"
   },
   "UserStatus": {
     "ACTIVE": "Active",
@@ -112,7 +113,8 @@
     "conflict": "The data was changed or already exists. Reload and try again.",
     "tooManyRequests": "Too many requests. Please try again in a few minutes.",
     "internal": "Something went wrong on the server. Please try again later.",
-    "generic": "Something went wrong. Please try again."
+    "generic": "Something went wrong. Please try again.",
+    "employeeProfileRequired": "Your account isn't linked to an employee profile yet. Contact HR."
   },
   "NotFound": {
     "title": "Page not found",
@@ -310,6 +312,7 @@
       "role": "Role",
       "code": "Code",
       "type": "Type",
+      "dataScope": "Data scope",
       "permissions": "Permissions",
       "people": "People"
     },
@@ -317,6 +320,26 @@
       "system": "System",
       "custom": "Custom",
       "locked": "Locked"
+    },
+    "DataScope": {
+      "label": "Data scope",
+      "hint": "Applies only to this role's permissions. People with several roles get the widest scope. Accounts without an employee profile see nothing unless the scope is Whole company.",
+      "SELF": {
+        "label": "Own data",
+        "description": "Only their own data."
+      },
+      "TEAM": {
+        "label": "Team",
+        "description": "Their own data and everyone under them in the org chart. Someone who leads no unit sees only their own."
+      },
+      "OFFICE": {
+        "label": "Office",
+        "description": "Everyone in their office, including people who have left."
+      },
+      "ALL": {
+        "label": "Whole company",
+        "description": "Everyone in the company."
+      }
     },
     "Create": {
       "title": "Create role",
@@ -345,12 +368,17 @@
       "systemCantDelete": "System roles can't be deleted.",
       "inUseCantDelete": "Remove this role from {count, plural, one {# account} other {# accounts}} before deleting it.",
       "notFound": "Role not found",
-      "notFoundDescription": "This role doesn't exist or the link is wrong."
+      "notFoundDescription": "This role doesn't exist or the link is wrong.",
+      "hrCompanyReminder": "HR (company-wide) must keep the same permissions as HR. After saving, make the same change in"
     },
     "Confirm": {
       "removeTitle": "Remove {count, plural, one {# permission} other {# permissions}} from {name}?",
       "removeDescription": "This takes effect immediately for {people, plural, one {# person} other {# people}} with this role.",
       "removeConfirm": "Save changes",
+      "widenTitle": "Widen the data scope of {name}?",
+      "widenDescription": "{people, plural, one {# person} other {# people}} with this role will immediately see data at the {scope} level.",
+      "bothTitle": "Save changes to {name}?",
+      "bothDescription": "This removes {count, plural, one {# permission} other {# permissions}} and widens the data scope to {scope}. It takes effect immediately for {people, plural, one {# person} other {# people}} with this role.",
       "deleteTitle": "Delete role {name}?",
       "deleteDescription": "The role is removed permanently. No account has it right now."
     },
@@ -496,6 +524,9 @@
       "to": "After",
       "added": "Added",
       "removed": "Removed",
+      "dataScope": "Data scope",
+      "dataScopeFrom": "Data scope before",
+      "dataScopeTo": "Data scope after",
       "sessionsRevoked": "Sessions signed out",
       "sessionId": "Session",
       "familyId": "Session family",
@@ -510,7 +541,11 @@
       "GOOGLE": "Google",
       "OTP": "Verification code",
       "EMAIL": "Email address",
-      "IP": "IP address"
+      "IP": "IP address",
+      "SELF": "Own data",
+      "TEAM": "Team",
+      "OFFICE": "Office",
+      "ALL": "Whole company"
     }
   },
   "Auth": {

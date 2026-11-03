@@ -148,16 +148,16 @@ export function useUpdateUser(id: string) {
 }
 
 /**
- * Tên hiển thị của role: 4 role hệ thống dùng bản dịch (Roles.*), role tự tạo dùng `name` từ /api/roles,
- * chưa tải được thì hiện mã.
+ * Tên hiển thị của role: role hệ thống và role seed sẵn (HR_COMPANY) dùng bản dịch (Roles.*), role tự tạo dùng
+ * `name` từ /api/roles, chưa tải được thì hiện mã.
  */
 export function useRoleLabel() {
   const tRole = useTranslations("Roles");
   const roles = useRoles().data;
   return useCallback(
     (code: string) =>
-      ROLES.includes(code as RoleCode)
-        ? tRole(code as RoleCode)
+      ROLES.includes(code as RoleCode) || tRole.has(code as never)
+        ? tRole(code as never)
         : (roles?.find((role) => role.code === code)?.name ?? code),
     [tRole, roles],
   );

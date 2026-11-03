@@ -17,6 +17,13 @@ export type UserDetail = UserSummary & {
   createdAt: string;
 };
 
+/**
+ * Phạm vi dữ liệu của role (DataScope backend), xếp từ hẹp đến rộng. Chỉ áp dụng cho các quyền role đó có;
+ * người nhiều role dùng phạm vi rộng nhất.
+ */
+export const DATA_SCOPES = ["SELF", "TEAM", "OFFICE", "ALL"] as const;
+export type DataScope = (typeof DATA_SCOPES)[number];
+
 /** Role kèm permission và số người đang giữ (RoleResponse). */
 export type RoleSummary = {
   code: string;
@@ -24,6 +31,7 @@ export type RoleSummary = {
   description: string | null;
   /** Role hệ thống (ADMIN, HR, MANAGER, EMPLOYEE): không xóa / đổi mã. */
   system: boolean;
+  dataScope: DataScope;
   permissionCodes: string[];
   userCount: number;
 };
@@ -58,10 +66,14 @@ export type PermissionInfo = {
   description: string | null;
 };
 
-/** Body của PUT /api/roles/{code}: thay tên, mô tả và TOÀN BỘ quyền. */
+/**
+ * Body của PUT /api/roles/{code}: thay tên, mô tả, phạm vi dữ liệu và TOÀN BỘ quyền.
+ * `dataScope` luôn gửi (backend coi null là giữ nguyên, dễ quên mà không báo lỗi).
+ */
 export type RoleInput = {
   name: string;
   description: string | null;
+  dataScope: DataScope;
   permissionCodes: string[];
 };
 

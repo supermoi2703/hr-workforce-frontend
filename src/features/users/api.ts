@@ -61,7 +61,7 @@ export const getPermissions = () => http.get<PermissionInfo[]>("/api/permissions
 /** Tạo role tự đặt (role:manage). */
 export const createRole = (body: CreateRoleInput) => http.post<RoleSummary>("/api/roles", body);
 
-/** Sửa tên, mô tả, toàn bộ quyền (role:manage); role ADMIN bị khóa. Có hiệu lực ngay với người đang giữ role. */
+/** Sửa tên, mô tả, phạm vi dữ liệu, toàn bộ quyền (role:manage); role ADMIN bị khóa. Có hiệu lực ngay với người đang giữ role. */
 export const updateRole = (code: string, body: RoleInput) =>
   http.put<RoleSummary>(`/api/roles/${encodeURIComponent(code)}`, body);
 

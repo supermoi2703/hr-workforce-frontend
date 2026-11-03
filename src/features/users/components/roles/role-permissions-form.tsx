@@ -18,9 +18,10 @@ import { applyServerFieldErrors } from "@/lib/forms";
 import { getUserError } from "../../error-messages";
 import { useUpdateRole } from "../../hooks";
 import { groupPermissions, permissionMessageKey } from "../../permission-groups";
-import { ADMIN_ROLE } from "../../role-rules";
+import { ADMIN_ROLE, isScopeWidening } from "../../role-rules";
 import { updateRoleSchema, type UpdateRoleFormValues } from "../../schemas";
 import type { PermissionInfo, RoleSummary } from "../../types";
+import { DataScopeField } from "./data-scope-field";
 
 type RolePermissionsFormProps = {
   role: RoleSummary;
@@ -30,8 +31,9 @@ type RolePermissionsFormProps = {
 };
 
 /**
- * Tên, mô tả và quyền của một role (chia nhóm theo phần trước dấu ":"). Lưu = thay TOÀN BỘ quyền, có hiệu lực ngay
- * với mọi người giữ role, nên bỏ bớt quyền khi role đang có người giữ thì hỏi lại trước.
+ * Tên, mô tả, phạm vi dữ liệu và quyền của một role (chia nhóm theo phần trước dấu ":"). Lưu = thay TOÀN BỘ quyền,
+ * có hiệu lực ngay với mọi người giữ role, nên khi role đang có người giữ mà bỏ bớt quyền hoặc mở rộng phạm vi
+ * thì hỏi lại trước.
  */
 export function RolePermissionsForm({ role, permissions, editable }: RolePermissionsFormProps) {
   const t = useTranslations("RoleAdmin");
@@ -49,19 +51,27 @@ export function RolePermissionsForm({ role, permissions, editable }: RolePermiss
   const schema = useMemo(() => updateRoleSchema(tValidation), [tValidation]);
   const form = useForm<UpdateRoleFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: role.name, description: role.description ?? "", permissionCodes: savedCodes },
+    defaultValues: {
+      name: role.name,
+      description: role.description ?? "",
+      dataScope: role.dataScope,
+      permissionCodes: savedCodes,
+    },
   });
   const selected = useWatch({ control: form.control, name: "permissionCodes" });
+  const scope = useWatch({ control: form.control, name: "dataScope" });
 
-  // Giá trị chờ xác nhận khi bỏ bớt quyền của role đang có người giữ.
+  // Giá trị chờ xác nhận khi bỏ bớt quyền / mở rộng phạm vi của role đang có người giữ.
   const [pendingValues, setPendingValues] = useState<UpdateRoleFormValues | null>(null);
   const removedCount = savedCodes.filter((code) => !selected.includes(code)).length;
+  const widened = isScopeWidening(role.dataScope, scope);
 
   async function save(values: UpdateRoleFormValues) {
     try {
       await mutation.mutateAsync({
         name: values.name,
         description: values.description || null,
+        dataScope: values.dataScope,
         permissionCodes: values.permissionCodes,
       });
       toast.success(t("Detail.saved"));
@@ -75,7 +85,7 @@ export function RolePermissionsForm({ role, permissions, editable }: RolePermiss
   }
 
   function submit(values: UpdateRoleFormValues) {
-    if (removedCount > 0 && role.userCount > 0) setPendingValues(values);
+    if ((removedCount > 0 || widened) && role.userCount > 0) setPendingValues(values);
     else void save(values).catch(() => {});
   }
 
@@ -84,6 +94,23 @@ export function RolePermissionsForm({ role, permissions, editable }: RolePermiss
     // Quyền mới thêm ở backend mà frontend chưa có bản dịch: dùng chữ tiếng Anh từ backend.
     return tPermission.has(key as never) ? tPermission(key as never) : permission[field];
   };
+  const scopeLabel = t(`DataScope.${scope}.label`);
+  // Nội dung hộp xác nhận theo lý do: bỏ quyền, mở rộng phạm vi, hoặc cả hai.
+  const confirmText =
+    removedCount > 0 && widened
+      ? {
+          title: t("Confirm.bothTitle", { name: role.name }),
+          description: t("Confirm.bothDescription", { count: removedCount, scope: scopeLabel, people: role.userCount }),
+        }
+      : widened
+        ? {
+            title: t("Confirm.widenTitle", { name: role.name }),
+            description: t("Confirm.widenDescription", { scope: scopeLabel, people: role.userCount }),
+          }
+        : {
+            title: t("Confirm.removeTitle", { count: removedCount, name: role.name }),
+            description: t("Confirm.removeDescription", { people: role.userCount }),
+          };
   const groupLabel = (key: string) => (t.has(`groups.${key}` as never) ? t(`groups.${key}` as never) : key);
 
   const { errors, isDirty } = form.formState;
@@ -108,6 +135,13 @@ export function RolePermissionsForm({ role, permissions, editable }: RolePermiss
           />
           <FieldError errors={[errors.description]} />
         </Field>
+        <Controller
+          control={form.control}
+          name="dataScope"
+          render={({ field }) => (
+            <DataScopeField id="role-data-scope" value={field.value} onChange={field.onChange} disabled={!editable} />
+          )}
+        />
       </FieldGroup>
 
       <section className="flex flex-col gap-3">
@@ -179,8 +213,8 @@ export function RolePermissionsForm({ role, permissions, editable }: RolePermiss
       <ConfirmDialog
         open={pendingValues !== null}
         onOpenChange={(open) => !open && setPendingValues(null)}
-        title={t("Confirm.removeTitle", { count: removedCount, name: role.name })}
-        description={t("Confirm.removeDescription", { people: role.userCount })}
+        title={confirmText.title}
+        description={confirmText.description}
         confirmLabel={t("Confirm.removeConfirm")}
         destructive
         onConfirm={() => (pendingValues ? save(pendingValues) : undefined)}

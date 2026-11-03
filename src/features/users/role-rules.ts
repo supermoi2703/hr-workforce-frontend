@@ -1,7 +1,15 @@
 import type { CurrentUser } from "@/lib/auth/types";
-import type { RoleSummary } from "./types";
+import { DATA_SCOPES, type DataScope, type RoleSummary } from "./types";
 
 export const ADMIN_ROLE = "ADMIN";
+export const HR_ROLE = "HR";
+/** HR toàn công ty: role tự tạo (không phải hệ thống), có cùng quyền với HR, gán thêm cho HR trụ sở. */
+export const HR_COMPANY_ROLE = "HR_COMPANY";
+
+/** `to` rộng hơn `from` (vd SELF → OFFICE): người giữ role thấy thêm dữ liệu ngay, nên cần hỏi lại. */
+export function isScopeWidening(from: DataScope, to: DataScope): boolean {
+  return DATA_SCOPES.indexOf(to) > DATA_SCOPES.indexOf(from);
+}
 
 /**
  * Vì sao không xóa được role (để hiện lời giải thích thay cho nút Xóa):

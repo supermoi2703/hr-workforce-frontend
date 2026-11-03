@@ -5,7 +5,7 @@ import { ApiError } from "@/lib/api/errors";
 import type { CurrentUser } from "@/lib/auth/types";
 import { getUserError } from "./error-messages";
 import { groupPermissions, permissionMessageKey } from "./permission-groups";
-import { getRoleRules, sortRoles } from "./role-rules";
+import { getRoleRules, isScopeWidening, sortRoles } from "./role-rules";
 import { createRoleSchema } from "./schemas";
 import type { PermissionInfo, RoleSummary } from "./types";
 
@@ -24,6 +24,7 @@ const role = (code: string, system: boolean, userCount: number): RoleSummary => 
   name: code,
   description: null,
   system,
+  dataScope: "SELF",
   permissionCodes: [],
   userCount,
 });
@@ -54,6 +55,16 @@ describe("getRoleRules", () => {
       canDelete: false,
       deleteBlocked: null,
     });
+  });
+});
+
+describe("isScopeWidening", () => {
+  it("chỉ mở rộng (sang phạm vi rộng hơn) mới tính, thu hẹp hoặc giữ nguyên thì không", () => {
+    expect(isScopeWidening("SELF", "TEAM")).toBe(true);
+    expect(isScopeWidening("TEAM", "ALL")).toBe(true);
+    expect(isScopeWidening("OFFICE", "TEAM")).toBe(false);
+    expect(isScopeWidening("ALL", "SELF")).toBe(false);
+    expect(isScopeWidening("OFFICE", "OFFICE")).toBe(false);
   });
 });
 
@@ -88,7 +99,7 @@ describe("groupPermissions", () => {
 
 describe("createRoleSchema", () => {
   const schema = createRoleSchema(createTranslator({ locale: "en", messages: en, namespace: "RoleAdmin.Validation" }));
-  const valid = { code: "ACCOUNTANT", name: "Accountant", description: "" };
+  const valid = { code: "ACCOUNTANT", name: "Accountant", description: "", dataScope: "SELF" };
 
   it("mã hợp lệ theo regex của backend", () => {
     expect(schema.safeParse(valid).success).toBe(true);
@@ -102,6 +113,11 @@ describe("createRoleSchema", () => {
     for (const code of ["AB", "1ABC", "A-B-C", "ke toan"]) {
       expect(schema.safeParse({ ...valid, code }).success).toBe(false);
     }
+  });
+
+  it("phạm vi dữ liệu chỉ nhận 4 giá trị của backend", () => {
+    expect(schema.safeParse({ ...valid, dataScope: "ALL" }).success).toBe(true);
+    expect(schema.safeParse({ ...valid, dataScope: "COMPANY" }).success).toBe(false);
   });
 });
 
