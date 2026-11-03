@@ -388,7 +388,8 @@
       "user": "Tài khoản",
       "role": "Vai trò",
       "session": "Phiên đăng nhập",
-      "audit": "Nhật ký hệ thống"
+      "audit": "Nhật ký hệ thống",
+      "approval": "Phê duyệt"
     },
     "Validation": {
       "codeInvalid": "Dùng 3–50 chữ HOA, chữ số hoặc dấu gạch dưới, bắt đầu bằng chữ",
@@ -433,6 +434,10 @@
     "audit_read": {
       "name": "Xem nhật ký hệ thống",
       "description": "Xem nhật ký bảo mật và quản trị"
+    },
+    "approval_read_all": {
+      "name": "Xem mọi đơn",
+      "description": "Xem mọi đơn cần duyệt trong phạm vi dữ liệu của mình"
     }
   },
   "AuditActions": {
@@ -1048,6 +1053,159 @@
       "back": "Quay lại",
       "approved": "Đã duyệt.",
       "rejected": "Đã từ chối."
+    }
+  },
+  "Approvals": {
+    "List": {
+      "metaTitle": "Phê duyệt",
+      "title": "Phê duyệt",
+      "description": "Các đơn đang chờ bạn quyết định và các đơn bạn đã gửi.",
+      "urgent": "Gấp",
+      "stepNo": "Bước {step}",
+      "empty": {
+        "inboxTitle": "Không có đơn nào chờ bạn duyệt",
+        "inbox": "Các đơn cần bạn quyết định sẽ hiện ở đây.",
+        "mineTitle": "Bạn chưa gửi đơn nào",
+        "mine": "Các đơn bạn gửi, như đơn nghỉ hay đăng ký giờ làm, sẽ hiện ở đây.",
+        "allTitle": "Chưa có đơn nào",
+        "all": "Chưa ai trong phạm vi dữ liệu của bạn gửi đơn.",
+        "filtered": "Không có đơn nào khớp bộ lọc."
+      }
+    },
+    "Tabs": {
+      "inbox": "Chờ tôi duyệt",
+      "mine": "Đơn của tôi",
+      "all": "Tất cả",
+      "inboxDescription": "Các đơn mà bạn là người duyệt của bước hiện tại.",
+      "mineDescription": "Các đơn bạn đã gửi, mới nhất trước.",
+      "allDescription": "Mọi đơn trong phạm vi dữ liệu của bạn. Nhân sự văn phòng chỉ thấy đơn của văn phòng mình."
+    },
+    "Filters": {
+      "type": "Loại đơn",
+      "status": "Trạng thái",
+      "allTypes": "Mọi loại đơn",
+      "allStatuses": "Mọi trạng thái"
+    },
+    "Columns": {
+      "request": "Đơn",
+      "requester": "Người gửi",
+      "step": "Bước hiện tại",
+      "status": "Trạng thái",
+      "submittedAt": "Gửi lúc"
+    },
+    "Detail": {
+      "metaTitle": "Chi tiết đơn",
+      "back": "Quay lại Phê duyệt",
+      "notFound": "Không tìm thấy đơn",
+      "notFoundDescription": "Đơn không tồn tại, hoặc bạn không có quyền xem.",
+      "requester": "Người gửi",
+      "submittedAt": "Gửi lúc",
+      "completedAt": "Kết thúc lúc",
+      "summary": "Lý do",
+      "noSummary": "Không ghi lý do.",
+      "source": "Bản ghi gốc",
+      "openSource": "Mở trang {type}",
+      "steps": "Các bước duyệt",
+      "timeline": "Dòng thời gian",
+      "stepTitle": "Bước {step}: {name}",
+      "noApprovers": "Chưa có người duyệt.",
+      "escalated": "Được đẩy lên",
+      "preApproved": "Đồng ý khi tạo đơn",
+      "assignment": {
+        "RULE": "Tìm theo quy tắc của bước",
+        "ESCALATED_REQUESTER_IS_APPROVER": "Người gửi không được tự duyệt đơn của mình, nên đơn chuyển lên cấp trên",
+        "ESCALATED_NO_APPROVER": "Không tìm được người duyệt theo quy tắc, nên đơn chuyển lên cấp trên",
+        "REQUESTER_PRE_APPROVED": "Việc tạo đơn được tính là người này đã đồng ý"
+      }
+    },
+    "Action": {
+      "optional": "Không bắt buộc.",
+      "approve": {
+        "title": "Duyệt đơn",
+        "description": "Duyệt “{title}”. Nếu đây là bước cuối, đơn được duyệt ngay.",
+        "label": "Ghi chú",
+        "submit": "Duyệt",
+        "success": "Đã duyệt đơn."
+      },
+      "reject": {
+        "title": "Từ chối đơn",
+        "description": "Từ chối “{title}” sẽ kết thúc cả đơn. Người gửi sẽ thấy lý do của bạn.",
+        "label": "Lý do",
+        "submit": "Từ chối",
+        "success": "Đã từ chối đơn."
+      },
+      "withdraw": {
+        "title": "Rút đơn",
+        "description": "Rút “{title}”. Muốn sửa thì gửi đơn mới sau khi rút.",
+        "label": "Lý do",
+        "submit": "Rút đơn",
+        "success": "Đã rút đơn."
+      }
+    },
+    "types": {
+      "LEAVE": "Đơn nghỉ",
+      "LEAVE_CANCEL": "Hủy đơn nghỉ",
+      "WFH": "Làm việc từ xa",
+      "SHIFT_CHANGE": "Đăng ký giờ làm",
+      "ATTENDANCE_EXPLANATION": "Giải trình chấm công",
+      "ALLOCATION": "Phân bổ dự án",
+      "TRANSFER": "Điều chuyển",
+      "SALARY_ADJUSTMENT": "Điều chỉnh lương"
+    },
+    "status": {
+      "PENDING": "Chờ duyệt",
+      "APPROVED": "Đã duyệt",
+      "REJECTED": "Bị từ chối",
+      "WITHDRAWN": "Đã rút"
+    },
+    "stepStatus": {
+      "WAITING": "Chưa tới lượt",
+      "IN_PROGRESS": "Đang duyệt",
+      "APPROVED": "Đã duyệt",
+      "REJECTED": "Bị từ chối",
+      "CANCELLED": "Đã hủy"
+    },
+    "decision": {
+      "PENDING": "Chờ quyết định",
+      "APPROVED": "Đã duyệt",
+      "REJECTED": "Từ chối",
+      "NOT_REQUIRED": "Không cần nữa"
+    },
+    "rules": {
+      "DIRECT_MANAGER": "Quản lý trực tiếp",
+      "DEPARTMENT_HEAD": "Trưởng phòng",
+      "OFFICE_HR": "Nhân sự văn phòng",
+      "SPECIFIC": "Người duyệt được chỉ định"
+    },
+    "modes": {
+      "ALL": "Cần tất cả cùng duyệt",
+      "ANY": "Một người duyệt là đủ"
+    },
+    "history": {
+      "SUBMITTED": "{actor} đã gửi đơn",
+      "STEP_STARTED": "Bắt đầu bước {step}: {name}",
+      "ESCALATED": "Bước {step} được đẩy lên cấp trên: {reason}",
+      "APPROVED": "{actor} đã duyệt bước {step}",
+      "REJECTED": "{actor} đã từ chối đơn ở bước {step}",
+      "STEP_COMPLETED": "Hoàn thành bước {step}",
+      "WITHDRAWN": "{actor} đã rút đơn",
+      "COMPLETED": "Đơn kết thúc: {status}"
+    },
+    "people": {
+      "me": "Bạn",
+      "system": "Hệ thống",
+      "unknown": "Người dùng"
+    },
+    "errors": {
+      "notFound": "Đơn không tồn tại, hoặc bạn không có quyền xem.",
+      "notCurrentApprover": "Bạn không phải người duyệt của bước hiện tại. Trang đã được tải lại.",
+      "alreadyDecided": "Bạn đã quyết định đơn này rồi. Trang đã được tải lại.",
+      "notPending": "Đơn này không còn chờ duyệt nữa. Trang đã được tải lại.",
+      "notRequester": "Chỉ người gửi đơn mới rút được đơn."
+    },
+    "Validation": {
+      "reasonRequired": "Nhập lý do từ chối",
+      "commentTooLong": "Tối đa 1000 ký tự"
     }
   }
 }

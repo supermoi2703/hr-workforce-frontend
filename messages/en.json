@@ -388,7 +388,8 @@
       "user": "Accounts",
       "role": "Roles",
       "session": "Sign-in sessions",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "approval": "Approvals"
     },
     "Validation": {
       "codeInvalid": "Use 3–50 uppercase letters, digits or underscores, starting with a letter",
@@ -433,6 +434,10 @@
     "audit_read": {
       "name": "View audit log",
       "description": "See the security and administration audit log"
+    },
+    "approval_read_all": {
+      "name": "View all requests",
+      "description": "See every approval request in their data scope"
     }
   },
   "AuditActions": {
@@ -1048,6 +1053,159 @@
       "back": "Back",
       "approved": "Approved.",
       "rejected": "Rejected."
+    }
+  },
+  "Approvals": {
+    "List": {
+      "metaTitle": "Approvals",
+      "title": "Approvals",
+      "description": "Requests waiting for your decision and requests you have sent.",
+      "urgent": "Urgent",
+      "stepNo": "Step {step}",
+      "empty": {
+        "inboxTitle": "Nothing waiting for you",
+        "inbox": "Requests that need your decision show up here.",
+        "mineTitle": "No requests yet",
+        "mine": "Requests you send, such as leave or working hours, show up here.",
+        "allTitle": "No requests",
+        "all": "No one in your data scope has sent a request yet.",
+        "filtered": "No request matches these filters."
+      }
+    },
+    "Tabs": {
+      "inbox": "Waiting for me",
+      "mine": "My requests",
+      "all": "All requests",
+      "inboxDescription": "Requests where you are an approver of the current step.",
+      "mineDescription": "Requests you have sent, newest first.",
+      "allDescription": "Every request in your data scope. Office HR sees requests from their own office."
+    },
+    "Filters": {
+      "type": "Request type",
+      "status": "Status",
+      "allTypes": "All types",
+      "allStatuses": "All statuses"
+    },
+    "Columns": {
+      "request": "Request",
+      "requester": "Sent by",
+      "step": "Current step",
+      "status": "Status",
+      "submittedAt": "Sent"
+    },
+    "Detail": {
+      "metaTitle": "Request details",
+      "back": "Back to approvals",
+      "notFound": "Request not found",
+      "notFoundDescription": "The request doesn't exist, or you aren't allowed to see it.",
+      "requester": "Sent by",
+      "submittedAt": "Sent",
+      "completedAt": "Closed",
+      "summary": "Reason",
+      "noSummary": "No reason given.",
+      "source": "Original record",
+      "openSource": "Open {type} page",
+      "steps": "Approval steps",
+      "timeline": "Timeline",
+      "stepTitle": "Step {step}: {name}",
+      "noApprovers": "No approver yet.",
+      "escalated": "Escalated",
+      "preApproved": "Approved by creating",
+      "assignment": {
+        "RULE": "Found by the step rule",
+        "ESCALATED_REQUESTER_IS_APPROVER": "The requester can't approve their own request, so it went to their manager",
+        "ESCALATED_NO_APPROVER": "No one matched the step rule, so it went up the chain",
+        "REQUESTER_PRE_APPROVED": "Creating the request counts as this person's approval"
+      }
+    },
+    "Action": {
+      "optional": "Optional.",
+      "approve": {
+        "title": "Approve request",
+        "description": "Approve “{title}”. If this is the last step, the request is approved right away.",
+        "label": "Comment",
+        "submit": "Approve",
+        "success": "Request approved."
+      },
+      "reject": {
+        "title": "Reject request",
+        "description": "Rejecting “{title}” closes the whole request. The requester sees your reason.",
+        "label": "Reason",
+        "submit": "Reject",
+        "success": "Request rejected."
+      },
+      "withdraw": {
+        "title": "Withdraw request",
+        "description": "Withdraw “{title}”. To change it, send a new request afterwards.",
+        "label": "Reason",
+        "submit": "Withdraw",
+        "success": "Request withdrawn."
+      }
+    },
+    "types": {
+      "LEAVE": "Leave",
+      "LEAVE_CANCEL": "Leave cancellation",
+      "WFH": "Work from home",
+      "SHIFT_CHANGE": "Working hours",
+      "ATTENDANCE_EXPLANATION": "Attendance explanation",
+      "ALLOCATION": "Project allocation",
+      "TRANSFER": "Transfer",
+      "SALARY_ADJUSTMENT": "Salary adjustment"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "WITHDRAWN": "Withdrawn"
+    },
+    "stepStatus": {
+      "WAITING": "Not started",
+      "IN_PROGRESS": "In progress",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled"
+    },
+    "decision": {
+      "PENDING": "Waiting",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "NOT_REQUIRED": "Not needed"
+    },
+    "rules": {
+      "DIRECT_MANAGER": "Direct manager",
+      "DEPARTMENT_HEAD": "Department head",
+      "OFFICE_HR": "Office HR",
+      "SPECIFIC": "Selected approvers"
+    },
+    "modes": {
+      "ALL": "Everyone must approve",
+      "ANY": "One approval is enough"
+    },
+    "history": {
+      "SUBMITTED": "{actor} sent the request",
+      "STEP_STARTED": "Step {step} started: {name}",
+      "ESCALATED": "Step {step} was escalated: {reason}",
+      "APPROVED": "{actor} approved step {step}",
+      "REJECTED": "{actor} rejected the request at step {step}",
+      "STEP_COMPLETED": "Step {step} completed",
+      "WITHDRAWN": "{actor} withdrew the request",
+      "COMPLETED": "Request closed: {status}"
+    },
+    "people": {
+      "me": "You",
+      "system": "System",
+      "unknown": "Unknown user"
+    },
+    "errors": {
+      "notFound": "This request doesn't exist, or you aren't allowed to see it.",
+      "notCurrentApprover": "You aren't an approver of the current step. The page has been refreshed.",
+      "alreadyDecided": "You have already decided on this request. The page has been refreshed.",
+      "notPending": "This request is no longer waiting for approval. The page has been refreshed.",
+      "notRequester": "Only the person who sent the request can withdraw it."
+    },
+    "Validation": {
+      "reasonRequired": "Enter a reason for rejecting",
+      "commentTooLong": "Must be at most 1000 characters"
     }
   }
 }
