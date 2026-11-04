@@ -18,6 +18,7 @@ import {
   ScrollTextIcon,
   ReceiptTextIcon,
   ScanFaceIcon,
+  SlidersHorizontalIcon,
   SparklesIcon,
   TabletSmartphoneIcon,
   TimerIcon,
@@ -131,6 +132,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: "users", href: "/admin/users", icon: UserCogIcon, access: { permissions: ["user:read"] }, task: "1.1" },
       { id: "roles", href: "/admin/roles", icon: KeyRoundIcon, access: { permissions: ["role:read"] }, task: "1.2" },
+      { id: "policies", href: "/admin/policies", icon: SlidersHorizontalIcon, access: { permissions: ["policy:read"] }, task: "0.4" },
       { id: "auditLog", href: "/admin/audit-logs", icon: ScrollTextIcon, access: { permissions: ["audit:read"] } },
     ],
   },
