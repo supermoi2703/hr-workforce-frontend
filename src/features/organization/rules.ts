@@ -8,6 +8,7 @@ import type {
   OrgNode,
   OrgView,
 } from "./types";
+import { foldText } from "@/lib/text";
 
 /** Trạng thái trang nằm trên URL (gửi link / F5 vẫn giữ). */
 export type OrgPageState = {
@@ -104,16 +105,7 @@ export function directorOf(chart: OrgChart | undefined) {
   return chart?.departments.find((d) => d.executive)?.head ?? null;
 }
 
-/** Bỏ dấu tiếng Việt và viết thường, để gõ "phat trien" vẫn tìm ra "Phát triển". */
-export function foldText(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim();
-}
+export { foldText };
 
 /**
  * Lọc cây theo tên hoặc mã đơn vị. Phòng khớp thì giữ cả các team; chỉ team khớp thì giữ phòng cha với các team khớp.
