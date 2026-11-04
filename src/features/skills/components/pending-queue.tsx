@@ -9,19 +9,25 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { createDataTableColumns, DataTable, useDataTableState } from "@/components/shared/data-table/data-table";
 import { EmptyState } from "@/components/shared/states";
-import { UserAvatar } from "@/components/shared/user-avatar";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { confirmSkill } from "../api";
 import { usePendingSkills, useSkillErrorMessage, useSkillMutation } from "../hooks";
 import type { PendingSkill } from "../types";
 import { EmployeeSkillsSheet, type SheetPerson } from "./employee-skills-sheet";
+import { PersonCell, ViewSkillsButton } from "./person-cell";
 import { LevelLabel } from "./skill-level";
 import { VerifyLevelDialog, type VerifyTarget } from "./verify-level-dialog";
 
 const rowKey = (row: PendingSkill) => `${row.employeeId}:${row.skill.skillId}`;
+const personOf = (row: PendingSkill): SheetPerson => ({
+  employeeId: row.employeeId,
+  fullName: row.fullName,
+  employeeCode: row.employeeCode,
+});
 
 /**
- * Tab "Chờ xác nhận" (skill:verify): kỹ năng cấp dưới vừa khai, cũ nhất trước. Xác nhận = chốt đúng mức tự khai;
+ * Tab "Chờ xác nhận" (ai có cấp dưới trên sơ đồ, hoặc HR / Admin theo skill:verify): kỹ năng cấp dưới vừa khai, cũ
+ * nhất trước. Xác nhận = chốt đúng mức tự khai;
  * "Chốt mức khác" khi thấy chưa đúng. Không gồm kỹ năng của chính mình (không ai tự xác nhận).
  */
 export function PendingQueue() {
@@ -48,21 +54,7 @@ export function PendingQueue() {
         header: t("employee"),
         cell: (c) => {
           const row = c.row.original;
-          return (
-            <span className="flex items-center gap-3">
-              <UserAvatar name={row.fullName} seed={row.employeeCode} />
-              <span className="flex min-w-0 flex-col">
-                <button
-                  type="button"
-                  onClick={() => setPerson({ employeeId: row.employeeId, fullName: row.fullName, employeeCode: row.employeeCode })}
-                  className="w-fit text-left font-medium hover:text-primary hover:underline focus-visible:underline focus-visible:outline-none"
-                >
-                  {row.fullName}
-                </button>
-                <span className="text-xs text-muted-foreground tabular-nums">{row.employeeCode}</span>
-              </span>
-            </span>
-          );
+          return <PersonCell fullName={row.fullName} employeeCode={row.employeeCode} onOpen={() => setPerson(personOf(row))} />;
         },
       }),
       col.accessor((row) => row.skill.skillName, {
@@ -115,6 +107,7 @@ export function PendingQueue() {
           const busy = confirmingKey === rowKey(row);
           return (
             <span className="flex justify-end gap-2">
+              <ViewSkillsButton fullName={row.fullName} onOpen={() => setPerson(personOf(row))} />
               <Button
                 size="sm"
                 variant="outline"

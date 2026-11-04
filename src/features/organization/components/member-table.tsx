@@ -68,7 +68,7 @@ export function MemberTable({
                   <button
                     type="button"
                     onClick={() => openPerson(member)}
-                    className="text-left font-medium hover:text-primary hover:underline focus-visible:underline focus-visible:outline-none"
+                    className="text-left font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary focus-visible:decoration-primary focus-visible:outline-none"
                   >
                     {member.fullName}
                   </button>

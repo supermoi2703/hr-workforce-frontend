@@ -2,6 +2,7 @@ import { foldText } from "@/lib/text";
 import {
   SKILL_CATEGORIES,
   SKILL_TABS,
+  type CatalogStatus,
   type EmployeeSkill,
   type Skill,
   type SkillCategory,
@@ -12,7 +13,6 @@ import {
 } from "./types";
 
 export const SKILL_MANAGE_PERMISSION = "skill:manage";
-export const SKILL_VERIFY_PERMISSION = "skill:verify";
 export const SKILL_READ_PERMISSION = "skill:read";
 
 /** Khớp SkillConstants.CODE_REGEX của backend. */
@@ -24,10 +24,13 @@ export const MAX_REQUIREMENTS = 10;
 
 // ===== Tab theo quyền
 
-/** Tab người dùng được thấy: "Của tôi" luôn có; các tab khác theo quyền (backend vẫn tự kiểm tra). */
-export function availableTabs(hasPermission: (permission: string) => boolean): SkillTab[] {
+/**
+ * Tab người dùng được thấy: "Của tôi" luôn có. "Chờ xác nhận" theo `canVerify` của backend (cấp dưới trên sơ đồ hoặc phạm
+ * vi skill:verify), không theo role: trưởng team role Employee vẫn có. Tìm người, danh mục theo permission.
+ */
+export function availableTabs(hasPermission: (permission: string) => boolean, canVerify: boolean): SkillTab[] {
   return SKILL_TABS.filter((tab) => {
-    if (tab === "pending") return hasPermission(SKILL_VERIFY_PERMISSION);
+    if (tab === "pending") return canVerify;
     if (tab === "search") return hasPermission(SKILL_READ_PERMISSION);
     if (tab === "catalog") return hasPermission(SKILL_MANAGE_PERMISSION);
     return true;
@@ -111,19 +114,37 @@ export function countByStatus(skills: EmployeeSkill[]): { total: number; pending
   return { total: skills.length, pending, confirmed: skills.length - pending };
 }
 
+/** Chốt mức khác mức nhân viên tự khai thì phải ghi lý do (backend: SKILL_CONFIRM_NOTE_REQUIRED). */
+export function requiresConfirmNote(selfLevel: number | null | undefined, level: number | null): boolean {
+  return selfLevel != null && level != null && selfLevel !== level;
+}
+
 // ===== Danh mục
 
-export type CatalogFilter = { text: string; category?: SkillCategory; includeInactive: boolean };
+export type CatalogFilter = { text: string; category?: SkillCategory; status: CatalogStatus };
 
-/** Lọc theo tên / mã (không dấu), nhóm, đang dùng. */
+/** Lọc theo tên / mã (không dấu), nhóm, trạng thái (đang dùng / ngừng dùng / tất cả). */
 export function filterSkills(skills: Skill[], filter: CatalogFilter): Skill[] {
   const needle = foldText(filter.text);
   return skills.filter(
     (skill) =>
-      (filter.includeInactive || skill.active) &&
+      (filter.status === "all" || skill.active === (filter.status === "active")) &&
       (!filter.category || skill.category === filter.category) &&
       (!needle || foldText(skill.name).includes(needle) || foldText(skill.code).includes(needle)),
   );
+}
+
+/** Gom theo nhóm như groupByCategory, trong nhóm đưa kỹ năng ngừng dùng xuống cuối (giữ thứ tự tên của backend). */
+export function groupCatalog(skills: Skill[]): { category: SkillCategory; items: Skill[] }[] {
+  return groupByCategory(skills).map((group) => ({
+    category: group.category,
+    items: [...group.items.filter((s) => s.active), ...group.items.filter((s) => !s.active)],
+  }));
+}
+
+export function countCatalog(skills: Skill[]): Record<CatalogStatus, number> {
+  const active = skills.filter((s) => s.active).length;
+  return { active, inactive: skills.length - active, all: skills.length };
 }
 
 /** Số năm kinh nghiệm từ ô nhập: trống → null; dấu phẩy được hiểu là dấu thập phân. */

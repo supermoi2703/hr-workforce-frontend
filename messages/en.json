@@ -1641,9 +1641,6 @@
       "summaryPending": "{count} awaiting confirmation",
       "years": "{years} years of experience",
       "pendingNote": "Skills awaiting confirmation still show up in searches, marked \"unconfirmed\", until your direct manager confirms them.",
-      "adjustedNote": "You declared level {self}; your manager set level {confirmed}.",
-      "addedByManagerNote": "Your manager added this skill for you.",
-      "confirmedAt": "Confirmed on {date}",
       "actions": "Actions for {name}",
       "edit": "Edit",
       "remove": "Remove",
@@ -1665,7 +1662,15 @@
       "selfMark": "Self-declared",
       "employeeNote": "Employee's note",
       "save": "Set level",
-      "saved": "Set {name} to level {level} for {person}."
+      "saved": "Set {name} to level {level} for {person}.",
+      "note": "Note for the employee",
+      "optional": "(optional)",
+      "notePlaceholder": "e.g. Right level, solid JPA work",
+      "notePlaceholderRequired": "e.g. Not yet independent on security; needs one more project",
+      "noteHint": "The employee will see this note with your name.",
+      "noteRequiredHint": "Required because the level differs from what the employee declared: tell them why. They will see it with your name.",
+      "noteRequired": "Add a reason when setting a level different from the declared one.",
+      "noteTooLong": "Note can be at most {max} characters."
     },
     "Pending": {
       "description": "Skills your team just declared, oldest first. Confirm the level, or set a different one if it's off.",
@@ -1688,7 +1693,6 @@
       "emptyTitle": "No skills yet",
       "empty": "This person hasn't declared any skills.",
       "years": "{years} yrs",
-      "selfLevel": "Self-declared level {level}",
       "confirm": "Confirm",
       "confirming": "Confirming…",
       "confirmed": "Confirmed {name}.",
@@ -1730,13 +1734,13 @@
         "SENIOR": "Senior",
         "LEAD": "Lead",
         "PRINCIPAL": "Principal"
-      }
+      },
+      "actions": "Actions"
     },
     "Catalog": {
       "search": "Search by name or code",
       "category": "Category",
       "allCategories": "All categories",
-      "showInactive": "Show inactive ({count})",
       "add": "Add skill",
       "name": "Name",
       "code": "Code",
@@ -1756,7 +1760,15 @@
       "emptyTitle": "The catalog is empty",
       "empty": "Add the first skill so employees can start declaring.",
       "noMatchTitle": "No matching skills",
-      "noMatch": "Try another keyword or category, or show inactive skills."
+      "noMatch": "Try another keyword or category, or show inactive skills.",
+      "status": "Status",
+      "statusFilter": {
+        "active": "In use",
+        "inactive": "Inactive",
+        "all": "All"
+      },
+      "noInactiveTitle": "No inactive skills",
+      "noInactive": "Every skill in the catalog is in use."
     },
     "Form": {
       "createTitle": "Add a skill",
@@ -1789,7 +1801,20 @@
       "notSelfDeclared": "A manager added this skill, so there is no self-declared level to confirm. Use \"Set level\".",
       "verifySelf": "You can't confirm your own skills.",
       "outOfScope": "You can only confirm skills of people you manage.",
-      "employeeNotWorking": "This employee has left the company."
+      "employeeNotWorking": "This employee has left the company.",
+      "noteRequired": "Add a reason when setting a level different from the one the employee declared."
+    },
+    "Person": {
+      "viewSkills": "View skills",
+      "viewSkillsOf": "View {name}'s skills"
+    },
+    "Confirmation": {
+      "someone": "A manager",
+      "confirmedBy": "Confirmed by {name} · {date}",
+      "adjustedSelf": "You declared level {self}; {name} set level {confirmed} · {date}",
+      "adjustedOther": "Self-declared level {self}; {name} set level {confirmed} · {date}",
+      "addedBy": "Added by {name} · {date}",
+      "noteLabel": "Note from {name}"
     }
   }
 }

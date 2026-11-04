@@ -10,12 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createDataTableColumns, DataTable, useDataTableState } from "@/components/shared/data-table/data-table";
 import { EmptyState } from "@/components/shared/states";
-import { UserAvatar } from "@/components/shared/user-avatar";
 import { cn } from "@/lib/utils";
 import { useOrgUnits, useSkillCatalog, useSkillSearch } from "../hooks";
 import { MAX_REQUIREMENTS } from "../rules";
 import { SKILL_LEVELS, type Skill, type SkillSearchCriteria, type SkillSearchResult } from "../types";
 import { EmployeeSkillsSheet, type SheetPerson } from "./employee-skills-sheet";
+import { PersonCell, ViewSkillsButton } from "./person-cell";
 import { LevelMeter } from "./skill-level";
 import { SkillPicker } from "./skill-picker";
 
@@ -68,6 +68,12 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
   }
 
   const columns = useMemo(() => {
+    const personOf = (row: SkillSearchResult): SheetPerson => ({
+      employeeId: row.employeeId,
+      fullName: row.fullName,
+      employeeCode: row.employeeCode,
+      subtitle: units.nameOf(row.departmentId),
+    });
     const col = createDataTableColumns<SkillSearchResult>();
     return col.columns([
       col.accessor("fullName", {
@@ -75,29 +81,12 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
         cell: (c) => {
           const row = c.row.original;
           return (
-            <span className="flex items-center gap-3">
-              <UserAvatar name={row.fullName} seed={row.employeeCode} />
-              <span className="flex min-w-0 flex-col">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPerson({
-                      employeeId: row.employeeId,
-                      fullName: row.fullName,
-                      employeeCode: row.employeeCode,
-                      subtitle: units.nameOf(row.departmentId),
-                    })
-                  }
-                  className="w-fit text-left font-medium hover:text-primary hover:underline focus-visible:underline focus-visible:outline-none"
-                >
-                  {row.fullName}
-                </button>
-                <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground tabular-nums">
-                  {row.employeeCode}
-                  {row.level && <Badge variant="outline">{t(`employeeLevel.${row.level}`)}</Badge>}
-                </span>
-              </span>
-            </span>
+            <PersonCell
+              fullName={row.fullName}
+              employeeCode={row.employeeCode}
+              extra={row.level && <Badge variant="outline">{t(`employeeLevel.${row.level}`)}</Badge>}
+              onOpen={() => setPerson(personOf(row))}
+            />
           );
         },
       }),
@@ -138,6 +127,15 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
         id: "office",
         header: t("office"),
         cell: (c) => units.nameOf(c.row.original.officeId) ?? <span className="text-muted-foreground">—</span>,
+      }),
+      col.display({
+        id: "actions",
+        header: () => <span className="sr-only">{t("actions")}</span>,
+        cell: (c) => (
+          <span className="flex justify-end">
+            <ViewSkillsButton fullName={c.row.original.fullName} onOpen={() => setPerson(personOf(c.row.original))} />
+          </span>
+        ),
       }),
     ]);
   }, [t, units]);

@@ -10,12 +10,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState, ErrorState } from "@/components/shared/states";
-import { formatDate, formatNumber } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { removeMySkill } from "../api";
 import { isProfileRequired } from "../error-messages";
 import { useMySkills, useSkillErrorMessage, useSkillMutation } from "../hooks";
-import { countByStatus, groupByCategory, skillStatus } from "../rules";
+import { countByStatus, groupByCategory } from "../rules";
 import type { EmployeeSkill } from "../types";
+import { ConfirmationInfo } from "./confirmation-info";
 import { DeclareSkillDialog, type DeclareTarget } from "./declare-skill-dialog";
 import { LevelLabel, SkillStatusBadge } from "./skill-level";
 
@@ -127,7 +128,6 @@ function CategoryCard({
 function MySkillRow({ skill, onEdit, onRemove }: { skill: EmployeeSkill; onEdit: () => void; onRemove: () => void }) {
   const t = useTranslations("Skills.Mine");
   const tCommon = useTranslations("Skills");
-  const status = skillStatus(skill);
   return (
     <li className="flex items-start gap-3 px-4 py-3">
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -142,14 +142,8 @@ function MySkillRow({ skill, onEdit, onRemove }: { skill: EmployeeSkill; onEdit:
             <span className="text-muted-foreground">{t("years", { years: formatNumber(skill.yearsExperience) })}</span>
           )}
         </div>
-        {status === "adjusted" && skill.selfLevel !== null && (
-          <p className="text-xs text-muted-foreground">{t("adjustedNote", { self: skill.selfLevel, confirmed: skill.confirmedLevel ?? 0 })}</p>
-        )}
-        {status === "addedByManager" && <p className="text-xs text-muted-foreground">{t("addedByManagerNote")}</p>}
-        {skill.confirmed && skill.confirmedAt && (
-          <p className="text-xs text-muted-foreground">{t("confirmedAt", { date: formatDate(skill.confirmedAt) })}</p>
-        )}
         {skill.note && <p className="text-sm whitespace-pre-line text-muted-foreground">{skill.note}</p>}
+        <ConfirmationInfo skill={skill} viewer="self" />
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={t("actions", { name: skill.skillName })} />}>

@@ -48,6 +48,19 @@ export type EmployeeSkill = {
   confirmedByEmployeeId: string | null;
   confirmedAt: string | null;
   updatedAt: string;
+  /** Ghi chú của người xác nhận (bắt buộc khi chốt mức khác mức tự khai). */
+  confirmedNote: string | null;
+  /** Họ tên người xác nhận; chỉ có ở API kỹ năng của một người (null ở hàng chờ, kết quả tìm). */
+  confirmedByName: string | null;
+};
+
+/**
+ * GET /api/employee-skills/verifier-status. Ai có cấp dưới trên sơ đồ tổ chức thì xác nhận được, không cần role
+ * (README backend skill mục 3.2), nên frontend không đoán theo permission.
+ */
+export type VerifierStatus = {
+  canVerify: boolean;
+  reach: "ALL" | "OFFICE" | "SUBORDINATES" | "NONE";
 };
 
 /** Một dòng của hàng chờ xác nhận (PendingSkillResponse). */
@@ -102,6 +115,10 @@ export type SkillSearchCriteria = {
   /** true = chỉ tính mức quản lý đã xác nhận. */
   confirmedOnly: boolean;
 };
+
+/** Lọc danh mục theo trạng thái. */
+export const CATALOG_STATUSES = ["active", "inactive", "all"] as const;
+export type CatalogStatus = (typeof CATALOG_STATUSES)[number];
 
 /** Các tab của trang /skills. */
 export const SKILL_TABS = ["mine", "pending", "search", "catalog"] as const;

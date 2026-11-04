@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/shared/page-header";
 import { LoadingState } from "@/components/shared/states";
-import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { usePendingCount, useSkillPageState } from "../hooks";
 import type { SkillTab } from "../types";
 import { MySkills } from "./my-skills";
@@ -14,17 +13,17 @@ import { SkillCatalog } from "./skill-catalog";
 import { SkillSearch } from "./skill-search";
 
 /**
- * Kỹ năng (/skills): tự khai (mọi người), hàng chờ xác nhận (skill:verify), tìm người theo kỹ năng (skill:read),
+ * Kỹ năng (/skills): tự khai (mọi người), hàng chờ xác nhận (ai có cấp dưới trên sơ đồ, hoặc HR / Admin theo
+ * skill:verify), tìm người theo kỹ năng (skill:read),
  * danh mục (skill:manage). Tab và điều kiện tìm nằm trên URL. Luật: backend modules/skill/README.md mục 3,
  * docs/policies/skill.md.
  */
 export function SkillsPage() {
   const t = useTranslations("Skills");
-  const { status } = useCurrentUser();
-  const { state, setState, tabs } = useSkillPageState();
+  const { state, setState, tabs, loading } = useSkillPageState();
   const pendingCount = usePendingCount(tabs.includes("pending")).data ?? 0;
 
-  if (status === "loading") return <LoadingState />;
+  if (loading) return <LoadingState />;
 
   return (
     <>

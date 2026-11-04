@@ -1641,9 +1641,6 @@
       "summaryPending": "{count} chờ xác nhận",
       "years": "{years} năm kinh nghiệm",
       "pendingNote": "Kỹ năng chờ xác nhận vẫn hiện khi người khác tìm, kèm nhãn \"chưa xác nhận\". Quản lý trực tiếp sẽ xác nhận.",
-      "adjustedNote": "Bạn khai mức {self}, quản lý chốt mức {confirmed}.",
-      "addedByManagerNote": "Quản lý đã thêm kỹ năng này cho bạn.",
-      "confirmedAt": "Xác nhận ngày {date}",
       "actions": "Thao tác với {name}",
       "edit": "Sửa",
       "remove": "Xóa",
@@ -1665,7 +1662,15 @@
       "selfMark": "Tự khai",
       "employeeNote": "Ghi chú của nhân viên",
       "save": "Chốt mức",
-      "saved": "Đã chốt {name} mức {level} cho {person}."
+      "saved": "Đã chốt {name} mức {level} cho {person}.",
+      "note": "Ghi chú cho nhân viên",
+      "optional": "(không bắt buộc)",
+      "notePlaceholder": "Ví dụ: Đúng mức, làm tốt phần JPA",
+      "notePlaceholderRequired": "Ví dụ: Chưa tự làm được phần bảo mật, cần thêm một dự án",
+      "noteHint": "Nhân viên sẽ thấy ghi chú này cùng tên bạn.",
+      "noteRequiredHint": "Bắt buộc vì mức chốt khác mức nhân viên tự khai: cho họ biết vì sao. Nhân viên sẽ thấy ghi chú cùng tên bạn.",
+      "noteRequired": "Hãy ghi lý do khi chốt mức khác mức tự khai.",
+      "noteTooLong": "Ghi chú tối đa {max} ký tự."
     },
     "Pending": {
       "description": "Kỹ năng cấp dưới vừa khai, cũ nhất trước. Xác nhận nếu đúng mức, hoặc chốt mức khác nếu thấy chưa đúng.",
@@ -1688,7 +1693,6 @@
       "emptyTitle": "Chưa có kỹ năng",
       "empty": "Người này chưa khai kỹ năng nào.",
       "years": "{years} năm",
-      "selfLevel": "Tự khai mức {level}",
       "confirm": "Xác nhận",
       "confirming": "Đang xác nhận…",
       "confirmed": "Đã xác nhận {name}.",
@@ -1730,13 +1734,13 @@
         "SENIOR": "Senior",
         "LEAD": "Lead",
         "PRINCIPAL": "Principal"
-      }
+      },
+      "actions": "Thao tác"
     },
     "Catalog": {
       "search": "Tìm theo tên hoặc mã",
       "category": "Nhóm",
       "allCategories": "Mọi nhóm",
-      "showInactive": "Hiện kỹ năng ngừng dùng ({count})",
       "add": "Thêm kỹ năng",
       "name": "Tên",
       "code": "Mã",
@@ -1756,7 +1760,15 @@
       "emptyTitle": "Danh mục trống",
       "empty": "Thêm kỹ năng đầu tiên để nhân viên bắt đầu khai.",
       "noMatchTitle": "Không có kỹ năng phù hợp",
-      "noMatch": "Thử từ khóa khác, chọn nhóm khác hoặc hiện cả kỹ năng ngừng dùng."
+      "noMatch": "Thử từ khóa khác, chọn nhóm khác hoặc hiện cả kỹ năng ngừng dùng.",
+      "status": "Trạng thái",
+      "statusFilter": {
+        "active": "Đang dùng",
+        "inactive": "Ngừng dùng",
+        "all": "Tất cả"
+      },
+      "noInactiveTitle": "Không có kỹ năng ngừng dùng",
+      "noInactive": "Mọi kỹ năng trong danh mục đều đang dùng."
     },
     "Form": {
       "createTitle": "Thêm kỹ năng",
@@ -1789,7 +1801,20 @@
       "notSelfDeclared": "Kỹ năng này do quản lý thêm, không có mức tự khai để xác nhận. Hãy dùng \"Chốt mức\".",
       "verifySelf": "Bạn không thể tự xác nhận kỹ năng của chính mình.",
       "outOfScope": "Bạn chỉ xác nhận được kỹ năng của người trong phạm vi quản lý.",
-      "employeeNotWorking": "Nhân viên đã nghỉ việc."
+      "employeeNotWorking": "Nhân viên đã nghỉ việc.",
+      "noteRequired": "Hãy ghi lý do khi chốt mức khác mức nhân viên tự khai."
+    },
+    "Person": {
+      "viewSkills": "Xem kỹ năng",
+      "viewSkillsOf": "Xem kỹ năng của {name}"
+    },
+    "Confirmation": {
+      "someone": "Quản lý",
+      "confirmedBy": "{name} xác nhận · {date}",
+      "adjustedSelf": "Bạn khai mức {self}, {name} chốt mức {confirmed} · {date}",
+      "adjustedOther": "Tự khai mức {self}, {name} chốt mức {confirmed} · {date}",
+      "addedBy": "{name} thêm kỹ năng này · {date}",
+      "noteLabel": "Ghi chú của {name}"
     }
   }
 }

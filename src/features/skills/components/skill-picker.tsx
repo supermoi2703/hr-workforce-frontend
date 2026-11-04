@@ -30,7 +30,7 @@ export function SkillPicker({ skills, value, onChange, disabled, placeholder, in
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
 
-  const groups = useMemo(() => groupByCategory(filterSkills(skills, { text, includeInactive: true })), [skills, text]);
+  const groups = useMemo(() => groupByCategory(filterSkills(skills, { text, status: "all" })), [skills, text]);
 
   function pick(skill: Skill) {
     onChange(skill);
