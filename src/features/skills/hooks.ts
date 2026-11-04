@@ -13,6 +13,7 @@ import {
   getOrgChartForSkills,
   getPendingSkills,
   getSkills,
+  getVerifierStatus,
   searchBySkills,
 } from "./api";
 import { getSkillError, isStaleSkillError } from "./error-messages";
@@ -30,6 +31,7 @@ export const skillKeys = {
   pending: (params: PageParams) => ["skills", "pending", params] as const,
   pendingCount: ["skills", "pending-count"] as const,
   search: (criteria: SkillSearchCriteria, params: PageParams) => ["skills", "search", criteria, params] as const,
+  verifierStatus: ["skills", "verifier-status"] as const,
   orgChart: ["skills", "org-chart"] as const,
   offices: ["skills", "offices"] as const,
 };
@@ -98,18 +100,32 @@ export function useOrgUnits() {
   }, [chart.data, offices.data]);
 }
 
+/**
+ * Tôi có xác nhận được cho ai không. Giữ 5 phút: chỉ đổi khi sơ đồ tổ chức đổi (được / thôi làm trưởng). Không thử lại
+ * khi lỗi: coi như không xác nhận được (tab tự ẩn), không làm hỏng cả trang.
+ */
+export function useVerifierStatus() {
+  return useQuery({ queryKey: skillKeys.verifierStatus, queryFn: getVerifierStatus, staleTime: SLOW_STALE_TIME, retry: false });
+}
+
 /** Tab và điều kiện tìm nằm trên URL (gửi link / F5 vẫn giữ). Đổi bằng router.replace để Back không lùi từng lần lọc. */
 export function useSkillPageState() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const { user, status } = useCurrentUser();
+  const verifier = useVerifierStatus();
+  const canVerify = !!verifier.data?.canVerify;
   // Theo `user` (ổn định giữa các lần render), không theo hasPermission (hàm mới mỗi lần render).
-  const tabs = useMemo(() => availableTabs((permission) => !!user?.permissions.includes(permission)), [user]);
-  // Khi chưa tải xong người dùng thì chưa biết quyền: giữ tab trên URL, đừng ép về "mine".
+  const tabs = useMemo(
+    () => availableTabs((permission) => !!user?.permissions.includes(permission), canVerify),
+    [user, canVerify],
+  );
+  // Chưa biết quyền (đang tải người dùng / trạng thái xác nhận): giữ tab trên URL, đừng ép về "mine".
+  const loading = status === "loading" || verifier.isPending;
   const state = useMemo(
-    () => stateFromSearchParams(searchParams, status === "loading" ? ["mine", "pending", "search", "catalog"] : tabs),
-    [searchParams, tabs, status],
+    () => stateFromSearchParams(searchParams, loading ? ["mine", "pending", "search", "catalog"] : tabs),
+    [searchParams, tabs, loading],
   );
 
   const setState = useCallback(
@@ -120,7 +136,7 @@ export function useSkillPageState() {
     [router, pathname],
   );
 
-  return { state, setState, tabs };
+  return { state, setState, tabs, loading };
 }
 
 /**

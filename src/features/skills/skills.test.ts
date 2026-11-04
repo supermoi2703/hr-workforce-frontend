@@ -2,13 +2,16 @@ import { describe, expect, it } from "vitest";
 import {
   availableTabs,
   countByStatus,
+  countCatalog,
   dedupeRequirements,
   filterSkills,
   groupByCategory,
+  groupCatalog,
   isValidYears,
   parseRequirement,
   parseYears,
   requirementToParam,
+  requiresConfirmNote,
   skillStatus,
   SKILL_CODE_PATTERN,
   stateFromSearchParams,
@@ -43,19 +46,36 @@ const employeeSkill = (overrides: Partial<EmployeeSkill>): EmployeeSkill => ({
   confirmedByEmployeeId: null,
   confirmedAt: null,
   updatedAt: "2026-11-03T00:00:00Z",
+  confirmedNote: null,
+  confirmedByName: null,
   ...overrides,
 });
 
 describe("availableTabs", () => {
   it("employee only sees their own skills", () => {
-    expect(availableTabs(() => false)).toEqual(["mine"]);
+    expect(availableTabs(() => false, false)).toEqual(["mine"]);
   });
 
-  it("manager gets the queue and search, HR also the catalog", () => {
+  it("the queue follows canVerify, not the role: a team lead with the Employee role gets it", () => {
+    expect(availableTabs(() => false, true)).toEqual(["mine", "pending"]);
+    // Manager không làm trưởng đơn vị nào: có quyền tìm nhưng không có ai để xác nhận
     const manager = new Set(["skill:verify", "skill:read"]);
-    expect(availableTabs((p) => manager.has(p))).toEqual(["mine", "pending", "search"]);
-    const hr = new Set([...manager, "skill:manage"]);
-    expect(availableTabs((p) => hr.has(p))).toEqual(ALL_TABS);
+    expect(availableTabs((p) => manager.has(p), false)).toEqual(["mine", "search"]);
+  });
+
+  it("HR with people in scope gets every tab", () => {
+    const hr = new Set(["skill:verify", "skill:read", "skill:manage"]);
+    expect(availableTabs((p) => hr.has(p), true)).toEqual(ALL_TABS);
+  });
+});
+
+describe("requiresConfirmNote", () => {
+  it("is required only when the level differs from a self-declared one", () => {
+    expect(requiresConfirmNote(4, 3)).toBe(true);
+    expect(requiresConfirmNote(4, 4)).toBe(false);
+    expect(requiresConfirmNote(null, 2)).toBe(false); // thêm hộ
+    expect(requiresConfirmNote(undefined, 2)).toBe(false);
+    expect(requiresConfirmNote(4, null)).toBe(false); // chưa chọn mức
   });
 });
 
@@ -162,10 +182,20 @@ describe("catalog helpers", () => {
     ]);
   });
 
-  it("filters by accent-insensitive text, category and active flag", () => {
-    expect(filterSkills(skills, { text: "tieng anh", includeInactive: false }).map((s) => s.id)).toEqual(["en"]);
-    expect(filterSkills(skills, { text: "", category: "PROGRAMMING_LANGUAGE", includeInactive: false }).map((s) => s.id)).toEqual(["java"]);
-    expect(filterSkills(skills, { text: "cob", includeInactive: true }).map((s) => s.id)).toEqual(["cobol"]);
+  it("filters by accent-insensitive text, category and status", () => {
+    expect(filterSkills(skills, { text: "tieng anh", status: "active" }).map((s) => s.id)).toEqual(["en"]);
+    expect(filterSkills(skills, { text: "", category: "PROGRAMMING_LANGUAGE", status: "active" }).map((s) => s.id)).toEqual(["java"]);
+    expect(filterSkills(skills, { text: "", status: "inactive" }).map((s) => s.id)).toEqual(["cobol"]);
+    expect(filterSkills(skills, { text: "cob", status: "all" }).map((s) => s.id)).toEqual(["cobol"]);
+  });
+
+  it("puts inactive skills last in their group and counts by status", () => {
+    const withInactiveFirst = [skills[2], skills[1], skills[0]];
+    expect(groupCatalog(withInactiveFirst).map((g) => [g.category, g.items.map((s) => s.id)])).toEqual([
+      ["PROGRAMMING_LANGUAGE", ["java", "cobol"]],
+      ["FOREIGN_LANGUAGE", ["en"]],
+    ]);
+    expect(countCatalog(skills)).toEqual({ active: 2, inactive: 1, all: 3 });
   });
 });
 

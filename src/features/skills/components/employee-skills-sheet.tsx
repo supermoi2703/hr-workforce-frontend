@@ -10,20 +10,21 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/shared/states";
 import { UserAvatar } from "@/components/shared/user-avatar";
-import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { formatNumber } from "@/lib/format";
 import { confirmSkill } from "../api";
-import { useEmployeeSkills, useSkillErrorMessage, useSkillMutation } from "../hooks";
-import { groupByCategory, skillStatus, SKILL_VERIFY_PERMISSION } from "../rules";
+import { useEmployeeSkills, useSkillErrorMessage, useSkillMutation, useVerifierStatus } from "../hooks";
+import { groupByCategory, skillStatus } from "../rules";
 import type { EmployeeSkill } from "../types";
+import { ConfirmationInfo } from "./confirmation-info";
 import { LevelLabel, SkillStatusBadge } from "./skill-level";
 import { VerifyLevelDialog, type VerifyTarget } from "./verify-level-dialog";
 
 export type SheetPerson = { employeeId: string; fullName: string; employeeCode: string; subtitle?: string };
 
 /**
- * Kỹ năng của một người, trượt từ bên phải. Có skill:verify thì xác nhận / chốt mức / thêm hộ ngay tại đây; backend
- * vẫn kiểm tra phạm vi (người ngoài phạm vi hoặc chính mình → báo lỗi).
+ * Kỹ năng của một người, trượt từ bên phải. Người xác nhận được cho ai đó (cấp dưới trên sơ đồ hoặc phạm vi
+ * skill:verify) thấy nút xác nhận / chốt mức / thêm hộ; backend vẫn kiểm tra từng người (ngoài phạm vi hoặc chính mình →
+ * báo lỗi).
  */
 export function EmployeeSkillsSheet({ person, onClose }: { person: SheetPerson | null; onClose: () => void }) {
   const t = useTranslations("Skills.Sheet");
@@ -57,7 +58,7 @@ function SheetBody({ person }: { person: SheetPerson }) {
   const t = useTranslations("Skills.Sheet");
   const tCategory = useTranslations("Skills.Categories");
   const query = useEmployeeSkills(person.employeeId);
-  const canVerify = useCurrentUser().hasPermission(SKILL_VERIFY_PERMISSION);
+  const canVerify = !!useVerifierStatus().data?.canVerify;
   const [verify, setVerify] = useState<VerifyTarget | null>(null);
   const errorMessage = useSkillErrorMessage();
   const confirm = useSkillMutation((skill: EmployeeSkill) => confirmSkill(person.employeeId, skill.skillId));
@@ -107,10 +108,8 @@ function SheetBody({ person }: { person: SheetPerson }) {
                         <span className="text-xs text-muted-foreground">{t("years", { years: formatNumber(skill.yearsExperience) })}</span>
                       )}
                     </div>
-                    {status === "adjusted" && skill.selfLevel !== null && (
-                      <span className="text-xs text-muted-foreground">{t("selfLevel", { level: skill.selfLevel })}</span>
-                    )}
                     {skill.note && <p className="text-xs whitespace-pre-line text-muted-foreground">{skill.note}</p>}
+                    <ConfirmationInfo skill={skill} viewer="other" />
                     {canVerify && (
                       <div className="flex flex-wrap gap-2 pt-1">
                         {status === "pending" && skill.selfLevel !== null && (

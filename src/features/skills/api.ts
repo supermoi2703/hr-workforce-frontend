@@ -11,6 +11,7 @@ import type {
   SkillInput,
   SkillSearchCriteria,
   SkillSearchResult,
+  VerifierStatus,
 } from "./types";
 
 const enc = encodeURIComponent;
@@ -37,14 +38,20 @@ export const removeMySkill = (skillId: string) => http.delete<void>(`/api/employ
 /** Chính mình, skill:read, hoặc người xác nhận được cho họ. */
 export const getEmployeeSkills = (employeeId: string) =>
   http.get<EmployeeSkill[]>(`/api/employees/${enc(employeeId)}/skills`);
-/** Chốt đúng mức tự khai (skill:verify + phạm vi; không tự xác nhận). */
-export const confirmSkill = (employeeId: string, skillId: string) =>
-  http.post<EmployeeSkill>(`/api/employees/${enc(employeeId)}/skills/${enc(skillId)}/confirm`);
-/** Chốt mức khác, hoặc thêm hộ kỹ năng nhân viên chưa khai. */
-export const setConfirmedLevel = (employeeId: string, skillId: string, level: number) =>
-  http.put<EmployeeSkill>(`/api/employees/${enc(employeeId)}/skills/${enc(skillId)}`, { level });
+/**
+ * Chốt đúng mức tự khai, ghi chú không bắt buộc. Được làm khi là cấp trên trên sơ đồ (không cần role) hoặc trong phạm vi
+ * skill:verify; không tự xác nhận.
+ */
+export const confirmSkill = (employeeId: string, skillId: string, note?: string | null) =>
+  http.post<EmployeeSkill>(`/api/employees/${enc(employeeId)}/skills/${enc(skillId)}/confirm`, note ? { note } : undefined);
+/** Chốt mức khác (bắt buộc ghi chú nếu khác mức tự khai), hoặc thêm hộ kỹ năng nhân viên chưa khai. */
+export const setConfirmedLevel = (employeeId: string, skillId: string, level: number, note: string | null) =>
+  http.put<EmployeeSkill>(`/api/employees/${enc(employeeId)}/skills/${enc(skillId)}`, { level, note });
 
-/** Hàng chờ xác nhận của tôi, cũ nhất trước, không gồm kỹ năng của mình. Thứ tự do backend: không gửi sort. */
+/** Tôi có xác nhận được cho ai không (cấp dưới trên sơ đồ, hoặc phạm vi skill:verify). */
+export const getVerifierStatus = () => http.get<VerifierStatus>("/api/employee-skills/verifier-status");
+
+/** Hàng chờ xác nhận của tôi, cũ nhất trước, không gồm kỹ năng của mình (rỗng nếu không xác nhận được cho ai). */
 export const getPendingSkills = (params: PageParams) =>
   http.get<PageResponse<PendingSkill>>("/api/employee-skills/pending", {
     query: toPageQuery({ page: params.page, size: params.size }),

@@ -16,6 +16,7 @@ const ERROR_KEYS: Record<string, SkillErrorKey> = {
   SKILL_VERIFY_SELF: "verifySelf",
   SKILL_VERIFY_OUT_OF_SCOPE: "outOfScope",
   EMPLOYEE_NOT_WORKING: "employeeNotWorking",
+  SKILL_CONFIRM_NOTE_REQUIRED: "noteRequired",
 };
 
 export function isSkillErrorCode(error: unknown, code: string): boolean {
