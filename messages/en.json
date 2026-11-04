@@ -55,7 +55,8 @@
       "roles": "Roles & permissions",
       "auditLog": "Audit log",
       "devUi": "UI components",
-      "devError": "Error page demo"
+      "devError": "Error page demo",
+      "policies": "Policy settings"
     }
   },
   "Shell": {
@@ -389,7 +390,8 @@
       "role": "Roles",
       "session": "Sign-in sessions",
       "audit": "Audit log",
-      "approval": "Approvals"
+      "approval": "Approvals",
+      "policy": "Policies"
     },
     "Validation": {
       "codeInvalid": "Use 3–50 uppercase letters, digits or underscores, starting with a letter",
@@ -438,6 +440,14 @@
     "approval_read_all": {
       "name": "View all requests",
       "description": "See every approval request in their data scope"
+    },
+    "policy_read": {
+      "name": "View policies",
+      "description": "See policy settings and their history"
+    },
+    "policy_manage": {
+      "name": "Manage policies",
+      "description": "Add or delete effective-dated policy values"
     }
   },
   "AuditActions": {
@@ -465,7 +475,9 @@
     "USER_UPDATED": "Account updated",
     "ROLE_CREATED": "Role created",
     "ROLE_UPDATED": "Role updated",
-    "ROLE_DELETED": "Role deleted"
+    "ROLE_DELETED": "Role deleted",
+    "POLICY_UPDATED": "Policy value set",
+    "POLICY_VALUE_DELETED": "Scheduled policy value deleted"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -519,7 +531,8 @@
       "details": "Details",
       "noDetails": "No extra details.",
       "openAccount": "Open account",
-      "openRole": "Open role"
+      "openRole": "Open role",
+      "openPolicy": "Open policy"
     },
     "Meta": {
       "reason": "Reason",
@@ -537,7 +550,10 @@
       "sessionsRevoked": "Sessions signed out",
       "sessionId": "Session",
       "familyId": "Session family",
-      "minutes": "{count, plural, one {# minute} other {# minutes}}"
+      "minutes": "{count, plural, one {# minute} other {# minutes}}",
+      "validFrom": "Starts on",
+      "officeId": "Office",
+      "value": "Value"
     },
     "values": {
       "BAD_PASSWORD": "Wrong password",
@@ -1352,6 +1368,186 @@
       "leads": "Leads",
       "people": "{count, plural, one {# person} other {# people}}",
       "profileNote": "Personal details, contract and leave are in the employee profile and depend on your access."
+    }
+  },
+  "Policies": {
+    "metaTitle": "Policy settings",
+    "List": {
+      "title": "Policy settings",
+      "description": "Business rules used across the system. A change takes effect from the date you choose; older values are kept so past months are still calculated the same way.",
+      "search": "Search policies",
+      "empty": "No policies match your search",
+      "officeCount": "{count, plural, one {# office has its own value} other {# offices have their own value}}",
+      "noOfficeValues": "Same for all offices",
+      "companyOnly": "Company-wide only"
+    },
+    "Columns": {
+      "policy": "Policy",
+      "current": "Current value",
+      "offices": "Offices"
+    },
+    "Detail": {
+      "metaTitle": "Policy",
+      "back": "All policies",
+      "notFound": "Policy not found",
+      "notFoundDescription": "This policy does not exist. It may have been removed in a newer version.",
+      "key": "Key",
+      "module": "Module",
+      "type": "Value type",
+      "range": "Allowed range",
+      "officeOverridable": "Office values",
+      "officeOverridableYes": "Each office can have its own value",
+      "officeOverridableNo": "One value for the whole company",
+      "howItWorks": "Values are never edited. To change a rule, add a new value with the date it starts. Values that have not started yet can be deleted.",
+      "addValue": "Add value",
+      "addForOffice": "Add value for this office",
+      "auditLog": "Change history",
+      "noOfficeValues": "No office has its own value yet. Add one to override the company-wide value for that office.",
+      "from": "From",
+      "delete": "Delete",
+      "deleteValue": "Delete the value starting {date}",
+      "deleteTitle": "Delete this scheduled value?",
+      "deleteDescription": "The value planned to start on {date} will be removed. The current value keeps applying.",
+      "deleted": "Scheduled value deleted."
+    },
+    "Add": {
+      "title": "Add a value",
+      "description": "New value for “{name}”. The current value stays in the history.",
+      "scope": "Applies to",
+      "scopeHint": "An office value replaces the company-wide value for that office only.",
+      "value": "Value",
+      "range": "Allowed: {range}",
+      "timeHint": "24-hour time, for example 08:30.",
+      "unitLabel": "Unit",
+      "unit": {
+        "SECONDS": "seconds",
+        "MINUTES": "minutes",
+        "HOURS": "hours"
+      },
+      "choose": "Choose",
+      "validFrom": "Starts on",
+      "chooseDate": "Choose a date",
+      "validFromHint": "Today or a later date. Past dates cannot be changed.",
+      "replaces": "A value of {value} is already scheduled from {date}. Saving replaces it.",
+      "conflict": "A value already applies from this date. Choose a later date.",
+      "submit": "Save value",
+      "success": "Value saved."
+    },
+    "modules": {
+      "approval": "Approvals",
+      "leave": "Leave",
+      "timesheet": "Working hours",
+      "calendar": "Office calendar",
+      "attendance": "Attendance",
+      "face": "Face check-in"
+    },
+    "types": {
+      "INTEGER": "Whole number",
+      "DECIMAL": "Decimal number",
+      "BOOLEAN": "Yes / No",
+      "STRING": "Text",
+      "DURATION": "Length of time",
+      "TIME": "Time of day"
+    },
+    "scope": {
+      "company": "Whole company",
+      "unknownOffice": "Unknown office",
+      "inactiveOffice": "{name} (inactive)"
+    },
+    "status": {
+      "upcoming": "Scheduled",
+      "current": "Current",
+      "superseded": "Replaced"
+    },
+    "units": {
+      "SECONDS": "{count, plural, one {# second} other {# seconds}}",
+      "MINUTES": "{count, plural, one {# minute} other {# minutes}}",
+      "HOURS": "{count, plural, one {# hour} other {# hours}}",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "errors": {
+      "notFound": "This policy no longer exists.",
+      "invalidValue": "The value is not valid for this policy. Check the type and the allowed range.",
+      "valueInEffect": "A value that has already started cannot be changed. Choose a later date."
+    },
+    "Validation": {
+      "required": "Enter a value.",
+      "tooLong": "Use at most {max} characters.",
+      "notInteger": "Enter a whole number.",
+      "notNumber": "Enter a number, for example 0.45.",
+      "belowMin": "Must be at least {min}.",
+      "aboveMax": "Must be at most {max}.",
+      "invalidTime": "Enter a time as HH:mm, for example 08:30.",
+      "durationPositive": "Enter a whole number greater than 0.",
+      "dateRequired": "Choose a start date.",
+      "pastDate": "The start date cannot be in the past."
+    },
+    "keys": {
+      "approval_leave_hr_step_min_days": {
+        "name": "Leave length that needs HR approval",
+        "description": "Leave requests of at least this many days get an extra HR approval step."
+      },
+      "face_match_high": {
+        "name": "Face match: accept",
+        "description": "Score at or above which a face is accepted without confirmation. Keep it above the reject score."
+      },
+      "face_match_low": {
+        "name": "Face match: reject",
+        "description": "Score below which a face is not recognized. Keep it below the accept score."
+      },
+      "face_match_margin": {
+        "name": "Kiosk: gap to the next person",
+        "description": "At the kiosk, the best match must beat the second-best person by at least this much."
+      },
+      "face_enroll_min_similarity": {
+        "name": "Face registration: photo similarity",
+        "description": "When registering a face, every pair of photos must score at least this."
+      },
+      "attendance_duplicate_punch_window": {
+        "name": "Duplicate punch window",
+        "description": "A second punch by the same person within this time is ignored."
+      },
+      "calendar_work_start": {
+        "name": "Working day start",
+        "description": "Default start of the working day. The day ends 9 hours later, with lunch from 12:00 to 13:00."
+      },
+      "schedule_start_earliest": {
+        "name": "Earliest start time",
+        "description": "Earliest start time an employee can register. Keep it before the latest start time."
+      },
+      "schedule_start_latest": {
+        "name": "Latest start time",
+        "description": "Latest start time an employee can register. Keep it after the earliest start time."
+      },
+      "schedule_start_step_minutes": {
+        "name": "Start time step (minutes)",
+        "description": "Registered start times must be a multiple of this many minutes."
+      },
+      "schedule_effective_delay_days": {
+        "name": "Days before a new schedule applies",
+        "description": "A registered schedule applies this many days after it is approved."
+      },
+      "schedule_max_changes_per_month": {
+        "name": "Schedule changes per month",
+        "description": "How many approved schedule changes an employee can have in a month."
+      },
+      "leave_annual_days": {
+        "name": "Annual leave days",
+        "description": "Annual leave for a full year of work, accrued monthly."
+      },
+      "leave_min_notice_days": {
+        "name": "Leave notice (days)",
+        "description": "Leave that starts sooner than this many days after the request is marked as short notice."
+      },
+      "leave_backdate_max_days": {
+        "name": "Backdated leave limit (days)",
+        "description": "For leave types that can be sent afterwards: how many days back at most."
+      },
+      "leave_max_request_days": {
+        "name": "Longest leave request (days)",
+        "description": "Longest single leave request, in calendar days."
+      }
     }
   },
   "Skills": {

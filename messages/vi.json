@@ -55,7 +55,8 @@
       "roles": "Vai trò & quyền",
       "auditLog": "Nhật ký hệ thống",
       "devUi": "Component mẫu",
-      "devError": "Trang lỗi mẫu"
+      "devError": "Trang lỗi mẫu",
+      "policies": "Cài đặt chính sách"
     }
   },
   "Shell": {
@@ -389,7 +390,8 @@
       "role": "Vai trò",
       "session": "Phiên đăng nhập",
       "audit": "Nhật ký hệ thống",
-      "approval": "Phê duyệt"
+      "approval": "Phê duyệt",
+      "policy": "Chính sách"
     },
     "Validation": {
       "codeInvalid": "Dùng 3–50 chữ HOA, chữ số hoặc dấu gạch dưới, bắt đầu bằng chữ",
@@ -438,6 +440,14 @@
     "approval_read_all": {
       "name": "Xem mọi đơn",
       "description": "Xem mọi đơn cần duyệt trong phạm vi dữ liệu của mình"
+    },
+    "policy_read": {
+      "name": "Xem chính sách",
+      "description": "Xem cài đặt chính sách và lịch sử giá trị"
+    },
+    "policy_manage": {
+      "name": "Quản lý chính sách",
+      "description": "Thêm hoặc xóa giá trị chính sách theo ngày hiệu lực"
     }
   },
   "AuditActions": {
@@ -465,7 +475,9 @@
     "USER_UPDATED": "Sửa tài khoản",
     "ROLE_CREATED": "Tạo vai trò",
     "ROLE_UPDATED": "Sửa vai trò",
-    "ROLE_DELETED": "Xóa vai trò"
+    "ROLE_DELETED": "Xóa vai trò",
+    "POLICY_UPDATED": "Đặt giá trị chính sách",
+    "POLICY_VALUE_DELETED": "Xóa giá trị chính sách đã hẹn"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -519,7 +531,8 @@
       "details": "Chi tiết",
       "noDetails": "Không có thông tin thêm.",
       "openAccount": "Mở tài khoản",
-      "openRole": "Mở vai trò"
+      "openRole": "Mở vai trò",
+      "openPolicy": "Mở chính sách"
     },
     "Meta": {
       "reason": "Lý do",
@@ -537,7 +550,10 @@
       "sessionsRevoked": "Số phiên bị đăng xuất",
       "sessionId": "Phiên",
       "familyId": "Họ phiên",
-      "minutes": "{count} phút"
+      "minutes": "{count} phút",
+      "validFrom": "Áp dụng từ",
+      "officeId": "Văn phòng",
+      "value": "Giá trị"
     },
     "values": {
       "BAD_PASSWORD": "Sai mật khẩu",
@@ -1352,6 +1368,186 @@
       "leads": "Phụ trách",
       "people": "{count} người",
       "profileNote": "Thông tin cá nhân, hợp đồng, nghỉ phép nằm trong hồ sơ nhân viên và tùy quyền của bạn."
+    }
+  },
+  "Policies": {
+    "metaTitle": "Cài đặt chính sách",
+    "List": {
+      "title": "Cài đặt chính sách",
+      "description": "Các quy tắc nghiệp vụ dùng chung trong hệ thống. Thay đổi có hiệu lực từ ngày bạn chọn; giá trị cũ được giữ lại nên các tháng trước vẫn tính như cũ.",
+      "search": "Tìm chính sách",
+      "empty": "Không có chính sách nào khớp",
+      "officeCount": "{count} văn phòng có giá trị riêng",
+      "noOfficeValues": "Mọi văn phòng như nhau",
+      "companyOnly": "Chỉ áp dụng toàn công ty"
+    },
+    "Columns": {
+      "policy": "Chính sách",
+      "current": "Đang áp dụng",
+      "offices": "Văn phòng"
+    },
+    "Detail": {
+      "metaTitle": "Chính sách",
+      "back": "Tất cả chính sách",
+      "notFound": "Không tìm thấy chính sách",
+      "notFoundDescription": "Chính sách này không tồn tại, có thể đã bị bỏ ở phiên bản mới.",
+      "key": "Mã khóa",
+      "module": "Module",
+      "type": "Kiểu giá trị",
+      "range": "Khoảng cho phép",
+      "officeOverridable": "Giá trị theo văn phòng",
+      "officeOverridableYes": "Mỗi văn phòng có thể có giá trị riêng",
+      "officeOverridableNo": "Một giá trị cho toàn công ty",
+      "howItWorks": "Giá trị không bao giờ bị sửa. Muốn đổi quy tắc thì thêm giá trị mới kèm ngày bắt đầu áp dụng. Giá trị chưa tới ngày thì xóa được.",
+      "addValue": "Thêm giá trị",
+      "addForOffice": "Thêm giá trị cho văn phòng này",
+      "auditLog": "Lịch sử thay đổi",
+      "noOfficeValues": "Chưa văn phòng nào có giá trị riêng. Thêm giá trị cho một văn phòng để thay giá trị toàn công ty ở văn phòng đó.",
+      "from": "Từ",
+      "delete": "Xóa",
+      "deleteValue": "Xóa giá trị áp dụng từ {date}",
+      "deleteTitle": "Xóa giá trị đã hẹn?",
+      "deleteDescription": "Giá trị dự kiến áp dụng từ {date} sẽ bị xóa. Giá trị hiện tại vẫn tiếp tục áp dụng.",
+      "deleted": "Đã xóa giá trị đã hẹn."
+    },
+    "Add": {
+      "title": "Thêm giá trị",
+      "description": "Giá trị mới cho “{name}”. Giá trị hiện tại vẫn được giữ trong lịch sử.",
+      "scope": "Áp dụng cho",
+      "scopeHint": "Giá trị của văn phòng chỉ thay giá trị toàn công ty ở văn phòng đó.",
+      "value": "Giá trị",
+      "range": "Cho phép: {range}",
+      "timeHint": "Giờ dạng 24 giờ, ví dụ 08:30.",
+      "unitLabel": "Đơn vị",
+      "unit": {
+        "SECONDS": "giây",
+        "MINUTES": "phút",
+        "HOURS": "giờ"
+      },
+      "choose": "Chọn",
+      "validFrom": "Áp dụng từ ngày",
+      "chooseDate": "Chọn ngày",
+      "validFromHint": "Hôm nay hoặc một ngày sau. Không sửa được ngày đã qua.",
+      "replaces": "Đã có giá trị {value} hẹn áp dụng từ {date}. Lưu sẽ thay giá trị đó.",
+      "conflict": "Đã có giá trị áp dụng từ ngày này. Hãy chọn một ngày sau.",
+      "submit": "Lưu giá trị",
+      "success": "Đã lưu giá trị."
+    },
+    "modules": {
+      "approval": "Phê duyệt",
+      "leave": "Nghỉ phép",
+      "timesheet": "Giờ làm việc",
+      "calendar": "Lịch văn phòng",
+      "attendance": "Chấm công",
+      "face": "Chấm công khuôn mặt"
+    },
+    "types": {
+      "INTEGER": "Số nguyên",
+      "DECIMAL": "Số thập phân",
+      "BOOLEAN": "Có / Không",
+      "STRING": "Chữ",
+      "DURATION": "Thời lượng",
+      "TIME": "Giờ trong ngày"
+    },
+    "scope": {
+      "company": "Toàn công ty",
+      "unknownOffice": "Văn phòng không xác định",
+      "inactiveOffice": "{name} (ngừng hoạt động)"
+    },
+    "status": {
+      "upcoming": "Sắp áp dụng",
+      "current": "Đang áp dụng",
+      "superseded": "Đã thay thế"
+    },
+    "units": {
+      "SECONDS": "{count} giây",
+      "MINUTES": "{count} phút",
+      "HOURS": "{count} giờ",
+      "yes": "Có",
+      "no": "Không"
+    },
+    "errors": {
+      "notFound": "Chính sách này không còn tồn tại.",
+      "invalidValue": "Giá trị không hợp lệ với chính sách này. Hãy kiểm tra kiểu và khoảng cho phép.",
+      "valueInEffect": "Không sửa được giá trị đã bắt đầu áp dụng. Hãy chọn một ngày sau."
+    },
+    "Validation": {
+      "required": "Nhập giá trị.",
+      "tooLong": "Tối đa {max} ký tự.",
+      "notInteger": "Nhập số nguyên.",
+      "notNumber": "Nhập một số, ví dụ 0,45.",
+      "belowMin": "Tối thiểu là {min}.",
+      "aboveMax": "Tối đa là {max}.",
+      "invalidTime": "Nhập giờ dạng HH:mm, ví dụ 08:30.",
+      "durationPositive": "Nhập số nguyên lớn hơn 0.",
+      "dateRequired": "Chọn ngày bắt đầu áp dụng.",
+      "pastDate": "Ngày bắt đầu không được ở quá khứ."
+    },
+    "keys": {
+      "approval_leave_hr_step_min_days": {
+        "name": "Số ngày nghỉ cần HR duyệt",
+        "description": "Đơn nghỉ từ số ngày này trở lên có thêm bước HR duyệt."
+      },
+      "face_match_high": {
+        "name": "Khuôn mặt: chấp nhận",
+        "description": "Điểm từ mức này trở lên thì nhận khuôn mặt luôn, không cần xác nhận. Phải lớn hơn điểm từ chối."
+      },
+      "face_match_low": {
+        "name": "Khuôn mặt: từ chối",
+        "description": "Điểm dưới mức này thì không nhận ra khuôn mặt. Phải nhỏ hơn điểm chấp nhận."
+      },
+      "face_match_margin": {
+        "name": "Kiosk: cách biệt với người thứ hai",
+        "description": "Ở kiosk, người khớp nhất phải hơn người khớp thứ hai ít nhất mức này."
+      },
+      "face_enroll_min_similarity": {
+        "name": "Đăng ký khuôn mặt: độ giống giữa các ảnh",
+        "description": "Khi đăng ký khuôn mặt, mọi cặp ảnh phải đạt ít nhất mức này."
+      },
+      "attendance_duplicate_punch_window": {
+        "name": "Khoảng bỏ qua chấm công trùng",
+        "description": "Cùng một người chấm công lần nữa trong khoảng này thì bỏ qua."
+      },
+      "calendar_work_start": {
+        "name": "Giờ bắt đầu ngày làm việc",
+        "description": "Giờ bắt đầu mặc định. Ngày làm kết thúc sau 9 tiếng, nghỉ trưa 12:00–13:00."
+      },
+      "schedule_start_earliest": {
+        "name": "Giờ bắt đầu sớm nhất",
+        "description": "Giờ bắt đầu sớm nhất nhân viên được đăng ký. Phải sớm hơn giờ bắt đầu muộn nhất."
+      },
+      "schedule_start_latest": {
+        "name": "Giờ bắt đầu muộn nhất",
+        "description": "Giờ bắt đầu muộn nhất nhân viên được đăng ký. Phải muộn hơn giờ bắt đầu sớm nhất."
+      },
+      "schedule_start_step_minutes": {
+        "name": "Bước giờ bắt đầu (phút)",
+        "description": "Giờ bắt đầu đăng ký phải là bội số của số phút này."
+      },
+      "schedule_effective_delay_days": {
+        "name": "Số ngày trước khi giờ mới áp dụng",
+        "description": "Giờ làm đã đăng ký áp dụng sau số ngày này kể từ khi được duyệt."
+      },
+      "schedule_max_changes_per_month": {
+        "name": "Số lần đổi giờ mỗi tháng",
+        "description": "Số lần đổi giờ làm được duyệt tối đa trong một tháng."
+      },
+      "leave_annual_days": {
+        "name": "Số ngày phép năm",
+        "description": "Số ngày phép cho một năm làm đủ, cộng dần theo tháng."
+      },
+      "leave_min_notice_days": {
+        "name": "Báo trước khi nghỉ (ngày)",
+        "description": "Đơn nghỉ bắt đầu sớm hơn số ngày này kể từ lúc gửi bị đánh dấu là báo gấp."
+      },
+      "leave_backdate_max_days": {
+        "name": "Gửi bù đơn nghỉ tối đa (ngày)",
+        "description": "Với loại nghỉ được gửi sau: gửi lùi tối đa bao nhiêu ngày."
+      },
+      "leave_max_request_days": {
+        "name": "Đơn nghỉ dài nhất (ngày)",
+        "description": "Một đơn nghỉ dài nhất bao nhiêu ngày (tính cả ngày nghỉ cuối tuần)."
+      }
     }
   },
   "Skills": {
