@@ -107,6 +107,8 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
 
 - Ngày giờ, tiền: `formatDate`, `formatDateTime`, `formatTime`, `formatCurrency` trong `lib/format`
   (luôn theo giờ Việt Nam; chuỗi `yyyy-MM-dd` của backend không bị lệch ngày).
+- Tìm / lọc không dấu ở phía trình duyệt: `foldText` trong `lib/text` (bỏ dấu tiếng Việt, viết thường), để gõ
+  "phat trien" vẫn ra "Phát triển". Dùng ở cây tổ chức, danh mục kỹ năng.
 - Thông báo: `toast.success(...)` / `toast.error(...)` từ `sonner`.
 - Thao tác khó hoàn tác: `<ConfirmDialog>`.
 - Trạng thái: `LoadingState`, `ErrorState`, `EmptyState` trong `components/shared/states`.
