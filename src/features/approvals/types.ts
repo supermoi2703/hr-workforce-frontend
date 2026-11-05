@@ -52,7 +52,7 @@ export const HISTORY_ACTIONS = [
 export type HistoryAction = (typeof HISTORY_ACTIONS)[number];
 
 /** Vì sao bước đang chờ được giao lại (metadata.reason của mốc REASSIGNED). */
-export const REASSIGN_REASONS = ["ACCOUNT_REVOKED", "UNIT_HEAD_CHANGED"] as const;
+export const REASSIGN_REASONS = ["ACCOUNT_REVOKED", "UNIT_HEAD_CHANGED", "EMPLOYEE_UNAVAILABLE"] as const;
 export type ReassignReason = (typeof REASSIGN_REASONS)[number];
 
 /**

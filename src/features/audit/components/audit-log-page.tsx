@@ -126,13 +126,13 @@ export function AuditLogPage() {
           const target = c.getValue();
           if (!target) return <span className="text-muted-foreground">—</span>;
           const label = target.label ?? target.id ?? "—";
-          if (!target.id || (target.type !== "USER" && target.type !== "ROLE")) return label;
+          if (!target.id || (target.type !== "USER" && target.type !== "ROLE" && target.type !== "EMPLOYEE")) return label;
           return (
             <button
               type="button"
               className={linkButtonClass}
               onClick={() =>
-                updateFilters({ targetType: target.type as "USER" | "ROLE", targetId: target.id ?? undefined, targetLabel: label })
+                updateFilters({ targetType: target.type as "USER" | "ROLE" | "EMPLOYEE", targetId: target.id ?? undefined, targetLabel: label })
               }
               title={t("Columns.filterBy", { label })}
             >

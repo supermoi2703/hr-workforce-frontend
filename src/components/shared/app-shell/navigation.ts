@@ -86,7 +86,7 @@ export const NAV_GROUPS: NavGroup[] = [
     id: "people",
     owner: "cuongvv",
     items: [
-      { id: "employees", href: "/employees", icon: UsersIcon, access: MANAGEMENT, task: "1.4" },
+      { id: "employees", href: "/employees", icon: UsersIcon, access: { permissions: ["employee:read"] }, task: "1.4" },
       { id: "contracts", href: "/contracts", icon: FileSignatureIcon, access: HR_ONLY, task: "1.5" },
     ],
   },

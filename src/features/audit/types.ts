@@ -27,6 +27,11 @@ export const AUDIT_ACTIONS_BY_CATEGORY = {
     "USER_DISABLED",
     "USER_ENABLED",
     "USER_ROLES_CHANGED",
+    "USER_LINKED_TO_EMPLOYEE",
+    "EMPLOYEE_CREATED",
+    "EMPLOYEE_UPDATED",
+    "EMPLOYEE_STATUS_CHANGED",
+    "EMPLOYEE_SENSITIVE_UPDATED",
     "ROLE_CREATED",
     "ROLE_UPDATED",
     "ROLE_DELETED",
@@ -42,7 +47,7 @@ export const AUDIT_ACTIONS: readonly AuditAction[] = Object.values(AUDIT_ACTIONS
 export const AUDIT_OUTCOMES = ["SUCCESS", "FAILURE"] as const;
 export type AuditOutcome = (typeof AUDIT_OUTCOMES)[number];
 
-export const AUDIT_TARGET_TYPES = ["USER", "ROLE", "POLICY"] as const;
+export const AUDIT_TARGET_TYPES = ["USER", "ROLE", "POLICY", "EMPLOYEE"] as const;
 export type AuditTargetType = (typeof AUDIT_TARGET_TYPES)[number];
 
 /** Một dòng nhật ký (AuditLogResponse). Thời điểm là chuỗi ISO. */

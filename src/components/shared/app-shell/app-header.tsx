@@ -37,6 +37,8 @@ function AppBreadcrumbs() {
   } else if (pathname === "/account") {
     // Trang tài khoản mở từ menu avatar, không nằm trong menu bên trái.
     crumbs.push({ label: tShell("account") });
+  } else if (pathname === "/profile") {
+    crumbs.push({ label: tShell("myProfile") });
   }
 
   return (

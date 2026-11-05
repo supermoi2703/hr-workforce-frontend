@@ -64,7 +64,8 @@
     "account": "Tài khoản",
     "signOut": "Đăng xuất",
     "roleLabel": "Vai trò:",
-    "demoSignIn": "Đăng nhập giả lập"
+    "demoSignIn": "Đăng nhập giả lập",
+    "myProfile": "Hồ sơ của tôi"
   },
   "Roles": {
     "ADMIN": "Quản trị",
@@ -215,7 +216,8 @@
       "rolesHint": "Để trống thì gán vai trò Nhân viên.",
       "defaultRole": "Tài khoản mới có vai trò Nhân viên.",
       "submit": "Tạo tài khoản",
-      "success": "Đã tạo tài khoản. Email kích hoạt đã được gửi tới {email}."
+      "success": "Đã tạo tài khoản. Email kích hoạt đã được gửi tới {email}.",
+      "employeeHint": "Tài khoản cho nhân viên: cấp từ trang hồ sơ ở mục Nhân viên để gắn sẵn với hồ sơ."
     },
     "Edit": {
       "title": "Sửa tên",
@@ -448,6 +450,18 @@
     "policy_manage": {
       "name": "Quản lý chính sách",
       "description": "Thêm hoặc xóa giá trị chính sách theo ngày hiệu lực"
+    },
+    "employee_read": {
+      "name": "Xem hồ sơ nhân viên",
+      "description": "Xem hồ sơ nhân viên trong phạm vi dữ liệu, không gồm thông tin cá nhân và nhạy cảm"
+    },
+    "employee_manage": {
+      "name": "Quản lý hồ sơ nhân viên",
+      "description": "Tạo và sửa hồ sơ, xem thông tin cá nhân, đổi trạng thái làm việc"
+    },
+    "employee_sensitive": {
+      "name": "Quản lý thông tin nhạy cảm",
+      "description": "Xem và sửa CCCD, mã số thuế, BHXH, tài khoản ngân hàng, người phụ thuộc"
     }
   },
   "AuditActions": {
@@ -477,7 +491,12 @@
     "ROLE_UPDATED": "Sửa vai trò",
     "ROLE_DELETED": "Xóa vai trò",
     "POLICY_UPDATED": "Đặt giá trị chính sách",
-    "POLICY_VALUE_DELETED": "Xóa giá trị chính sách đã hẹn"
+    "POLICY_VALUE_DELETED": "Xóa giá trị chính sách đã hẹn",
+    "USER_LINKED_TO_EMPLOYEE": "Gắn tài khoản với hồ sơ nhân viên",
+    "EMPLOYEE_CREATED": "Tạo hồ sơ nhân viên",
+    "EMPLOYEE_UPDATED": "Sửa hồ sơ nhân viên",
+    "EMPLOYEE_STATUS_CHANGED": "Đổi trạng thái làm việc",
+    "EMPLOYEE_SENSITIVE_UPDATED": "Sửa thông tin nhạy cảm"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -532,7 +551,8 @@
       "noDetails": "Không có thông tin thêm.",
       "openAccount": "Mở tài khoản",
       "openRole": "Mở vai trò",
-      "openPolicy": "Mở chính sách"
+      "openPolicy": "Mở chính sách",
+      "openEmployee": "Mở hồ sơ"
     },
     "Meta": {
       "reason": "Lý do",
@@ -1234,7 +1254,8 @@
     },
     "reassignReason": {
       "ACCOUNT_REVOKED": "tài khoản người duyệt bị khóa hoặc vô hiệu hóa",
-      "UNIT_HEAD_CHANGED": "người duyệt không còn là trưởng đơn vị"
+      "UNIT_HEAD_CHANGED": "người duyệt không còn là trưởng đơn vị",
+      "EMPLOYEE_UNAVAILABLE": "người duyệt đang nghỉ dài hạn"
     }
   },
   "Organization": {
@@ -1829,5 +1850,209 @@
       "addedBy": "{name} thêm kỹ năng này · {date}",
       "noteLabel": "Ghi chú của {name}"
     }
+  },
+  "Employees": {
+    "metaTitle": "Nhân viên",
+    "statuses": {
+      "ONBOARDING": "Chờ vào làm",
+      "ACTIVE": "Đang làm việc",
+      "ON_LEAVE": "Nghỉ dài hạn",
+      "TERMINATED": "Đã nghỉ việc"
+    },
+    "levels": {
+      "INTERN": "Intern",
+      "FRESHER": "Fresher",
+      "JUNIOR": "Junior",
+      "MIDDLE": "Middle",
+      "SENIOR": "Senior",
+      "LEAD": "Lead",
+      "PRINCIPAL": "Principal"
+    },
+    "employmentTypes": {
+      "FULL_TIME": "Chính thức",
+      "PROBATION": "Thử việc",
+      "INTERN": "Thực tập",
+      "CONTRACTOR": "Cộng tác viên"
+    },
+    "genders": {
+      "MALE": "Nam",
+      "FEMALE": "Nữ",
+      "OTHER": "Khác"
+    },
+    "List": {
+      "title": "Nhân viên",
+      "description": "Hồ sơ nhân viên trong phạm vi dữ liệu của bạn. Nhân sự văn phòng thấy văn phòng mình, quản lý thấy đội của mình.",
+      "create": "Thêm nhân viên",
+      "empty": "Không có nhân viên nào khớp bộ lọc",
+      "emptyHint": "Hồ sơ bạn được xem sẽ hiện ở đây."
+    },
+    "Filters": {
+      "search": "Tìm theo tên hoặc mã nhân viên",
+      "office": "Văn phòng",
+      "allOffices": "Mọi văn phòng",
+      "department": "Phòng ban",
+      "allDepartments": "Mọi phòng ban",
+      "team": "Team",
+      "allTeams": "Mọi team",
+      "status": "Trạng thái",
+      "allStatuses": "Mọi trạng thái",
+      "clear": "Xóa bộ lọc"
+    },
+    "Columns": {
+      "employee": "Nhân viên",
+      "code": "Mã",
+      "unit": "Phòng ban / team",
+      "position": "Chức vụ / level",
+      "status": "Trạng thái",
+      "hireDate": "Ngày vào làm",
+      "account": "Tài khoản",
+      "hasAccount": "Đã có",
+      "noAccount": "Chưa có"
+    },
+    "Fields": {
+      "employeeCode": "Mã nhân viên",
+      "fullName": "Họ và tên",
+      "workEmail": "Email công việc",
+      "status": "Trạng thái",
+      "office": "Văn phòng",
+      "department": "Phòng ban",
+      "team": "Team",
+      "position": "Chức vụ",
+      "level": "Level",
+      "employmentType": "Loại nhân viên",
+      "manager": "Quản lý trực tiếp",
+      "hireDate": "Ngày vào làm",
+      "terminationDate": "Ngày nghỉ việc",
+      "account": "Tài khoản",
+      "phone": "Điện thoại",
+      "personalEmail": "Email cá nhân",
+      "dateOfBirth": "Ngày sinh",
+      "gender": "Giới tính",
+      "genderNone": "Không chọn",
+      "address": "Địa chỉ",
+      "nationalId": "Số CCCD",
+      "nationalIdIssuedOn": "Ngày cấp CCCD",
+      "nationalIdIssuedPlace": "Nơi cấp CCCD",
+      "taxCode": "Mã số thuế",
+      "socialInsuranceNo": "Số sổ BHXH",
+      "bankName": "Ngân hàng",
+      "bankAccountNo": "Số tài khoản",
+      "bankAccountHolder": "Chủ tài khoản",
+      "taxDependents": "Số người phụ thuộc"
+    },
+    "Form": {
+      "createTitle": "Thêm nhân viên",
+      "createDescription": "Hồ sơ mới ở trạng thái Chờ vào làm. Mã nhân viên do hệ thống cấp.",
+      "editTitle": "Sửa hồ sơ",
+      "editDescription": "Thay đổi có hiệu lực ngay. Đổi trạng thái làm việc ở menu Thao tác.",
+      "work": "Công việc",
+      "personal": "Thông tin cá nhân",
+      "workEmailHint": "Tài khoản của nhân viên đăng nhập bằng email này.",
+      "choose": "Chọn",
+      "noTeam": "Không thuộc team",
+      "inactiveOption": "{name} (ngừng dùng)",
+      "create": "Thêm nhân viên",
+      "save": "Lưu thay đổi",
+      "created": "Đã tạo hồ sơ {code}",
+      "saved": "Đã lưu hồ sơ"
+    },
+    "Detail": {
+      "metaTitle": "Hồ sơ nhân viên",
+      "back": "Nhân viên",
+      "notFound": "Không tìm thấy nhân viên",
+      "notFoundDescription": "Hồ sơ không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn.",
+      "tabs": {
+        "overview": "Tổng quan",
+        "personal": "Cá nhân",
+        "sensitive": "Nhạy cảm"
+      },
+      "viewAuditLog": "Xem nhật ký",
+      "edit": "Sửa",
+      "actions": "Thao tác",
+      "changeStatus": "Đổi trạng thái",
+      "createAccount": "Cấp tài khoản",
+      "unitHeadWarning": "{name} vẫn đang là trưởng phòng hoặc trưởng team. Hãy gán trưởng mới ở trang Tổ chức.",
+      "openOrganization": "Mở trang Tổ chức",
+      "unlockHint": "Tài khoản gắn hồ sơ này vẫn đang bị khóa hoặc vô hiệu hóa. Nhân viên vào làm lại thì tài khoản không tự mở khóa.",
+      "openAccount": "Mở tài khoản",
+      "inactive": "ngừng dùng",
+      "noTeam": "Không thuộc team",
+      "noManager": "Chưa có quản lý",
+      "noAccount": "Chưa có tài khoản",
+      "notProvided": "Chưa khai"
+    },
+    "Status": {
+      "title": "Đổi trạng thái",
+      "description": "{name} đang ở trạng thái {status}.",
+      "newStatus": "Trạng thái mới",
+      "choose": "Chọn",
+      "terminationDate": "Ngày nghỉ việc",
+      "reason": "Lý do",
+      "reasonHint": "Ghi vào nhật ký hệ thống.",
+      "terminateWarning": "Tài khoản gắn hồ sơ sẽ bị khóa và đăng xuất trên mọi thiết bị. Các bước duyệt đang chờ nhân viên này được giao cho người khác.",
+      "onLeaveWarning": "Các bước duyệt đang chờ nhân viên này được giao cho người khác.",
+      "rehireHint": "Mã nhân viên giữ nguyên. Tài khoản đang bị khóa không tự mở khóa.",
+      "submit": "Đổi trạng thái",
+      "success": "Đã chuyển sang {status}"
+    },
+    "Account": {
+      "title": "Cấp tài khoản cho nhân viên này?",
+      "description": "Tài khoản đăng nhập bằng {email} với vai trò Nhân viên. Mã kích hoạt được gửi tới email đó. Nếu đã có tài khoản cùng email chưa gắn hồ sơ thì tài khoản đó được gắn vào. Đổi vai trò ở trang tài khoản.",
+      "confirm": "Cấp tài khoản",
+      "success": "Đã cấp tài khoản cho {email}"
+    },
+    "Sensitive": {
+      "description": "Chỉ nhân sự và chính nhân viên xem được. Nhật ký hệ thống chỉ ghi trường nào đổi, không ghi giá trị.",
+      "readOnlyHint": "Liên hệ nhân sự để sửa các thông tin này.",
+      "notProvided": "Chưa khai",
+      "show": "Hiện số",
+      "hide": "Ẩn số",
+      "edit": "Sửa",
+      "editTitle": "Sửa thông tin nhạy cảm",
+      "save": "Lưu",
+      "saved": "Đã lưu thông tin nhạy cảm"
+    },
+    "Validation": {
+      "required": "Bắt buộc",
+      "tooLong": "Quá dài",
+      "emailInvalid": "Nhập email hợp lệ",
+      "phoneInvalid": "Nhập số điện thoại Việt Nam, ví dụ 0912345678 hoặc +84912345678",
+      "tooYoung": "Nhân viên phải đủ 15 tuổi",
+      "pastDate": "Phải là ngày trong quá khứ",
+      "terminationBeforeHire": "Không được trước ngày vào làm",
+      "nationalIdInvalid": "Gồm 12 chữ số",
+      "taxCodeInvalid": "Gồm 10 hoặc 13 chữ số",
+      "socialInsuranceInvalid": "Gồm 10 chữ số",
+      "bankAccountInvalid": "Gồm 6 đến 30 chữ số",
+      "dependentsInvalid": "Nhập số từ 0 đến 20"
+    },
+    "Errors": {
+      "notFound": "Hồ sơ không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn.",
+      "orgUnitInvalid": "Văn phòng, phòng ban, team hoặc chức vụ đã ngừng dùng, hoặc team không thuộc phòng đã chọn. Hãy chọn lại.",
+      "outsideOffice": "Bạn chỉ quản lý được nhân viên của văn phòng mình.",
+      "versionConflict": "Hồ sơ vừa được người khác sửa. Bản mới nhất đã được tải lại, hãy kiểm tra rồi lưu lại.",
+      "invalidTransition": "Không chuyển được sang trạng thái này từ trạng thái hiện tại. Hồ sơ đã được tải lại.",
+      "terminationDateRequired": "Nhập ngày nghỉ việc từ ngày vào làm trở đi.",
+      "sensitiveDuplicate": "Số CCCD hoặc mã số thuế này đã thuộc nhân viên khác.",
+      "alreadyHasAccount": "Nhân viên này đã có tài khoản. Hồ sơ đã được tải lại.",
+      "terminated": "Nhân viên đã nghỉ việc nên không cấp được tài khoản.",
+      "emailExists": "Email này đã thuộc tài khoản khác.",
+      "adminProtected": "Chỉ quản trị viên được thay đổi hồ sơ này."
+    }
+  },
+  "Profile": {
+    "metaTitle": "Hồ sơ của tôi",
+    "title": "Hồ sơ của tôi",
+    "description": "Hồ sơ nhân viên của bạn. Liên hệ nhân sự để sửa thông tin công việc hoặc thông tin nhạy cảm.",
+    "noProfile": "Tài khoản của bạn chưa gắn với hồ sơ nhân viên",
+    "noProfileDescription": "Hồ sơ do nhân sự quản lý. Tài khoản quản trị và tài khoản kỹ thuật không có hồ sơ.",
+    "work": "Công việc",
+    "personal": "Thông tin cá nhân",
+    "sensitive": "Thông tin nhạy cảm",
+    "editPersonal": "Sửa thông tin cá nhân",
+    "editTitle": "Sửa thông tin cá nhân",
+    "editDescription": "Nhân sự xem được các thông tin này. Ô để trống sẽ được lưu là trống.",
+    "save": "Lưu",
+    "saved": "Đã lưu thông tin cá nhân"
   }
 }
