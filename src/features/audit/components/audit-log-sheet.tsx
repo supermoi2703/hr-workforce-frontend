@@ -18,12 +18,13 @@ type AuditLogSheetProps = {
   onClose: () => void;
 };
 
-/** Link sang trang quản trị của đối tượng (tài khoản / vai trò / khóa chính sách). */
+/** Link sang trang quản trị của đối tượng (tài khoản / vai trò / khóa chính sách / hồ sơ nhân viên). */
 function targetHref(target: AuditLogEntry["target"]): string | null {
   if (!target?.id) return null;
   if (target.type === "USER") return `/admin/users/${encodeURIComponent(target.id)}`;
   if (target.type === "ROLE") return `/admin/roles/${encodeURIComponent(target.id)}`;
   if (target.type === "POLICY") return `/admin/policies/${encodeURIComponent(target.id)}`;
+  if (target.type === "EMPLOYEE") return `/employees/${encodeURIComponent(target.id)}`;
   return null;
 }
 
@@ -74,7 +75,9 @@ export function AuditLogSheet({ entry, onClose }: AuditLogSheetProps) {
                         ? t("Sheet.openRole")
                         : shown.target.type === "POLICY"
                           ? t("Sheet.openPolicy")
-                          : t("Sheet.openAccount")}
+                          : shown.target.type === "EMPLOYEE"
+                            ? t("Sheet.openEmployee")
+                            : t("Sheet.openAccount")}
                     </Link>
                   )}
                 </span>

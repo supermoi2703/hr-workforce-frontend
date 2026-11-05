@@ -14,6 +14,11 @@ export type CurrentUser = {
   roles: string[];
   /** Mã permission dạng `resource:action`, vd. `user:read`. */
   permissions: string[];
+  /**
+   * Hồ sơ nhân viên gắn với tài khoản (MeResponse.employeeId); null / thiếu = không có hồ sơ (Admin, tài khoản kỹ thuật).
+   * Vừa cấp / gắn hồ sơ thì chỉ có từ lần refresh token tiếp theo (tối đa 15 phút).
+   */
+  employeeId?: string | null;
 };
 
 /** Khớp AuthResponse của POST /api/auth/login và /api/auth/refresh. Refresh token không có ở đây (cookie HttpOnly). */

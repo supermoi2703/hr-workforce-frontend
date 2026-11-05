@@ -97,6 +97,8 @@ export function CreateUserDialog() {
         <DialogHeader>
           <DialogTitle>{t("Create.title")}</DialogTitle>
           <DialogDescription>{t("Create.description")}</DialogDescription>
+          {/* Từ 1.4 tài khoản của nhân viên cấp từ trang hồ sơ (gắn sẵn hồ sơ); ở đây chỉ còn tài khoản không có hồ sơ. */}
+          <DialogDescription>{t("Create.employeeHint")}</DialogDescription>
         </DialogHeader>
 
         {formError && !formError.field && (

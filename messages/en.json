@@ -64,7 +64,8 @@
     "account": "Account",
     "signOut": "Sign out",
     "roleLabel": "Role:",
-    "demoSignIn": "Demo sign-in"
+    "demoSignIn": "Demo sign-in",
+    "myProfile": "My profile"
   },
   "Roles": {
     "ADMIN": "Admin",
@@ -215,7 +216,8 @@
       "rolesHint": "Leave empty to give the Employee role.",
       "defaultRole": "New accounts get the Employee role.",
       "submit": "Create account",
-      "success": "Account created. An activation email was sent to {email}."
+      "success": "Account created. An activation email was sent to {email}.",
+      "employeeHint": "For employees, create the account from their profile in Employees so it is linked to the profile."
     },
     "Edit": {
       "title": "Edit name",
@@ -448,6 +450,18 @@
     "policy_manage": {
       "name": "Manage policies",
       "description": "Add or delete effective-dated policy values"
+    },
+    "employee_read": {
+      "name": "View employee profiles",
+      "description": "See employee profiles in the data scope, without personal or sensitive details"
+    },
+    "employee_manage": {
+      "name": "Manage employee profiles",
+      "description": "Create and edit profiles, see personal details and change the employment status"
+    },
+    "employee_sensitive": {
+      "name": "Manage sensitive details",
+      "description": "See and edit national ID, tax code, social insurance, bank account and tax dependents"
     }
   },
   "AuditActions": {
@@ -477,7 +491,12 @@
     "ROLE_UPDATED": "Role updated",
     "ROLE_DELETED": "Role deleted",
     "POLICY_UPDATED": "Policy value set",
-    "POLICY_VALUE_DELETED": "Scheduled policy value deleted"
+    "POLICY_VALUE_DELETED": "Scheduled policy value deleted",
+    "USER_LINKED_TO_EMPLOYEE": "Account linked to employee profile",
+    "EMPLOYEE_CREATED": "Employee profile created",
+    "EMPLOYEE_UPDATED": "Employee profile updated",
+    "EMPLOYEE_STATUS_CHANGED": "Employment status changed",
+    "EMPLOYEE_SENSITIVE_UPDATED": "Sensitive details updated"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -532,7 +551,8 @@
       "noDetails": "No extra details.",
       "openAccount": "Open account",
       "openRole": "Open role",
-      "openPolicy": "Open policy"
+      "openPolicy": "Open policy",
+      "openEmployee": "Open profile"
     },
     "Meta": {
       "reason": "Reason",
@@ -1829,5 +1849,209 @@
       "addedBy": "Added by {name} · {date}",
       "noteLabel": "Note from {name}"
     }
+  },
+  "Employees": {
+    "metaTitle": "Employees",
+    "statuses": {
+      "ONBOARDING": "Onboarding",
+      "ACTIVE": "Active",
+      "ON_LEAVE": "On leave",
+      "TERMINATED": "Left"
+    },
+    "levels": {
+      "INTERN": "Intern",
+      "FRESHER": "Fresher",
+      "JUNIOR": "Junior",
+      "MIDDLE": "Middle",
+      "SENIOR": "Senior",
+      "LEAD": "Lead",
+      "PRINCIPAL": "Principal"
+    },
+    "employmentTypes": {
+      "FULL_TIME": "Full-time",
+      "PROBATION": "Probation",
+      "INTERN": "Internship",
+      "CONTRACTOR": "Contractor"
+    },
+    "genders": {
+      "MALE": "Male",
+      "FEMALE": "Female",
+      "OTHER": "Other"
+    },
+    "List": {
+      "title": "Employees",
+      "description": "Employee profiles in your data scope. Office HR sees their own office, managers see their team.",
+      "create": "Add employee",
+      "empty": "No employees match your filters",
+      "emptyHint": "Profiles you can see will appear here."
+    },
+    "Filters": {
+      "search": "Search by name or employee code",
+      "office": "Office",
+      "allOffices": "All offices",
+      "department": "Department",
+      "allDepartments": "All departments",
+      "team": "Team",
+      "allTeams": "All teams",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "clear": "Clear filters"
+    },
+    "Columns": {
+      "employee": "Employee",
+      "code": "Code",
+      "unit": "Department / team",
+      "position": "Position / level",
+      "status": "Status",
+      "hireDate": "Hire date",
+      "account": "Account",
+      "hasAccount": "Yes",
+      "noAccount": "Not yet"
+    },
+    "Fields": {
+      "employeeCode": "Employee code",
+      "fullName": "Full name",
+      "workEmail": "Work email",
+      "status": "Status",
+      "office": "Office",
+      "department": "Department",
+      "team": "Team",
+      "position": "Position",
+      "level": "Level",
+      "employmentType": "Employment type",
+      "manager": "Manager",
+      "hireDate": "Hire date",
+      "terminationDate": "Termination date",
+      "account": "Account",
+      "phone": "Phone",
+      "personalEmail": "Personal email",
+      "dateOfBirth": "Date of birth",
+      "gender": "Gender",
+      "genderNone": "Not specified",
+      "address": "Address",
+      "nationalId": "National ID",
+      "nationalIdIssuedOn": "ID issued on",
+      "nationalIdIssuedPlace": "ID issued at",
+      "taxCode": "Tax code",
+      "socialInsuranceNo": "Social insurance no.",
+      "bankName": "Bank",
+      "bankAccountNo": "Bank account no.",
+      "bankAccountHolder": "Account holder",
+      "taxDependents": "Tax dependents"
+    },
+    "Form": {
+      "createTitle": "Add employee",
+      "createDescription": "The new profile starts as Onboarding. The employee code is assigned automatically.",
+      "editTitle": "Edit profile",
+      "editDescription": "Changes take effect immediately. Change the employment status from the Actions menu.",
+      "work": "Job",
+      "personal": "Personal details",
+      "workEmailHint": "The employee's account signs in with this email.",
+      "choose": "Select",
+      "noTeam": "No team",
+      "inactiveOption": "{name} (no longer in use)",
+      "create": "Add employee",
+      "save": "Save changes",
+      "created": "Profile {code} created",
+      "saved": "Profile saved"
+    },
+    "Detail": {
+      "metaTitle": "Employee profile",
+      "back": "Employees",
+      "notFound": "Employee not found",
+      "notFoundDescription": "The profile doesn't exist or is outside your data scope.",
+      "tabs": {
+        "overview": "Overview",
+        "personal": "Personal",
+        "sensitive": "Sensitive"
+      },
+      "viewAuditLog": "View audit log",
+      "edit": "Edit",
+      "actions": "Actions",
+      "changeStatus": "Change status",
+      "createAccount": "Create account",
+      "unitHeadWarning": "{name} is still the head of a department or team. Assign a new head on the Organization page.",
+      "openOrganization": "Open Organization",
+      "unlockHint": "The account linked to this profile is still locked or disabled. It isn't unlocked automatically when the employee returns.",
+      "openAccount": "Open account",
+      "inactive": "no longer in use",
+      "noTeam": "No team",
+      "noManager": "No manager",
+      "noAccount": "No account yet",
+      "notProvided": "Not provided"
+    },
+    "Status": {
+      "title": "Change status",
+      "description": "{name} is currently {status}.",
+      "newStatus": "New status",
+      "choose": "Select",
+      "terminationDate": "Termination date",
+      "reason": "Reason",
+      "reasonHint": "Saved in the audit log.",
+      "terminateWarning": "The linked account will be locked and signed out on every device. Pending approvals assigned to this employee go to someone else.",
+      "onLeaveWarning": "Pending approvals assigned to this employee go to someone else.",
+      "rehireHint": "The employee code stays the same. A locked account isn't unlocked automatically.",
+      "submit": "Change status",
+      "success": "Status changed to {status}"
+    },
+    "Account": {
+      "title": "Create an account for this employee?",
+      "description": "The account signs in with {email} and gets the Employee role. An activation code is sent to that email. If an account with this email already exists and isn't linked to a profile, it is linked instead. Change roles on the account page.",
+      "confirm": "Create account",
+      "success": "Account created for {email}"
+    },
+    "Sensitive": {
+      "description": "Only HR and the employee can see these details. The audit log records which fields changed, not the values.",
+      "readOnlyHint": "Contact HR to change these details.",
+      "notProvided": "Not provided",
+      "show": "Show numbers",
+      "hide": "Hide numbers",
+      "edit": "Edit",
+      "editTitle": "Edit sensitive details",
+      "save": "Save",
+      "saved": "Sensitive details saved"
+    },
+    "Validation": {
+      "required": "Required",
+      "tooLong": "Too long",
+      "emailInvalid": "Enter a valid email address",
+      "phoneInvalid": "Enter a Vietnamese phone number, for example 0912345678 or +84912345678",
+      "tooYoung": "The employee must be at least 15 years old",
+      "pastDate": "Must be a date in the past",
+      "terminationBeforeHire": "Must be on or after the hire date",
+      "nationalIdInvalid": "Must be 12 digits",
+      "taxCodeInvalid": "Must be 10 or 13 digits",
+      "socialInsuranceInvalid": "Must be 10 digits",
+      "bankAccountInvalid": "Must be 6 to 30 digits",
+      "dependentsInvalid": "Enter a number from 0 to 20"
+    },
+    "Errors": {
+      "notFound": "The profile doesn't exist or is outside your data scope.",
+      "orgUnitInvalid": "An office, department, team or position is no longer in use, or the team isn't in the selected department. Choose again.",
+      "outsideOffice": "You can only manage employees of your own office.",
+      "versionConflict": "Someone else just changed this profile. The latest version has been loaded, check it and save again.",
+      "invalidTransition": "This status change isn't allowed from the current status. The profile has been reloaded.",
+      "terminationDateRequired": "Enter a termination date on or after the hire date.",
+      "sensitiveDuplicate": "This national ID or tax code is already used by another employee.",
+      "alreadyHasAccount": "This employee already has an account. The profile has been reloaded.",
+      "terminated": "The employee has left the company, so an account can't be created.",
+      "emailExists": "This email is already used by another account.",
+      "adminProtected": "Only an administrator can change this profile."
+    }
+  },
+  "Profile": {
+    "metaTitle": "My profile",
+    "title": "My profile",
+    "description": "Your employee profile. Contact HR to change job or sensitive details.",
+    "noProfile": "Your account isn't linked to an employee profile",
+    "noProfileDescription": "Profiles are managed by HR. Administrator and service accounts don't have one.",
+    "work": "Job",
+    "personal": "Personal details",
+    "sensitive": "Sensitive details",
+    "editPersonal": "Edit personal details",
+    "editTitle": "Edit personal details",
+    "editDescription": "HR can see these details. Empty fields are saved as empty.",
+    "save": "Save",
+    "saved": "Personal details saved"
   }
 }
