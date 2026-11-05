@@ -4,9 +4,25 @@ import en from "../../../messages/en.json";
 import { ApiError } from "@/lib/api/errors";
 import { getApprovalError, isStaleApprovalError } from "./error-messages";
 import { filtersFromSearchParams, filtersToSearchParams } from "./filters";
-import { getApprovalActions, parseTitle, personLabel, sourceLink } from "./rules";
+import {
+  buildNameIndex,
+  getApprovalActions,
+  idList,
+  parseTitle,
+  personLabel,
+  reassignedAway,
+  sourceLink,
+  subjectOf,
+} from "./rules";
 import { commentSchema } from "./schemas";
-import { APPROVAL_TYPES, type ApprovalDetail, type ApproverResponse, type StepResponse } from "./types";
+import {
+  APPROVAL_TYPES,
+  REASSIGN_REASONS,
+  type ApprovalDetail,
+  type ApproverResponse,
+  type HistoryResponse,
+  type StepResponse,
+} from "./types";
 
 const ME = "me-user";
 const OTHER = "other-user";
@@ -55,6 +71,67 @@ function detail(overrides: Partial<ApprovalDetail["request"]>, steps: StepRespon
     timeline: [],
   };
 }
+
+const reassignedEntry = (stepNo: number, from: string[], to: string[]): HistoryResponse => ({
+  action: "REASSIGNED",
+  stepNo,
+  actorUserId: null,
+  comment: null,
+  metadata: { reason: "ACCOUNT_REVOKED", fromUserIds: from, toUserIds: to },
+  at: "2026-11-05T02:00:00Z",
+});
+
+describe("giao lại / người được đề xuất (1.6.1)", () => {
+  it("bị giao lại đi: không còn được duyệt (NOT_REQUIRED), người mới thì được", () => {
+    const d = detail({}, [step(1, "IN_PROGRESS", [approver(ME, "NOT_REQUIRED"), approver(OTHER)])]);
+    expect(getApprovalActions(d, ME).canDecide).toBe(false);
+    expect(getApprovalActions(d, OTHER).canDecide).toBe(true);
+  });
+
+  it("reassignedAway chỉ đánh dấu người trong fromUserIds của đúng bước", () => {
+    const d = {
+      ...detail({}, [step(1, "IN_PROGRESS", [approver(ME, "NOT_REQUIRED"), approver(OTHER)])]),
+      timeline: [reassignedEntry(1, [ME], [OTHER])],
+    };
+    expect([...reassignedAway(d)]).toEqual([`1:${ME}`]);
+    expect(reassignedAway(detail({}, []))).toEqual(new Set());
+  });
+
+  it("buildNameIndex gom tên người tạo, người duyệt (cả người cũ), người thực hiện; bỏ chỗ không có tên", () => {
+    const d: ApprovalDetail = {
+      ...detail({ requesterUserId: "req", requesterName: "Lan" }, [
+        step(1, "IN_PROGRESS", [
+          { ...approver(ME, "NOT_REQUIRED"), displayName: "Bình" },
+          { ...approver(OTHER), displayName: "Chi" },
+          approver("no-name"),
+        ]),
+      ]),
+      timeline: [{ ...reassignedEntry(1, [ME], [OTHER]), actorUserId: "actor", actorName: "Hà" }],
+    };
+    const names = buildNameIndex(d);
+    expect(Object.fromEntries(names)).toEqual({ req: "Lan", [ME]: "Bình", [OTHER]: "Chi", actor: "Hà" });
+  });
+
+  it("idList chỉ nhận mảng chuỗi", () => {
+    expect(idList(["a", 1, "b"])).toEqual(["a", "b"]);
+    expect(idList("a")).toEqual([]);
+    expect(idList(undefined)).toEqual([]);
+  });
+
+  it("subjectOf: chỉ khi đơn về người khác người tạo; backend cũ (không có trường) → null", () => {
+    const base = detail({ requesterEmployeeId: "emp-lan" }, []).request;
+    expect(subjectOf({ ...base, subjectEmployeeId: "emp-an", subjectName: "An" })).toEqual({ name: "An" });
+    expect(subjectOf({ ...base, subjectEmployeeId: "emp-an" })).toEqual({ name: null });
+    expect(subjectOf({ ...base, subjectEmployeeId: "emp-lan" })).toBeNull();
+    expect(subjectOf(base)).toBeNull();
+  });
+
+  it("mọi lý do giao lại và cách giao mới đều có bản dịch", () => {
+    for (const reason of REASSIGN_REASONS) expect(en.Approvals.reassignReason).toHaveProperty(reason);
+    expect(en.Approvals.Detail.assignment).toHaveProperty("ESCALATED_SUBJECT_IS_APPROVER");
+    expect(en.Approvals.history).toHaveProperty("REASSIGNED");
+  });
+});
 
 describe("getApprovalActions", () => {
   it("người duyệt của bước hiện tại, chưa quyết định: được duyệt, không được rút", () => {

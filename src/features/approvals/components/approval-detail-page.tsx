@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeftIcon, ArrowUpRightIcon, FileQuestionIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -12,7 +12,7 @@ import { isApiError } from "@/lib/api/errors";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { formatDateTime } from "@/lib/format";
 import { useApproval, useApprovalTypeLabel, usePersonName, useStepLabel } from "../hooks";
-import { getApprovalActions, parseTitle, sourceLink } from "../rules";
+import { buildNameIndex, getApprovalActions, idList, parseTitle, reassignedAway, sourceLink, subjectOf } from "../rules";
 import type { ApprovalDetail, HistoryResponse, StepResponse } from "../types";
 import { ApprovalActionDialog, type ApprovalAction } from "./approval-action-dialog";
 import { ApprovalStatusBadge, DecisionBadge, StepStatusBadge } from "./approval-status-badge";
@@ -72,6 +72,9 @@ function ApprovalDetailContent({ detail, myUserId }: { detail: ApprovalDetail; m
   const { request } = detail;
   const { urgent, text } = parseTitle(request.title);
   const actions = getApprovalActions(detail, myUserId);
+  const names = useMemo(() => buildNameIndex(detail), [detail]);
+  const reassigned = useMemo(() => reassignedAway(detail), [detail]);
+  const subject = subjectOf(request);
   const source = sourceLink(request.type);
 
   return (
@@ -107,6 +110,7 @@ function ApprovalDetailContent({ detail, myUserId }: { detail: ApprovalDetail; m
 
       <DetailList className="max-w-3xl">
         <DetailRow label={t("requester")}>{personName(request.requesterUserId, request.requesterName)}</DetailRow>
+        {subject && <DetailRow label={t("subject")}>{subject.name ?? t("unknownSubject")}</DetailRow>}
         <DetailRow label={t("submittedAt")}>
           <time dateTime={request.submittedAt}>{formatDateTime(request.submittedAt)}</time>
         </DetailRow>
@@ -137,7 +141,12 @@ function ApprovalDetailContent({ detail, myUserId }: { detail: ApprovalDetail; m
         </h2>
         <ol className="flex flex-col gap-3">
           {detail.steps.map((step) => (
-            <StepItem key={step.stepNo} step={step} current={request.status === "PENDING" && step.stepNo === request.currentStepNo} />
+            <StepItem
+              key={step.stepNo}
+              step={step}
+              current={request.status === "PENDING" && step.stepNo === request.currentStepNo}
+              reassigned={reassigned}
+            />
           ))}
         </ol>
       </section>
@@ -148,7 +157,7 @@ function ApprovalDetailContent({ detail, myUserId }: { detail: ApprovalDetail; m
         </h2>
         <ol className="flex flex-col divide-y rounded-xl border bg-card">
           {detail.timeline.map((entry, index) => (
-            <TimelineItem key={`${entry.at}-${index}`} entry={entry} />
+            <TimelineItem key={`${entry.at}-${index}`} entry={entry} names={names} />
           ))}
         </ol>
       </section>
@@ -158,7 +167,14 @@ function ApprovalDetailContent({ detail, myUserId }: { detail: ApprovalDetail; m
   );
 }
 
-function StepItem({ step, current }: { step: StepResponse; current: boolean }) {
+type StepItemProps = {
+  step: StepResponse;
+  current: boolean;
+  /** "bước:userId" của người đã bị giao lại cho người khác (reassignedAway). */
+  reassigned: Set<string>;
+};
+
+function StepItem({ step, current, reassigned }: StepItemProps) {
   const t = useTranslations("Approvals.Detail");
   const tModes = useTranslations("Approvals.modes");
   const stepLabel = useStepLabel();
@@ -187,7 +203,13 @@ function StepItem({ step, current }: { step: StepResponse; current: boolean }) {
             <li key={approver.userId} className="flex flex-col gap-1 px-4 py-3 text-sm">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">{personName(approver.userId, approver.displayName)}</span>
-                <DecisionBadge decision={approver.decision} />
+                {approver.decision === "NOT_REQUIRED" && reassigned.has(`${step.stepNo}:${approver.userId}`) ? (
+                  <Badge variant="secondary" title={t("reassignedHint")}>
+                    {t("reassigned")}
+                  </Badge>
+                ) : (
+                  <DecisionBadge decision={approver.decision} />
+                )}
                 {approver.assignment.startsWith("ESCALATED_") && (
                   <Badge variant="info" title={t(`assignment.${approver.assignment}` as never)}>
                     {t("escalated")}
@@ -211,13 +233,15 @@ function StepItem({ step, current }: { step: StepResponse; current: boolean }) {
   );
 }
 
-function TimelineItem({ entry }: { entry: HistoryResponse }) {
+/** `names`: user id → tên (buildNameIndex), cho các mốc chỉ có user id trong metadata (giao lại, đẩy lên). */
+function TimelineItem({ entry, names }: { entry: HistoryResponse; names: Map<string, string> }) {
   const t = useTranslations("Approvals");
   const personName = usePersonName();
   const stepLabel = useStepLabel();
   const actor = personName(entry.actorUserId, entry.actorName);
   const meta = entry.metadata ?? {};
   const step = entry.stepNo ?? 0;
+  const people = (value: unknown) => idList(value).map((id) => personName(id, names.get(id))).join(", ");
 
   let text: string;
   switch (entry.action) {
@@ -229,10 +253,27 @@ function TimelineItem({ entry }: { entry: HistoryResponse }) {
       break;
     case "ESCALATED": {
       const reason = String(meta.reason ?? "");
-      text = t("history.ESCALATED", {
+      const to = people(meta.approverUserIds);
+      const values = {
         step,
         reason: t.has(`Detail.assignment.${reason}` as never) ? t(`Detail.assignment.${reason}` as never) : reason,
+      };
+      text = to ? t("history.ESCALATED_TO", { ...values, to }) : t("history.ESCALATED", values);
+      break;
+    }
+    case "REASSIGNED": {
+      const reason = String(meta.reason ?? "");
+      text = t("history.REASSIGNED", {
+        step,
+        from: people(meta.fromUserIds) || t("people.unknown"),
+        to: people(meta.toUserIds) || t("people.unknown"),
+        reason: t.has(`reassignReason.${reason}` as never) ? t(`reassignReason.${reason}` as never) : reason,
       });
+      break;
+    }
+    case "APPROVED": {
+      const seats = Number(meta.seats ?? 1);
+      text = seats > 1 ? t("history.APPROVED_SEATS", { actor, step, seats }) : t("history.APPROVED", { actor, step });
       break;
     }
     case "COMPLETED": {

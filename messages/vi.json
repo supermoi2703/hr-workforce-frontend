@@ -1086,7 +1086,8 @@
         "allTitle": "Chưa có đơn nào",
         "all": "Chưa ai trong phạm vi dữ liệu của bạn gửi đơn.",
         "filtered": "Không có đơn nào khớp bộ lọc."
-      }
+      },
+      "subject": "Cho {name}"
     },
     "Tabs": {
       "inbox": "Chờ tôi duyệt",
@@ -1094,7 +1095,7 @@
       "all": "Tất cả",
       "inboxDescription": "Các đơn mà bạn là người duyệt của bước hiện tại.",
       "mineDescription": "Các đơn bạn đã gửi, mới nhất trước.",
-      "allDescription": "Mọi đơn trong phạm vi dữ liệu của bạn. Nhân sự văn phòng chỉ thấy đơn của văn phòng mình."
+      "allDescription": "Mọi đơn trong phạm vi dữ liệu của bạn. Nhân sự văn phòng thấy đơn do người văn phòng mình gửi hoặc đơn về người văn phòng mình."
     },
     "Filters": {
       "type": "Loại đơn",
@@ -1131,8 +1132,13 @@
         "RULE": "Tìm theo quy tắc của bước",
         "ESCALATED_REQUESTER_IS_APPROVER": "Người gửi không được tự duyệt đơn của mình, nên đơn chuyển lên cấp trên",
         "ESCALATED_NO_APPROVER": "Không tìm được người duyệt theo quy tắc, nên đơn chuyển lên cấp trên",
-        "REQUESTER_PRE_APPROVED": "Việc tạo đơn được tính là người này đã đồng ý"
-      }
+        "REQUESTER_PRE_APPROVED": "Việc tạo đơn được tính là người này đã đồng ý",
+        "ESCALATED_SUBJECT_IS_APPROVER": "Người được đề xuất không được tự duyệt đơn về mình, nên đơn chuyển lên cấp trên"
+      },
+      "subject": "Đề xuất cho",
+      "unknownSubject": "Nhân viên khác",
+      "reassigned": "Đã giao lại",
+      "reassignedHint": "Bước này đã được giao cho người khác, xem dòng thời gian"
     },
     "Action": {
       "optional": "Không bắt buộc.",
@@ -1205,7 +1211,10 @@
       "REJECTED": "{actor} đã từ chối đơn ở bước {step}",
       "STEP_COMPLETED": "Hoàn thành bước {step}",
       "WITHDRAWN": "{actor} đã rút đơn",
-      "COMPLETED": "Đơn kết thúc: {status}"
+      "COMPLETED": "Đơn kết thúc: {status}",
+      "ESCALATED_TO": "Bước {step} được đẩy lên {to}: {reason}",
+      "REASSIGNED": "Bước {step} được giao lại từ {from} cho {to}: {reason}",
+      "APPROVED_SEATS": "{actor} đã duyệt bước {step} (cho {seats} vị trí)"
     },
     "people": {
       "me": "Bạn",
@@ -1222,6 +1231,10 @@
     "Validation": {
       "reasonRequired": "Nhập lý do từ chối",
       "commentTooLong": "Tối đa 1000 ký tự"
+    },
+    "reassignReason": {
+      "ACCOUNT_REVOKED": "tài khoản người duyệt bị khóa hoặc vô hiệu hóa",
+      "UNIT_HEAD_CHANGED": "người duyệt không còn là trưởng đơn vị"
     }
   },
   "Organization": {

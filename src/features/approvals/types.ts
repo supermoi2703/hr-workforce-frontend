@@ -34,6 +34,7 @@ export type ApprovalMode = "ALL" | "ANY";
 export type ApproverAssignment =
   | "RULE"
   | "ESCALATED_REQUESTER_IS_APPROVER"
+  | "ESCALATED_SUBJECT_IS_APPROVER"
   | "ESCALATED_NO_APPROVER"
   | "REQUESTER_PRE_APPROVED";
 
@@ -45,9 +46,14 @@ export const HISTORY_ACTIONS = [
   "REJECTED",
   "STEP_COMPLETED",
   "WITHDRAWN",
+  "REASSIGNED",
   "COMPLETED",
 ] as const;
 export type HistoryAction = (typeof HISTORY_ACTIONS)[number];
+
+/** Vì sao bước đang chờ được giao lại (metadata.reason của mốc REASSIGNED). */
+export const REASSIGN_REASONS = ["ACCOUNT_REVOKED", "UNIT_HEAD_CHANGED"] as const;
+export type ReassignReason = (typeof REASSIGN_REASONS)[number];
 
 /**
  * Một dòng ở danh sách (ApprovalSummary). `title`, `summary`, `currentStepName` là chữ module gốc chụp lại lúc gửi
@@ -65,6 +71,15 @@ export type ApprovalSummary = {
   requesterUserId: string;
   requesterName?: string | null;
   requesterEmployeeId: string | null;
+  /**
+   * Người được đề xuất (vd nhân viên được điều chuyển / phân bổ); bằng requesterEmployeeId với đơn của chính người tạo.
+   * Không bắt buộc: backend trước 1.6.1 chưa trả.
+   */
+  subjectEmployeeId?: string | null;
+  /** Họ tên người được đề xuất, chỉ có khi đơn về người khác người tạo. */
+  subjectName?: string | null;
+  /** Văn phòng của người được đề xuất lúc gửi. */
+  officeId?: string | null;
   submittedAt: string;
   completedAt: string | null;
 };
@@ -90,7 +105,10 @@ export type StepResponse = {
   approvers: ApproverResponse[];
 };
 
-/** `actorUserId` null = hệ thống (vd đẩy lên cấp trên). */
+/**
+ * `actorUserId` null = hệ thống (vd đẩy lên cấp trên, giao lại). metadata theo action: ESCALATED {reason, approverUserIds},
+ * REASSIGNED {reason, fromUserIds, toUserIds}, APPROVED {seats} khi một người giữ nhiều ghế, COMPLETED {status}.
+ */
 export type HistoryResponse = {
   action: HistoryAction;
   stepNo: number | null;

@@ -1086,7 +1086,8 @@
         "allTitle": "No requests",
         "all": "No one in your data scope has sent a request yet.",
         "filtered": "No request matches these filters."
-      }
+      },
+      "subject": "For {name}"
     },
     "Tabs": {
       "inbox": "Waiting for me",
@@ -1094,7 +1095,7 @@
       "all": "All requests",
       "inboxDescription": "Requests where you are an approver of the current step.",
       "mineDescription": "Requests you have sent, newest first.",
-      "allDescription": "Every request in your data scope. Office HR sees requests from their own office."
+      "allDescription": "Every request in your data scope. Office HR sees requests sent by or about people in their own office."
     },
     "Filters": {
       "type": "Request type",
@@ -1131,8 +1132,13 @@
         "RULE": "Found by the step rule",
         "ESCALATED_REQUESTER_IS_APPROVER": "The requester can't approve their own request, so it went to their manager",
         "ESCALATED_NO_APPROVER": "No one matched the step rule, so it went up the chain",
-        "REQUESTER_PRE_APPROVED": "Creating the request counts as this person's approval"
-      }
+        "REQUESTER_PRE_APPROVED": "Creating the request counts as this person's approval",
+        "ESCALATED_SUBJECT_IS_APPROVER": "The person the request is about can't approve it, so it went to their manager"
+      },
+      "subject": "Requested for",
+      "unknownSubject": "Another employee",
+      "reassigned": "Reassigned",
+      "reassignedHint": "This step was handed to someone else, see the timeline"
     },
     "Action": {
       "optional": "Optional.",
@@ -1205,7 +1211,10 @@
       "REJECTED": "{actor} rejected the request at step {step}",
       "STEP_COMPLETED": "Step {step} completed",
       "WITHDRAWN": "{actor} withdrew the request",
-      "COMPLETED": "Request closed: {status}"
+      "COMPLETED": "Request closed: {status}",
+      "ESCALATED_TO": "Step {step} was escalated to {to}: {reason}",
+      "REASSIGNED": "Step {step} was reassigned from {from} to {to}: {reason}",
+      "APPROVED_SEATS": "{actor} approved step {step} (for {seats} roles)"
     },
     "people": {
       "me": "You",
@@ -1222,6 +1231,10 @@
     "Validation": {
       "reasonRequired": "Enter a reason for rejecting",
       "commentTooLong": "Must be at most 1000 characters"
+    },
+    "reassignReason": {
+      "ACCOUNT_REVOKED": "the approver's account was locked or disabled",
+      "UNIT_HEAD_CHANGED": "the approver is no longer the head of the unit"
     }
   },
   "Organization": {
