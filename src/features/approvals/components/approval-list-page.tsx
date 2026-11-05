@@ -11,7 +11,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/states";
 import { formatDateTime } from "@/lib/format";
 import { useApprovalFilters, useApprovalList, useApprovalTypeLabel, useInboxCount, usePersonName } from "../hooks";
-import { parseTitle } from "../rules";
+import { parseTitle, subjectOf } from "../rules";
 import {
   APPROVAL_STATUSES,
   APPROVAL_TYPES,
@@ -55,6 +55,7 @@ export function ApprovalListPage() {
         cell: (c) => {
           const row = c.row.original;
           const { urgent, text } = parseTitle(row.title);
+          const subject = subjectOf(row);
           return (
             <span className="flex min-w-0 flex-col gap-1">
               <span className="flex flex-wrap items-center gap-1.5">
@@ -68,6 +69,11 @@ export function ApprovalListPage() {
               >
                 {text}
               </Link>
+              {subject && (
+                <span className="max-w-96 truncate text-xs text-muted-foreground">
+                  {t("List.subject", { name: subject.name ?? t("Detail.unknownSubject") })}
+                </span>
+              )}
             </span>
           );
         },
