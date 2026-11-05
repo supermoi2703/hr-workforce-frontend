@@ -1254,7 +1254,8 @@
     },
     "reassignReason": {
       "ACCOUNT_REVOKED": "tài khoản người duyệt bị khóa hoặc vô hiệu hóa",
-      "UNIT_HEAD_CHANGED": "người duyệt không còn là trưởng đơn vị"
+      "UNIT_HEAD_CHANGED": "người duyệt không còn là trưởng đơn vị",
+      "EMPLOYEE_UNAVAILABLE": "người duyệt đang nghỉ dài hạn"
     }
   },
   "Organization": {

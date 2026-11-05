@@ -1254,7 +1254,8 @@
     },
     "reassignReason": {
       "ACCOUNT_REVOKED": "the approver's account was locked or disabled",
-      "UNIT_HEAD_CHANGED": "the approver is no longer the head of the unit"
+      "UNIT_HEAD_CHANGED": "the approver is no longer the head of the unit",
+      "EMPLOYEE_UNAVAILABLE": "the approver is on long leave"
     }
   },
   "Organization": {
