@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { monthGrid, requestsOn, statusTone } from "../calendar";
-import type { LeaveRequest, TimesheetDay } from "../types";
+import { monthGrid, remoteRequestsOn, requestsOn, statusTone } from "../calendar";
+import type { LeaveRequest, RemoteWorkRequest, TimesheetDay } from "../types";
 import { CELL_TONE } from "./status-badge";
 
 const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
@@ -15,6 +15,8 @@ type MonthCalendarProps = {
   days: TimesheetDay[];
   /** Đơn nghỉ của tôi: hiện dấu "chờ duyệt" trên ngày (bảng công chỉ biết đơn đã duyệt). */
   requests: LeaveRequest[];
+  /** Đơn WFH của tôi: hiện dấu "chờ duyệt", như đơn nghỉ. */
+  remote: RemoteWorkRequest[];
   selected: string | null;
   onSelect: (day: string) => void;
 };
@@ -23,7 +25,7 @@ type MonthCalendarProps = {
  * Lịch tháng của một người: mỗi ô là một ngày, màu theo trạng thái công, có giờ vào / ra, buổi nghỉ và đơn đang chờ.
  * Bấm vào ô để xem chi tiết và xin nghỉ.
  */
-export function MonthCalendar({ month, today, days, requests, selected, onSelect }: MonthCalendarProps) {
+export function MonthCalendar({ month, today, days, requests, remote, selected, onSelect }: MonthCalendarProps) {
   const t = useTranslations("Timesheet");
   const byDate = new Map(days.map((day) => [day.workDate, day]));
 
@@ -41,6 +43,7 @@ export function MonthCalendar({ month, today, days, requests, selected, onSelect
           if (!date) return <div key={`empty-${index}`} className="min-h-24 border-b border-r bg-muted/20 last:border-r-0" />;
           const day = byDate.get(date);
           const pending = requestsOn(requests, date).filter((r) => r.status === "PENDING");
+          const pendingRemote = remoteRequestsOn(remote, date).filter((r) => r.status === "PENDING");
           const isToday = date === today;
           return (
             <button
@@ -59,6 +62,7 @@ export function MonthCalendar({ month, today, days, requests, selected, onSelect
               </span>
               {day && <CellBody day={day} today={today} />}
               {pending.length > 0 && <span className="font-medium text-warning">{t("calendar.pendingLeave")}</span>}
+              {pendingRemote.length > 0 && <span className="font-medium text-warning">{t("calendar.pendingRemote")}</span>}
             </button>
           );
         })}
@@ -76,6 +80,8 @@ function CellBody({ day, today }: { day: TimesheetDay; today: string }) {
     <>
       {label && <span className="font-medium">{label}</span>}
       {day.leavePart && day.leavePart !== "FULL_DAY" && <span className="text-info">{t(`leavePart.${day.leavePart}`)}</span>}
+      {day.remotePart && <span className="text-info">{t(`remotePart.${day.remotePart}`)}</span>}
+      {day.outsideOffice && <span className="text-warning">{t("outsideOffice")}</span>}
       {day.firstIn && (
         <span className="tabular-nums text-muted-foreground">
           {formatTime(day.firstIn)} – {day.lastOut ? formatTime(day.lastOut) : "…"}

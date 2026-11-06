@@ -11,7 +11,8 @@ import { CELL_TONE } from "./status-badge";
 
 /**
  * Lịch đội trong tháng (quản lý): mỗi hàng một người, mỗi cột một ngày. Ô tô màu theo trạng thái để thấy nhanh ai
- * nghỉ, ai muộn, ai vắng trước khi duyệt đơn. Chỉ có đơn đã duyệt; đơn đang chờ xem ở trang Nghỉ phép.
+ * nghỉ, ai WFH, ai muộn, ai vắng trước khi duyệt đơn. Chỉ có đơn đã duyệt; đơn đang chờ xem ở trang Nghỉ phép. Ô viền
+ * vàng là ngày có cờ chấm ngoài văn phòng, cột cuối đếm số ngày đó để HR rà soát.
  */
 export function TeamCalendar({ month, today }: { month: string; today: string }) {
   const t = useTranslations("Timesheet");
@@ -37,6 +38,7 @@ export function TeamCalendar({ month, today }: { month: string; today: string })
               </th>
             ))}
             <th className="px-3 py-2 text-right font-medium">{t("team.paidUnits")}</th>
+            <th className="px-3 py-2 text-right font-medium">{t("team.outsideOffice")}</th>
           </tr>
         </thead>
         <tbody>
@@ -54,6 +56,9 @@ export function TeamCalendar({ month, today }: { month: string; today: string })
                   </td>
                 ))}
                 <td className="px-3 text-right tabular-nums">{sheet.summary.paidUnits}</td>
+                <td className={cn("px-3 text-right tabular-nums", sheet.summary.outsideOfficeCount > 0 && "font-medium text-warning")}>
+                  {sheet.summary.outsideOfficeCount || "—"}
+                </td>
               </tr>
             );
           })}
@@ -63,7 +68,7 @@ export function TeamCalendar({ month, today }: { month: string; today: string })
   );
 }
 
-// Chữ viết tắt trong ô: P = nghỉ có đơn, M = muộn / sớm, V = vắng, L = lễ, ✓ = đủ công.
+// Chữ viết tắt trong ô: P = nghỉ có đơn, R = làm từ xa, M = muộn / sớm, V = vắng, L = lễ, ✓ = đủ công.
 const SHORT: Partial<Record<TimesheetDay["status"], string>> = {
   WORK: "✓",
   LATE: "M",
@@ -73,6 +78,7 @@ const SHORT: Partial<Record<TimesheetDay["status"], string>> = {
   ABSENT: "V",
   LEAVE_PAID: "P",
   LEAVE_UNPAID: "P",
+  REMOTE: "R",
   HOLIDAY: "L",
   IN_PROGRESS: "•",
 };
@@ -90,14 +96,15 @@ function TeamCell({ day, today }: { day: TimesheetDay | undefined; today: string
   const t = useTranslations("Timesheet");
   if (!day || day.dayType === "WEEKLY_OFF") return <div className="h-7 rounded bg-muted/30" />;
   const future = day.workDate > today;
-  // Ngày tương lai chỉ hiện nghỉ đã duyệt (và nửa ngày), không hiện trạng thái "chưa tới".
-  const status = future && !day.leavePart ? null : day.status;
-  const label = day.leavePart && day.leavePart !== "FULL_DAY" ? "½" : status ? (SHORT[status] ?? "") : "";
-  const tone: Tone = day.leavePart ? "info" : status ? statusTone(status) : "muted";
+  // Ngày tương lai chỉ hiện nghỉ / WFH đã duyệt (và nửa ngày), không hiện trạng thái "chưa tới".
+  const status = future && !day.leavePart && !day.remotePart ? null : day.status;
+  const label = day.leavePart && day.leavePart !== "FULL_DAY" ? "½" : day.remotePart && (future || day.status === "UPCOMING") ? "R" : status ? (SHORT[status] ?? "") : "";
+  const tone: Tone = day.leavePart || (day.remotePart && future) ? "info" : status ? statusTone(status) : "muted";
   const title = [formatDate(day.workDate), status ? t(`status.${status}`) : t(`dayType.${day.dayType}`),
-    day.leavePart ? t(`leavePart.${day.leavePart}`) : null].filter(Boolean).join(" · ");
+    day.leavePart ? t(`leavePart.${day.leavePart}`) : null, day.remotePart ? t(`remotePart.${day.remotePart}`) : null,
+    day.outsideOffice ? t("outsideOffice") : null].filter(Boolean).join(" · ");
   return (
-    <div title={title} className={cn("flex h-7 items-center justify-center rounded font-medium", CELL_TONE[tone], TEXT_TONE[tone])}>
+    <div title={title} className={cn("flex h-7 items-center justify-center rounded font-medium", CELL_TONE[tone], TEXT_TONE[tone], day.outsideOffice && "ring-1 ring-warning ring-inset")}>
       {label}
     </div>
   );

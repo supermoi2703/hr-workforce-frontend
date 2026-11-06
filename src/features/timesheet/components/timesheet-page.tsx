@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon, TreePalmIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, HousePlusIcon, TreePalmIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/shared/page-header";
 import { ErrorState, LoadingState } from "@/components/shared/states";
@@ -10,11 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { todayIsoDate } from "@/lib/format";
 import { freeParts, monthRange, shiftMonth } from "../calendar";
-import { useMyLeave, useMyTimesheet } from "../hooks";
+import { useMyLeave, useMyRemoteWork, useMyTimesheet } from "../hooks";
 import { DayDetail } from "./day-detail";
 import { LeaveRequestDialog } from "./leave-request-dialog";
 import { MonthCalendar } from "./month-calendar";
 import { MySchedulePanel } from "./my-schedule-panel";
+import { RemoteWorkDialog } from "./remote-work-dialog";
 import { TeamCalendar } from "./team-calendar";
 import { TimesheetTable } from "./timesheet-table";
 
@@ -22,7 +23,7 @@ type Tab = "calendar" | "list" | "team" | "schedule";
 
 /**
  * Bảng công của tôi: lịch tháng (bấm ngày để xem chi tiết và xin nghỉ), bảng công dạng danh sách có tổng cuối bảng,
- * giờ làm của tôi (đăng ký giờ riêng). Quản lý có thêm lịch đội.
+ * giờ làm của tôi (đăng ký giờ riêng). Quản lý và HR văn phòng có thêm lịch đội, gồm cờ chấm ngoài văn phòng.
  */
 export function TimesheetPage() {
   const t = useTranslations("Timesheet");
@@ -32,11 +33,14 @@ export function TimesheetPage() {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [selected, setSelected] = useState<string>(today);
   const [requesting, setRequesting] = useState<string | null>(null);
+  const [requestingRemote, setRequestingRemote] = useState<string | null>(null);
   const { from, to } = monthRange(month);
   const sheet = useMyTimesheet(from, to);
   const leave = useMyLeave();
   const requests = leave.data ?? [];
-  const isManager = hasRole("MANAGER");
+  const remote = useMyRemoteWork().data ?? [];
+  // HR toàn công ty chưa xem được: API cần chọn văn phòng mà tab này chưa có ô chọn.
+  const canSeeTeam = hasRole("MANAGER") || (hasRole("HR") && !hasRole("HR_COMPANY"));
 
   function changeMonth(delta: number) {
     const next = shiftMonth(month, delta);
@@ -72,9 +76,14 @@ export function TimesheetPage() {
         title={t("title")}
         description={t("description")}
         actions={
-          <Button onClick={() => setRequesting(selected >= today ? selected : today)}>
-            <TreePalmIcon /> {t("requestLeave")}
-          </Button>
+          <>
+            <Button variant="outline" onClick={() => setRequestingRemote(selected >= today ? selected : today)}>
+              <HousePlusIcon /> {t("requestRemote")}
+            </Button>
+            <Button onClick={() => setRequesting(selected >= today ? selected : today)}>
+              <TreePalmIcon /> {t("requestLeave")}
+            </Button>
+          </>
         }
       />
 
@@ -83,7 +92,7 @@ export function TimesheetPage() {
           <TabsList>
             <TabsTrigger value="calendar">{t("tabs.calendar")}</TabsTrigger>
             <TabsTrigger value="list">{t("tabs.list")}</TabsTrigger>
-            {isManager && <TabsTrigger value="team">{t("tabs.team")}</TabsTrigger>}
+            {canSeeTeam && <TabsTrigger value="team">{t("tabs.team")}</TabsTrigger>}
             <TabsTrigger value="schedule">{t("tabs.schedule")}</TabsTrigger>
           </TabsList>
           {tab !== "schedule" && monthNav}
@@ -96,13 +105,15 @@ export function TimesheetPage() {
             <ErrorState error={sheet.error} onRetry={() => sheet.refetch()} />
           ) : (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
-              <MonthCalendar month={month} today={today} days={sheet.data.days} requests={requests} selected={selected} onSelect={setSelected} />
+              <MonthCalendar month={month} today={today} days={sheet.data.days} requests={requests} remote={remote} selected={selected} onSelect={setSelected} />
               <DayDetail
                 date={selected}
                 today={today}
                 day={sheet.data.days.find((day) => day.workDate === selected)}
                 requests={requests}
+                remote={remote}
                 onRequestLeave={() => setRequesting(selected)}
+                onRequestRemote={() => setRequestingRemote(selected)}
               />
             </div>
           )}
@@ -118,7 +129,7 @@ export function TimesheetPage() {
           )}
         </TabsContent>
 
-        {isManager && (
+        {canSeeTeam && (
           <TabsContent value="team" className="mt-4">
             {tab === "team" && <TeamCalendar month={month} today={today} />}
           </TabsContent>
@@ -132,8 +143,15 @@ export function TimesheetPage() {
       {requesting && (
         <LeaveRequestDialog
           initialDate={requesting}
-          allowedParts={freeParts(requests, requesting)}
+          allowedParts={freeParts(requests, requesting, remote)}
           onClose={() => setRequesting(null)}
+        />
+      )}
+      {requestingRemote && (
+        <RemoteWorkDialog
+          initialDate={requestingRemote}
+          allowedParts={freeParts(requests, requestingRemote, remote)}
+          onClose={() => setRequestingRemote(null)}
         />
       )}
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate, formatNumber, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,8 @@ export function TimesheetTable({ sheet, today, onSelect }: { sheet: EmployeeTime
                     {day.leavePart && day.leavePart !== "FULL_DAY" && (
                       <span className="text-xs text-info">{t(`leavePart.${day.leavePart}`)}</span>
                     )}
+                    {day.remotePart && <span className="text-xs text-info">{t(`remotePart.${day.remotePart}`)}</span>}
+                    {day.outsideOffice && <Badge variant="warning">{t("outsideOffice")}</Badge>}
                   </span>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">{working || day.dayType === "HOLIDAY" ? formatNumber(day.paidUnits) : "—"}</TableCell>
@@ -69,8 +72,10 @@ export function TimesheetTable({ sheet, today, onSelect }: { sheet: EmployeeTime
                 <span>{t("summary.late", { count: s.lateCount, minutes: s.lateMinutes })}</span>
                 <span>{t("summary.early", { count: s.earlyCount, minutes: s.earlyMinutes })}</span>
                 <span>{t("summary.leave", { value: formatNumber(s.leaveDays) })}</span>
+                <span>{t("summary.remote", { value: formatNumber(s.remoteDays) })}</span>
                 <span>{t("summary.absent", { count: s.absentCount })}</span>
                 <span>{t("summary.missingOut", { count: s.missingOutCount })}</span>
+                {s.outsideOfficeCount > 0 && <span className="text-warning">{t("summary.outsideOffice", { count: s.outsideOfficeCount })}</span>}
               </div>
             </TableCell>
           </TableRow>
