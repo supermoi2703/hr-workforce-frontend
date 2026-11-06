@@ -36,6 +36,8 @@ export function parseTitle(title: string): { urgent: boolean; text: string } {
 const SOURCE_PAGES: Partial<Record<ApprovalType, string>> = {
   LEAVE: "/leave",
   LEAVE_CANCEL: "/leave",
+  WFH: "/leave",
+  WFH_CANCEL: "/leave",
   SHIFT_CHANGE: "/timesheets",
 };
 
