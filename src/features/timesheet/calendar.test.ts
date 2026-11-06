@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { addDays, endOfDay, freeParts, monthGrid, monthRange, shiftMonth, weekdayIndex } from "./calendar";
-import type { LeaveRequest } from "./types";
+import {
+  addDays,
+  canRequestLeave,
+  canRequestRemote,
+  endOfDay,
+  freeParts,
+  isPersonalReason,
+  monthGrid,
+  monthRange,
+  remoteRequestsOn,
+  REMOTE_REASONS,
+  shiftMonth,
+  statusTone,
+  weekdayIndex,
+} from "./calendar";
+import type { LeaveRequest, RemoteWorkRequest, TimesheetDay } from "./types";
 
 function request(part: LeaveRequest["part"], status: LeaveRequest["status"] = "PENDING"): LeaveRequest {
   return {
@@ -22,6 +36,58 @@ function request(part: LeaveRequest["part"], status: LeaveRequest["status"] = "P
     decidedAt: null,
   };
 }
+
+function remote(part: RemoteWorkRequest["part"], status: RemoteWorkRequest["status"] = "APPROVED"): RemoteWorkRequest {
+  return {
+    id: part,
+    employeeId: "e",
+    employeeCode: null,
+    employeeName: null,
+    workDate: "2026-11-05",
+    part,
+    reason: "HEALTH",
+    personal: true,
+    detail: "x",
+    days: part === "FULL_DAY" ? 1 : 0.5,
+    shortNotice: false,
+    status,
+    cancelStatus: null,
+    cancelReason: null,
+    createdAt: "2026-11-01T00:00:00Z",
+    decidedAt: null,
+  };
+}
+
+const workingDay = { workDate: "2026-11-05", dayType: "WORKING_DAY" } as TimesheetDay;
+
+describe("làm từ xa trên lịch", () => {
+  it("chỉ tính đơn WFH đang chờ hoặc đã duyệt của đúng ngày", () => {
+    expect(remoteRequestsOn([remote("MORNING", "PENDING")], "2026-11-05")).toHaveLength(1);
+    expect(remoteRequestsOn([remote("MORNING", "CANCELLED")], "2026-11-05")).toHaveLength(0);
+    expect(remoteRequestsOn([remote("MORNING")], "2026-11-06")).toHaveLength(0);
+  });
+
+  it("buổi đã có đơn WFH không còn trống để xin nghỉ hay xin WFH", () => {
+    expect(freeParts([], "2026-11-05", [remote("MORNING")])).toEqual(["AFTERNOON"]);
+    expect(freeParts([request("AFTERNOON")], "2026-11-05", [remote("MORNING")])).toEqual([]);
+    expect(canRequestLeave(workingDay, [], [remote("FULL_DAY")])).toBe(false);
+  });
+
+  it("chỉ xin WFH cho ngày làm việc từ hôm nay trở đi", () => {
+    expect(canRequestRemote(workingDay, "2026-11-05", [], [])).toBe(true);
+    expect(canRequestRemote(workingDay, "2026-11-06", [], [])).toBe(false);
+    expect(canRequestRemote({ ...workingDay, dayType: "HOLIDAY" }, "2026-11-05", [], [])).toBe(false);
+    expect(canRequestRemote(undefined, "2026-11-05", [], [])).toBe(false);
+  });
+
+  it("ba lý do chủ động, ba lý do khách quan", () => {
+    expect(REMOTE_REASONS.filter(isPersonalReason)).toEqual(["HEALTH", "FAMILY", "PERSONAL_TRAVEL"]);
+  });
+
+  it("REMOTE cùng màu với ngày nghỉ có đơn", () => {
+    expect(statusTone("REMOTE")).toBe("info");
+  });
+});
 
 describe("calendar", () => {
   it("lưới tháng 11/2026 bắt đầu từ thứ Hai, ngày 1 là Chủ nhật", () => {

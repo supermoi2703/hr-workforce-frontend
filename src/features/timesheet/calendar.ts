@@ -1,4 +1,4 @@
-import type { LeavePart, LeaveRequest, TimesheetDay, TimesheetStatus } from "./types";
+import type { LeavePart, LeaveRequest, RemoteWorkReason, RemoteWorkRequest, TimesheetDay, TimesheetStatus } from "./types";
 
 // Ngày dạng "yyyy-MM-dd" (LocalDate của backend). Tính bằng UTC để không lệch múi giờ của máy người dùng.
 
@@ -65,6 +65,7 @@ export function statusTone(status: TimesheetStatus): Tone {
     case "LEAVE_PAID":
     case "LEAVE_UNPAID":
     case "HOLIDAY":
+    case "REMOTE":
       return "info";
     case "IN_PROGRESS":
       return "outline";
@@ -80,9 +81,21 @@ export function requestsOn(requests: LeaveRequest[], day: string): LeaveRequest[
   );
 }
 
-/** Các buổi còn trống để xin nghỉ trong ngày (bỏ buổi đã có đơn). */
-export function freeParts(requests: LeaveRequest[], day: string): LeavePart[] {
-  const taken = requestsOn(requests, day);
+/** Đơn WFH còn giữ ngày (đang chờ hoặc đã duyệt, chưa hủy) của ngày day. */
+export function remoteRequestsOn(requests: RemoteWorkRequest[], day: string): RemoteWorkRequest[] {
+  return requests.filter((r) => (r.status === "PENDING" || r.status === "APPROVED") && r.workDate === day);
+}
+
+export const REMOTE_REASONS: RemoteWorkReason[] = ["HEALTH", "FAMILY", "PERSONAL_TRAVEL", "DISASTER", "OFFICE_INCIDENT", "WORK_REQUIRED"];
+
+/** Lý do chủ động có giới hạn số ngày; lý do khách quan thì không (remote-work.md mục 3, 4). */
+export function isPersonalReason(reason: RemoteWorkReason): boolean {
+  return reason === "HEALTH" || reason === "FAMILY" || reason === "PERSONAL_TRAVEL";
+}
+
+/** Các buổi còn trống trong ngày (bỏ buổi đã có đơn nghỉ hoặc đơn WFH). */
+export function freeParts(requests: LeaveRequest[], day: string, remote: RemoteWorkRequest[] = []): LeavePart[] {
+  const taken = [...requestsOn(requests, day), ...remoteRequestsOn(remote, day)];
   const morningTaken = taken.some((r) => r.part !== "AFTERNOON");
   const afternoonTaken = taken.some((r) => r.part !== "MORNING");
   const parts: LeavePart[] = [];
@@ -93,6 +106,11 @@ export function freeParts(requests: LeaveRequest[], day: string): LeavePart[] {
 }
 
 /** Có nút xin nghỉ cho ngày này không: ngày làm việc còn buổi trống. Ngày đã qua chỉ nghỉ ốm gửi được (backend kiểm tra). */
-export function canRequestLeave(day: TimesheetDay | undefined, requests: LeaveRequest[]): boolean {
-  return !!day && day.dayType === "WORKING_DAY" && freeParts(requests, day.workDate).length > 0;
+export function canRequestLeave(day: TimesheetDay | undefined, requests: LeaveRequest[], remote: RemoteWorkRequest[] = []): boolean {
+  return !!day && day.dayType === "WORKING_DAY" && freeParts(requests, day.workDate, remote).length > 0;
+}
+
+/** Có nút xin làm từ xa không: ngày làm việc từ hôm nay trở đi còn buổi trống. */
+export function canRequestRemote(day: TimesheetDay | undefined, today: string, requests: LeaveRequest[], remote: RemoteWorkRequest[]): boolean {
+  return !!day && day.workDate >= today && canRequestLeave(day, requests, remote);
 }
