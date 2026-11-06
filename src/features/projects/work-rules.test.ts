@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatMinutes, groupMyWork, loadTone, parseHours, percent, sundayOf, toColumns, workGroup } from "./rules";
-import { BOARD_STATUSES, type MyWork, type TaskCard } from "./types";
+import { formatMinutes, groupMyWork, loadTone, parseHours, percent, sundayOf, toColumns, workGroup } from "./work-rules";
+import { BOARD_STATUSES, type MyWork, type TaskCard } from "./work-types";
 
 describe("formatMinutes", () => {
   it("hiện giờ và phút", () => {

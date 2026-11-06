@@ -9,10 +9,12 @@ import { ErrorState, LoadingState } from "@/components/shared/states";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { transitionTask } from "../api";
-import { useBoard, useMembers, useProjectErrorMessage, useProjectMutation, useSprints } from "../hooks";
-import { formatMinutes, toColumns } from "../rules";
-import { BOARD_STATUSES, type Project, type TaskCard, type TaskStatus } from "../types";
+import { transitionTask } from "../work-api";
+import { useProjectMembers } from "../hooks";
+import { useBoard, useWorkErrorMessage, useWorkMutation, useSprints } from "../work-hooks";
+import { formatMinutes, toColumns } from "../work-rules";
+import type { Project } from "../types";
+import { BOARD_STATUSES, type TaskCard, type TaskStatus } from "../work-types";
 import { PriorityIcon, TypeIcon } from "./badges";
 import { SimpleSelect } from "./simple-select";
 
@@ -20,19 +22,19 @@ const ALL_SPRINTS = "ALL";
 
 /** S5: bảng 4 cột. Kéo bằng HTML5, không cần thư viện; tự tải lại 3 giây nên trình duyệt khác thấy thay đổi. */
 export function BoardTab({ project, onOpenTask }: { project: Project; onOpenTask: (key: string) => void }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const queryClient = useQueryClient();
   const [assigneeId, setAssigneeId] = useState<string | undefined>();
   const [sprintChoice, setSprintChoice] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<TaskStatus | null>(null);
-  const members = useMembers(project.id);
+  const members = useProjectMembers(project.id);
   const sprints = useSprints(project.id, project.sprintEnabled);
   const active = sprints.data?.find((sprint) => sprint.status === "ACTIVE");
   const sprint = sprintChoice ?? active?.id ?? ALL_SPRINTS;
   const filter = { assigneeId, sprintId: sprint === ALL_SPRINTS ? undefined : sprint };
   const board = useBoard(project.id, filter);
-  const move = useProjectMutation(({ card, to }: { card: TaskCard; to: TaskStatus }) => transitionTask(card.id, to, card.version));
+  const move = useWorkMutation(({ card, to }: { card: TaskCard; to: TaskStatus }) => transitionTask(card.id, to, card.version));
 
   function drop(event: DragEvent, to: TaskStatus) {
     event.preventDefault();
@@ -40,7 +42,7 @@ export function BoardTab({ project, onOpenTask }: { project: Project; onOpenTask
     const card = board.data?.find((item) => item.id === event.dataTransfer.getData("text/plain"));
     if (!card || card.status === to) return;
     // Đổi ngay trên màn hình cho mượt; lỗi thì tải lại dữ liệu thật.
-    queryClient.setQueriesData<TaskCard[]>({ queryKey: ["projects", "board", project.id] }, (cards) =>
+    queryClient.setQueriesData<TaskCard[]>({ queryKey: ["projects", "work", "board", project.id] }, (cards) =>
       cards?.map((item) => (item.id === card.id ? { ...item, status: to } : item)),
     );
     move.mutate({ card, to }, { onError: (error) => toast.error(errorMessage(error)) });
@@ -49,20 +51,20 @@ export function BoardTab({ project, onOpenTask }: { project: Project; onOpenTask
   if (board.isPending) return <LoadingState />;
   if (board.isError) return <ErrorState error={board.error} onRetry={() => board.refetch()} />;
 
-  const people = (members.data?.members ?? []).filter((member) => member.role !== "VIEWER");
+  const people = (members.data ?? []).filter((member) => member.role !== "OBSERVER");
   return (
     <div className="grid gap-3">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1">
           {people.map((member) => (
             <button
-              key={member.person.id}
+              key={member.employee.id}
               type="button"
-              title={member.person.fullName}
-              className={cn("rounded-full ring-offset-2", assigneeId === member.person.id && "ring-primary ring-2")}
-              onClick={() => setAssigneeId(assigneeId === member.person.id ? undefined : member.person.id)}
+              title={member.employee.fullName}
+              className={cn("rounded-full ring-offset-2", assigneeId === member.employee.id && "ring-primary ring-2")}
+              onClick={() => setAssigneeId(assigneeId === member.employee.id ? undefined : member.employee.id)}
             >
-              <UserAvatar name={member.person.fullName} seed={member.person.id} size="sm" />
+              <UserAvatar name={member.employee.fullName} seed={member.employee.id} size="sm" />
             </button>
           ))}
         </div>

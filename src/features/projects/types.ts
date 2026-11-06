@@ -23,6 +23,8 @@ export type ProjectListItem = {
   startDate: string;
   endDate: string | null;
   status: ProjectStatus;
+  /** Bật Backlog và Sprint; tắt là làm liên tục kiểu Kanban. */
+  sprintEnabled: boolean;
   /** Số người chưa rời dự án. */
   memberCount: number;
   /** Vai trò của người đang đăng nhập; null nếu không tham gia. */
@@ -37,6 +39,11 @@ export type ProjectPermissions = {
   close: boolean;
   viewTaskContent: boolean;
   viewAllocation: boolean;
+  manageMembers: boolean;
+  createTask: boolean;
+  editAnyTask: boolean;
+  manageSprint: boolean;
+  logWork: boolean;
 };
 
 export type Project = ProjectListItem & {
@@ -80,6 +87,7 @@ export type CreateProjectInput = {
   pmAllocationPercent: number;
   startDate: string;
   endDate: string | null;
+  sprintEnabled: boolean;
 };
 
 export type UpdateProjectInput = {

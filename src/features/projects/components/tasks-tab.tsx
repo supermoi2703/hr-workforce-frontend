@@ -8,35 +8,37 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/format";
-import { transitionTask } from "../api";
-import { useMembers, useProjectErrorMessage, useProjectMutation, useTasks } from "../hooks";
-import { formatMinutes } from "../rules";
-import { TASK_STATUSES, type Project, type TaskCard, type TaskStatus } from "../types";
+import { transitionTask } from "../work-api";
+import { useProjectMembers } from "../hooks";
+import { useWorkErrorMessage, useWorkMutation, useTasks } from "../work-hooks";
+import { formatMinutes } from "../work-rules";
+import type { Project } from "../types";
+import { TASK_STATUSES, type TaskCard, type TaskStatus } from "../work-types";
 import { PersonChip, PriorityIcon, TypeIcon } from "./badges";
 import { SimpleSelect } from "./simple-select";
 
-const PAGE = { pageIndex: 0, pageSize: 100 };
+const PAGE = { page: 0, size: 100 };
 const ALL = "ALL";
 
 /** S4: danh sách việc, lọc và đổi trạng thái ngay trên dòng. */
 export function TasksTab({ project, onOpenTask }: { project: Project; onOpenTask: (key: string) => void }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const [status, setStatus] = useState(ALL);
   const [assignee, setAssignee] = useState(ALL);
   const [q, setQ] = useState("");
-  const members = useMembers(project.id);
+  const members = useProjectMembers(project.id);
   const tasks = useTasks(project.id, PAGE, {
     status: status === ALL ? undefined : (status as TaskStatus),
     assigneeId: assignee === ALL ? undefined : assignee,
     q: q.trim() || undefined,
   });
-  const transition = useProjectMutation(({ task, to }: { task: TaskCard; to: TaskStatus }) => transitionTask(task.id, to, task.version));
+  const transition = useWorkMutation(({ task, to }: { task: TaskCard; to: TaskStatus }) => transitionTask(task.id, to, task.version));
 
   const statusOptions = [{ value: ALL, label: t("allStatuses") }, ...TASK_STATUSES.map((value) => ({ value, label: t(`status.${value}`) }))];
   const assigneeOptions = [
     { value: ALL, label: t("allPeople") },
-    ...(members.data?.members ?? []).map((member) => ({ value: member.person.id, label: member.person.fullName })),
+    ...(members.data ?? []).map((member) => ({ value: member.employee.id, label: member.employee.fullName })),
   ];
 
   return (

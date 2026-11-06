@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useMetrics, useOverview, useRisks } from "../hooks";
-import { formatMinutes, percent } from "../rules";
-import { BOARD_STATUSES, type Project, type Risk, type TaskEvent } from "../types";
+import { useMetrics, useOverview, useRisks } from "../work-hooks";
+import { formatMinutes, percent } from "../work-rules";
+import type { Project } from "../types";
+import { BOARD_STATUSES, type Risk, type TaskEvent } from "../work-types";
 import { PersonChip } from "./badges";
 import { ReassignDialog } from "./reassign-dialog";
 
@@ -19,10 +20,10 @@ const STATUS_BAR = { TODO: "bg-muted-foreground/40", IN_PROGRESS: "bg-info", IN_
 
 /** S3: 4 thẻ, cảnh báo từ dữ liệu nhân sự, tải theo người, metric, hoạt động. */
 export function OverviewTab({ project, onOpenTask }: { project: Project; onOpenTask: (key: string) => void }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const overview = useOverview(project.id);
-  const risks = useRisks(project.id, project.can.viewTasks);
-  const metrics = useMetrics(project.id, project.can.viewTasks);
+  const risks = useRisks(project.id, project.can.viewTaskContent);
+  const metrics = useMetrics(project.id, project.can.viewTaskContent);
   const [reassigning, setReassigning] = useState<Risk | null>(null);
 
   if (overview.isPending) return <LoadingState />;
@@ -55,7 +56,7 @@ export function OverviewTab({ project, onOpenTask }: { project: Project; onOpenT
         ))}
       </div>
 
-      {project.can.viewTasks && (
+      {project.can.viewTaskContent && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -155,7 +156,7 @@ export function OverviewTab({ project, onOpenTask }: { project: Project; onOpenT
         </Card>
       </div>
 
-      {project.can.viewTasks && metrics.data && (
+      {project.can.viewTaskContent && metrics.data && (
         <Card>
           <CardHeader>
             <CardTitle>{t("metricsTitle")}</CardTitle>
@@ -209,7 +210,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 /** Một dòng lịch sử, dùng chung cho tổng quan và panel việc. */
 export function EventLine({ event, showKey, onOpenTask }: { event: TaskEvent; showKey?: boolean; onOpenTask?: (key: string) => void }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const status = (value: string | null) => (value && value in STATUS_LABEL_KEYS ? t(`status.${value as keyof typeof STATUS_LABEL_KEYS}`) : value ?? "—");
   const useStatus = event.kind === "STATUS_CHANGED";
   return (

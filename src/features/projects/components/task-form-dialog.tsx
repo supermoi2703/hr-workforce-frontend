@@ -9,20 +9,22 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { createTask, updateTask } from "../api";
-import { useMembers, useProjectErrorMessage, useProjectMutation, useSkillOptions } from "../hooks";
-import { formatMinutes, parseHours } from "../rules";
-import { TASK_PRIORITIES, TASK_TYPES, type Project, type Task, type TaskPriority, type TaskType } from "../types";
+import { createTask, updateTask } from "../work-api";
+import { useProjectMembers } from "../hooks";
+import { useWorkErrorMessage, useWorkMutation, useSkillOptions } from "../work-hooks";
+import { formatMinutes, parseHours } from "../work-rules";
+import type { Project } from "../types";
+import { TASK_PRIORITIES, TASK_TYPES, type Task, type TaskPriority, type TaskType } from "../work-types";
 import { SimpleSelect } from "./simple-select";
 
 const NOBODY = "NOBODY";
 
 /** Tạo hoặc sửa việc. Kỹ năng cần có là đầu vào của gợi ý giao lại. */
 export function TaskFormDialog({ project, task, onClose }: { project: Project; task?: Task; onClose: () => void }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const tCommon = useTranslations("Common");
-  const errorMessage = useProjectErrorMessage();
-  const members = useMembers(project.id);
+  const errorMessage = useWorkErrorMessage();
+  const members = useProjectMembers(project.id);
   const skills = useSkillOptions();
   const [title, setTitle] = useState(task?.card.title ?? "");
   const [description, setDescription] = useState(task?.description ?? "");
@@ -35,7 +37,7 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   const estimateMinutes = parseHours(estimate);
   const validEstimate = !estimate.trim() || estimateMinutes != null;
 
-  const mutation = useProjectMutation(() => {
+  const mutation = useWorkMutation(() => {
     const body = {
       type,
       title: title.trim(),
@@ -43,7 +45,6 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
       priority,
       assigneeId: assignee === NOBODY ? null : assignee,
       parentId: task?.parent?.taskId ?? null,
-      workTeamId: task?.workTeamId ?? null,
       dueDate: dueDate || null,
       estimateMinutes,
       skillIds,
@@ -51,7 +52,7 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
     return task ? updateTask(task.card.id, { ...body, version: task.card.version }) : createTask(project.id, body);
   });
 
-  const people = (members.data?.members ?? []).filter((member) => member.role !== "VIEWER");
+  const people = (members.data ?? []).filter((member) => member.role !== "OBSERVER");
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-lg">
@@ -91,7 +92,7 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
                 className="w-full"
                 value={assignee}
                 onChange={setAssignee}
-                options={[{ value: NOBODY, label: t("unassigned") }, ...people.map((member) => ({ value: member.person.id, label: member.person.fullName }))]}
+                options={[{ value: NOBODY, label: t("unassigned") }, ...people.map((member) => ({ value: member.employee.id, label: member.employee.fullName }))]}
               />
             </Field>
             <Field>

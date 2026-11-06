@@ -12,10 +12,11 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate, formatDateTime, todayIsoDate } from "@/lib/format";
-import { addComment, addLink, addWorklog, deleteTask, deleteWorklog, removeLink, transitionTask } from "../api";
-import { useComments, useEvents, useProjectErrorMessage, useProjectMutation, useTask, useWorklogs } from "../hooks";
-import { formatMinutes, parseHours, percent } from "../rules";
-import { BOARD_STATUSES, TASK_STATUSES, type LinkedTask, type Project, type Task, type TaskStatus } from "../types";
+import { addComment, addLink, addWorklog, deleteTask, deleteWorklog, removeLink, transitionTask } from "../work-api";
+import { useComments, useEvents, useWorkErrorMessage, useWorkMutation, useTask, useWorklogs } from "../work-hooks";
+import { formatMinutes, parseHours, percent } from "../work-rules";
+import type { Project } from "../types";
+import { BOARD_STATUSES, TASK_STATUSES, type LinkedTask, type Task, type TaskStatus } from "../work-types";
 import { PersonChip, PriorityIcon, TaskStatusBadge, TypeIcon } from "./badges";
 import { EventLine } from "./overview-tab";
 import { ReassignDialog } from "./reassign-dialog";
@@ -51,14 +52,14 @@ export function TaskSheet({
 }
 
 function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; project: Project; onClose: () => void; onOpenTask: (key: string) => void }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const { card, can } = task;
   const [editing, setEditing] = useState(false);
   const [reassigning, setReassigning] = useState(false);
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
-  const transition = useProjectMutation((to: TaskStatus) => transitionTask(card.id, to, card.version));
-  const remove = useProjectMutation(() => deleteTask(card.id));
+  const transition = useWorkMutation((to: TaskStatus) => transitionTask(card.id, to, card.version));
+  const remove = useWorkMutation(() => deleteTask(card.id));
   const statuses = can.cancel ? TASK_STATUSES : BOARD_STATUSES;
   const spent = card.loggedMinutes + (card.remainingMinutes ?? 0);
 
@@ -149,13 +150,13 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
 }
 
 function Links({ task, onOpenTask }: { task: Task; onOpenTask: (key: string) => void }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const [target, setTarget] = useState("");
   const [direction, setDirection] = useState<"BLOCKS" | "BLOCKED_BY">("BLOCKED_BY");
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
-  const add = useProjectMutation(() => addLink(task.card.id, target, direction));
-  const remove = useProjectMutation((linkId: string) => removeLink(task.card.id, linkId));
+  const add = useWorkMutation(() => addLink(task.card.id, target, direction));
+  const remove = useWorkMutation((linkId: string) => removeLink(task.card.id, linkId));
 
   const line = (item: LinkedTask) => (
     <li key={item.linkId ?? item.taskId} className="flex items-center gap-2 text-sm">
@@ -214,16 +215,16 @@ function Links({ task, onOpenTask }: { task: Task; onOpenTask: (key: string) => 
 }
 
 function WorklogSection({ task }: { task: Task }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const worklogs = useWorklogs(task.card.id);
   const [day, setDay] = useState(todayIsoDate());
   const [hours, setHours] = useState("");
   const [note, setNote] = useState("");
   const minutes = parseHours(hours);
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
-  const add = useProjectMutation(() => addWorklog(task.card.id, { workDate: day, minutes: minutes!, note: note.trim() || null }));
-  const remove = useProjectMutation(deleteWorklog);
+  const add = useWorkMutation(() => addWorklog(task.card.id, { workDate: day, minutes: minutes!, note: note.trim() || null }));
+  const remove = useWorkMutation(deleteWorklog);
 
   return (
     <section className="grid gap-2">
@@ -272,11 +273,11 @@ function WorklogSection({ task }: { task: Task }) {
 }
 
 function CommentSection({ task }: { task: Task }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const comments = useComments(task.card.id);
   const [body, setBody] = useState("");
-  const add = useProjectMutation(() => addComment(task.card.id, body));
+  const add = useWorkMutation(() => addComment(task.card.id, body));
 
   return (
     <section className="grid gap-2">
@@ -311,7 +312,7 @@ function CommentSection({ task }: { task: Task }) {
 }
 
 function History({ task }: { task: Task }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const events = useEvents(task.card.id);
   return (
     <section className="grid gap-2">

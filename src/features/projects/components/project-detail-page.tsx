@@ -21,6 +21,8 @@ import type { Project } from "../types";
 import { ProjectRoleBadge, ProjectStatusBadge } from "./project-badges";
 import { ChangeManagerDialog, EditProjectDialog, ProjectSettingsDialog } from "./project-edit-dialogs";
 import { ProjectMembers } from "./project-members";
+import { ProjectStaffing } from "./project-staffing";
+import { ProjectWorkspace } from "./project-workspace";
 
 const LIST_PATH = "/projects";
 
@@ -113,48 +115,57 @@ function ProjectDetail({ project }: { project: Project }) {
         )}
       </div>
 
-      <DetailList>
-        <DetailRow label={t("type")}>
-          <span className="flex flex-wrap items-center gap-2">
-            {tType(project.type)}
-            {project.billable && <Badge variant="secondary">{tColumns("billable")}</Badge>}
-          </span>
-        </DetailRow>
-        <DetailRow label={t("department")}>{project.ownerDepartment?.name ?? "—"}</DetailRow>
-        <DetailRow label={t("office")}>{project.office?.name ?? "—"}</DetailRow>
-        <DetailRow label={t("pm")}>
-          {project.pm ? (
-            <span className="flex items-center gap-2">
-              <UserAvatar name={project.pm.fullName} seed={project.pm.id} size="sm" />
-              {project.pm.fullName}
-            </span>
-          ) : (
-            "—"
-          )}
-        </DetailRow>
-        <DetailRow label={t("period")}>
-          {formatDate(project.startDate)} – {project.endDate ? formatDate(project.endDate) : tColumns("noEndDate")}
-        </DetailRow>
-        {project.closedOn && <DetailRow label={t("closedOn")}>{formatDate(project.closedOn)}</DetailRow>}
-        <DetailRow label={t("description")}>
-          {can.viewTaskContent ? (
-            project.description ? (
-              <span className="whitespace-pre-wrap">{project.description}</span>
-            ) : (
-              <span className="text-muted-foreground">{t("noDescription")}</span>
-            )
-          ) : (
-            <span className="text-muted-foreground">{t("descriptionHidden")}</span>
-          )}
-        </DetailRow>
-      </DetailList>
-
-      <ProjectMembers
+      <ProjectWorkspace
         project={project}
-        members={members.data}
-        isPending={members.isPending}
-        error={members.error}
-        onRetry={() => members.refetch()}
+        info={
+            <DetailList>
+              <DetailRow label={t("type")}>
+                <span className="flex flex-wrap items-center gap-2">
+                  {tType(project.type)}
+                  {project.billable && <Badge variant="secondary">{tColumns("billable")}</Badge>}
+                </span>
+              </DetailRow>
+              <DetailRow label={t("department")}>{project.ownerDepartment?.name ?? "—"}</DetailRow>
+              <DetailRow label={t("office")}>{project.office?.name ?? "—"}</DetailRow>
+              <DetailRow label={t("pm")}>
+                {project.pm ? (
+                  <span className="flex items-center gap-2">
+                    <UserAvatar name={project.pm.fullName} seed={project.pm.id} size="sm" />
+                    {project.pm.fullName}
+                  </span>
+                ) : (
+                  "—"
+                )}
+              </DetailRow>
+              <DetailRow label={t("period")}>
+                {formatDate(project.startDate)} – {project.endDate ? formatDate(project.endDate) : tColumns("noEndDate")}
+              </DetailRow>
+              {project.closedOn && <DetailRow label={t("closedOn")}>{formatDate(project.closedOn)}</DetailRow>}
+              <DetailRow label={t("description")}>
+                {can.viewTaskContent ? (
+                  project.description ? (
+                    <span className="whitespace-pre-wrap">{project.description}</span>
+                  ) : (
+                    <span className="text-muted-foreground">{t("noDescription")}</span>
+                  )
+                ) : (
+                  <span className="text-muted-foreground">{t("descriptionHidden")}</span>
+                )}
+              </DetailRow>
+            </DetailList>
+        }
+        members={
+          <div className="grid gap-4">
+            {can.manageMembers && <ProjectStaffing project={project} members={members.data ?? []} />}
+            <ProjectMembers
+              project={project}
+              members={members.data}
+              isPending={members.isPending}
+              error={members.error}
+              onRetry={() => members.refetch()}
+            />
+          </div>
+        }
       />
 
       <EditProjectDialog project={project} open={dialog === "edit"} onOpenChange={openDialog("edit")} />

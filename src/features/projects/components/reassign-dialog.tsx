@@ -6,18 +6,18 @@ import { ErrorState, LoadingState } from "@/components/shared/states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { assignTask, getTask } from "../api";
-import { useProjectErrorMessage, useProjectMutation, useSuggestions } from "../hooks";
-import { formatMinutes } from "../rules";
-import type { Suggestion } from "../types";
+import { assignTask, getTask } from "../work-api";
+import { useWorkErrorMessage, useWorkMutation, useSuggestions } from "../work-hooks";
+import { formatMinutes } from "../work-rules";
+import type { Suggestion } from "../work-types";
 import { PersonChip } from "./badges";
 
 /** Gợi ý người thay thế bằng luật. Hệ thống không tự giao: PM luôn là người quyết định. */
 export function ReassignDialog({ taskId, taskKey, onClose }: { taskId: string; taskKey: string; onClose: () => void }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const suggestions = useSuggestions(taskId);
-  const assign = useProjectMutation(async (person: Suggestion) => {
+  const assign = useWorkMutation(async (person: Suggestion) => {
     const task = await getTask(taskKey);
     return assignTask(taskId, person.person.id, task.card.version);
   });

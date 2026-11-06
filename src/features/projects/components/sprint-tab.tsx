@@ -13,10 +13,11 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { formatDate, todayIsoDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { closeSprint, createSprint, moveTaskToSprint, startSprint } from "../api";
-import { useBoard, useProjectErrorMessage, useProjectMutation, useSprintCapacity, useSprints } from "../hooks";
-import { formatMinutes, percent } from "../rules";
-import type { Project, Sprint, TaskCard } from "../types";
+import { closeSprint, createSprint, moveTaskToSprint, startSprint } from "../work-api";
+import { useBoard, useWorkErrorMessage, useWorkMutation, useSprintCapacity, useSprints } from "../work-hooks";
+import { formatMinutes, percent } from "../work-rules";
+import type { Project } from "../types";
+import type { Sprint, TaskCard } from "../work-types";
 import { PersonChip, PriorityIcon, TypeIcon } from "./badges";
 import { SimpleSelect } from "./simple-select";
 
@@ -24,15 +25,15 @@ const BACKLOG = "BACKLOG";
 
 /** S6: sprint và backlog. Điểm khác Jira là thanh năng lực lấy từ lịch và đơn nghỉ đã duyệt. */
 export function SprintTab({ project, onOpenTask }: { project: Project; onOpenTask: (key: string) => void }) {
-  const t = useTranslations("Projects");
-  const errorMessage = useProjectErrorMessage();
+  const t = useTranslations("ProjectWork");
+  const errorMessage = useWorkErrorMessage();
   const sprints = useSprints(project.id, true);
   const board = useBoard(project.id, {});
   const [creating, setCreating] = useState(false);
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
-  const start = useProjectMutation(startSprint);
-  const close = useProjectMutation(closeSprint);
-  const move = useProjectMutation(({ task, sprintId }: { task: TaskCard; sprintId: string | null }) => moveTaskToSprint(task.id, sprintId, task.version));
+  const start = useWorkMutation(startSprint);
+  const close = useWorkMutation(closeSprint);
+  const move = useWorkMutation(({ task, sprintId }: { task: TaskCard; sprintId: string | null }) => moveTaskToSprint(task.id, sprintId, task.version));
 
   if (sprints.isPending || board.isPending) return <LoadingState />;
   if (sprints.isError) return <ErrorState error={sprints.error} onRetry={() => sprints.refetch()} />;
@@ -113,7 +114,7 @@ export function SprintTab({ project, onOpenTask }: { project: Project; onOpenTas
 }
 
 function SprintCapacityBars({ sprint }: { sprint: Sprint }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const capacity = useSprintCapacity(sprint.id);
   return (
     <div className="grid content-start gap-2">
@@ -137,13 +138,13 @@ function SprintCapacityBars({ sprint }: { sprint: Sprint }) {
 }
 
 function SprintDialog({ project, onClose }: { project: Project; onClose: () => void }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const tCommon = useTranslations("Common");
-  const errorMessage = useProjectErrorMessage();
+  const errorMessage = useWorkErrorMessage();
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState(todayIsoDate());
   const [endDate, setEndDate] = useState("");
-  const mutation = useProjectMutation(() => createSprint(project.id, { name: name.trim(), goal: null, startDate, endDate }));
+  const mutation = useWorkMutation(() => createSprint(project.id, { name: name.trim(), goal: null, startDate, endDate }));
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { cn } from "@/lib/utils";
-import type { Person, TaskPriority, TaskStatus, TaskType } from "../types";
+import type { Person, TaskPriority, TaskStatus, TaskType } from "../work-types";
 
 const STATUS_VARIANT: Record<TaskStatus, "secondary" | "info" | "warning" | "success" | "outline"> = {
   TODO: "secondary",
@@ -16,7 +16,7 @@ const STATUS_VARIANT: Record<TaskStatus, "secondary" | "info" | "warning" | "suc
 };
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {
-  const t = useTranslations("Projects.status");
+  const t = useTranslations("ProjectWork.status");
   return <Badge variant={STATUS_VARIANT[status]}>{t(status)}</Badge>;
 }
 
@@ -29,7 +29,7 @@ const PRIORITY_TONE: Record<TaskPriority, string> = {
 };
 
 export function PriorityIcon({ priority }: { priority: TaskPriority }) {
-  const t = useTranslations("Projects.priority");
+  const t = useTranslations("ProjectWork.priority");
   const Icon = PRIORITY_ICON[priority];
   return (
     <span title={t(priority)} className={cn("inline-flex", PRIORITY_TONE[priority])}>
@@ -42,7 +42,7 @@ const TYPE_ICON = { TASK: SquareCheckIcon, STORY: BookmarkIcon, BUG: BugIcon };
 const TYPE_TONE: Record<TaskType, string> = { TASK: "text-info", STORY: "text-success", BUG: "text-destructive" };
 
 export function TypeIcon({ type }: { type: TaskType }) {
-  const t = useTranslations("Projects.type");
+  const t = useTranslations("ProjectWork.type");
   const Icon = TYPE_ICON[type];
   return (
     <span title={t(type)} className={cn("inline-flex", TYPE_TONE[type])}>

@@ -8,15 +8,15 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, todayIsoDate } from "@/lib/format";
-import { useMyWork } from "../hooks";
-import { formatMinutes, groupMyWork, type WorkGroup } from "../rules";
+import { useMyWork } from "../work-hooks";
+import { formatMinutes, groupMyWork, type WorkGroup } from "../work-rules";
 import { PriorityIcon, TaskStatusBadge, TypeIcon } from "./badges";
 
 const GROUPS: WorkGroup[] = ["overdue", "thisWeek", "later", "noDue"];
 
 /** S11: việc được giao trên mọi dự án, kèm năng lực và tải tuần này. */
 export function MyWorkPage() {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const work = useMyWork();
 
   return (

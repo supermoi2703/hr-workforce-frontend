@@ -5,9 +5,10 @@ import { ErrorState, LoadingState } from "@/components/shared/states";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useCapacity } from "../hooks";
-import { formatMinutes, loadTone, type LoadTone } from "../rules";
+import { useCapacity } from "../work-hooks";
+import { formatMinutes, loadTone, type LoadTone } from "../work-rules";
 import type { Project } from "../types";
+import type {  } from "../work-types";
 import { PersonChip } from "./badges";
 
 const TONE: Record<LoadTone, string> = {
@@ -20,7 +21,7 @@ const TONE: Record<LoadTone, string> = {
 
 /** S7: người × tuần. Năng lực = lịch văn phòng − nghỉ đã duyệt; tải = giờ còn lại của việc có hạn trong tuần, trên mọi dự án. */
 export function CapacityTab({ project }: { project: Project }) {
-  const t = useTranslations("Projects");
+  const t = useTranslations("ProjectWork");
   const capacity = useCapacity(project.id);
   if (capacity.isPending) return <LoadingState />;
   if (capacity.isError) return <ErrorState error={capacity.error} onRetry={() => capacity.refetch()} />;

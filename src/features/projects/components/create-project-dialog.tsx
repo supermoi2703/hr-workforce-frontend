@@ -60,6 +60,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
           description: z.string().max(DESCRIPTION_MAX_LENGTH, t("descriptionTooLong")),
           type: z.enum(PROJECT_TYPES, { error: t("typeRequired") }),
           billable: z.boolean(),
+          sprintEnabled: z.boolean(),
           ownerDepartmentId: z.string().min(1, t("departmentRequired")),
           officeId: z.string().min(1, t("officeRequired")),
           pm: z.custom<ProjectPerson>((value) => !!value, t("pmRequired")),
@@ -83,6 +84,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
       description: "",
       type: "" as ProjectType,
       billable: false,
+      sprintEnabled: false,
       // Trưởng phòng chỉ có một phòng thì chọn sẵn
       ownerDepartmentId: departmentChoices.length === 1 ? departmentChoices[0].id : "",
       officeId: "",
@@ -106,6 +108,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
       pmAllocationPercent: Number(values.pmAllocationPercent),
       startDate: values.startDate,
       endDate: values.endDate || null,
+      sprintEnabled: values.sprintEnabled,
     }),
   );
 
@@ -176,6 +179,16 @@ function CreateForm({ onDone }: { onDone: () => void }) {
                     invalid={!!errors.type}
                   />
                   <FieldError errors={[errors.type]} />
+                </Field>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="sprintEnabled"
+              render={({ field }) => (
+                <Field orientation="horizontal">
+                  <Checkbox id="project-sprint" checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />
+                  <FieldLabel htmlFor="project-sprint">{t("sprintEnabled")}</FieldLabel>
                 </Field>
               )}
             />

@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { MyWorkPage } from "@/features/projects/components/my-work-page";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Projects");
+  const t = await getTranslations("ProjectWork");
   return { title: t("myWorkTitle") };
 }
 
