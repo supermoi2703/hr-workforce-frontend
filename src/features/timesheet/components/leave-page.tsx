@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TreePalmIcon } from "lucide-react";
+import { HousePlusIcon, TreePalmIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -21,17 +21,19 @@ import { useCancelLeave, useDecide, useMyBalance, useMyLeave, useTimeInbox, useT
 import type { TimeApproval } from "../hooks";
 import type { LeaveRequest } from "../types";
 import { LeaveRequestDialog } from "./leave-request-dialog";
+import { RemoteWorkDialog } from "./remote-work-dialog";
+import { RemoteWorkPanel } from "./remote-work-panel";
 import { LeaveStatusBadge } from "./status-badge";
 
 /**
  * Nghỉ phép: số dư phép năm (còn dùng được, đã nghỉ, đang giữ cho đơn chờ duyệt, đã cộng), đơn của tôi (rút đơn đang
- * chờ, xin hủy đơn đã duyệt), và hộp "Cần tôi duyệt" cho người duyệt (đơn nghỉ, hủy đơn, đăng ký giờ làm).
+ * chờ, xin hủy đơn đã duyệt), làm từ xa, và hộp "Cần tôi duyệt" cho người duyệt (đơn nghỉ, WFH, hủy đơn, đăng ký giờ làm).
  */
 export function LeavePage() {
   const t = useTranslations("Leave");
   const inbox = useTimeInbox();
-  const [tab, setTab] = useState<"mine" | "inbox">("mine");
-  const [requesting, setRequesting] = useState(false);
+  const [tab, setTab] = useState<"mine" | "remote" | "inbox">("mine");
+  const [requesting, setRequesting] = useState<"leave" | "remote" | null>(null);
   const inboxCount = inbox.data?.length ?? 0;
 
   return (
@@ -40,17 +42,23 @@ export function LeavePage() {
         title={t("title")}
         description={t("description")}
         actions={
-          <Button onClick={() => setRequesting(true)}>
-            <TreePalmIcon /> {t("newRequest")}
-          </Button>
+          <>
+            <Button variant="outline" onClick={() => setRequesting("remote")}>
+              <HousePlusIcon /> {t("newRemote")}
+            </Button>
+            <Button onClick={() => setRequesting("leave")}>
+              <TreePalmIcon /> {t("newRequest")}
+            </Button>
+          </>
         }
       />
 
       <BalanceCards />
 
-      <Tabs value={tab} onValueChange={(value) => setTab(value as "mine" | "inbox")}>
+      <Tabs value={tab} onValueChange={(value) => setTab(value as "mine" | "remote" | "inbox")}>
         <TabsList>
           <TabsTrigger value="mine">{t("tabs.mine")}</TabsTrigger>
+          <TabsTrigger value="remote">{t("tabs.remote")}</TabsTrigger>
           <TabsTrigger value="inbox">
             {t("tabs.inbox")}
             {inboxCount > 0 && <Badge variant="warning" className="ml-1">{inboxCount}</Badge>}
@@ -59,12 +67,16 @@ export function LeavePage() {
         <TabsContent value="mine" className="mt-4">
           <MyRequests />
         </TabsContent>
+        <TabsContent value="remote" className="mt-4">
+          <RemoteWorkPanel />
+        </TabsContent>
         <TabsContent value="inbox" className="mt-4">
           <Inbox query={inbox} />
         </TabsContent>
       </Tabs>
 
-      {requesting && <LeaveRequestDialog initialDate={todayIsoDate()} onClose={() => setRequesting(false)} />}
+      {requesting === "leave" && <LeaveRequestDialog initialDate={todayIsoDate()} onClose={() => setRequesting(null)} />}
+      {requesting === "remote" && <RemoteWorkDialog initialDate={todayIsoDate()} onClose={() => setRequesting(null)} />}
     </>
   );
 }
