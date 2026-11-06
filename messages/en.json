@@ -844,7 +844,8 @@
       "HOLIDAY": "Holiday",
       "OFF": "Day off",
       "LEAVE_PAID": "Paid leave",
-      "LEAVE_UNPAID": "Unpaid leave"
+      "LEAVE_UNPAID": "Unpaid leave",
+      "REMOTE": "Remote"
     },
     "dayType": {
       "WORKING_DAY": "Working day",
@@ -862,7 +863,8 @@
     },
     "calendar": {
       "pendingLeave": "Leave pending",
-      "lateBy": "{minutes} min late"
+      "lateBy": "{minutes} min late",
+      "pendingRemote": "WFH pending"
     },
     "day": {
       "noData": "Outside the month on screen",
@@ -878,7 +880,11 @@
       "leaveRequests": "Leave requests on this day",
       "explainLater": "Forgot to check in or out, or on a business trip? Explanations come in a later version; tell HR for now.",
       "requestLeave": "Request leave for this day",
-      "requestSickLeave": "Send sick leave for this day"
+      "requestSickLeave": "Send sick leave for this day",
+      "remoteRequests": "Remote work requests",
+      "remotePunchHint": "Remote day: use the personal punch once in and once out, on time as on any other day.",
+      "outsideOfficeHint": "There is a personal punch but no approved remote work request. HR will review this day.",
+      "requestRemote": "Request WFH for this day"
     },
     "table": {
       "date": "Date",
@@ -896,13 +902,16 @@
       "early": "Early: {count} times, {minutes} min",
       "leave": "Leave: {value} days",
       "absent": "Absent: {count} days",
-      "missingOut": "No check-out: {count} days"
+      "missingOut": "No check-out: {count} days",
+      "remote": "WFH: {value} days",
+      "outsideOffice": "Punched outside office: {count} days"
     },
     "team": {
       "emptyTitle": "No one in your team",
       "emptyDescription": "You do not manage anyone yet.",
       "employee": "Employee",
-      "paidUnits": "Paid"
+      "paidUnits": "Paid",
+      "outsideOffice": "Flags"
     },
     "schedule": {
       "currentTitle": "Today's working hours",
@@ -965,8 +974,23 @@
       "approvalAlreadyDecided": "You have already decided on this request.",
       "notCurrentApprover": "You are not an approver of the current step.",
       "employeeProfileRequired": "Your account is not linked to an employee profile.",
+      "remoteNotEligible": "Only full-time employees can request remote work.",
+      "remoteInPast": "Remote work cannot be requested for past days.",
+      "remoteNoWorkingDay": "This day is not a working day.",
+      "remoteTooLate": "It is too late to request remote work for today.",
+      "remoteOverlap": "A leave or remote work request already covers this time.",
+      "remoteWeekLimit": "You have used your personal remote work days for this week.",
+      "remoteMonthLimit": "You have used your personal remote work days for this month.",
+      "remoteNotCancellable": "Only an approved request for a future day without a pending cancellation can be cancelled.",
       "unknown": "This request cannot be sent."
-    }
+    },
+    "remotePart": {
+      "FULL_DAY": "WFH full day",
+      "MORNING": "WFH morning",
+      "AFTERNOON": "WFH afternoon"
+    },
+    "requestRemote": "Request WFH",
+    "outsideOffice": "Punched outside office"
   },
   "Leave": {
     "metaTitle": "Leave",
@@ -976,6 +1000,7 @@
     "shortNotice": "Urgent",
     "tabs": {
       "mine": "My requests",
+      "remote": "Remote work",
       "inbox": "To approve"
     },
     "types": {
@@ -1070,11 +1095,13 @@
     },
     "inbox": {
       "emptyTitle": "Nothing waiting for you",
-      "emptyDescription": "Leave requests, cancellations and working-hour requests of people you manage show up here.",
+      "emptyDescription": "Leave and remote work requests, cancellations and working hours requests from your team appear here.",
       "types": {
         "LEAVE": "Leave",
         "LEAVE_CANCEL": "Leave cancellation",
-        "SHIFT_CHANGE": "Working hours"
+        "SHIFT_CHANGE": "Working hours",
+        "WFH": "Remote work",
+        "WFH_CANCEL": "Remote work cancellation"
       },
       "urgent": "Urgent",
       "meta": "Sent {at} · Step: {step}",
@@ -1089,6 +1116,66 @@
       "back": "Back",
       "approved": "Approved.",
       "rejected": "Rejected."
+    },
+    "newRemote": "Request WFH",
+    "remote": {
+      "emptyTitle": "No remote work requests yet",
+      "emptyDescription": "Remote work is an exception for days you cannot come to the office. Use Request WFH to send one.",
+      "detailColumn": "Details",
+      "withdrawTitle": "Withdraw this remote work request?",
+      "withdrawCancelTitle": "Withdraw the cancellation? The remote work request stays approved.",
+      "reasons": {
+        "HEALTH": "Minor health issue, can still work",
+        "FAMILY": "Caring for a family member",
+        "PERSONAL_TRAVEL": "Personal travel problem",
+        "DISASTER": "Natural disaster, flooding, epidemic",
+        "OFFICE_INCIDENT": "Office incident",
+        "WORK_REQUIRED": "Required by work"
+      },
+      "usage": {
+        "personalWeek": "Personal WFH this week",
+        "personalMonth": "Personal WFH this month",
+        "objectiveMonth": "Objective WFH this month",
+        "personalWeekNote": "Includes requests waiting for approval.",
+        "personalMonthNote": "Unused days do not carry over.",
+        "objectiveMonthNote": "No limit, approval is still needed.",
+        "usedValue": "{used} / {max} days",
+        "daysValue": "{days} days"
+      },
+      "dialog": {
+        "title": "Request remote work",
+        "description": "Remote work is an exception for days you cannot come to the office. One request covers one day.",
+        "day": "Day",
+        "part": "Remote work",
+        "reason": "Reason",
+        "personal": "personal",
+        "objective": "objective",
+        "detail": "Details",
+        "detailPlaceholder": "For example: the street is flooded, I cannot get out",
+        "checking": "Checking...",
+        "usedWeek": "Personal this week",
+        "usedMonth": "Personal this month",
+        "usedValue": "{used} / {max} days held",
+        "objectiveMonth": "Objective this month",
+        "objectiveValue": "{used} days held, no limit",
+        "approvers": "Approver",
+        "approversManager": "Direct manager",
+        "urgentTitle": "Urgent request",
+        "urgentDescription": "A request sent close to the day is marked Urgent, and the manager can reject it.",
+        "punchHint": "A remote day needs a personal face punch once in and once out, on time as on any other day. Without both punches the day does not count yet.",
+        "cancel": "Cancel",
+        "send": "Send request",
+        "sendUrgent": "Send as urgent",
+        "sent": "Request sent, waiting for your manager."
+      },
+      "cancelDialog": {
+        "title": "Ask to cancel an approved remote work request",
+        "description": "Your direct manager approves the cancellation. Once approved, you work at the office that day.",
+        "reason": "Cancellation reason",
+        "back": "Back",
+        "send": "Send cancellation",
+        "sent": "Cancellation sent."
+      }
     }
   },
   "Approvals": {
@@ -1188,6 +1275,7 @@
       "LEAVE": "Leave",
       "LEAVE_CANCEL": "Leave cancellation",
       "WFH": "Work from home",
+      "WFH_CANCEL": "Remote work cancellation",
       "SHIFT_CHANGE": "Working hours",
       "ATTENDANCE_EXPLANATION": "Attendance explanation",
       "ALLOCATION": "Project allocation",
@@ -1581,6 +1669,34 @@
       "leave_max_request_days": {
         "name": "Longest leave request (days)",
         "description": "Longest single leave request, in calendar days."
+      },
+      "remote_max_personal_days_per_week": {
+        "name": "Personal WFH per week (days)",
+        "description": "Most personal remote work days in one week, Monday to Sunday."
+      },
+      "remote_max_personal_days_per_month": {
+        "name": "Personal WFH per month (days)",
+        "description": "Most personal remote work days in one calendar month."
+      },
+      "remote_min_notice_days": {
+        "name": "WFH notice (days)",
+        "description": "A personal WFH request sent closer than this is marked as urgent."
+      },
+      "remote_allow_probation": {
+        "name": "Probation can request WFH",
+        "description": "Allow probation employees to request remote work."
+      },
+      "remote_allow_intern": {
+        "name": "Interns can request WFH",
+        "description": "Allow interns to request remote work."
+      },
+      "attendance_remote_requires_punch": {
+        "name": "WFH requires punching",
+        "description": "A remote day needs a personal punch in and out to count."
+      },
+      "attendance_remote_min_span_percent": {
+        "name": "Gap between WFH punches (%)",
+        "description": "On a remote day, in and out must be at least this percent of the required hours apart."
       }
     }
   },

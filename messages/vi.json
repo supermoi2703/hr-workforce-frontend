@@ -844,7 +844,8 @@
       "HOLIDAY": "Ngày lễ",
       "OFF": "Nghỉ tuần",
       "LEAVE_PAID": "Nghỉ có lương",
-      "LEAVE_UNPAID": "Nghỉ không lương"
+      "LEAVE_UNPAID": "Nghỉ không lương",
+      "REMOTE": "Làm từ xa"
     },
     "dayType": {
       "WORKING_DAY": "Ngày làm việc",
@@ -862,7 +863,8 @@
     },
     "calendar": {
       "pendingLeave": "Đơn nghỉ chờ duyệt",
-      "lateBy": "Muộn {minutes} phút"
+      "lateBy": "Muộn {minutes} phút",
+      "pendingRemote": "WFH chờ duyệt"
     },
     "day": {
       "noData": "Ngày ngoài tháng đang xem",
@@ -878,7 +880,11 @@
       "leaveRequests": "Đơn nghỉ trong ngày",
       "explainLater": "Quên chấm hoặc đi công tác? Giải trình công sẽ có ở bản sau; tạm thời báo HR.",
       "requestLeave": "Xin nghỉ ngày này",
-      "requestSickLeave": "Gửi đơn nghỉ ốm cho ngày này"
+      "requestSickLeave": "Gửi đơn nghỉ ốm cho ngày này",
+      "remoteRequests": "Đơn làm từ xa",
+      "remotePunchHint": "Ngày này làm từ xa: chấm công cá nhân một lần vào, một lần ra, đúng giờ như ngày thường.",
+      "outsideOfficeHint": "Có chấm cá nhân nhưng không có đơn làm từ xa đã duyệt. HR sẽ rà soát ngày này.",
+      "requestRemote": "Xin làm từ xa ngày này"
     },
     "table": {
       "date": "Ngày",
@@ -896,13 +902,16 @@
       "early": "Về sớm: {count} lần, {minutes} phút",
       "leave": "Nghỉ có đơn: {value} ngày",
       "absent": "Vắng: {count} ngày",
-      "missingOut": "Thiếu giờ ra: {count} ngày"
+      "missingOut": "Thiếu giờ ra: {count} ngày",
+      "remote": "WFH: {value} ngày",
+      "outsideOffice": "Chấm ngoài văn phòng: {count} ngày"
     },
     "team": {
       "emptyTitle": "Chưa có ai trong đội",
       "emptyDescription": "Bạn chưa quản lý nhân viên nào.",
       "employee": "Nhân viên",
-      "paidUnits": "Công"
+      "paidUnits": "Công",
+      "outsideOffice": "Cờ"
     },
     "schedule": {
       "currentTitle": "Giờ làm hôm nay",
@@ -965,8 +974,23 @@
       "approvalAlreadyDecided": "Bạn đã quyết định đơn này rồi.",
       "notCurrentApprover": "Bạn không phải người duyệt bước hiện tại.",
       "employeeProfileRequired": "Tài khoản của bạn chưa gắn hồ sơ nhân viên.",
+      "remoteNotEligible": "Chỉ nhân viên chính thức được xin làm từ xa.",
+      "remoteInPast": "Không xin làm từ xa cho ngày đã qua.",
+      "remoteNoWorkingDay": "Ngày này không phải ngày làm việc.",
+      "remoteTooLate": "Đã quá hạn gửi đơn làm từ xa cho hôm nay.",
+      "remoteOverlap": "Buổi này đã có đơn nghỉ hoặc đơn làm từ xa.",
+      "remoteWeekLimit": "Đã hết số ngày làm từ xa chủ động của tuần này.",
+      "remoteMonthLimit": "Đã hết số ngày làm từ xa chủ động của tháng này.",
+      "remoteNotCancellable": "Chỉ hủy được đơn đã duyệt của ngày chưa tới, và chưa có yêu cầu hủy đang chờ.",
       "unknown": "Không gửi được đơn này."
-    }
+    },
+    "remotePart": {
+      "FULL_DAY": "WFH cả ngày",
+      "MORNING": "WFH sáng",
+      "AFTERNOON": "WFH chiều"
+    },
+    "requestRemote": "Xin làm từ xa",
+    "outsideOffice": "Chấm ngoài văn phòng"
   },
   "Leave": {
     "metaTitle": "Nghỉ phép",
@@ -976,6 +1000,7 @@
     "shortNotice": "Gấp",
     "tabs": {
       "mine": "Đơn của tôi",
+      "remote": "Làm từ xa",
       "inbox": "Cần tôi duyệt"
     },
     "types": {
@@ -1070,11 +1095,13 @@
     },
     "inbox": {
       "emptyTitle": "Không có đơn nào chờ bạn duyệt",
-      "emptyDescription": "Đơn nghỉ, yêu cầu hủy và đơn đăng ký giờ làm của người bạn quản lý sẽ hiện ở đây.",
+      "emptyDescription": "Đơn nghỉ, đơn làm từ xa, yêu cầu hủy và đơn đăng ký giờ làm của người bạn quản lý sẽ hiện ở đây.",
       "types": {
         "LEAVE": "Đơn nghỉ",
         "LEAVE_CANCEL": "Hủy đơn nghỉ",
-        "SHIFT_CHANGE": "Đăng ký giờ làm"
+        "SHIFT_CHANGE": "Đăng ký giờ làm",
+        "WFH": "Làm từ xa",
+        "WFH_CANCEL": "Hủy đơn làm từ xa"
       },
       "urgent": "Gấp",
       "meta": "Gửi lúc {at} · Bước: {step}",
@@ -1089,6 +1116,66 @@
       "back": "Quay lại",
       "approved": "Đã duyệt.",
       "rejected": "Đã từ chối."
+    },
+    "newRemote": "Xin làm từ xa",
+    "remote": {
+      "emptyTitle": "Chưa có đơn làm từ xa nào",
+      "emptyDescription": "Làm từ xa là ngoại lệ khi không thể đến công ty. Bấm Xin làm từ xa để gửi đơn.",
+      "detailColumn": "Chi tiết",
+      "withdrawTitle": "Rút đơn làm từ xa này?",
+      "withdrawCancelTitle": "Rút yêu cầu hủy? Đơn làm từ xa vẫn giữ là đã duyệt.",
+      "reasons": {
+        "HEALTH": "Sức khỏe nhẹ, vẫn làm việc được",
+        "FAMILY": "Chăm sóc người nhà",
+        "PERSONAL_TRAVEL": "Sự cố đi lại của cá nhân",
+        "DISASTER": "Thiên tai, mưa ngập, dịch bệnh",
+        "OFFICE_INCIDENT": "Sự cố văn phòng",
+        "WORK_REQUIRED": "Yêu cầu công việc"
+      },
+      "usage": {
+        "personalWeek": "WFH chủ động tuần này",
+        "personalMonth": "WFH chủ động tháng này",
+        "objectiveMonth": "WFH khách quan tháng này",
+        "personalWeekNote": "Tính cả đơn đang chờ duyệt.",
+        "personalMonthNote": "Không cộng dồn sang tháng sau.",
+        "objectiveMonthNote": "Không giới hạn, vẫn phải được duyệt.",
+        "usedValue": "{used} / {max} ngày",
+        "daysValue": "{days} ngày"
+      },
+      "dialog": {
+        "title": "Xin làm từ xa",
+        "description": "Làm từ xa là ngoại lệ khi không thể đến công ty. Mỗi đơn cho một ngày.",
+        "day": "Ngày",
+        "part": "Làm từ xa",
+        "reason": "Lý do",
+        "personal": "chủ động",
+        "objective": "khách quan",
+        "detail": "Chi tiết",
+        "detailPlaceholder": "Ví dụ: đường trước nhà ngập, không đi được",
+        "checking": "Đang kiểm tra...",
+        "usedWeek": "Chủ động tuần này",
+        "usedMonth": "Chủ động tháng này",
+        "usedValue": "đã giữ {used} / {max} ngày",
+        "objectiveMonth": "Khách quan tháng này",
+        "objectiveValue": "đã giữ {used} ngày, không giới hạn",
+        "approvers": "Người duyệt",
+        "approversManager": "Quản lý trực tiếp",
+        "urgentTitle": "Đơn gấp",
+        "urgentDescription": "Đơn gửi sát ngày được đánh dấu Gấp, quản lý có thể từ chối.",
+        "punchHint": "Ngày làm từ xa phải chấm công cá nhân bằng khuôn mặt một lần vào, một lần ra, đúng giờ như ngày thường. Thiếu lần chấm thì ngày đó chưa được tính công.",
+        "cancel": "Hủy",
+        "send": "Gửi đơn",
+        "sendUrgent": "Vẫn gửi đơn gấp",
+        "sent": "Đã gửi đơn, chờ quản lý duyệt."
+      },
+      "cancelDialog": {
+        "title": "Xin hủy đơn làm từ xa đã duyệt",
+        "description": "Quản lý trực tiếp duyệt yêu cầu hủy. Được duyệt thì ngày đó trở lại làm ở văn phòng.",
+        "reason": "Lý do hủy",
+        "back": "Quay lại",
+        "send": "Gửi yêu cầu hủy",
+        "sent": "Đã gửi yêu cầu hủy."
+      }
     }
   },
   "Approvals": {
@@ -1188,6 +1275,7 @@
       "LEAVE": "Đơn nghỉ",
       "LEAVE_CANCEL": "Hủy đơn nghỉ",
       "WFH": "Làm việc từ xa",
+      "WFH_CANCEL": "Hủy đơn làm từ xa",
       "SHIFT_CHANGE": "Đăng ký giờ làm",
       "ATTENDANCE_EXPLANATION": "Giải trình chấm công",
       "ALLOCATION": "Phân bổ dự án",
@@ -1581,6 +1669,34 @@
       "leave_max_request_days": {
         "name": "Đơn nghỉ dài nhất (ngày)",
         "description": "Một đơn nghỉ dài nhất bao nhiêu ngày (tính cả ngày nghỉ cuối tuần)."
+      },
+      "remote_max_personal_days_per_week": {
+        "name": "WFH chủ động mỗi tuần (ngày)",
+        "description": "Số ngày làm từ xa chủ động tối đa trong một tuần, từ thứ Hai đến Chủ nhật."
+      },
+      "remote_max_personal_days_per_month": {
+        "name": "WFH chủ động mỗi tháng (ngày)",
+        "description": "Số ngày làm từ xa chủ động tối đa trong một tháng."
+      },
+      "remote_min_notice_days": {
+        "name": "Báo trước khi WFH (ngày)",
+        "description": "Đơn WFH chủ động gửi sát hơn số ngày này bị đánh dấu là gấp."
+      },
+      "remote_allow_probation": {
+        "name": "Thử việc được xin WFH",
+        "description": "Cho nhân viên thử việc xin làm từ xa."
+      },
+      "remote_allow_intern": {
+        "name": "Thực tập sinh được xin WFH",
+        "description": "Cho thực tập sinh xin làm từ xa."
+      },
+      "attendance_remote_requires_punch": {
+        "name": "WFH bắt buộc chấm công",
+        "description": "Ngày làm từ xa phải chấm công cá nhân vào và ra mới được tính công."
+      },
+      "attendance_remote_min_span_percent": {
+        "name": "Khoảng cách hai lần chấm WFH (%)",
+        "description": "Ngày làm từ xa, lần vào và lần ra phải cách nhau ít nhất chừng này phần trăm khung giờ phải làm."
       }
     }
   },
