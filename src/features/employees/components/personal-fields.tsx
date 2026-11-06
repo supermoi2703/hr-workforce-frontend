@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { todayIsoDate } from "@/lib/format";
 import { MIN_AGE, yearsBefore, type PersonalFormValues } from "../schemas";
 import { GENDERS } from "../types";
-import { ChoiceSelect } from "./choice-select";
+import { ChoiceSelect } from "@/components/shared/choice-select";
 
 type PersonalForm = { personal: PersonalFormValues };
 

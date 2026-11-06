@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { RequireAccess } from "@/components/shared/require-access";
 import { ProjectDetailPage } from "@/features/projects/components/project-detail-page";
 
-type Props = { params: Promise<{ code: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { code } = await params;
-  return { title: code.toUpperCase() };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Projects.Detail");
+  return { title: t("metaTitle") };
 }
 
-export default async function ProjectDetailRoute({ params }: Props) {
+export default async function ProjectRoute({ params }: PageProps<"/projects/[code]">) {
   const { code } = await params;
-  return <ProjectDetailPage code={code.toUpperCase()} />;
+  return (
+    <RequireAccess access={{ permissions: ["project:read"] }}>
+      <ProjectDetailPage code={code} />
+    </RequireAccess>
+  );
 }

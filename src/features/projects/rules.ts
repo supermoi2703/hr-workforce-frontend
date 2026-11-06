@@ -1,69 +1,112 @@
-import type { BOARD_STATUSES, MyWork, TaskCard, WeekCell } from "./types";
+import {
+  PROJECT_STATUSES,
+  PROJECT_TYPES,
+  type ProjectCreateScope,
+  type ProjectFilters,
+  type ProjectMember,
+  type ProjectStatus,
+  type ProjectType,
+  type UnitRef,
+} from "./types";
 
-const MINUTES_PER_HOUR = 60;
+/** Khớp ProjectConstants.CODE_REGEX của backend; backend lưu dạng viết HOA. */
+export const PROJECT_CODE_PATTERN = /^[A-Za-z][A-Za-z0-9]{1,9}$/;
+export const NAME_MAX_LENGTH = 200;
+export const DESCRIPTION_MAX_LENGTH = 2000;
+const MIN_PERCENT = 5;
+const MAX_PERCENT = 100;
+const PERCENT_STEP = 5;
+/** Còn từng này ngày trở xuống thì báo sắp hết hạn. */
+export const ENDING_SOON_DAYS = 14;
 
-/** 90 → "1h30", 480 → "8h". */
-export function formatMinutes(minutes: number | null | undefined, fallback = "—"): string {
-  if (minutes == null) return fallback;
-  const sign = minutes < 0 ? "-" : "";
-  const value = Math.abs(minutes);
-  const hours = Math.floor(value / MINUTES_PER_HOUR);
-  const rest = value % MINUTES_PER_HOUR;
-  if (rest === 0) return `${sign}${hours}h`;
-  return `${sign}${hours}h${String(rest).padStart(2, "0")}`;
+/** Bội số của 5, từ 5 đến 100 (ProjectConstants.isValidAllocationPercent). */
+export function isValidPercent(value: string): boolean {
+  if (!/^\d+$/.test(value.trim())) return false;
+  const percent = Number(value);
+  return percent >= MIN_PERCENT && percent <= MAX_PERCENT && percent % PERCENT_STEP === 0;
 }
 
-/** Nhập "8", "1.5", "1,5" hoặc "1:30" → số phút; sai định dạng thì null. */
-export function parseHours(input: string): number | null {
-  const text = input.trim();
-  if (!text) return null;
-  const clock = /^(\d{1,3}):([0-5]\d)$/.exec(text);
-  if (clock) return Number(clock[1]) * MINUTES_PER_HOUR + Number(clock[2]);
-  const hours = Number(text.replace(",", "."));
-  if (!Number.isFinite(hours) || hours < 0) return null;
-  return Math.round(hours * MINUTES_PER_HOUR);
+// ===== Bộ lọc trên URL
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_KEYWORD_LENGTH = 100;
+
+function uuid(value: string | null): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed && UUID_PATTERN.test(trimmed) ? trimmed : undefined;
 }
 
-export type BoardColumn = { status: (typeof BOARD_STATUSES)[number]; cards: TaskCard[] };
-
-export function toColumns(statuses: readonly (typeof BOARD_STATUSES)[number][], cards: TaskCard[]): BoardColumn[] {
-  return statuses.map((status) => ({ status, cards: cards.filter((card) => card.status === status) }));
+function oneOf<T extends string>(values: readonly T[], value: string | null): T | undefined {
+  return values.includes(value as T) ? (value as T) : undefined;
 }
 
-export type WorkGroup = "overdue" | "thisWeek" | "later" | "noDue";
-
-/** Gom việc của tôi theo hạn: quá hạn, tới Chủ nhật tuần này, sau đó, không có hạn. */
-export function workGroup(dueDate: string | null, today: string, sunday: string): WorkGroup {
-  if (!dueDate) return "noDue";
-  if (dueDate < today) return "overdue";
-  return dueDate <= sunday ? "thisWeek" : "later";
+/** Đọc bộ lọc từ URL. Giá trị lạ bị bỏ qua thay vì để backend trả 400. */
+export function filtersFromSearchParams(params: { get(name: string): string | null }): ProjectFilters {
+  return {
+    q: params.get("q")?.trim().slice(0, MAX_KEYWORD_LENGTH) || undefined,
+    status: oneOf<ProjectStatus>(PROJECT_STATUSES, params.get("status")),
+    type: oneOf<ProjectType>(PROJECT_TYPES, params.get("type")),
+    departmentId: uuid(params.get("departmentId")),
+    officeId: uuid(params.get("officeId")),
+    mine: params.get("mine") === "1" || undefined,
+  };
 }
 
-export function sundayOf(day: string): string {
-  const date = new Date(`${day}T00:00:00Z`);
-  const offset = (7 - date.getUTCDay()) % 7;
-  date.setUTCDate(date.getUTCDate() + offset);
-  return date.toISOString().slice(0, 10);
+/** Ghi bộ lọc ra query string, bỏ giá trị trống. */
+export function filtersToSearchParams(filters: ProjectFilters): URLSearchParams {
+  const params = new URLSearchParams();
+  if (filters.mine) params.set("mine", "1");
+  for (const key of ["q", "status", "type", "departmentId", "officeId"] as const) {
+    const value = filters[key];
+    if (value) params.set(key, value);
+  }
+  return params;
 }
 
-export function groupMyWork(tasks: MyWork["tasks"], today: string) {
-  const sunday = sundayOf(today);
-  const groups: Record<WorkGroup, MyWork["tasks"]> = { overdue: [], thisWeek: [], later: [], noDue: [] };
-  for (const task of tasks) groups[workGroup(task.card.dueDate, today, sunday)].push(task);
-  return groups;
+// ===== Tiến độ theo ngày
+
+export type DeadlineState = "notStarted" | "endingSoon" | "overdue";
+
+function daysBetween(from: string, to: string): number {
+  return (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000;
 }
 
-export type LoadTone = "over" | "high" | "normal" | "low" | "off";
-
-/** Màu ô năng lực: quá tải, gần đầy (từ 80%), bình thường, ít việc (dưới 20%), không có giờ làm. */
-export function loadTone(cell: Pick<WeekCell, "capacityMinutes" | "loadMinutes">): LoadTone {
-  if (cell.capacityMinutes === 0) return cell.loadMinutes > 0 ? "over" : "off";
-  const ratio = cell.loadMinutes / cell.capacityMinutes;
-  if (ratio > 1) return "over";
-  if (ratio >= 0.8) return "high";
-  return ratio < 0.2 ? "low" : "normal";
+/** null = không có gì cần lưu ý. Dự án đã đóng không có cảnh báo; quá hạn vẫn là ACTIVE tới khi được đóng. */
+export function deadlineState(
+  project: { status: ProjectStatus; startDate: string; endDate: string | null },
+  today: string,
+): DeadlineState | null {
+  if (project.status === "CLOSED") return null;
+  if (project.startDate > today) return "notStarted";
+  if (!project.endDate) return null;
+  const left = daysBetween(today, project.endDate);
+  if (left < 0) return "overdue";
+  return left <= ENDING_SOON_DAYS ? "endingSoon" : null;
 }
 
-export function percent(part: number, whole: number): number {
-  return whole <= 0 ? 0 : Math.min(100, Math.round((part / whole) * 100));
+// ===== Quyền và lựa chọn
+
+export function canCreateProject(scope: ProjectCreateScope | undefined): boolean {
+  return !!scope && (scope.allDepartments || scope.departmentIds.length > 0);
+}
+
+/** Các phòng được chọn khi tạo dự án: mọi phòng, hoặc phòng mình đứng đầu. */
+export function creatableDepartments(scope: ProjectCreateScope | undefined, departments: UnitRef[]): UnitRef[] {
+  if (!scope) return [];
+  return scope.allDepartments ? departments : departments.filter((unit) => scope.departmentIds.includes(unit.id));
+}
+
+/** Người đang có phân bổ: phải kết thúc phân bổ trước khi làm PM. Người quan sát được, backend kết thúc dòng quan sát. */
+export function allocatedEmployeeIds(members: ProjectMember[]): string[] {
+  return members.filter((member) => member.role === "MEMBER").map((member) => member.employee.id);
+}
+
+/** PM đang giữ: dòng chưa kết thúc. */
+export function currentManager(members: ProjectMember[]): ProjectMember | undefined {
+  return members.find((member) => member.role === "PM" && member.toDate === null);
+}
+
+/** Có dòng nào người xem không được xem % không (không tính người quan sát, vốn không có %). */
+export function hasHiddenPercent(members: ProjectMember[]): boolean {
+  return members.some((member) => member.role !== "OBSERVER" && member.allocationPercent === null);
 }

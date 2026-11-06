@@ -1,117 +1,108 @@
 "use client";
 
-import { useCallback } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations, type Messages } from "next-intl";
-import { isApiError } from "@/lib/api/errors";
+import { useCallback, useMemo } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import type { PageParams } from "@/lib/api/types";
-import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
-  getBoard,
-  getCapacity,
-  getComments,
-  getEvents,
-  getMembers,
-  getMetrics,
-  getMyWork,
-  getOverview,
-  getProject,
+  getOrgDepartments,
+  getOrgOffices,
+  getProjectByCode,
+  getProjectCreateScope,
+  getProjectMembers,
   getProjects,
-  getRisks,
-  getSkillOptions,
-  getSprintCapacity,
-  getSprints,
-  getSuggestions,
-  getTask,
-  getTasks,
-  getWorkTeam,
-  getWorkTeams,
-  getWorklogs,
-  searchPeople,
+  searchEmployeeOptions,
 } from "./api";
-import type { TaskStatus } from "./types";
+import { getProjectError, isStaleProjectError } from "./error-messages";
+import { filtersFromSearchParams, filtersToSearchParams } from "./rules";
+import type { ProjectFilters } from "./types";
 
-// Board và cảnh báo tự tải lại để nhiều người cùng xem thấy thay đổi gần như ngay (đặc tả mục 10).
-const BOARD_POLL_MS = 3_000;
-const INSIGHT_POLL_MS = 5_000;
+// Phòng ban, văn phòng, phạm vi tạo dự án ít đổi: giữ 5 phút.
+const SLOW_STALE_TIME = 5 * 60_000;
+const EMPLOYEE_PAGE_SIZE = 20;
 
-const projectKeys = { all: ["projects"] as const };
-const key = (...parts: unknown[]) => [...projectKeys.all, ...parts];
+export const projectKeys = {
+  all: ["projects"] as const,
+  list: (filters: ProjectFilters, params: PageParams) => ["projects", "list", filters, params] as const,
+  detail: (code: string) => ["projects", "detail", code.toUpperCase()] as const,
+  members: (id: string, date: string | undefined) => ["projects", "members", id, date ?? "current"] as const,
+  createScope: ["projects", "create-scope"] as const,
+  departments: ["projects", "departments"] as const,
+  offices: ["projects", "offices"] as const,
+  employees: (keyword: string) => ["projects", "employees", keyword] as const,
+};
 
-export const useProjects = (params: PageParams) =>
-  useQuery({ queryKey: key("list", params), queryFn: () => getProjects(params) });
-export const useProject = (code: string) => useQuery({ queryKey: key("detail", code), queryFn: () => getProject(code), retry: false });
-export const useMembers = (projectId: string) => useQuery({ queryKey: key("members", projectId), queryFn: () => getMembers(projectId) });
-export const useOverview = (projectId: string) =>
-  useQuery({ queryKey: key("overview", projectId), queryFn: () => getOverview(projectId), refetchInterval: INSIGHT_POLL_MS });
-export const useRisks = (projectId: string, enabled: boolean) =>
-  useQuery({ queryKey: key("risks", projectId), queryFn: () => getRisks(projectId), enabled, refetchInterval: INSIGHT_POLL_MS });
-export const useCapacity = (projectId: string) => useQuery({ queryKey: key("capacity", projectId), queryFn: () => getCapacity(projectId) });
-export const useMetrics = (projectId: string, enabled: boolean) =>
-  useQuery({ queryKey: key("metrics", projectId), queryFn: () => getMetrics(projectId), enabled });
-export const useTasks = (projectId: string, params: PageParams, filter: { status?: TaskStatus; assigneeId?: string; q?: string }) =>
-  useQuery({ queryKey: key("tasks", projectId, params, filter), queryFn: () => getTasks(projectId, params, filter) });
-export const useBoard = (projectId: string, filter: { sprintId?: string; assigneeId?: string }) =>
-  useQuery({
-    queryKey: key("board", projectId, filter),
-    queryFn: () => getBoard(projectId, filter),
-    refetchInterval: BOARD_POLL_MS,
-    refetchIntervalInBackground: false,
+export function useProjects(filters: ProjectFilters, params: PageParams) {
+  return useQuery({
+    queryKey: projectKeys.list(filters, params),
+    queryFn: () => getProjects(filters, params),
+    placeholderData: keepPreviousData,
   });
-export const useTask = (taskKey: string | null) =>
-  useQuery({ queryKey: key("task", taskKey), queryFn: () => getTask(taskKey!), enabled: !!taskKey, retry: false });
-export const useComments = (id: string | undefined) =>
-  useQuery({ queryKey: key("comments", id), queryFn: () => getComments(id!), enabled: !!id });
-export const useEvents = (id: string | undefined) => useQuery({ queryKey: key("events", id), queryFn: () => getEvents(id!), enabled: !!id });
-export const useWorklogs = (id: string | undefined) =>
-  useQuery({ queryKey: key("worklogs", id), queryFn: () => getWorklogs(id!), enabled: !!id });
-export const useSuggestions = (id: string | null) =>
-  useQuery({ queryKey: key("suggestions", id), queryFn: () => getSuggestions(id!), enabled: !!id });
-export const useMyWork = () => useQuery({ queryKey: key("my-work"), queryFn: getMyWork, retry: false });
-export const useSkillOptions = () => useQuery({ queryKey: key("skills"), queryFn: getSkillOptions, staleTime: 300_000 });
-export const useSprints = (projectId: string, enabled: boolean) =>
-  useQuery({ queryKey: key("sprints", projectId), queryFn: () => getSprints(projectId), enabled });
-export const useSprintCapacity = (id: string | undefined) =>
-  useQuery({ queryKey: key("sprint-capacity", id), queryFn: () => getSprintCapacity(id!), enabled: !!id });
-export const useWorkTeams = () => useQuery({ queryKey: key("work-teams"), queryFn: getWorkTeams });
-export const useWorkTeam = (id: string | null) =>
-  useQuery({ queryKey: key("work-team", id), queryFn: () => getWorkTeam(id!), enabled: !!id });
-export const usePeopleSearch = (q: string) =>
-  useQuery({ queryKey: key("people", q), queryFn: () => searchPeople(q), enabled: q.trim().length >= 2 });
-
-/** Mọi thao tác ghi: xong thì tải lại toàn bộ dữ liệu dự án vì số liệu liên quan chéo nhau. */
-export function useProjectMutation<TInput, TResult>(mutationFn: (input: TInput) => Promise<TResult>) {
-  const queryClient = useQueryClient();
-  return useMutation({ mutationFn, onSettled: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }) });
 }
 
-type ErrorKey = keyof Messages["Projects"]["Errors"];
-const ERROR_KEYS: readonly string[] = [
-  "PROJECT_NOT_FOUND",
-  "PROJECT_CODE_EXISTS",
-  "PROJECT_CLOSED",
-  "PROJECT_MEMBER_INVALID",
-  "PROJECT_PM_REMOVAL",
-  "STALE_VERSION",
-  "WORK_TEAM_NOT_FOUND",
-  "WORK_TEAM_CODE_EXISTS",
-  "TASK_NOT_FOUND",
-  "TASK_INVALID_PARENT",
-  "TASK_LINK_INVALID",
-  "TASK_LINK_CYCLE",
-  "TASK_HAS_WORKLOG",
-  "SPRINT_DISABLED",
-  "SPRINT_ALREADY_ACTIVE",
-  "SPRINT_INVALID_STATE",
-  "WORKLOG_DAY_NOT_ALLOWED",
-  "WORKLOG_STEP",
-];
+export function useProject(code: string) {
+  return useQuery({ queryKey: projectKeys.detail(code), queryFn: () => getProjectByCode(code) });
+}
 
+export function useProjectMembers(id: string, date?: string) {
+  return useQuery({ queryKey: projectKeys.members(id, date), queryFn: () => getProjectMembers(id, date) });
+}
+
+export function useProjectCreateScope() {
+  return useQuery({ queryKey: projectKeys.createScope, queryFn: getProjectCreateScope, staleTime: SLOW_STALE_TIME });
+}
+
+export function useOrgDepartments() {
+  return useQuery({ queryKey: projectKeys.departments, queryFn: getOrgDepartments, staleTime: SLOW_STALE_TIME });
+}
+
+export function useOrgOffices() {
+  return useQuery({ queryKey: projectKeys.offices, queryFn: getOrgOffices, staleTime: SLOW_STALE_TIME });
+}
+
+export function useEmployeeOptions(keyword: string, enabled: boolean) {
+  return useQuery({
+    queryKey: projectKeys.employees(keyword),
+    queryFn: () => searchEmployeeOptions(keyword || undefined, EMPLOYEE_PAGE_SIZE),
+    enabled,
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Bộ lọc nằm trên URL (gửi link / F5 vẫn giữ). Đổi bằng router.replace để Back không lùi từng lần lọc. */
+export function useProjectFilters() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const filters = useMemo(() => filtersFromSearchParams(searchParams), [searchParams]);
+
+  const updateFilters = useCallback(
+    (patch: Partial<ProjectFilters>) => {
+      const query = filtersToSearchParams({ ...filtersFromSearchParams(searchParams), ...patch }).toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [router, pathname, searchParams],
+  );
+
+  return { filters, updateFilters };
+}
+
+/** Thao tác ghi: xong thì làm mới mọi query dự án. Lỗi "dữ liệu đã đổi" cũng làm mới để màn hình đúng. */
+export function useProjectMutation<TVariables, TResult = unknown>(action: (variables: TVariables) => Promise<TResult>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: action,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+    onError: (error) => {
+      if (isStaleProjectError(error)) void queryClient.invalidateQueries({ queryKey: projectKeys.all });
+    },
+  });
+}
+
+/** Thông báo lỗi theo mã của module dự án, rơi về thông báo chung. */
 export function useProjectErrorMessage() {
   const t = useTranslations("Projects.Errors");
-  const fallback = useErrorMessage();
-  return useCallback(
-    (error: unknown) => (isApiError(error) && ERROR_KEYS.includes(error.code) ? t(error.code as ErrorKey) : fallback(error)),
-    [t, fallback],
-  );
+  const tErrors = useTranslations("Errors");
+  return useCallback((error: unknown) => getProjectError(error, t, tErrors), [t, tErrors]);
 }

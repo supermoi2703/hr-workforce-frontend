@@ -27,7 +27,7 @@ import { useChangeEmployeeStatus, useRefreshEmployee } from "../hooks";
 import { allowedStatusTransitions } from "../rules";
 import { statusSchema, toStatusRequest, type StatusFormValues } from "../schemas";
 import type { EmployeeDetail } from "../types";
-import { ChoiceSelect } from "./choice-select";
+import { ChoiceSelect } from "@/components/shared/choice-select";
 
 const FORM_ID = "employee-status-form";
 
