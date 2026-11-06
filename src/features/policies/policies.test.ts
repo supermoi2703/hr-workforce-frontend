@@ -160,7 +160,7 @@ describe("groupByModule / policyMessageKey", () => {
   it("mọi khóa đã biết có bản dịch", () => {
     const keys = Object.keys(en.Policies.keys);
     expect(keys).toContain(policyMessageKey("attendance.duplicate_punch_window"));
-    expect(keys).toHaveLength(16);
+    expect(keys).toHaveLength(17);
   });
 });
 

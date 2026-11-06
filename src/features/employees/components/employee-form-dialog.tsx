@@ -30,7 +30,7 @@ import { useCreateEmployee, useMyProfile, useOrgUnits, useRefreshEmployee, useUp
 import { orgUnitOptions, teamsOf } from "../rules";
 import { EMPTY_PERSONAL, employeeSchema, personalToForm, toEmployeeRequest, type EmployeeFormValues } from "../schemas";
 import { EMPLOYEE_LEVELS, EMPLOYMENT_TYPES, type EmployeeDetail, type OrgUnit } from "../types";
-import { ChoiceSelect, type Choice } from "./choice-select";
+import { ChoiceSelect, type Choice } from "@/components/shared/choice-select";
 import { PersonalFields } from "./personal-fields";
 
 const FORM_ID = "employee-form";
@@ -242,7 +242,7 @@ function EmployeeForm({ employee, onDone }: { employee?: EmployeeDetail; onDone:
             })}
             {select("teamId", tFields("team"), teamChoices, { noneLabel: t("noTeam") })}
             {select("level", tFields("level"), levelChoices)}
-            {select("employmentType", tFields("employmentType"), typeChoices)}
+            {select("employmentType", tFields("employmentType"), typeChoices, { hint: t("employmentTypeHint") })}
             <Field data-invalid={!!errors.hireDate}>
               <FieldLabel htmlFor="employee-hire-date">{tFields("hireDate")}</FieldLabel>
               <Input id="employee-hire-date" type="date" aria-invalid={!!errors.hireDate} {...form.register("hireDate")} />

@@ -462,6 +462,14 @@
     "employee_sensitive": {
       "name": "Manage sensitive details",
       "description": "See and edit national ID, tax code, social insurance, bank account and tax dependents"
+    },
+    "contract_read": {
+      "name": "View contracts",
+      "description": "See contracts and salary history in the data scope"
+    },
+    "contract_manage": {
+      "name": "Manage contracts",
+      "description": "Create, change and end contracts, and manage salary history"
     }
   },
   "AuditActions": {
@@ -496,7 +504,14 @@
     "EMPLOYEE_CREATED": "Employee profile created",
     "EMPLOYEE_UPDATED": "Employee profile updated",
     "EMPLOYEE_STATUS_CHANGED": "Employment status changed",
-    "EMPLOYEE_SENSITIVE_UPDATED": "Sensitive details updated"
+    "EMPLOYEE_SENSITIVE_UPDATED": "Sensitive details updated",
+    "CONTRACT_CREATED": "Contract created",
+    "CONTRACT_UPDATED": "Contract updated",
+    "CONTRACT_ENDED": "Contract ended",
+    "CONTRACT_DELETED": "Contract deleted",
+    "CONTRACT_SALARY_ADDED": "Salary added",
+    "CONTRACT_SALARY_UPDATED": "Salary updated",
+    "CONTRACT_SALARY_DELETED": "Salary deleted"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -552,7 +567,8 @@
       "openAccount": "Open account",
       "openRole": "Open role",
       "openPolicy": "Open policy",
-      "openEmployee": "Open profile"
+      "openEmployee": "Open profile",
+      "openContract": "Open contract"
     },
     "Meta": {
       "reason": "Reason",
@@ -1473,7 +1489,8 @@
       "timesheet": "Working hours",
       "calendar": "Office calendar",
       "attendance": "Attendance",
-      "face": "Face check-in"
+      "face": "Face check-in",
+      "contract": "Contracts"
     },
     "types": {
       "INTEGER": "Whole number",
@@ -1581,6 +1598,10 @@
       "leave_max_request_days": {
         "name": "Longest leave request (days)",
         "description": "Longest single leave request, in calendar days."
+      },
+      "contract_expiry_warning_days": {
+        "name": "Contract expiry warning",
+        "description": "Show contracts ending within this many days."
       }
     }
   },
@@ -1954,7 +1975,8 @@
       "create": "Add employee",
       "save": "Save changes",
       "created": "Profile {code} created",
-      "saved": "Profile saved"
+      "saved": "Profile saved",
+      "employmentTypeHint": "Updated automatically from the active contract."
     },
     "Detail": {
       "metaTitle": "Employee profile",
@@ -1964,7 +1986,8 @@
       "tabs": {
         "overview": "Overview",
         "personal": "Personal",
-        "sensitive": "Sensitive"
+        "sensitive": "Sensitive",
+        "contracts": "Contracts"
       },
       "viewAuditLog": "View audit log",
       "edit": "Edit",
@@ -1989,7 +2012,7 @@
       "terminationDate": "Termination date",
       "reason": "Reason",
       "reasonHint": "Saved in the audit log.",
-      "terminateWarning": "The linked account will be locked and signed out on every device. Pending approvals assigned to this employee go to someone else.",
+      "terminateWarning": "The linked account will be locked and signed out on every device. Active contracts end on the termination date, and pending approvals assigned to this employee go to someone else.",
       "onLeaveWarning": "Pending approvals assigned to this employee go to someone else.",
       "rehireHint": "The employee code stays the same. A locked account isn't unlocked automatically.",
       "submit": "Change status",
@@ -2053,6 +2076,160 @@
     "editTitle": "Edit personal details",
     "editDescription": "HR can see these details. Empty fields are saved as empty.",
     "save": "Save",
-    "saved": "Personal details saved"
+    "saved": "Personal details saved",
+    "contracts": "Contracts and salary"
+  },
+  "Contracts": {
+    "metaTitle": "Contracts",
+    "types": {
+      "PROBATION": "Probation",
+      "FIXED_TERM": "Fixed term",
+      "INDEFINITE": "Indefinite",
+      "INTERNSHIP": "Internship",
+      "SERVICE": "Service"
+    },
+    "states": {
+      "UPCOMING": "Not started",
+      "ACTIVE": "Active",
+      "ENDED": "Ended"
+    },
+    "List": {
+      "title": "Contracts",
+      "description": "Employment contracts in your data scope. To add one, open the employee's profile.",
+      "empty": "No contracts match your filters"
+    },
+    "Filters": {
+      "search": "Search by contract number, name or employee code",
+      "office": "Office",
+      "allOffices": "All offices",
+      "type": "Type",
+      "allTypes": "All types",
+      "state": "Status",
+      "allStates": "All statuses",
+      "clear": "Clear filters"
+    },
+    "Columns": {
+      "number": "Contract no.",
+      "employee": "Employee",
+      "type": "Type",
+      "state": "Status",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "noEndDate": "No end date"
+    },
+    "Expiring": {
+      "title": "{count, plural, one {# contract ending soon} other {# contracts ending soon}}",
+      "endsOn": "Ends {date}"
+    },
+    "Fields": {
+      "contractNumber": "Contract number",
+      "type": "Type",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "employee": "Employee",
+      "effectiveFrom": "Effective from",
+      "baseSalary": "Base salary",
+      "lunchAllowance": "Lunch allowance",
+      "otherAllowance": "Other allowance",
+      "insuranceSalary": "Insurance salary",
+      "insuranceHint": "Leave empty to use the base salary.",
+      "allowanceHint": "Leave empty for 0.",
+      "status": "Status",
+      "reason": "Reason"
+    },
+    "Form": {
+      "createTitle": "Add contract",
+      "createDescription": "The salary below applies from the start date.",
+      "editTitle": "Edit contract",
+      "editDescription": "A contract can be changed until it starts. After that it can only be ended early.",
+      "renewTitle": "Renew contract",
+      "renewDescription": "Creates a new contract that follows this one, filled in from the latest salary. Check the details before saving.",
+      "contract": "Contract",
+      "salary": "Salary from the start date",
+      "choose": "Select",
+      "save": "Save changes",
+      "create": "Add contract",
+      "saved": "Contract saved",
+      "created": "Contract {number} created"
+    },
+    "Salary": {
+      "title": "Salary history",
+      "description": "A salary already in effect can't be changed. To correct one, add a new salary on the same date with a reason: the newer one applies.",
+      "addTitle": "Add salary",
+      "editTitle": "Edit salary",
+      "add": "Add salary",
+      "edit": "Edit salary",
+      "delete": "Delete salary",
+      "actions": "Actions",
+      "show": "Show amounts",
+      "hide": "Hide amounts",
+      "inEffectHint": "This date is today or in the past, so a reason is required. Differences in locked payroll periods are settled in a later period.",
+      "save": "Save",
+      "saved": "Salary saved",
+      "deleted": "Salary deleted",
+      "deleteTitle": "Delete this salary?",
+      "deleteDescription": "The salary effective from {date} will be removed.",
+      "statuses": {
+        "current": "Current",
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "replaced": "Replaced"
+      }
+    },
+    "End": {
+      "title": "End contract early",
+      "description": "Future salaries after the new end date are removed. This can't be undone.",
+      "newEndDate": "New end date",
+      "submit": "End contract",
+      "success": "Contract ended"
+    },
+    "Detail": {
+      "metaTitle": "Contract",
+      "back": "Contracts",
+      "notFound": "Contract not found",
+      "notFoundDescription": "The contract doesn't exist or is outside your data scope.",
+      "viewAuditLog": "View audit log",
+      "actions": "Actions",
+      "edit": "Edit contract",
+      "renew": "Renew",
+      "end": "End early",
+      "delete": "Delete contract",
+      "noEndDate": "No end date",
+      "deleted": "Contract deleted",
+      "deleteTitle": "Delete this contract?",
+      "deleteDescription": "Contract {number} and its salaries will be removed."
+    },
+    "EmployeeTab": {
+      "empty": "No contracts yet",
+      "create": "Add contract",
+      "noEndDate": "no end date"
+    },
+    "Mine": {
+      "empty": "You don't have a contract on record",
+      "noEndDate": "no end date"
+    },
+    "Validation": {
+      "required": "Required",
+      "tooLong": "Too long",
+      "salaryRequired": "Enter a base salary above 0",
+      "beforeHireDate": "Must be on or after the hire date",
+      "endBeforeStart": "Must be on or after the start date",
+      "outOfContract": "Must be inside the contract period. For a contract that hasn't started, it must be after the start date",
+      "reasonRequired": "Enter a reason for a salary effective today or earlier",
+      "endDateInvalid": "Must be on or after the start date and before the current end date"
+    },
+    "Errors": {
+      "notFound": "The contract doesn't exist or is outside your data scope.",
+      "numberExists": "This contract number is already in use.",
+      "overlap": "The employee already has a contract in this period. End that contract first or choose other dates.",
+      "invalidDates": "Check the dates: an indefinite contract has no end date, other types need one, and a contract can't start before the hire date.",
+      "notEditable": "This contract has already started, so it can't be changed. The page has been reloaded.",
+      "versionConflict": "Someone else just changed this contract. The latest version has been loaded, check it and try again.",
+      "salaryNotFound": "This salary no longer exists. The page has been reloaded.",
+      "salaryLocked": "This salary can't be changed: it's already in effect or it's the first salary of the contract. The page has been reloaded.",
+      "salaryOutOfRange": "The effective date must be inside the contract period.",
+      "employeeTerminated": "The employee has left the company, so a new contract can't be created.",
+      "employeeNotFound": "The employee doesn't exist or is outside your data scope."
+    }
   }
 }

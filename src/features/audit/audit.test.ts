@@ -111,7 +111,7 @@ describe("formatMetadata", () => {
 
 describe("bản dịch hành động", () => {
   it("mọi AuditAction đều có nhãn ở cả en và vi", () => {
-    expect(AUDIT_ACTIONS).toHaveLength(32);
+    expect(AUDIT_ACTIONS).toHaveLength(39);
     for (const action of AUDIT_ACTIONS) {
       expect(en.AuditActions).toHaveProperty(action);
       expect(vi.AuditActions).toHaveProperty(action);

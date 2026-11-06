@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon, PencilIcon, UserRoundXIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -35,8 +35,9 @@ import { SensitiveSection } from "./sensitive-section";
 /**
  * Hồ sơ của người đang đăng nhập: xem thông tin công việc và thông tin nhạy cảm (chỉ xem), tự sửa thông tin cá nhân.
  * Tài khoản không gắn hồ sơ (Admin, tài khoản kỹ thuật) thì không gọi API, hiện hướng dẫn.
+ * `contracts`: mục hợp đồng do route ghép vào (feature không import nhau), chỉ dựng khi đã có hồ sơ.
  */
-export function MyProfilePage() {
+export function MyProfilePage({ contracts }: { contracts?: ReactNode }) {
   const t = useTranslations("Profile");
   const { user } = useCurrentUser();
   const hasProfile = Boolean(user?.employeeId);
@@ -57,7 +58,7 @@ export function MyProfilePage() {
   } else if (query.isError) {
     content = <ErrorState error={query.error} onRetry={() => query.refetch()} />;
   } else {
-    content = <MyProfileView employee={query.data} />;
+    content = <MyProfileView employee={query.data} contracts={contracts} />;
   }
 
   return (
@@ -68,7 +69,7 @@ export function MyProfilePage() {
   );
 }
 
-function MyProfileView({ employee }: { employee: EmployeeDetail }) {
+function MyProfileView({ employee, contracts }: { employee: EmployeeDetail; contracts?: ReactNode }) {
   const t = useTranslations("Profile");
   const org = useOrgUnits();
   const sensitive = useMySensitive(true);
@@ -95,6 +96,13 @@ function MyProfileView({ employee }: { employee: EmployeeDetail }) {
         <h2 className="font-heading text-base font-medium">{t("sensitive")}</h2>
         <SensitiveSection query={sensitive} />
       </section>
+
+      {contracts && (
+        <section className="flex flex-col gap-3">
+          <h2 className="font-heading text-base font-medium">{t("contracts")}</h2>
+          {contracts}
+        </section>
+      )}
 
       <Dialog open={editing} onOpenChange={setEditing}>
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-2xl">
