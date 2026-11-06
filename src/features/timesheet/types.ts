@@ -16,7 +16,8 @@ export type TimesheetStatus =
   | "HOLIDAY"
   | "OFF"
   | "LEAVE_PAID"
-  | "LEAVE_UNPAID";
+  | "LEAVE_UNPAID"
+  | "REMOTE";
 
 export type EmployeeRef = { id: string; employeeCode: string | null; fullName: string | null };
 
@@ -37,6 +38,10 @@ export type TimesheetDay = {
   paidUnits: number;
   leavePart: LeavePart | null;
   leaveTypeCode: string | null;
+  /** Buổi WFH đã duyệt, kể cả khi chưa đủ lần chấm và ngày tương lai. */
+  remotePart: LeavePart | null;
+  /** Có chấm cá nhân mà không có đơn WFH đã duyệt: HR rà soát. */
+  outsideOffice: boolean;
 };
 
 export type TimesheetSummary = {
@@ -48,6 +53,8 @@ export type TimesheetSummary = {
   absentCount: number;
   missingOutCount: number;
   leaveDays: number;
+  remoteDays: number;
+  outsideOfficeCount: number;
 };
 
 export type EmployeeTimesheet = { employee: EmployeeRef; days: TimesheetDay[]; summary: TimesheetSummary };
@@ -133,10 +140,54 @@ export type LeaveRequest = {
   decidedAt: string | null;
 };
 
+/** Lý do xin WFH: ba lý do đầu là chủ động (có giới hạn), còn lại là khách quan. */
+export type RemoteWorkReason = "HEALTH" | "FAMILY" | "PERSONAL_TRAVEL" | "DISASTER" | "OFFICE_INCIDENT" | "WORK_REQUIRED";
+
+export type RemoteWorkDraft = { workDate: string; part: LeavePart; reason: RemoteWorkReason };
+
+/** Số ngày đang giữ (đơn chờ + đã duyệt) của tuần và tháng. Khách quan không có giới hạn. */
+export type RemoteWorkUsage = {
+  personalWeek: number;
+  maxPersonalWeek: number;
+  personalMonth: number;
+  maxPersonalMonth: number;
+  objectiveMonth: number;
+};
+
+export type RemoteWorkPreview = RemoteWorkDraft & {
+  days: number;
+  personal: boolean;
+  shortNotice: boolean;
+  minNoticeDays: number;
+  usage: RemoteWorkUsage;
+  /** Mã lỗi sẽ gặp nếu gửi; null = gửi được. */
+  problem: string | null;
+};
+
+export type RemoteWorkRequest = {
+  id: string;
+  employeeId: string;
+  employeeCode: string | null;
+  employeeName: string | null;
+  workDate: string;
+  part: LeavePart;
+  reason: RemoteWorkReason;
+  personal: boolean;
+  detail: string;
+  days: number;
+  shortNotice: boolean;
+  status: LeaveRequestStatus;
+  cancelStatus: ApprovalStatus | null;
+  cancelReason: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+};
+
 export type ApprovalType =
   | "LEAVE"
   | "LEAVE_CANCEL"
   | "WFH"
+  | "WFH_CANCEL"
   | "SHIFT_CHANGE"
   | "ATTENDANCE_EXPLANATION"
   | "ALLOCATION"
@@ -144,7 +195,7 @@ export type ApprovalType =
   | "SALARY_ADJUSTMENT";
 
 /** Loại yêu cầu của cụm công & phép, hiện ở hộp "Cần tôi duyệt". */
-export type TimeApprovalType = "LEAVE" | "LEAVE_CANCEL" | "SHIFT_CHANGE";
+export type TimeApprovalType = "LEAVE" | "LEAVE_CANCEL" | "WFH" | "WFH_CANCEL" | "SHIFT_CHANGE";
 
 export type ApprovalSummary = {
   id: string;

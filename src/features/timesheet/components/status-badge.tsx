@@ -40,7 +40,7 @@ const REQUEST_VARIANT: Record<LeaveRequestStatus, BadgeVariant> = {
 };
 
 /** Trạng thái đơn nghỉ, kèm trạng thái yêu cầu hủy nếu đang chờ / bị từ chối. */
-export function LeaveStatusBadge({ request }: { request: LeaveRequest }) {
+export function LeaveStatusBadge({ request }: { request: Pick<LeaveRequest, "status" | "cancelStatus" | "shortNotice"> }) {
   const t = useTranslations("Leave");
   return (
     <span className="inline-flex flex-wrap items-center gap-1">

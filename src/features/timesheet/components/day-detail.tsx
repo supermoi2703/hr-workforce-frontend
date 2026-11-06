@@ -1,13 +1,13 @@
 "use client";
 
-import { TreePalmIcon } from "lucide-react";
+import { HousePlusIcon, TreePalmIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DetailList, DetailRow } from "@/components/shared/detail-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatLongDate, formatNumber, formatTime } from "@/lib/format";
-import { canRequestLeave, hhmm, requestsOn } from "../calendar";
-import type { LeaveRequest, TimesheetDay } from "../types";
+import { canRequestLeave, canRequestRemote, hhmm, remoteRequestsOn, requestsOn } from "../calendar";
+import type { LeaveRequest, RemoteWorkRequest, TimesheetDay } from "../types";
 import { DayStatusBadge, LeaveStatusBadge } from "./status-badge";
 
 type DayDetailProps = {
@@ -15,15 +15,18 @@ type DayDetailProps = {
   date: string;
   today: string;
   requests: LeaveRequest[];
+  remote: RemoteWorkRequest[];
   onRequestLeave: () => void;
+  onRequestRemote: () => void;
 };
 
-/** Chi tiết một ngày bấm trên lịch: giờ phải có mặt, vào / ra, muộn / sớm, công, đơn nghỉ; nút xin nghỉ. */
-export function DayDetail({ day, date, today, requests, onRequestLeave }: DayDetailProps) {
+/** Chi tiết một ngày bấm trên lịch: giờ phải có mặt, vào / ra, muộn / sớm, công, đơn nghỉ, WFH; nút xin nghỉ, xin WFH. */
+export function DayDetail({ day, date, today, requests, remote, onRequestLeave, onRequestRemote }: DayDetailProps) {
   const t = useTranslations("Timesheet.day");
   const tStatus = useTranslations("Timesheet");
   const tLeave = useTranslations("Leave");
   const onDay = requestsOn(requests, date);
+  const remoteOnDay = remoteRequestsOn(remote, date);
   const past = date < today;
 
   return (
@@ -87,11 +90,34 @@ export function DayDetail({ day, date, today, requests, onRequestLeave }: DayDet
           </div>
         )}
 
+        {remoteOnDay.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">{t("remoteRequests")}</p>
+            {remoteOnDay.map((request) => (
+              <div key={request.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-2 text-sm">
+                <span>
+                  {tLeave(`remote.reasons.${request.reason}`)} · {tLeave(`parts.${request.part}`)}
+                </span>
+                <LeaveStatusBadge request={request} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {day?.remotePart && date >= today && <p className="text-sm text-muted-foreground">{t("remotePunchHint")}</p>}
+        {day?.outsideOffice && <p className="text-sm text-warning">{t("outsideOfficeHint")}</p>}
+
         {day?.status === "MISSING_OUT" || day?.status === "ABSENT" ? (
           <p className="text-sm text-muted-foreground">{t("explainLater")}</p>
         ) : null}
 
-        {canRequestLeave(day, requests) && (
+        {canRequestRemote(day, today, requests, remote) && (
+          <Button variant="outline" className="w-full" onClick={onRequestRemote}>
+            <HousePlusIcon /> {t("requestRemote")}
+          </Button>
+        )}
+
+        {canRequestLeave(day, requests, remote) && (
           <Button className="w-full" onClick={onRequestLeave}>
             <TreePalmIcon /> {past ? t("requestSickLeave") : t("requestLeave")}
           </Button>
