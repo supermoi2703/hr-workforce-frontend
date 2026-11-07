@@ -10,6 +10,10 @@ import type {
   LeaveRequestDetail,
   LeaveType,
   MyWorkSchedule,
+  RemoteWorkDraft,
+  RemoteWorkPreview,
+  RemoteWorkRequest,
+  RemoteWorkUsage,
   ShiftChange,
 } from "./types";
 
@@ -53,6 +57,23 @@ export const withdrawLeave = (id: string) => http.post<LeaveRequest>(`/api/leave
 
 export const cancelLeave = (id: string, reason: string) =>
   http.post<LeaveRequest>(`/api/leave-requests/${id}/cancel`, { reason });
+
+// ===== Làm từ xa =====
+
+export const previewRemoteWork = (draft: RemoteWorkDraft) =>
+  http.post<RemoteWorkPreview>("/api/remote-work-requests/preview", draft);
+
+export const submitRemoteWork = (draft: RemoteWorkDraft, detail: string) =>
+  http.post<RemoteWorkRequest>("/api/remote-work-requests", { ...draft, detail });
+
+export const listMyRemoteWork = () => http.get<RemoteWorkRequest[]>("/api/remote-work-requests/me");
+
+export const getMyRemoteUsage = () => http.get<RemoteWorkUsage>("/api/remote-work-requests/me/usage");
+
+export const withdrawRemoteWork = (id: string) => http.post<RemoteWorkRequest>(`/api/remote-work-requests/${id}/withdraw`);
+
+export const cancelRemoteWork = (id: string, reason: string) =>
+  http.post<RemoteWorkRequest>(`/api/remote-work-requests/${id}/cancel`, { reason });
 
 // ===== Duyệt (bộ máy chung /api/approvals) =====
 

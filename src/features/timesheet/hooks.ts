@@ -8,25 +8,31 @@ import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
   approve,
   cancelLeave,
+  cancelRemoteWork,
   getMyBalance,
+  getMyRemoteUsage,
   getMySchedule,
   getTeamTimesheet,
   getTimesheet,
   listInbox,
   listLeaveTypes,
   listMyLeave,
+  listMyRemoteWork,
   listMyShiftChanges,
   previewLeave,
+  previewRemoteWork,
   reject,
   submitLeave,
+  submitRemoteWork,
   submitShiftChange,
   withdrawLeave,
+  withdrawRemoteWork,
   withdrawShiftChange,
 } from "./api";
-import type { ApprovalSummary, LeaveDraft, TimeApprovalType } from "./types";
+import type { ApprovalSummary, LeaveDraft, RemoteWorkDraft, TimeApprovalType } from "./types";
 
 /** Loại yêu cầu duyệt của cụm công & phép, hiện ở tab "Cần tôi duyệt". */
-export const TIME_APPROVAL_TYPES: TimeApprovalType[] = ["LEAVE", "LEAVE_CANCEL", "SHIFT_CHANGE"];
+export const TIME_APPROVAL_TYPES: TimeApprovalType[] = ["LEAVE", "LEAVE_CANCEL", "WFH", "WFH_CANCEL", "SHIFT_CHANGE"];
 
 export type TimeApproval = ApprovalSummary & { type: TimeApprovalType };
 
@@ -40,6 +46,9 @@ export const timesheetKeys = {
   balance: ["timesheet", "balance"] as const,
   myLeave: ["timesheet", "my-leave"] as const,
   preview: (draft: LeaveDraft) => ["timesheet", "leave-preview", draft] as const,
+  myRemote: ["timesheet", "my-remote"] as const,
+  remoteUsage: ["timesheet", "remote-usage"] as const,
+  remotePreview: (draft: RemoteWorkDraft | null) => ["timesheet", "remote-preview", draft] as const,
   inbox: ["timesheet", "inbox"] as const,
 };
 
@@ -85,6 +94,25 @@ export function useLeavePreview(draft: LeaveDraft | null) {
   return useQuery({
     queryKey: timesheetKeys.preview(draft ?? { leaveType: "ANNUAL", startDate: "", endDate: "", part: "FULL_DAY" }),
     queryFn: () => previewLeave(draft!),
+    enabled: !!draft,
+    placeholderData: keepPreviousData,
+    staleTime: 0,
+  });
+}
+
+export function useMyRemoteWork() {
+  return useQuery({ queryKey: timesheetKeys.myRemote, queryFn: listMyRemoteWork });
+}
+
+export function useRemoteUsage() {
+  return useQuery({ queryKey: timesheetKeys.remoteUsage, queryFn: getMyRemoteUsage });
+}
+
+/** Xem trước đơn WFH mỗi khi đổi ngày / buổi / lý do (backend kiểm tra đối tượng, hạn gửi, giới hạn, trùng đơn). */
+export function useRemoteWorkPreview(draft: RemoteWorkDraft | null) {
+  return useQuery({
+    queryKey: timesheetKeys.remotePreview(draft),
+    queryFn: () => previewRemoteWork(draft!),
     enabled: !!draft,
     placeholderData: keepPreviousData,
     staleTime: 0,
@@ -141,6 +169,27 @@ export function useCancelLeave() {
   });
 }
 
+export function useSubmitRemoteWork() {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: ({ draft, detail }: { draft: RemoteWorkDraft; detail: string }) => submitRemoteWork(draft, detail),
+    onSuccess: invalidate,
+  });
+}
+
+export function useWithdrawRemoteWork() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: withdrawRemoteWork, onSuccess: invalidate });
+}
+
+export function useCancelRemoteWork() {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => cancelRemoteWork(id, reason),
+    onSuccess: invalidate,
+  });
+}
+
 export function useDecide() {
   const invalidate = useInvalidateAll();
   return useMutation({
@@ -166,6 +215,14 @@ const ERROR_KEYS: Record<string, TimesheetErrorKey> = {
   LEAVE_OVERLAP: "leaveOverlap",
   LEAVE_INSUFFICIENT_BALANCE: "leaveInsufficientBalance",
   LEAVE_NOT_CANCELLABLE: "leaveNotCancellable",
+  REMOTE_NOT_ELIGIBLE: "remoteNotEligible",
+  REMOTE_IN_PAST: "remoteInPast",
+  REMOTE_NO_WORKING_DAY: "remoteNoWorkingDay",
+  REMOTE_TOO_LATE: "remoteTooLate",
+  REMOTE_OVERLAP: "remoteOverlap",
+  REMOTE_WEEK_LIMIT: "remoteWeekLimit",
+  REMOTE_MONTH_LIMIT: "remoteMonthLimit",
+  REMOTE_NOT_CANCELLABLE: "remoteNotCancellable",
   APPROVAL_NOT_PENDING: "approvalNotPending",
   APPROVAL_ALREADY_DECIDED: "approvalAlreadyDecided",
   NOT_CURRENT_APPROVER: "notCurrentApprover",
