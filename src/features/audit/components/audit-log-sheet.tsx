@@ -25,6 +25,7 @@ function targetHref(target: AuditLogEntry["target"]): string | null {
   if (target.type === "ROLE") return `/admin/roles/${encodeURIComponent(target.id)}`;
   if (target.type === "POLICY") return `/admin/policies/${encodeURIComponent(target.id)}`;
   if (target.type === "EMPLOYEE") return `/employees/${encodeURIComponent(target.id)}`;
+  if (target.type === "CONTRACT") return `/contracts/${encodeURIComponent(target.id)}`;
   return null;
 }
 
@@ -77,7 +78,9 @@ export function AuditLogSheet({ entry, onClose }: AuditLogSheetProps) {
                           ? t("Sheet.openPolicy")
                           : shown.target.type === "EMPLOYEE"
                             ? t("Sheet.openEmployee")
-                            : t("Sheet.openAccount")}
+                            : shown.target.type === "CONTRACT"
+                              ? t("Sheet.openContract")
+                              : t("Sheet.openAccount")}
                     </Link>
                   )}
                 </span>

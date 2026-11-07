@@ -38,6 +38,8 @@ export const employeeKeys = {
 
 /** Trạng thái tài khoản đổi theo hồ sơ (nghỉ việc → khóa, cấp tài khoản): làm mới cả trang tài khoản (key "users"). */
 const USERS_KEY = ["users"] as const;
+/** Nghỉ việc đóng / xóa hợp đồng của người đó. */
+const CONTRACTS_KEY = ["contracts"] as const;
 
 /** Thông tin nhạy cảm: không giữ trong bộ nhớ đệm lâu sau khi rời màn hình. */
 const SENSITIVE_GC_TIME = 30_000;
@@ -148,7 +150,10 @@ export function useChangeEmployeeStatus(id: string) {
     mutationFn: (body: EmployeeStatusInput) => changeEmployeeStatus(id, body),
     onSuccess: async (result) => {
       await store(result.employee);
-      await queryClient.invalidateQueries({ queryKey: USERS_KEY });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: USERS_KEY }),
+        queryClient.invalidateQueries({ queryKey: CONTRACTS_KEY }),
+      ]);
     },
   });
 }

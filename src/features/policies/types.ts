@@ -3,7 +3,7 @@ export const POLICY_VALUE_TYPES = ["INTEGER", "DECIMAL", "BOOLEAN", "STRING", "D
 export type PolicyValueType = (typeof POLICY_VALUE_TYPES)[number];
 
 /** Thứ tự module trên trang danh sách. Module mới chưa có ở đây thì xếp cuối theo tên. */
-export const POLICY_MODULES = ["approval", "leave", "timesheet", "calendar", "attendance", "face"] as const;
+export const POLICY_MODULES = ["approval", "leave", "timesheet", "calendar", "attendance", "face", "contract"] as const;
 
 /** Một khóa trong danh sách (PolicySummaryResponse): giá trị toàn công ty đang áp dụng hôm nay. */
 export type PolicySummary = {

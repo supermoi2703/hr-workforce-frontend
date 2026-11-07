@@ -14,11 +14,13 @@ const ALL_PERMISSIONS = [
   "employee:read",
   "employee:manage",
   "employee:sensitive",
+  "contract:read",
+  "contract:manage",
 ];
 
 const PERMISSIONS_BY_ROLE: Record<RoleCode, string[]> = {
   ADMIN: ALL_PERMISSIONS,
-  HR: ["user:read", "user:create", "user:update", "user:lock", "role:read", "employee:read", "employee:manage", "employee:sensitive"],
+  HR: ["user:read", "user:create", "user:update", "user:lock", "role:read", "employee:read", "employee:manage", "employee:sensitive", "contract:read", "contract:manage"],
   MANAGER: ["employee:read"],
   EMPLOYEE: [],
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -41,11 +41,17 @@ import { SensitiveSection } from "./sensitive-section";
 import { StatusDialog } from "./status-dialog";
 
 const LIST_PATH = "/employees";
-const TABS = ["overview", "personal", "sensitive"] as const;
+const TABS = ["overview", "personal", "sensitive", "contracts"] as const;
 type DetailTab = (typeof TABS)[number];
 
+type EmployeeDetailPageProps = {
+  id: string;
+  /** Nội dung tab "Hợp đồng" (feature không import nhau: route ghép vào). Chỉ hiện khi có contract:read. */
+  renderContracts?: (employee: EmployeeDetail) => ReactNode;
+};
+
 /** Chi tiết một hồ sơ (employee:read): thông tin công việc, cá nhân, nhạy cảm theo quyền; sửa / đổi trạng thái / cấp tài khoản. */
-export function EmployeeDetailPage({ id }: { id: string }) {
+export function EmployeeDetailPage({ id, renderContracts }: EmployeeDetailPageProps) {
   const t = useTranslations("Employees.Detail");
   const query = useEmployee(id);
 
@@ -79,12 +85,18 @@ export function EmployeeDetailPage({ id }: { id: string }) {
   return (
     <>
       {backLink}
-      <EmployeeDetailView employee={query.data} />
+      <EmployeeDetailView employee={query.data} renderContracts={renderContracts} />
     </>
   );
 }
 
-function EmployeeDetailView({ employee }: { employee: EmployeeDetail }) {
+function EmployeeDetailView({
+  employee,
+  renderContracts,
+}: {
+  employee: EmployeeDetail;
+  renderContracts?: EmployeeDetailPageProps["renderContracts"];
+}) {
   const t = useTranslations("Employees.Detail");
   const tAccount = useTranslations("Employees.Account");
   const tEmployeeErrors = useTranslations("Employees.Errors");
@@ -100,9 +112,14 @@ function EmployeeDetailView({ employee }: { employee: EmployeeDetail }) {
   const [provisionOpen, setProvisionOpen] = useState(false);
   const [unitHeadWarning, setUnitHeadWarning] = useState(false);
 
-  const tabs = TABS.filter(
-    (tab) => tab === "overview" || (tab === "personal" ? employee.personal !== null : actions.viewSensitive),
-  );
+  const showContracts = renderContracts !== undefined && hasPermission("contract:read");
+  const visibleTab: Record<DetailTab, boolean> = {
+    overview: true,
+    personal: employee.personal !== null,
+    sensitive: actions.viewSensitive,
+    contracts: showContracts,
+  };
+  const tabs = TABS.filter((tab) => visibleTab[tab]);
   const requested = useSearchParams().get("tab");
   const tab: DetailTab = tabs.includes(requested as DetailTab) ? (requested as DetailTab) : "overview";
   const sensitive = useSensitive(employee.id, actions.viewSensitive && tab === "sensitive");
@@ -232,6 +249,7 @@ function EmployeeDetailView({ employee }: { employee: EmployeeDetail }) {
             <SensitiveSection query={sensitive} employeeId={employee.id} />
           </TabsContent>
         )}
+        {showContracts && <TabsContent value="contracts">{renderContracts(employee)}</TabsContent>}
       </Tabs>
 
       {actions.edit && <EmployeeFormDialog employee={employee} open={editOpen} onOpenChange={setEditOpen} />}

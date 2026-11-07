@@ -462,6 +462,14 @@
     "employee_sensitive": {
       "name": "Quản lý thông tin nhạy cảm",
       "description": "Xem và sửa CCCD, mã số thuế, BHXH, tài khoản ngân hàng, người phụ thuộc"
+    },
+    "contract_read": {
+      "name": "Xem hợp đồng",
+      "description": "Xem hợp đồng và lịch sử lương trong phạm vi dữ liệu"
+    },
+    "contract_manage": {
+      "name": "Quản lý hợp đồng",
+      "description": "Tạo, sửa, kết thúc hợp đồng và quản lý lịch sử lương"
     }
   },
   "AuditActions": {
@@ -496,7 +504,14 @@
     "EMPLOYEE_CREATED": "Tạo hồ sơ nhân viên",
     "EMPLOYEE_UPDATED": "Sửa hồ sơ nhân viên",
     "EMPLOYEE_STATUS_CHANGED": "Đổi trạng thái làm việc",
-    "EMPLOYEE_SENSITIVE_UPDATED": "Sửa thông tin nhạy cảm"
+    "EMPLOYEE_SENSITIVE_UPDATED": "Sửa thông tin nhạy cảm",
+    "CONTRACT_CREATED": "Tạo hợp đồng",
+    "CONTRACT_UPDATED": "Sửa hợp đồng",
+    "CONTRACT_ENDED": "Kết thúc hợp đồng",
+    "CONTRACT_DELETED": "Xóa hợp đồng",
+    "CONTRACT_SALARY_ADDED": "Thêm mức lương",
+    "CONTRACT_SALARY_UPDATED": "Sửa mức lương",
+    "CONTRACT_SALARY_DELETED": "Xóa mức lương"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -552,7 +567,8 @@
       "openAccount": "Mở tài khoản",
       "openRole": "Mở vai trò",
       "openPolicy": "Mở chính sách",
-      "openEmployee": "Mở hồ sơ"
+      "openEmployee": "Mở hồ sơ",
+      "openContract": "Mở hợp đồng"
     },
     "Meta": {
       "reason": "Lý do",
@@ -1561,7 +1577,8 @@
       "timesheet": "Giờ làm việc",
       "calendar": "Lịch văn phòng",
       "attendance": "Chấm công",
-      "face": "Chấm công khuôn mặt"
+      "face": "Chấm công khuôn mặt",
+      "contract": "Hợp đồng"
     },
     "types": {
       "INTEGER": "Số nguyên",
@@ -1697,6 +1714,10 @@
       "attendance_remote_min_span_percent": {
         "name": "Khoảng cách hai lần chấm WFH (%)",
         "description": "Ngày làm từ xa, lần vào và lần ra phải cách nhau ít nhất chừng này phần trăm khung giờ phải làm."
+      },
+      "contract_expiry_warning_days": {
+        "name": "Cảnh báo hợp đồng sắp hết hạn",
+        "description": "Hiện các hợp đồng kết thúc trong số ngày này."
       }
     }
   },
@@ -2070,7 +2091,8 @@
       "create": "Thêm nhân viên",
       "save": "Lưu thay đổi",
       "created": "Đã tạo hồ sơ {code}",
-      "saved": "Đã lưu hồ sơ"
+      "saved": "Đã lưu hồ sơ",
+      "employmentTypeHint": "Tự cập nhật theo hợp đồng đang hiệu lực."
     },
     "Detail": {
       "metaTitle": "Hồ sơ nhân viên",
@@ -2080,7 +2102,8 @@
       "tabs": {
         "overview": "Tổng quan",
         "personal": "Cá nhân",
-        "sensitive": "Nhạy cảm"
+        "sensitive": "Nhạy cảm",
+        "contracts": "Hợp đồng"
       },
       "viewAuditLog": "Xem nhật ký",
       "edit": "Sửa",
@@ -2105,7 +2128,7 @@
       "terminationDate": "Ngày nghỉ việc",
       "reason": "Lý do",
       "reasonHint": "Ghi vào nhật ký hệ thống.",
-      "terminateWarning": "Tài khoản gắn hồ sơ sẽ bị khóa và đăng xuất trên mọi thiết bị. Các bước duyệt đang chờ nhân viên này được giao cho người khác.",
+      "terminateWarning": "Tài khoản gắn hồ sơ sẽ bị khóa và đăng xuất trên mọi thiết bị. Hợp đồng đang chạy kết thúc tại ngày nghỉ, các bước duyệt đang chờ nhân viên này được giao cho người khác.",
       "onLeaveWarning": "Các bước duyệt đang chờ nhân viên này được giao cho người khác.",
       "rehireHint": "Mã nhân viên giữ nguyên. Tài khoản đang bị khóa không tự mở khóa.",
       "submit": "Đổi trạng thái",
@@ -2169,7 +2192,8 @@
     "editTitle": "Sửa thông tin cá nhân",
     "editDescription": "Nhân sự xem được các thông tin này. Ô để trống sẽ được lưu là trống.",
     "save": "Lưu",
-    "saved": "Đã lưu thông tin cá nhân"
+    "saved": "Đã lưu thông tin cá nhân",
+    "contracts": "Hợp đồng và lương"
   },
   "Projects": {
     "List": {
@@ -2576,5 +2600,158 @@
     "deleteLogDescription": "Giờ đã log của việc sẽ giảm tương ứng.",
     "removeMemberTitle": "Bớt {name} khỏi dự án?",
     "removeMemberDescription": "Việc đang mở của người này sẽ về Chưa giao. Giờ đã log vẫn giữ."
+  },
+  "Contracts": {
+    "metaTitle": "Hợp đồng",
+    "types": {
+      "PROBATION": "Thử việc",
+      "FIXED_TERM": "Xác định thời hạn",
+      "INDEFINITE": "Không xác định thời hạn",
+      "INTERNSHIP": "Thực tập",
+      "SERVICE": "Dịch vụ"
+    },
+    "states": {
+      "UPCOMING": "Chưa bắt đầu",
+      "ACTIVE": "Đang hiệu lực",
+      "ENDED": "Đã kết thúc"
+    },
+    "List": {
+      "title": "Hợp đồng",
+      "description": "Hợp đồng lao động trong phạm vi dữ liệu của bạn. Muốn thêm hợp đồng, hãy mở hồ sơ nhân viên.",
+      "empty": "Không có hợp đồng nào khớp bộ lọc"
+    },
+    "Filters": {
+      "search": "Tìm theo số hợp đồng, tên hoặc mã nhân viên",
+      "office": "Văn phòng",
+      "allOffices": "Mọi văn phòng",
+      "type": "Loại",
+      "allTypes": "Mọi loại",
+      "state": "Trạng thái",
+      "allStates": "Mọi trạng thái",
+      "clear": "Xóa bộ lọc"
+    },
+    "Columns": {
+      "number": "Số hợp đồng",
+      "employee": "Nhân viên",
+      "type": "Loại",
+      "state": "Trạng thái",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "noEndDate": "Không thời hạn"
+    },
+    "Expiring": {
+      "title": "{count, plural, other {# hợp đồng sắp hết hạn}}",
+      "endsOn": "Kết thúc {date}"
+    },
+    "Fields": {
+      "contractNumber": "Số hợp đồng",
+      "type": "Loại hợp đồng",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "employee": "Nhân viên",
+      "effectiveFrom": "Hiệu lực từ",
+      "baseSalary": "Lương cơ bản",
+      "lunchAllowance": "Phụ cấp ăn trưa",
+      "otherAllowance": "Phụ cấp khác",
+      "insuranceSalary": "Lương đóng bảo hiểm",
+      "insuranceHint": "Để trống thì bằng lương cơ bản.",
+      "allowanceHint": "Để trống là 0.",
+      "status": "Trạng thái",
+      "reason": "Lý do"
+    },
+    "Form": {
+      "createTitle": "Thêm hợp đồng",
+      "createDescription": "Mức lương bên dưới áp dụng từ ngày bắt đầu.",
+      "editTitle": "Sửa hợp đồng",
+      "editDescription": "Hợp đồng sửa được cho tới khi bắt đầu. Sau đó chỉ kết thúc sớm được.",
+      "renewTitle": "Gia hạn hợp đồng",
+      "renewDescription": "Tạo hợp đồng mới nối tiếp hợp đồng này, điền sẵn theo mức lương gần nhất. Hãy kiểm tra trước khi lưu.",
+      "contract": "Hợp đồng",
+      "salary": "Mức lương từ ngày bắt đầu",
+      "choose": "Chọn",
+      "save": "Lưu thay đổi",
+      "create": "Thêm hợp đồng",
+      "saved": "Đã lưu hợp đồng",
+      "created": "Đã tạo hợp đồng {number}"
+    },
+    "Salary": {
+      "title": "Lịch sử lương",
+      "description": "Mức lương đã có hiệu lực không sửa được. Muốn sửa, hãy thêm mức mới cùng ngày kèm lý do: mức mới sẽ được áp dụng.",
+      "addTitle": "Thêm mức lương",
+      "editTitle": "Sửa mức lương",
+      "add": "Thêm mức lương",
+      "edit": "Sửa mức lương",
+      "delete": "Xóa mức lương",
+      "actions": "Thao tác",
+      "show": "Hiện số tiền",
+      "hide": "Ẩn số tiền",
+      "inEffectHint": "Ngày này là hôm nay hoặc đã qua nên bắt buộc có lý do. Chênh lệch ở kỳ lương đã khóa được xử lý ở kỳ sau.",
+      "save": "Lưu",
+      "saved": "Đã lưu mức lương",
+      "deleted": "Đã xóa mức lương",
+      "deleteTitle": "Xóa mức lương này?",
+      "deleteDescription": "Mức lương hiệu lực từ {date} sẽ bị xóa.",
+      "statuses": {
+        "current": "Đang áp dụng",
+        "upcoming": "Sắp áp dụng",
+        "past": "Đã qua",
+        "replaced": "Đã thay thế"
+      }
+    },
+    "End": {
+      "title": "Kết thúc sớm hợp đồng",
+      "description": "Các mức lương tương lai sau ngày kết thúc mới sẽ bị xóa. Không hoàn tác được.",
+      "newEndDate": "Ngày kết thúc mới",
+      "submit": "Kết thúc hợp đồng",
+      "success": "Đã kết thúc hợp đồng"
+    },
+    "Detail": {
+      "metaTitle": "Hợp đồng",
+      "back": "Hợp đồng",
+      "notFound": "Không tìm thấy hợp đồng",
+      "notFoundDescription": "Hợp đồng không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn.",
+      "viewAuditLog": "Xem nhật ký",
+      "actions": "Thao tác",
+      "edit": "Sửa hợp đồng",
+      "renew": "Gia hạn",
+      "end": "Kết thúc sớm",
+      "delete": "Xóa hợp đồng",
+      "noEndDate": "Không thời hạn",
+      "deleted": "Đã xóa hợp đồng",
+      "deleteTitle": "Xóa hợp đồng này?",
+      "deleteDescription": "Hợp đồng {number} và các mức lương của nó sẽ bị xóa."
+    },
+    "EmployeeTab": {
+      "empty": "Chưa có hợp đồng",
+      "create": "Thêm hợp đồng",
+      "noEndDate": "không thời hạn"
+    },
+    "Mine": {
+      "empty": "Bạn chưa có hợp đồng trên hệ thống",
+      "noEndDate": "không thời hạn"
+    },
+    "Validation": {
+      "required": "Bắt buộc",
+      "tooLong": "Quá dài",
+      "salaryRequired": "Nhập lương cơ bản lớn hơn 0",
+      "beforeHireDate": "Không được trước ngày vào làm",
+      "endBeforeStart": "Không được trước ngày bắt đầu",
+      "outOfContract": "Phải nằm trong thời hạn hợp đồng. Hợp đồng chưa bắt đầu thì phải sau ngày bắt đầu",
+      "reasonRequired": "Nhập lý do cho mức lương có hiệu lực từ hôm nay trở về trước",
+      "endDateInvalid": "Phải từ ngày bắt đầu trở đi và trước ngày kết thúc hiện tại"
+    },
+    "Errors": {
+      "notFound": "Hợp đồng không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn.",
+      "numberExists": "Số hợp đồng này đã được dùng.",
+      "overlap": "Nhân viên đã có hợp đồng trong khoảng thời gian này. Hãy kết thúc hợp đồng đó hoặc chọn ngày khác.",
+      "invalidDates": "Kiểm tra lại ngày: hợp đồng không thời hạn không có ngày kết thúc, loại khác bắt buộc có, và không được bắt đầu trước ngày vào làm.",
+      "notEditable": "Hợp đồng đã bắt đầu nên không sửa được. Trang đã được tải lại.",
+      "versionConflict": "Hợp đồng vừa được người khác sửa. Bản mới nhất đã được tải lại, hãy kiểm tra rồi thử lại.",
+      "salaryNotFound": "Mức lương này không còn tồn tại. Trang đã được tải lại.",
+      "salaryLocked": "Không sửa được mức lương này: đã có hiệu lực hoặc là mức đầu tiên của hợp đồng. Trang đã được tải lại.",
+      "salaryOutOfRange": "Ngày hiệu lực phải nằm trong thời hạn hợp đồng.",
+      "employeeTerminated": "Nhân viên đã nghỉ việc nên không tạo được hợp đồng mới.",
+      "employeeNotFound": "Nhân viên không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn."
+    }
   }
 }
