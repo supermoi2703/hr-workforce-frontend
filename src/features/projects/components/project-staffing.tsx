@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Trash2Icon, UserPlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,6 +28,7 @@ export function ProjectStaffing({ project, members }: { project: Project; member
   const t = useTranslations("ProjectWork");
   const errorMessage = useWorkErrorMessage();
   const [adding, setAdding] = useState(false);
+  const [removing, setRemoving] = useState<ProjectMember | null>(null);
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
   const remove = useWorkMutation((employeeId: string) => removeMember(project.id, employeeId));
   const update = useWorkMutation(({ employeeId, percent }: { employeeId: string; percent: number }) =>
@@ -55,7 +57,7 @@ export function ProjectStaffing({ project, members }: { project: Project; member
                 onChange={(value) => update.mutate({ employeeId: member.employee.id, percent: Number(value) }, fail)}
                 options={[...new Set([...PERCENTS, member.allocationPercent ?? 100])].map((value) => ({ value: String(value), label: `${value}%` }))}
               />
-              <Button size="icon-sm" variant="ghost" aria-label={t("removeMember")} onClick={() => remove.mutate(member.employee.id, fail)}>
+              <Button size="icon-sm" variant="ghost" aria-label={t("removeMember")} onClick={() => setRemoving(member)}>
                 <Trash2Icon />
               </Button>
             </li>
@@ -63,6 +65,23 @@ export function ProjectStaffing({ project, members }: { project: Project; member
         </ul>
       )}
       {adding && <AddMembersDialog project={project} onClose={() => setAdding(false)} />}
+      <ConfirmDialog
+        open={!!removing}
+        onOpenChange={(open) => !open && setRemoving(null)}
+        title={t("removeMemberTitle", { name: removing?.employee.fullName ?? "" })}
+        description={t("removeMemberDescription")}
+        confirmLabel={t("removeMember")}
+        destructive
+        onConfirm={() =>
+          remove.mutateAsync(removing!.employee.id).then(
+            () => setRemoving(null),
+            (error) => {
+              toast.error(errorMessage(error));
+              throw error;
+            },
+          )
+        }
+      />
     </div>
   );
 }

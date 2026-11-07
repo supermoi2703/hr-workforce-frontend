@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BanIcon, PencilIcon, Trash2Icon, UserRoundCogIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ErrorState, LoadingState } from "@/components/shared/states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
   const { card, can } = task;
   const [editing, setEditing] = useState(false);
   const [reassigning, setReassigning] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
   const transition = useWorkMutation((to: TaskStatus) => transitionTask(card.id, to, card.version));
   const remove = useWorkMutation(() => deleteTask(card.id));
@@ -101,7 +103,7 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
           </Button>
         )}
         {can.delete && (
-          <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => remove.mutate(undefined, { ...fail, onSuccess: onClose })}>
+          <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => setDeleting(true)}>
             <Trash2Icon />
           </Button>
         )}
@@ -145,6 +147,20 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
 
       {editing && <TaskFormDialog project={project} task={task} onClose={() => setEditing(false)} />}
       {reassigning && <ReassignDialog taskId={card.id} taskKey={card.key} onClose={() => setReassigning(false)} />}
+      <ConfirmDialog
+        open={deleting}
+        onOpenChange={setDeleting}
+        title={t("deleteTaskTitle", { key: card.key })}
+        description={t("deleteTaskDescription")}
+        confirmLabel={t("delete")}
+        destructive
+        onConfirm={() =>
+          remove.mutateAsync(undefined).then(onClose, (error) => {
+            toast.error(errorMessage(error));
+            throw error;
+          })
+        }
+      />
     </div>
   );
 }
@@ -225,6 +241,7 @@ function WorklogSection({ task }: { task: Task }) {
   const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
   const add = useWorkMutation(() => addWorklog(task.card.id, { workDate: day, minutes: minutes!, note: note.trim() || null }));
   const remove = useWorkMutation(deleteWorklog);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   return (
     <section className="grid gap-2">
@@ -261,13 +278,30 @@ function WorklogSection({ task }: { task: Task }) {
               {log.note ? ` · ${log.note}` : ""}
             </span>
             {log.mine && (
-              <button type="button" aria-label={t("delete")} className="text-muted-foreground ml-auto" onClick={() => remove.mutate(log.id, fail)}>
+              <button type="button" aria-label={t("delete")} className="text-muted-foreground ml-auto" onClick={() => setDeleting(log.id)}>
                 <Trash2Icon className="size-3.5" />
               </button>
             )}
           </li>
         ))}
       </ul>
+      <ConfirmDialog
+        open={!!deleting}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title={t("deleteLogTitle")}
+        description={t("deleteLogDescription")}
+        confirmLabel={t("delete")}
+        destructive
+        onConfirm={() =>
+          remove.mutateAsync(deleting!).then(
+            () => setDeleting(null),
+            (error) => {
+              toast.error(errorMessage(error));
+              throw error;
+            },
+          )
+        }
+      />
     </section>
   );
 }
