@@ -13,7 +13,7 @@ import { useProjectMembers } from "../hooks";
 import { useWorkErrorMessage, useWorkMutation, useTasks } from "../work-hooks";
 import { formatMinutes } from "../work-rules";
 import type { Project } from "../types";
-import { TASK_STATUSES, type TaskCard, type TaskStatus } from "../work-types";
+import { BOARD_STATUSES, TASK_STATUSES, type TaskCard, type TaskStatus } from "../work-types";
 import { PersonChip, PriorityIcon, TypeIcon } from "./badges";
 import { SimpleSelect } from "./simple-select";
 
@@ -81,19 +81,24 @@ export function TasksTab({ project, onOpenTask }: { project: Project; onOpenTask
                     <span className="flex items-center gap-2">
                       <PriorityIcon priority={task.priority} />
                       <span className="truncate">{task.title}</span>
+                      {task.common && <Badge variant="secondary">{t("common")}</Badge>}
                       {task.blocked && <Badge variant="destructive">{t("blocked")}</Badge>}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <SimpleSelect
-                      size="sm"
-                      className="w-36"
-                      value={task.status}
-                      onChange={(to) =>
-                        transition.mutate({ task, to: to as TaskStatus }, { onError: (error) => toast.error(errorMessage(error)) })
-                      }
-                      options={TASK_STATUSES.map((value) => ({ value, label: t(`status.${value}`) }))}
-                    />
+                    {task.common ? (
+                      "—"
+                    ) : (
+                      <SimpleSelect
+                        size="sm"
+                        className="w-36"
+                        value={task.status}
+                        onChange={(to) =>
+                          transition.mutate({ task, to: to as TaskStatus }, { onError: (error) => toast.error(errorMessage(error)) })
+                        }
+                        options={(project.can.editAnyTask ? TASK_STATUSES : BOARD_STATUSES).map((value) => ({ value, label: t(`status.${value}`) }))}
+                      />
+                    )}
                   </TableCell>
                   <TableCell>
                     <PersonChip person={task.assignee} emptyLabel={t("unassigned")} />

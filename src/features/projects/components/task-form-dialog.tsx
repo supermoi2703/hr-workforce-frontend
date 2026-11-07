@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   const [dueDate, setDueDate] = useState(task?.card.dueDate ?? "");
   const [estimate, setEstimate] = useState(task?.card.estimateMinutes != null ? String(task.card.estimateMinutes / 60) : "");
   const [skillIds, setSkillIds] = useState<string[]>(task?.skillIds ?? []);
+  const [common, setCommon] = useState(false);
   const estimateMinutes = parseHours(estimate);
   const validEstimate = !estimate.trim() || estimateMinutes != null;
 
@@ -43,7 +45,8 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
       title: title.trim(),
       description: description.trim() || null,
       priority,
-      assigneeId: assignee === NOBODY ? null : assignee,
+      assigneeId: common || assignee === NOBODY ? null : assignee,
+      common,
       parentId: task?.parent?.taskId ?? null,
       dueDate: dueDate || null,
       estimateMinutes,
@@ -60,6 +63,12 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
           <DialogTitle>{task ? t("editTask", { key: task.card.key }) : t("newTask")}</DialogTitle>
         </DialogHeader>
         <FieldGroup className="gap-4">
+          {!task && (
+            <label className="flex items-center gap-2 text-sm" title={t("commonHint")}>
+              <Checkbox checked={common} onCheckedChange={(checked) => setCommon(checked === true)} />
+              {t("common")}
+            </label>
+          )}
           <Field>
             <FieldLabel htmlFor="task-title">{t("taskTitle")}</FieldLabel>
             <Input id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
