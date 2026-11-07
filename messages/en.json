@@ -2380,10 +2380,10 @@
     "reassign": "Reassign",
     "statusTitle": "Progress",
     "hoursSummary": "Estimate {estimate} · Logged {logged} · Remaining {remaining}",
-    "activeSprint": "Sprint {name}: {done}/{total} tasks done",
+    "activeSprint": "{name}: {done}/{total} tasks done",
     "workloadTitle": "Workload by person",
     "noWorkload": "No open assigned tasks.",
-    "workloadRow": "{tasks} tasks · {hours}",
+    "workloadRow": "{tasks, plural, one {# task} other {# tasks}} · {hours}",
     "metricsTitle": "Delivery metrics",
     "metricCycle": "Average cycle time",
     "metricOnTime": "On-time rate",
@@ -2414,7 +2414,7 @@
     "closeSprint": "Close sprint",
     "sprintDone": "{done}/{total} done",
     "sprintCapacity": "Sprint capacity (leave removed)",
-    "leaveDays": "{days} days off",
+    "leaveDays": "{days, plural, one {# day off} other {# days off}}",
     "capacityHint": "Each cell shows work due that week on every project / hours available after approved leave.",
     "person": "Person",
     "peopleCount": "{count} people",
@@ -2510,7 +2510,8 @@
       "NOT_ENOUGH_TIME": "Not enough time",
       "OVERDUE": "Overdue",
       "LEAVE_BEFORE_DUE": "Leave before due date",
-      "BLOCKED": "Blocked"
+      "BLOCKED": "Blocked",
+      "ASSIGNEE_UNAVAILABLE": "Assignee left or is on long leave"
     },
     "sprintStatus": {
       "PLANNED": "Planned",
@@ -2546,10 +2547,14 @@
       "SPRINT_DISABLED": "Sprints are off for this project.",
       "SPRINT_ALREADY_ACTIVE": "A sprint is already running.",
       "SPRINT_INVALID_STATE": "Not allowed in the current sprint state.",
-      "WORKLOG_DAY_NOT_ALLOWED": "Time cannot be logged for future days or full days off.",
+      "WORKLOG_DAY_NOT_ALLOWED": "Time cannot be logged for future days, days over 30 days ago, days off or non-working days.",
       "WORKLOG_STEP": "Logged time must be a multiple of 15 minutes.",
       "PROJECT_MEMBER_INVALID": "This person is not in the project or cannot take tasks.",
-      "PROJECT_HAS_OPEN_TASKS": "Finish or cancel the open tasks before closing the project."
+      "PROJECT_HAS_OPEN_TASKS": "Finish or cancel the open tasks before closing the project.",
+      "TASK_NOT_DELETABLE": "Only a new task without subtasks or comments can be deleted. Cancel it instead to keep its history.",
+      "WORKLOG_DAY_LIMIT": "This exceeds the hours you can log for the day: 8 hours, or 4 on a half day off.",
+      "WORKLOG_NOT_MEMBER_ON_DAY": "You were not on this project on that day.",
+      "WORKLOG_TASK_CLOSED": "Time cannot be logged on a cancelled task or one finished more than 7 days ago."
     },
     "useSprints": "Use sprints (adds Backlog and Sprint; off means continuous Kanban)",
     "addMembers": "Add members",
@@ -2562,6 +2567,14 @@
     "pickProject": "Choose a project",
     "alreadyInProject": "Already in project",
     "membersAdded": "{count} people added",
-    "addCount": "Add {count} people"
+    "addCount": "Add {count} people",
+    "common": "Shared task",
+    "commonHint": "Meetings, training, support: no assignee, anyone in the project can log time",
+    "deleteTaskTitle": "Delete {key}?",
+    "deleteTaskDescription": "The task and its history will be gone for good. Cancel it instead to keep them.",
+    "deleteLogTitle": "Delete this time entry?",
+    "deleteLogDescription": "Logged time on the task goes down accordingly.",
+    "removeMemberTitle": "Remove {name} from the project?",
+    "removeMemberDescription": "Their open tasks become unassigned. Logged time is kept."
   }
 }

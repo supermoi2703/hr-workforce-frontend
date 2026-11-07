@@ -6,7 +6,7 @@ export const BOARD_STATUSES = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"] as co
 export const TASK_STATUSES = [...BOARD_STATUSES, "CANCELLED"] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 export type SprintStatus = "PLANNED" | "ACTIVE" | "CLOSED";
-export type RiskCode = "DUE_ON_LEAVE" | "NOT_ENOUGH_TIME" | "OVERDUE" | "LEAVE_BEFORE_DUE" | "BLOCKED";
+export type RiskCode = "DUE_ON_LEAVE" | "NOT_ENOUGH_TIME" | "OVERDUE" | "LEAVE_BEFORE_DUE" | "BLOCKED" | "ASSIGNEE_UNAVAILABLE";
 export type CapacityFlag = "OVERLOADED" | "ON_LEAVE" | "IDLE";
 export type TaskEventKind =
   | "CREATED"
@@ -40,6 +40,7 @@ export type TaskCard = {
   parentId: string | null;
   blocked: boolean;
   overdue: boolean;
+  common: boolean;
   version: number;
 };
 

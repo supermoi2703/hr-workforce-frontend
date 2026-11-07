@@ -22,7 +22,7 @@ const STATUS_BAR = { TODO: "bg-muted-foreground/40", IN_PROGRESS: "bg-info", IN_
 export function OverviewTab({ project, onOpenTask }: { project: Project; onOpenTask: (key: string) => void }) {
   const t = useTranslations("ProjectWork");
   const overview = useOverview(project.id);
-  const risks = useRisks(project.id, project.can.viewTaskContent);
+  const risks = useRisks(project.id, project.can.editAnyTask);
   const metrics = useMetrics(project.id, project.can.viewTaskContent);
   const [reassigning, setReassigning] = useState<Risk | null>(null);
 
@@ -56,7 +56,7 @@ export function OverviewTab({ project, onOpenTask }: { project: Project; onOpenT
         ))}
       </div>
 
-      {project.can.viewTaskContent && (
+      {project.can.editAnyTask && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

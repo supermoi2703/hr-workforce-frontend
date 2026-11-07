@@ -2380,7 +2380,7 @@
     "reassign": "Giao lại",
     "statusTitle": "Tiến độ",
     "hoursSummary": "Ước lượng {estimate} · Đã log {logged} · Còn lại {remaining}",
-    "activeSprint": "Sprint {name}: xong {done}/{total} việc",
+    "activeSprint": "{name}: xong {done}/{total} việc",
     "workloadTitle": "Tải theo người",
     "noWorkload": "Chưa có việc đang mở được giao.",
     "workloadRow": "{tasks} việc · {hours}",
@@ -2510,7 +2510,8 @@
       "NOT_ENOUGH_TIME": "Không đủ giờ",
       "OVERDUE": "Quá hạn",
       "LEAVE_BEFORE_DUE": "Có ngày nghỉ trước hạn",
-      "BLOCKED": "Bị chặn"
+      "BLOCKED": "Bị chặn",
+      "ASSIGNEE_UNAVAILABLE": "Người làm đã rời hoặc đang nghỉ dài"
     },
     "sprintStatus": {
       "PLANNED": "Kế hoạch",
@@ -2546,10 +2547,14 @@
       "SPRINT_DISABLED": "Dự án chưa bật sprint.",
       "SPRINT_ALREADY_ACTIVE": "Dự án đang có sprint chạy.",
       "SPRINT_INVALID_STATE": "Không làm được ở trạng thái hiện tại của sprint.",
-      "WORKLOG_DAY_NOT_ALLOWED": "Không log được ngày tương lai hoặc ngày nghỉ cả ngày.",
+      "WORKLOG_DAY_NOT_ALLOWED": "Không log được ngày tương lai, quá 30 ngày, ngày nghỉ hoặc ngày không làm việc.",
       "WORKLOG_STEP": "Giờ log phải chia hết cho 15 phút.",
       "PROJECT_MEMBER_INVALID": "Người này không thuộc dự án hoặc không nhận việc được.",
-      "PROJECT_HAS_OPEN_TASKS": "Còn việc đang mở, hãy hoàn thành hoặc huỷ trước khi đóng dự án."
+      "PROJECT_HAS_OPEN_TASKS": "Còn việc đang mở, hãy hoàn thành hoặc huỷ trước khi đóng dự án.",
+      "TASK_NOT_DELETABLE": "Chỉ xoá được việc mới tạo, chưa có việc con và bình luận. Việc khác hãy huỷ để giữ lịch sử.",
+      "WORKLOG_DAY_LIMIT": "Vượt số giờ log được trong ngày: 8 giờ, nghỉ nửa ngày là 4 giờ.",
+      "WORKLOG_NOT_MEMBER_ON_DAY": "Ngày đó bạn chưa thuộc dự án này.",
+      "WORKLOG_TASK_CLOSED": "Không log được vào việc đã huỷ hoặc đã xong quá 7 ngày."
     },
     "useSprints": "Dùng sprint (bật Backlog và Sprint; tắt là làm liên tục kiểu Kanban)",
     "addMembers": "Thêm thành viên",
@@ -2562,6 +2567,14 @@
     "pickProject": "Chọn dự án",
     "alreadyInProject": "Đã ở dự án",
     "membersAdded": "Đã thêm {count} người",
-    "addCount": "Thêm {count} người"
+    "addCount": "Thêm {count} người",
+    "common": "Việc chung",
+    "commonHint": "Họp, đào tạo, hỗ trợ: không có người làm, ai trong dự án cũng log được",
+    "deleteTaskTitle": "Xoá {key}?",
+    "deleteTaskDescription": "Việc sẽ mất hẳn cùng lịch sử, không khôi phục được. Muốn giữ lại thì đổi sang Đã huỷ.",
+    "deleteLogTitle": "Xoá dòng log giờ này?",
+    "deleteLogDescription": "Giờ đã log của việc sẽ giảm tương ứng.",
+    "removeMemberTitle": "Bớt {name} khỏi dự án?",
+    "removeMemberDescription": "Việc đang mở của người này sẽ về Chưa giao. Giờ đã log vẫn giữ."
   }
 }

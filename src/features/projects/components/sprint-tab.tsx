@@ -94,9 +94,9 @@ export function SprintTab({ project, onOpenTask }: { project: Project; onOpenTas
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <CardContent className={cn("grid gap-4", project.can.viewAllocation && "lg:grid-cols-[minmax(0,1fr)_20rem]")}>
             <ul className="divide-y">{openTasks.filter((task) => task.sprintId === sprint.id).map(row)}</ul>
-            <SprintCapacityBars sprint={sprint} />
+            {project.can.viewAllocation && <SprintCapacityBars sprint={sprint} />}
           </CardContent>
         </Card>
       ))}

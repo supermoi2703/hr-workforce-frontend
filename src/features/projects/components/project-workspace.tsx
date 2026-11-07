@@ -23,7 +23,6 @@ import { TasksTab } from "./tasks-tab";
 const TABS = ["overview", "list", "board", "sprint", "capacity", "members", "info"] as const;
 type Tab = (typeof TABS)[number];
 const TASK_TABS: readonly Tab[] = ["list", "board", "sprint"];
-const INSIGHT_TABS: readonly Tab[] = ["overview", "capacity"];
 
 type ProjectWorkspaceProps = {
   project: Project;
@@ -70,7 +69,9 @@ function Workspace({ project, info, members }: ProjectWorkspaceProps) {
   const tabs = TABS.filter((tab) => {
     if (tab === "sprint" && !project.sprintEnabled) return false;
     if (TASK_TABS.includes(tab)) return can.viewTaskContent;
-    if (INSIGHT_TABS.includes(tab)) return can.viewTaskContent || can.viewAllocation;
+    if (tab === "overview") return can.viewTaskContent || can.viewAllocation;
+    // Năng lực có ngày nghỉ của từng người nên thành viên thường không xem.
+    if (tab === "capacity") return can.viewAllocation;
     return true;
   });
   const asked = params.get("tab") as Tab | null;
