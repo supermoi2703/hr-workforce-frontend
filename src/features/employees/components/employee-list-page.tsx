@@ -16,7 +16,7 @@ import { formatDate } from "@/lib/format";
 import { useEmployeeFilters, useEmployees, useOrgUnits } from "../hooks";
 import { teamsOf } from "../rules";
 import { EMPLOYEE_STATUSES, type EmployeeListItem, type EmployeeStatus, type OrgUnit } from "../types";
-import { ChoiceSelect } from "./choice-select";
+import { ChoiceSelect } from "@/components/shared/choice-select";
 import { EmployeeFormDialog } from "./employee-form-dialog";
 import { EmployeeStatusBadge } from "./employee-status-badge";
 

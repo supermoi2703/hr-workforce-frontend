@@ -30,7 +30,7 @@ import { useCreateEmployee, useMyProfile, useOrgUnits, useRefreshEmployee, useUp
 import { orgUnitOptions, teamsOf } from "../rules";
 import { EMPTY_PERSONAL, employeeSchema, personalToForm, toEmployeeRequest, type EmployeeFormValues } from "../schemas";
 import { EMPLOYEE_LEVELS, EMPLOYMENT_TYPES, type EmployeeDetail, type OrgUnit } from "../types";
-import { ChoiceSelect, type Choice } from "./choice-select";
+import { ChoiceSelect, type Choice } from "@/components/shared/choice-select";
 import { PersonalFields } from "./personal-fields";
 
 const FORM_ID = "employee-form";
