@@ -6,15 +6,25 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import type { PageParams } from "@/lib/api/types";
 import { ROLES, type RoleCode, type UserStatus } from "@/lib/auth/types";
-import { searchAuditLogs } from "./api";
+import { getEmployeeHistory, searchAuditLogs } from "./api";
 import { filtersFromSearchParams, filtersToSearchParams } from "./filters";
 import type { MetadataLabels } from "./metadata";
-import { AUDIT_ACTIONS, type AuditAction, type AuditFilters } from "./types";
+import { AUDIT_ACTIONS, type AuditAction, type AuditFilters, type EmployeeHistoryGroup } from "./types";
 
 export const auditKeys = {
   all: ["audit"] as const,
   list: (filters: AuditFilters, params: PageParams) => ["audit", "list", filters, params] as const,
+  employeeHistory: (employeeId: string, group: EmployeeHistoryGroup | undefined, params: PageParams) =>
+    ["audit", "employee-history", employeeId, group, params] as const,
 };
+
+export function useEmployeeHistory(employeeId: string, group: EmployeeHistoryGroup | undefined, params: PageParams) {
+  return useQuery({
+    queryKey: auditKeys.employeeHistory(employeeId, group, params),
+    queryFn: () => getEmployeeHistory(employeeId, group, params),
+    placeholderData: keepPreviousData,
+  });
+}
 
 export function useAuditLogs(filters: AuditFilters, params: PageParams) {
   return useQuery({

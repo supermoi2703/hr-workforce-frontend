@@ -81,6 +81,7 @@ describe("getEmployeeActions", () => {
       viewSensitive: true,
       viewAccount: false,
       viewAuditLog: false,
+      viewHistory: true,
     });
   });
 

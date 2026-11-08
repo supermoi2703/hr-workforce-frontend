@@ -41,17 +41,19 @@ import { SensitiveSection } from "./sensitive-section";
 import { StatusDialog } from "./status-dialog";
 
 const LIST_PATH = "/employees";
-const TABS = ["overview", "personal", "sensitive", "contracts"] as const;
+const TABS = ["overview", "personal", "sensitive", "contracts", "history"] as const;
 type DetailTab = (typeof TABS)[number];
 
 type EmployeeDetailPageProps = {
   id: string;
   /** Nội dung tab "Hợp đồng" (feature không import nhau: route ghép vào). Chỉ hiện khi có contract:read. */
   renderContracts?: (employee: EmployeeDetail) => ReactNode;
+  /** Nội dung tab "Lịch sử" (route ghép vào). Chỉ hiện và chỉ tải khi có employee:manage và đang mở tab. */
+  renderHistory?: (employee: EmployeeDetail) => ReactNode;
 };
 
 /** Chi tiết một hồ sơ (employee:read): thông tin công việc, cá nhân, nhạy cảm theo quyền; sửa / đổi trạng thái / cấp tài khoản. */
-export function EmployeeDetailPage({ id, renderContracts }: EmployeeDetailPageProps) {
+export function EmployeeDetailPage({ id, renderContracts, renderHistory }: EmployeeDetailPageProps) {
   const t = useTranslations("Employees.Detail");
   const query = useEmployee(id);
 
@@ -85,7 +87,7 @@ export function EmployeeDetailPage({ id, renderContracts }: EmployeeDetailPagePr
   return (
     <>
       {backLink}
-      <EmployeeDetailView employee={query.data} renderContracts={renderContracts} />
+      <EmployeeDetailView employee={query.data} renderContracts={renderContracts} renderHistory={renderHistory} />
     </>
   );
 }
@@ -93,9 +95,11 @@ export function EmployeeDetailPage({ id, renderContracts }: EmployeeDetailPagePr
 function EmployeeDetailView({
   employee,
   renderContracts,
+  renderHistory,
 }: {
   employee: EmployeeDetail;
   renderContracts?: EmployeeDetailPageProps["renderContracts"];
+  renderHistory?: EmployeeDetailPageProps["renderHistory"];
 }) {
   const t = useTranslations("Employees.Detail");
   const tAccount = useTranslations("Employees.Account");
@@ -113,11 +117,13 @@ function EmployeeDetailView({
   const [unitHeadWarning, setUnitHeadWarning] = useState(false);
 
   const showContracts = renderContracts !== undefined && hasPermission("contract:read");
+  const showHistory = renderHistory !== undefined && actions.viewHistory;
   const visibleTab: Record<DetailTab, boolean> = {
     overview: true,
     personal: employee.personal !== null,
     sensitive: actions.viewSensitive,
     contracts: showContracts,
+    history: showHistory,
   };
   const tabs = TABS.filter((tab) => visibleTab[tab]);
   const requested = useSearchParams().get("tab");
@@ -250,6 +256,7 @@ function EmployeeDetailView({
           </TabsContent>
         )}
         {showContracts && <TabsContent value="contracts">{renderContracts(employee)}</TabsContent>}
+        {showHistory && <TabsContent value="history">{tab === "history" && renderHistory(employee)}</TabsContent>}
       </Tabs>
 
       {actions.edit && <EmployeeFormDialog employee={employee} open={editOpen} onOpenChange={setEditOpen} />}
