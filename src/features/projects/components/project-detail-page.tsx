@@ -156,7 +156,7 @@ function ProjectDetail({ project }: { project: Project }) {
         }
         members={
           <div className="grid gap-4">
-            {can.manageMembers && <ProjectStaffing project={project} members={members.data ?? []} />}
+            {(can.manageMembers || can.viewAllocation) && <ProjectStaffing project={project} />}
             <ProjectMembers
               project={project}
               members={members.data}

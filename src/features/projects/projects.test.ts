@@ -119,6 +119,11 @@ describe("lỗi dự án", () => {
     const error = apiError("PROJECT_MEMBER_OUTSIDE_DATES", "End these allocations first: NV00013, NV00014");
     expect(getProjectError(error, t, tErrors)).toBe("memberOutsideDates NV00013, NV00014");
   });
+  it("vượt 100%: nối người, tổng % và ngày bắt đầu vượt", () => {
+    const error = apiError("ALLOCATION_OVER_LIMIT", "Employee NV00013 would be allocated 110% from 2026-12-01");
+    expect(getProjectError(error, t, tErrors)).toBe("allocationOverLimit NV00013: 110% (01/12/2026)");
+    expect(getProjectError(apiError("ALLOCATION_OVER_LIMIT", "other"), t, tErrors)).toBe("allocationOverLimit");
+  });
   it("dữ liệu cũ thì cần tải lại", () => {
     expect(isStaleProjectError(apiError("STALE_VERSION", "x"))).toBe(true);
     expect(isStaleProjectError(apiError("PROJECT_CODE_EXISTS", "x"))).toBe(false);

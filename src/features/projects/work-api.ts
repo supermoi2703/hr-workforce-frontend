@@ -1,6 +1,10 @@
 import { http, toPageQuery } from "@/lib/api/http-client";
 import type { PageParams, PageResponse } from "@/lib/api/types";
 import type {
+  AllocationInput,
+  AllocationRequest,
+  AllocationRequestStatus,
+  Availability,
   Candidate,
   Capacity,
   Comment,
@@ -25,18 +29,36 @@ import type {
 
 const enc = encodeURIComponent;
 
-// ===== Thành viên: tạm, tới khi có phân bổ có duyệt (3.4)
+// ===== Phân bổ có duyệt (3.4): vào dự án bằng đề xuất, ra bằng kết thúc sớm
 
-export const getCandidates = (projectId: string, sourceTeamId: string | null, sourceProjectId: string | null) =>
+export type CandidateQuery = {
+  sourceTeamId: string | null;
+  sourceProjectId: string | null;
+  /** Có from thì mỗi người kèm % còn trống trong [from, to]. */
+  from: string | null;
+  to: string | null;
+};
+
+export const getCandidates = (projectId: string, query: CandidateQuery) =>
   http.get<Candidate[]>(`/api/projects/${enc(projectId)}/member-candidates`, {
-    query: { sourceTeamId: sourceTeamId ?? undefined, sourceProjectId: sourceProjectId ?? undefined },
+    query: {
+      sourceTeamId: query.sourceTeamId ?? undefined,
+      sourceProjectId: query.sourceProjectId ?? undefined,
+      from: query.from ?? undefined,
+      to: query.to ?? undefined,
+    },
   });
-export const addMembers = (projectId: string, employeeIds: string[], allocationPercent: number) =>
-  http.post<number>(`/api/projects/${enc(projectId)}/members`, { employeeIds, allocationPercent });
-export const updateMemberPercent = (projectId: string, employeeId: string, allocationPercent: number) =>
-  http.put<void>(`/api/projects/${enc(projectId)}/members/${enc(employeeId)}`, { allocationPercent });
-export const removeMember = (projectId: string, employeeId: string) =>
-  http.delete<void>(`/api/projects/${enc(projectId)}/members/${enc(employeeId)}`);
+export const proposeAllocation = (projectId: string, body: AllocationInput) =>
+  http.post<AllocationRequest[]>(`/api/projects/${enc(projectId)}/allocation-requests`, body);
+export const getAllocationRequests = (projectId: string, status?: AllocationRequestStatus) =>
+  http.get<AllocationRequest[]>(`/api/projects/${enc(projectId)}/allocation-requests`, { query: { status } });
+export const getAvailability = (projectId: string, employeeId: string, from: string, to: string | null) =>
+  http.get<Availability>(`/api/projects/${enc(projectId)}/allocation-availability`, {
+    query: { employeeId, from, to: to ?? undefined },
+  });
+/** lastDay null = rời ngay: hôm nay không còn ở dự án, việc đang mở về Chưa giao. */
+export const endAllocation = (projectId: string, employeeId: string, lastDay: string | null) =>
+  http.post<void>(`/api/projects/${enc(projectId)}/members/${enc(employeeId)}/end`, { lastDay });
 export const getOrgTeams = () => http.get<OrgTeam[]>("/api/teams");
 export const setSprintMode = (projectId: string, enabled: boolean) =>
   http.put<void>(`/api/projects/${enc(projectId)}/sprint-mode`, { enabled });
