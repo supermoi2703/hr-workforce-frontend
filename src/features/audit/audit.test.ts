@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import en from "../../../messages/en.json";
 import vi from "../../../messages/vi.json";
 import { filtersFromSearchParams, filtersToSearchParams, hasActiveFilters, toApiRange } from "./filters";
-import { formatMetadata, type MetadataLabels } from "./metadata";
+import { formatChanges, formatHistoryMetadata, formatMetadata, type MetadataLabels } from "./metadata";
 import { AUDIT_ACTIONS } from "./types";
 
 const USER_ID = "0192f0aa-1111-7222-8333-444455556666";
@@ -109,9 +109,47 @@ describe("formatMetadata", () => {
   });
 });
 
+describe("lịch sử hồ sơ", () => {
+  const labels: MetadataLabels = {
+    key: (key) => ({ level: "Level", officeId: "Office", reason: "Reason" })[key] ?? null,
+    value: (value) => ({ ACTIVE: "Active" })[value] ?? null,
+    minutes: (count) => `${count} min`,
+  };
+  const OFFICE_ID = "0192f0aa-1111-7222-8333-444455556666";
+  const unitName = (_field: string, id: string) => (id === OFFICE_ID ? "Hà Nội" : undefined);
+
+  it("trường đổi → dòng trước / sau; id đơn vị → tên", () => {
+    const changes = {
+      level: { before: "JUNIOR", after: "SENIOR" },
+      officeId: { before: OFFICE_ID, after: null },
+    };
+    expect(formatChanges(changes, labels, unitName)).toEqual([
+      { key: "level", label: "Level", before: "JUNIOR", after: "SENIOR" },
+      { key: "officeId", label: "Office", before: "Hà Nội", after: "—" },
+    ]);
+  });
+
+  it("đơn vị không tra được hiện mã ngắn, không in cả UUID", () => {
+    const changes = { officeId: { before: "aaaaaaaa-1111-7222-8333-444455556666", after: OFFICE_ID } };
+    expect(formatChanges(changes, labels, unitName)[0]).toMatchObject({ before: "aaaaaaaa", after: "Hà Nội" });
+  });
+
+  it("không có changes → rỗng", () => {
+    expect(formatChanges(undefined, labels, unitName)).toEqual([]);
+    expect(formatChanges(null, labels, unitName)).toEqual([]);
+  });
+
+  it("dòng nhãn – giá trị bỏ changes và self", () => {
+    expect(formatHistoryMetadata({ changes: {}, self: true, reason: "Sửa tay" }, labels)).toEqual([
+      { key: "reason", label: "Reason", value: "Sửa tay" },
+    ]);
+    expect(formatHistoryMetadata(null, labels)).toEqual([]);
+  });
+});
+
 describe("bản dịch hành động", () => {
   it("mọi AuditAction đều có nhãn ở cả en và vi", () => {
-    expect(AUDIT_ACTIONS).toHaveLength(39);
+    expect(AUDIT_ACTIONS).toHaveLength(46);
     for (const action of AUDIT_ACTIONS) {
       expect(en.AuditActions).toHaveProperty(action);
       expect(vi.AuditActions).toHaveProperty(action);

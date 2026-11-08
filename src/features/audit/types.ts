@@ -45,6 +45,15 @@ export const AUDIT_ACTIONS_BY_CATEGORY = {
     "POLICY_UPDATED",
     "POLICY_VALUE_DELETED",
   ],
+  WORKFLOW: [
+    "APPROVAL_SUBMITTED",
+    "APPROVAL_APPROVED",
+    "APPROVAL_REJECTED",
+    "APPROVAL_WITHDRAWN",
+    "EMPLOYEE_SKILL_DECLARED",
+    "EMPLOYEE_SKILL_REMOVED",
+    "EMPLOYEE_SKILL_CONFIRMED",
+  ],
 } as const;
 
 export type AuditCategory = keyof typeof AUDIT_ACTIONS_BY_CATEGORY;
@@ -69,6 +78,21 @@ export type AuditLogEntry = {
   target: { type: string; id: string | null; label: string | null } | null;
   ipAddress: string | null;
   userAgent: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+};
+
+/** Nhóm sự kiện ở tab Lịch sử (enum EmployeeHistoryGroup). Nhóm người xem không có quyền thì backend bỏ qua. */
+export const EMPLOYEE_HISTORY_GROUPS = ["PROFILE", "SENSITIVE", "CONTRACT", "ACCOUNT", "APPROVAL", "SKILL"] as const;
+export type EmployeeHistoryGroup = (typeof EMPLOYEE_HISTORY_GROUPS)[number];
+
+/** Một dòng ở tab Lịch sử (EmployeeHistoryItem). Không có IP, thiết bị. `actorEmail` null = hệ thống. */
+export type EmployeeHistoryItem = {
+  id: string;
+  action: string;
+  group: EmployeeHistoryGroup;
+  actorEmail: string | null;
+  targetLabel: string | null;
   metadata: Record<string, unknown> | null;
   createdAt: string;
 };

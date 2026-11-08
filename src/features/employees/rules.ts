@@ -35,6 +35,8 @@ export type EmployeeActions = {
   /** Link sang /admin/users/{id}. */
   viewAccount: boolean;
   viewAuditLog: boolean;
+  /** Tab Lịch sử trong hồ sơ: HR và Admin, trong phạm vi (06 A4). */
+  viewHistory: boolean;
 };
 
 /**
@@ -53,6 +55,7 @@ export function getEmployeeActions(
     viewSensitive: hasPermission("employee:sensitive"),
     viewAccount: hasPermission("user:read") && detail.account !== null,
     viewAuditLog: hasPermission("audit:read"),
+    viewHistory: manage,
   };
 }
 
