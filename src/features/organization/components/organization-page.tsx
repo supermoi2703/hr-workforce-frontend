@@ -22,7 +22,8 @@ const SEARCH_DELAY_MS = 350;
 /**
  * Cơ cấu tổ chức (/organization): cây phòng ban → team bên trái, chi tiết nút đang chọn bên phải (sơ đồ báo cáo +
  * danh sách người). Hai cách xem: cả công ty theo phòng ban, hoặc theo từng văn phòng. Mọi người đã đăng nhập đều xem
- * được (06 C1). Cách xem, văn phòng, nút đang chọn, từ khóa nằm trên URL.
+ * được khung; người và số người theo phạm vi người xem (đơn vị ngoài phạm vi có `restricted`). Cách xem, văn phòng, nút
+ * đang chọn, từ khóa nằm trên URL.
  */
 export function OrganizationPage() {
   const t = useTranslations("Organization");
