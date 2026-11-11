@@ -22,7 +22,8 @@ const SEARCH_DELAY_MS = 350;
 /**
  * Cơ cấu tổ chức (/organization): cây phòng ban → team bên trái, chi tiết nút đang chọn bên phải (sơ đồ báo cáo +
  * danh sách người). Hai cách xem: cả công ty theo phòng ban, hoặc theo từng văn phòng. Mọi người đã đăng nhập đều xem
- * được (06 C1). Cách xem, văn phòng, nút đang chọn, từ khóa nằm trên URL.
+ * được khung; người và số người theo phạm vi người xem (đơn vị ngoài phạm vi có `restricted`). Cách xem, văn phòng, nút
+ * đang chọn, từ khóa nằm trên URL.
  */
 export function OrganizationPage() {
   const t = useTranslations("Organization");
@@ -190,7 +191,7 @@ function OfficePicker({
   value,
   onChange,
 }: {
-  offices: { id: string; name: string; city: string | null; employeeCount: number }[];
+  offices: { id: string; name: string; city: string | null; employeeCount: number | null }[];
   loading: boolean;
   value: string | undefined;
   onChange: (id: string) => void;
@@ -199,7 +200,10 @@ function OfficePicker({
   if (loading) return <Skeleton className="h-8 w-full" />;
   if (offices.length === 0) return <p className="text-sm text-muted-foreground">{t("Empty.noOffices")}</p>;
   const items = Object.fromEntries(
-    offices.map((office) => [office.id, t("officeOption", { name: office.name, count: office.employeeCount })]),
+    offices.map((office) => [
+      office.id,
+      office.employeeCount == null ? office.name : t("officeOption", { name: office.name, count: office.employeeCount }),
+    ]),
   );
   return (
     <Select value={value ?? null} onValueChange={(next) => next && onChange(String(next))} items={items}>

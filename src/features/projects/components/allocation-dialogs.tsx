@@ -19,15 +19,16 @@ import {
   defaultPeriod,
   hasRoomFor,
   periodProblem,
-  pickedByDefault,
+  selectableIds,
   pickedIds,
 } from "../allocation-rules";
 import { useProjectErrorMessage } from "../hooks";
 import type { Project, ProjectMember, ProjectPerson } from "../types";
 import { endAllocation, proposeAllocation } from "../work-api";
-import { useAvailability, useCandidates, useOrgTeams, useSourceProjects, useWorkMutation } from "../work-hooks";
+import { useAvailability, useCandidates, useOrgTeams, useWorkMutation } from "../work-hooks";
 import { PersonChip } from "./badges";
 import { EmployeePicker } from "./employee-picker";
+import { ProjectSourcePicker, type SourceProject } from "./project-source-picker";
 import { SimpleSelect } from "./simple-select";
 
 type Source = "team" | "project" | "person";
@@ -79,6 +80,7 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   const initial = defaultPeriod(project, today);
   const [source, setSource] = useState<Source>(initialPerson ? "person" : "team");
   const [sourceId, setSourceId] = useState<string | null>(null);
+  const [sourceProject, setSourceProject] = useState<SourceProject | null>(null);
   const [person, setPerson] = useState<ProjectPerson | null>(initialPerson);
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to ?? "");
@@ -92,7 +94,6 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   const asked = problem === null ? period : { from: null, to: null };
   const level = Number(percent);
   const teams = useOrgTeams(source === "team");
-  const projects = useSourceProjects(source === "project");
   const candidates = useCandidates(project.id, {
     sourceTeamId: source === "team" ? sourceId : null,
     sourceProjectId: source === "project" ? sourceId : null,
@@ -101,17 +102,25 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   });
   const availability = useAvailability(project.id, source === "person" ? (person?.id ?? null) : null, asked.from, asked.to);
 
-  const options = useMemo(() => {
-    if (source === "team") return (teams.data ?? []).map((team) => ({ value: team.id, label: `${team.name} · ${team.departmentName}` }));
-    return (projects.data?.content ?? [])
-      .filter((item) => item.id !== project.id)
-      .map((item) => ({ value: item.id, label: `${item.code} · ${item.name}` }));
-  }, [source, teams.data, projects.data, project.id]);
+  const teamOptions = useMemo(
+    () => (teams.data ?? []).map((team) => ({ value: team.id, label: `${team.name} · ${team.departmentName}` })),
+    [teams.data],
+  );
 
   const list = candidates.data ?? [];
   const personFree = availability.data?.freePercent;
   const personShort = source === "person" && personFree !== undefined && personFree < level;
   const picked = source === "person" ? (person && !personShort ? [person.id] : []) : pickedIds(list, level, choices);
+  const selectable = selectableIds(list, level);
+  const allSelected = selectable.length > 0 && selectable.every((id) => choices.get(id) === true);
+
+  function selectAll(select: boolean) {
+    setChoices((previous) => {
+      const next = new Map(previous);
+      for (const id of selectable) next.set(id, select);
+      return next;
+    });
+  }
   const propose = useWorkMutation(() =>
     proposeAllocation(project.id, {
       employeeIds: picked,
@@ -125,6 +134,7 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   function chooseSource(next: string) {
     setSource(next as Source);
     setSourceId(null);
+    setSourceProject(null);
     setChoices(new Map());
   }
 
@@ -215,16 +225,29 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
         ) : (
           <Field>
             <FieldLabel htmlFor="alloc-from-source">{t(source === "team" ? "pickTeam" : "pickProject")}</FieldLabel>
-            <SimpleSelect
-              id="alloc-from-source"
-              className="w-full"
-              value={sourceId}
-              onChange={(value) => {
-                setSourceId(value);
-                setChoices(new Map());
-              }}
-              options={options}
-            />
+            {source === "team" ? (
+              <SimpleSelect
+                id="alloc-from-source"
+                className="w-full"
+                value={sourceId}
+                onChange={(value) => {
+                  setSourceId(value);
+                  setChoices(new Map());
+                }}
+                options={teamOptions}
+              />
+            ) : (
+              <ProjectSourcePicker
+                id="alloc-from-source"
+                value={sourceProject}
+                excludeId={project.id}
+                onChange={(picked) => {
+                  setSourceProject(picked);
+                  setSourceId(picked.id);
+                  setChoices(new Map());
+                }}
+              />
+            )}
           </Field>
         )}
 
@@ -235,31 +258,41 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
             ) : list.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t("noCandidates")}</p>
             ) : (
-              <ul className="grid max-h-64 gap-1 overflow-y-auto">
-                {list.map((candidate) => {
-                  const room = hasRoomFor(candidate, level);
-                  const checked = room && (choices.get(candidate.person.id) ?? pickedByDefault(candidate, level));
-                  return (
-                    <li key={candidate.person.id} className="flex items-center gap-2 text-sm">
-                      <Checkbox
-                        checked={checked}
-                        disabled={!room}
-                        onCheckedChange={() => toggle(candidate.person.id, checked)}
-                        aria-label={candidate.person.fullName}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <PersonChip person={candidate.person} />
-                      </span>
-                      {candidate.alreadyInProject && <Badge variant="secondary">{t("inProject")}</Badge>}
-                      {candidate.freePercent !== null && (
-                        <span className={cn("text-xs tabular-nums", room ? "text-muted-foreground" : "text-destructive")}>
-                          {t("free", { percent: candidate.freePercent })}
+              <>
+                <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <span className="tabular-nums">{t("selectedCount", { count: picked.length, total: list.length })}</span>
+                  {selectable.length > 0 && (
+                    <Button type="button" variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => selectAll(!allSelected)}>
+                      {allSelected ? t("clearAll") : t("selectAll", { count: selectable.length })}
+                    </Button>
+                  )}
+                </div>
+                <ul className="grid max-h-64 gap-1 overflow-y-auto">
+                  {list.map((candidate) => {
+                    const room = hasRoomFor(candidate, level);
+                    const checked = room && choices.get(candidate.person.id) === true;
+                    return (
+                      <li key={candidate.person.id} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={checked}
+                          disabled={!room}
+                          onCheckedChange={() => toggle(candidate.person.id, checked)}
+                          aria-label={candidate.person.fullName}
+                        />
+                        <span className="min-w-0 flex-1">
+                          <PersonChip person={candidate.person} />
                         </span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+                        {candidate.alreadyInProject && <Badge variant="secondary">{t("inProject")}</Badge>}
+                        {candidate.freePercent !== null && (
+                          <span className={cn("text-xs tabular-nums", room ? "text-muted-foreground" : "text-destructive")}>
+                            {t("free", { percent: candidate.freePercent })}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
             )}
           </div>
         )}

@@ -11,9 +11,12 @@ export type OrgChartTeam = {
   id: string;
   code: string;
   name: string;
-  /** Trưởng team còn hợp lệ; null = chỗ trống. */
+  /** Trưởng team còn hợp lệ; null = chỗ trống (hoặc bị ẩn nếu restricted). */
   lead: OrgChartPerson | null;
-  employeeCount: number;
+  /** null khi restricted. */
+  employeeCount: number | null;
+  /** true = người xem không thấy hết người của team (ngoài phạm vi): không có trưởng team, không có số người. */
+  restricted: boolean;
 };
 
 export type OrgChartDepartment = {
@@ -24,17 +27,21 @@ export type OrgChartDepartment = {
   executive: boolean;
   /** Trưởng phòng còn hợp lệ; null = chỗ trống. */
   head: OrgChartPerson | null;
-  employeeCount: number;
+  /** Các số người là null khi restricted. */
+  employeeCount: number | null;
   /** Người của phòng không thuộc team nào đang dùng. */
-  withoutTeamCount: number;
+  withoutTeamCount: number | null;
   /** Như withoutTeamCount nhưng không tính trưởng phòng: số người hiện dưới ô trưởng phòng trên sơ đồ. */
-  directStaffCount: number;
+  directStaffCount: number | null;
+  /** true = người xem không thấy hết người của phòng (ngoài phạm vi): danh sách chỉ có trưởng phòng. */
+  restricted: boolean;
   teams: OrgChartTeam[];
 };
 
 /** GET /api/org-chart: Ban Giám đốc trước, còn lại theo mã. */
 export type OrgChart = {
-  employeeCount: number;
+  /** null khi người xem không thấy hết. */
+  employeeCount: number | null;
   departments: OrgChartDepartment[];
 };
 
@@ -43,7 +50,8 @@ export type OrgChartOffice = {
   code: string;
   name: string;
   city: string | null;
-  employeeCount: number;
+  /** null khi người xem không thấy hết người ở văn phòng. */
+  employeeCount: number | null;
 };
 
 export type OrgUnitRef = {

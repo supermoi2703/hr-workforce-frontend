@@ -144,7 +144,7 @@ function PersonDetail({
               className="flex w-full items-center justify-between gap-3 rounded-lg border p-2.5 text-left transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
             >
               <span className="font-medium">{ledName}</span>
-              {ledCount !== undefined && (
+              {ledCount != null && (
                 <span className="text-xs text-muted-foreground tabular-nums">{t("people", { count: ledCount })}</span>
               )}
             </button>

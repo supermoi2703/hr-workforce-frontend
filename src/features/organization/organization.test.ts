@@ -26,6 +26,7 @@ const bgd: OrgChartDepartment = {
   employeeCount: 2,
   withoutTeamCount: 2,
   directStaffCount: 1,
+  restricted: false,
   teams: [],
 };
 const ptpm: OrgChartDepartment = {
@@ -37,9 +38,10 @@ const ptpm: OrgChartDepartment = {
   employeeCount: 9,
   withoutTeamCount: 2,
   directStaffCount: 1,
+  restricted: false,
   teams: [
-    { id: "be", code: "BACKEND", name: "Team Backend", lead: person("binh", "Bình"), employeeCount: 6 },
-    { id: "qa", code: "QA", name: "Đảm bảo chất lượng", lead: null, employeeCount: 1 },
+    { id: "be", code: "BACKEND", name: "Team Backend", lead: person("binh", "Bình"), employeeCount: 6, restricted: false },
+    { id: "qa", code: "QA", name: "Đảm bảo chất lượng", lead: null, employeeCount: 1, restricted: false },
   ],
 };
 const chart: OrgChart = { employeeCount: 11, departments: [bgd, ptpm] };

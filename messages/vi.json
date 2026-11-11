@@ -1467,6 +1467,7 @@
     },
     "Diagram": {
       "vacant": "Chưa có trưởng",
+      "hidden": "Không hiển thị",
       "companyLabel": "Sơ đồ công ty: giám đốc và các phòng ban",
       "unitLabel": "Sơ đồ {name}",
       "chainLabel": "Tuyến báo cáo của {name}",
@@ -1478,6 +1479,9 @@
       "emptyScope": "Chưa có ai",
       "members": "Thành viên",
       "emptyNode": "Đơn vị này chưa có ai",
+      "restrictedOverview": "Bạn xem được thành viên phòng ban của mình và trưởng các phòng ban.",
+      "restrictedDepartment": "Đơn vị ngoài phạm vi của bạn: chỉ hiện trưởng phòng.",
+      "restrictedTeam": "Team ngoài phạm vi của bạn: không hiện thành viên.",
       "withoutTeamSubtitle": "Nhân sự làm việc trực tiếp ở {name}, không thuộc team nào",
       "executiveBadge": "Ban Giám đốc",
       "searchTitle": "Kết quả cho “{keyword}”",
@@ -2430,6 +2434,7 @@
       "search": "Tìm theo tên hoặc mã",
       "listLabel": "Danh sách nhân viên",
       "noMatch": "Không tìm thấy nhân viên",
+      "typeMore": "Gõ ít nhất 2 ký tự của tên hoặc mã nhân viên",
       "loadFailed": "Không tải được danh sách"
     },
     "Errors": {
@@ -2838,6 +2843,19 @@
     "sourcePerson": "Từng người",
     "pickTeam": "Chọn team",
     "pickProject": "Chọn dự án",
+    "selectedCount": "Đã chọn {count}/{total} người",
+    "selectAll": "Chọn tất cả còn đủ chỗ ({count})",
+    "clearAll": "Bỏ chọn tất cả",
+    "ProjectPicker": {
+      "placeholder": "Chọn dự án",
+      "search": "Tìm theo mã hoặc tên dự án",
+      "activeHint": "Đang gợi ý dự án đang chạy. Gõ để tìm cả dự án đã đóng.",
+      "listLabel": "Danh sách dự án",
+      "noMatch": "Không tìm thấy dự án",
+      "loadFailed": "Không tải được danh sách dự án",
+      "closed": "Đã đóng",
+      "more": "Còn dự án khác, gõ để thu hẹp"
+    },
     "person": "Người",
     "fromDate": "Từ ngày",
     "toDate": "Đến ngày",

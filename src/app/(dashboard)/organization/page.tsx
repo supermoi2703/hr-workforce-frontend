@@ -7,7 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("metaTitle") };
 }
 
-// Mọi người đã đăng nhập đều xem được cây tổ chức (06 C1); backend chỉ trả cột danh bạ.
+// Mọi người đã đăng nhập đều xem được khung cây tổ chức; người và số người theo phạm vi người xem (backend lọc,
+// README organization mục 11). Backend chỉ trả cột danh bạ.
 export default function OrganizationRoute() {
   return <OrganizationPage />;
 }

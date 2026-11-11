@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Building2Icon, ChevronRightIcon, LandmarkIcon, NetworkIcon, UserRoundIcon, UsersRoundIcon, type LucideIcon } from "lucide-react";
+import { Building2Icon, ChevronRightIcon, EyeOffIcon, LandmarkIcon, NetworkIcon, UserRoundIcon, UsersRoundIcon, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { IconTile } from "@/components/shared/icon-tile";
@@ -45,6 +45,7 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
       title={scopeLabel}
       subtitle={tt.detail("overviewSubtitle", { departments: departments.length })}
       count={chart.employeeCount}
+      notice={chart.employeeCount == null ? tt.detail("restrictedOverview") : undefined}
       actions={state.view === "department" ? <AddDepartmentButton /> : undefined}
       diagram={
         chart.departments.length > 0 && (
@@ -90,9 +91,29 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
 }
 
 /** Chi tiết một phòng ban, một team hoặc nhóm "trực thuộc phòng". */
-export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: DetailProps & { resolved: ResolvedNode }) {
+export function NodeDetail({ chart, director, state, scopeLabel, onSelect, resolved }: DetailProps & { resolved: ResolvedNode }) {
   const tt = useOrgTranslations();
   const { department } = resolved;
+  const executive = chart.departments.find((d) => d.executive);
+  // Giám đốc đứng trên mọi phòng (trừ chính Ban Giám đốc, nơi trưởng phòng là giám đốc): nút phòng, team hay "trực thuộc
+  // phòng" đều vẽ từ giám đốc xuống, để tuyến báo cáo nhất quán giữa các cấp
+  const directorStep =
+    director && !department.executive
+      ? {
+          key: "director",
+          node: (
+            <UnitCard
+              wide
+              person={director}
+              role={tt.roles("director")}
+              unit={executive?.name}
+              onClick={executive ? () => onSelect({ kind: "department", id: executive.id }) : undefined}
+            />
+          ),
+        }
+      : undefined;
+  const underDirector = (key: string, node: ReactNode, label: string) =>
+    directorStep ? <ReportingChain steps={[directorStep, { key, node }]} label={label} /> : node;
   const headRole = department.executive ? tt.roles("director") : tt.roles("departmentHead");
   const filters = memberFilters({ ...state, keyword: undefined });
 
@@ -106,24 +127,22 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
   if (resolved.kind === "department") {
     title = department.name;
     icon = department.executive ? LandmarkIcon : Building2Icon;
-    diagram = (
+    diagram = underDirector(
+      "department",
       <DepartmentDiagram
         department={department}
         headRole={headRole}
         officeId={filters.officeId}
         onSelect={onSelect}
         label={tt.diagram("unitLabel", { name: title })}
-      />
+      />,
+      tt.diagram("chainLabel", { name: title }),
     );
   } else if (resolved.kind === "team") {
     const { team } = resolved;
     title = team.name;
     icon = UsersRoundIcon;
-    const steps: { key: string; node: ReactNode }[] = [];
-    // Giám đốc chỉ hiện khi khác trưởng phòng (team thuộc Ban Giám đốc thì trưởng phòng chính là giám đốc)
-    if (director && !department.executive) {
-      steps.push({ key: "director", node: <UnitCard wide person={director} role={tt.roles("director")} /> });
-    }
+    const steps: { key: string; node: ReactNode }[] = directorStep ? [directorStep] : [];
     steps.push({
       key: "head",
       node: (
@@ -142,9 +161,10 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
   } else {
     title = tt.tree("withoutTeam");
     icon = UserRoundIcon;
-    diagram = (
+    diagram = underDirector(
+      "noTeam",
       <LeaderWithMembers
-        label={tt.diagram("chainLabel", { name: department.name })}
+        label={tt.diagram("unitLabel", { name: department.name })}
         leaderId={department.head?.id}
         filters={filters}
         leader={
@@ -157,11 +177,20 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
             onClick={() => onSelect({ kind: "department", id: department.id })}
           />
         }
-      />
+      />,
+      tt.diagram("chainLabel", { name: department.name }),
     );
   }
 
   const code = resolved.kind === "team" ? resolved.team.code : resolved.kind === "department" ? department.code : undefined;
+  const notice =
+    resolved.kind === "team"
+      ? resolved.team.restricted
+        ? tt.detail("restrictedTeam")
+        : undefined
+      : department.restricted
+        ? tt.detail("restrictedDepartment")
+        : undefined;
 
   return (
     <DetailLayout
@@ -173,6 +202,7 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
       subtitle={resolved.kind === "noTeam" ? tt.detail("withoutTeamSubtitle", { name: department.name }) : undefined}
       badge={department.executive && resolved.kind === "department" ? tt.detail("executiveBadge") : undefined}
       count={nodeCount(resolved)}
+      notice={notice}
       actions={<UnitActions resolved={resolved} onSelect={onSelect} />}
       diagram={diagram}
       membersTitle={tt.detail("members")}
@@ -183,7 +213,7 @@ export function NodeDetail({ director, state, scopeLabel, onSelect, resolved }: 
         unitColumn={resolved.kind === "department" ? "team" : "none"}
         onSelectUnit={onSelect}
         showOffice={state.view !== "office"}
-        emptyTitle={tt.detail("emptyNode")}
+        emptyTitle={notice ?? tt.detail("emptyNode")}
       />
     </DetailLayout>
   );
@@ -200,7 +230,17 @@ function TeamDiagram({ team, officeId, label }: { team: OrgChartTeam; officeId?:
       label={label}
       leaderId={team.lead?.id}
       filters={{ officeId, teamId: team.id }}
-      leader={<UnitCard wide active person={team.lead} role={tt.roles("teamLead")} unit={team.name} count={team.employeeCount} />}
+      leader={
+        <UnitCard
+          wide
+          active
+          person={team.lead}
+          hidden={team.restricted}
+          role={tt.roles("teamLead")}
+          unit={team.name}
+          count={team.employeeCount}
+        />
+      }
     />
   );
 }
@@ -307,6 +347,7 @@ function DepartmentDiagram({
     node: (
       <UnitCard
         person={team.lead}
+        hidden={team.restricted}
         role={tt.roles("teamLead")}
         unit={team.name}
         count={team.employeeCount}
@@ -315,7 +356,7 @@ function DepartmentDiagram({
     ),
   }));
   // Trưởng phòng đã ở ô trên nên ô này đếm directStaffCount (không tính trưởng phòng); không còn ai thì không vẽ
-  if (department.directStaffCount > 0 && department.teams.length > 0) {
+  if ((department.directStaffCount ?? 0) > 0 && department.teams.length > 0) {
     items.push({
       key: "no-team",
       node: (
@@ -325,7 +366,7 @@ function DepartmentDiagram({
           className="flex w-48 flex-col justify-center rounded-lg border border-dashed p-2.5 text-left text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
         >
           <span className="font-medium text-foreground">{tt.tree("withoutTeam")}</span>
-          <span className="text-xs tabular-nums">{tt.detail("people", { count: department.directStaffCount })}</span>
+          <span className="text-xs tabular-nums">{tt.detail("people", { count: department.directStaffCount ?? 0 })}</span>
         </button>
       ),
     });
@@ -350,7 +391,10 @@ type DetailLayoutProps = {
   code?: string;
   subtitle?: string;
   badge?: string;
-  count?: number;
+  /** null / không truyền = không hiện số người. */
+  count?: number | null;
+  /** Dòng giải thích phạm vi xem, hiện trên danh sách thành viên. */
+  notice?: string;
   path?: { label: string; node?: OrgNode }[];
   onSelect?: (node: OrgNode | undefined) => void;
   diagram?: ReactNode;
@@ -366,6 +410,7 @@ function DetailLayout({
   subtitle,
   badge,
   count,
+  notice,
   path,
   onSelect,
   diagram,
@@ -407,9 +452,9 @@ function DetailLayout({
             {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
-        {(count !== undefined || actions) && (
+        {(count != null || actions) && (
           <div className="flex shrink-0 items-center gap-4">
-            {count !== undefined && (
+            {count != null && (
               <p className="text-sm text-muted-foreground">
                 {t.rich("headcount", {
                   count,
@@ -426,6 +471,12 @@ function DetailLayout({
 
       <section id={MEMBERS_SECTION_ID} className="flex scroll-mt-4 flex-col gap-3 p-4" aria-label={membersTitle}>
         <h3 className="text-sm font-medium">{membersTitle}</h3>
+        {notice && (
+          <p className="flex items-start gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+            <EyeOffIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
+            {notice}
+          </p>
+        )}
         {children}
       </section>
     </div>

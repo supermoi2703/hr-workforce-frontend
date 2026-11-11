@@ -1467,6 +1467,7 @@
     },
     "Diagram": {
       "vacant": "No head assigned",
+      "hidden": "Not shown",
       "companyLabel": "Company chart: director and departments",
       "unitLabel": "Chart of {name}",
       "chainLabel": "Reporting line of {name}",
@@ -1478,6 +1479,9 @@
       "emptyScope": "Nobody here yet",
       "members": "Members",
       "emptyNode": "Nobody in this unit",
+      "restrictedOverview": "You can see members of your own department and the heads of all departments.",
+      "restrictedDepartment": "Outside your scope: only the department head is shown.",
+      "restrictedTeam": "Outside your scope: team members are not shown.",
       "withoutTeamSubtitle": "People who work directly in {name}, outside any team",
       "executiveBadge": "Executive board",
       "searchTitle": "Results for “{keyword}”",
@@ -2430,6 +2434,7 @@
       "search": "Search by name or code",
       "listLabel": "Employees",
       "noMatch": "No employees found",
+      "typeMore": "Type at least 2 characters of a name or employee code",
       "loadFailed": "Could not load employees"
     },
     "Errors": {
@@ -2838,6 +2843,19 @@
     "sourcePerson": "One person",
     "pickTeam": "Choose a team",
     "pickProject": "Choose a project",
+    "selectedCount": "{count} of {total} selected",
+    "selectAll": "Select all with room ({count})",
+    "clearAll": "Clear selection",
+    "ProjectPicker": {
+      "placeholder": "Select a project",
+      "search": "Search by project code or name",
+      "activeHint": "Showing active projects. Type to also search closed ones.",
+      "listLabel": "Projects",
+      "noMatch": "No projects found",
+      "loadFailed": "Could not load projects",
+      "closed": "Closed",
+      "more": "More projects available, type to narrow down"
+    },
     "person": "Person",
     "fromDate": "From",
     "toDate": "To",

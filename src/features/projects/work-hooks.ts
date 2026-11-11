@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations, type Messages } from "next-intl";
 import { isApiError } from "@/lib/api/errors";
 import type { PageParams } from "@/lib/api/types";
@@ -87,8 +87,21 @@ export const useAvailability = (projectId: string, employeeId: string | null, fr
     retry: false,
   });
 export const useOrgTeams = (enabled: boolean) => useQuery({ queryKey: key("org-teams"), queryFn: getOrgTeams, enabled });
-export const useSourceProjects = (enabled: boolean) =>
-  useQuery({ queryKey: key("source-projects"), queryFn: () => getProjects({}, { page: 0, size: 100 }), enabled });
+/** Số dự án hiện một lần trong ô chọn dự án nguồn; muốn dự án khác thì gõ tìm. */
+const SOURCE_PROJECT_PAGE_SIZE = 20;
+
+/** Dự án nguồn để lấy người: chưa gõ thì dự án đang chạy; có từ khóa thì tìm theo mã / tên, kể cả dự án đã đóng. */
+export const useSourceProjects = (keyword: string, enabled: boolean) =>
+  useQuery({
+    queryKey: key("source-projects", keyword),
+    queryFn: () =>
+      getProjects(
+        { q: keyword || undefined, status: keyword ? undefined : "ACTIVE" },
+        { page: 0, size: SOURCE_PROJECT_PAGE_SIZE },
+      ),
+    enabled,
+    placeholderData: keepPreviousData,
+  });
 
 /** Mọi thao tác ghi: xong thì tải lại toàn bộ dữ liệu dự án vì số liệu liên quan chéo nhau. */
 export function useWorkMutation<TInput, TResult>(mutationFn: (input: TInput) => Promise<TResult>) {

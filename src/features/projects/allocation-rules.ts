@@ -35,18 +35,23 @@ export function hasRoomFor(candidate: Candidate, percent: number): boolean {
 }
 
 /**
- * Người được tick sẵn: chưa ở dự án và còn đủ chỗ. Người đang ở dự án vẫn chọn được (đề xuất mới đặt lại % của họ
- * trong khoảng đó), nhưng không tick sẵn để không đổi nhầm.
+ * Người mà nút "Chọn tất cả" tick: chưa ở dự án và còn đủ chỗ. Người đang ở dự án vẫn chọn tay được (đề xuất mới đặt lại
+ * % của họ trong khoảng đó), nhưng không nằm trong "tất cả" để không đổi nhầm.
  */
-export function pickedByDefault(candidate: Candidate, percent: number): boolean {
-  return !candidate.alreadyInProject && hasRoomFor(candidate, percent);
+export function selectableIds(candidates: Candidate[], percent: number): string[] {
+  return candidates
+    .filter((candidate) => !candidate.alreadyInProject && hasRoomFor(candidate, percent))
+    .map((candidate) => candidate.person.id);
 }
 
-/** Danh sách được gửi: theo lựa chọn của người dùng nếu có, không thì theo mặc định; người không đủ chỗ luôn bị bỏ. */
+/**
+ * Danh sách được gửi: chỉ người đã được tick (mặc định không tick ai, vì một team có thể rất đông); người không đủ chỗ
+ * luôn bị bỏ.
+ */
 export function pickedIds(candidates: Candidate[], percent: number, choices: ReadonlyMap<string, boolean>): string[] {
   return candidates
     .filter((candidate) => hasRoomFor(candidate, percent))
-    .filter((candidate) => choices.get(candidate.person.id) ?? pickedByDefault(candidate, percent))
+    .filter((candidate) => choices.get(candidate.person.id) === true)
     .map((candidate) => candidate.person.id);
 }
 
