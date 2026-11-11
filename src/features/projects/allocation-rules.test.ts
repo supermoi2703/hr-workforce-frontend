@@ -6,7 +6,7 @@ import {
   isRunningMember,
   pendingRequests,
   periodProblem,
-  pickedByDefault,
+  selectableIds,
   pickedIds,
 } from "./allocation-rules";
 import type { ProjectMember } from "./types";
@@ -81,18 +81,16 @@ describe("periodProblem", () => {
 });
 
 describe("chọn người", () => {
-  it("tick sẵn người chưa ở dự án và còn đủ chỗ", () => {
-    expect(pickedByDefault(candidate("an", 60), 50)).toBe(true);
-    expect(pickedByDefault(candidate("an", 40), 50)).toBe(false);
-    expect(pickedByDefault(candidate("an", 100, true), 50)).toBe(false);
-    expect(pickedByDefault(candidate("an", null), 50)).toBe(true);
+  it("\"Chọn tất cả\" lấy người chưa ở dự án và còn đủ chỗ", () => {
+    const list = [candidate("an", 60), candidate("binh", 40), candidate("chi", 100, true), candidate("dung", null)];
+    expect(selectableIds(list, 50)).toEqual(["an", "dung"]);
   });
 
-  it("theo lựa chọn của người dùng, nhưng luôn bỏ người không đủ chỗ", () => {
+  it("mặc định không chọn ai; theo lựa chọn của người dùng, nhưng luôn bỏ người không đủ chỗ", () => {
     const list = [candidate("an", 100), candidate("binh", 100, true), candidate("chi", 20)];
-    expect(pickedIds(list, 50, new Map())).toEqual(["an"]);
+    expect(pickedIds(list, 50, new Map())).toEqual([]);
     expect(pickedIds(list, 50, new Map([["an", false], ["binh", true], ["chi", true]]))).toEqual(["binh"]);
-    expect(pickedIds(list, 20, new Map())).toEqual(["an", "chi"]);
+    expect(pickedIds(list, 20, new Map([["chi", true]]))).toEqual(["chi"]);
   });
 });
 
