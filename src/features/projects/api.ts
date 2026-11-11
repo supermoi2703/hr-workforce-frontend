@@ -48,12 +48,14 @@ export const addProjectObserver = (id: string, employeeId: string) =>
 export const removeProjectObserver = (id: string, employeeId: string) =>
   http.delete<void>(`/api/projects/${enc(id)}/observers/${enc(employeeId)}`);
 
-// ===== Dữ liệu tổ chức: mọi người đã đăng nhập đều xem được (khác /api/employees cần employee:read)
+// ===== Dữ liệu tổ chức: khung cây tổ chức ai cũng xem được (khác /api/employees cần employee:read)
 
 export const getOrgDepartments = () =>
   http.get<{ departments: UnitRef[] }>("/api/org-chart").then((chart) => chart.departments);
 export const getOrgOffices = () => http.get<UnitRef[]>("/api/org-chart/offices");
-export const searchEmployeeOptions = (keyword: string | undefined, size: number) =>
-  http
-    .get<PageResponse<EmployeeOption>>("/api/org-chart/members", { query: { keyword, page: 0, size } })
-    .then((page) => page.content);
+/**
+ * Ô chọn người của dự án: tìm cả công ty, nhưng chỉ cho PM, trưởng phòng, giám đốc, Admin; cần từ khóa ≥ 2 ký tự,
+ * tối đa 10 người (backend ProjectPeopleSearchService).
+ */
+export const searchEmployeeOptions = (keyword: string) =>
+  http.get<EmployeeOption[]>("/api/projects/people", { query: { keyword } });

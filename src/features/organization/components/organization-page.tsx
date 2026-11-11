@@ -190,7 +190,7 @@ function OfficePicker({
   value,
   onChange,
 }: {
-  offices: { id: string; name: string; city: string | null; employeeCount: number }[];
+  offices: { id: string; name: string; city: string | null; employeeCount: number | null }[];
   loading: boolean;
   value: string | undefined;
   onChange: (id: string) => void;
@@ -199,7 +199,10 @@ function OfficePicker({
   if (loading) return <Skeleton className="h-8 w-full" />;
   if (offices.length === 0) return <p className="text-sm text-muted-foreground">{t("Empty.noOffices")}</p>;
   const items = Object.fromEntries(
-    offices.map((office) => [office.id, t("officeOption", { name: office.name, count: office.employeeCount })]),
+    offices.map((office) => [
+      office.id,
+      office.employeeCount == null ? office.name : t("officeOption", { name: office.name, count: office.employeeCount }),
+    ]),
   );
   return (
     <Select value={value ?? null} onValueChange={(next) => next && onChange(String(next))} items={items}>

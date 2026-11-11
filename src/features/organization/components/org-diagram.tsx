@@ -10,11 +10,14 @@ import type { OrgChartPerson } from "../types";
 export type UnitCardProps = {
   /** Người đứng đầu; null = chỗ trống. */
   person: OrgChartPerson | null;
+  /** Đơn vị ngoài phạm vi xem: không có người đứng đầu là do bị ẩn, không phải chỗ trống. */
+  hidden?: boolean;
   /** Vai trò của người đứng đầu: "Trưởng phòng", "Giám đốc"... */
   role: string;
   /** Tên đơn vị hiện dưới người đứng đầu. */
   unit?: string;
-  count?: number;
+  /** null / không truyền = không hiện số người. */
+  count?: number | null;
   active?: boolean;
   onClick?: () => void;
   /** Ô gốc to hơn một chút. */
@@ -24,7 +27,7 @@ export type UnitCardProps = {
 };
 
 /** Một ô trên sơ đồ: người đứng đầu + đơn vị + số người. Bấm được thì là nút chọn đơn vị đó trên cây. */
-export function UnitCard({ person, role, unit, count, active, onClick, emphasis, wide }: UnitCardProps) {
+export function UnitCard({ person, hidden, role, unit, count, active, onClick, emphasis, wide }: UnitCardProps) {
   const t = useTranslations("Organization.Diagram");
   const content = (
     <>
@@ -43,17 +46,17 @@ export function UnitCard({ person, role, unit, count, active, onClick, emphasis,
         )}
         <span className="flex min-w-0 flex-col">
           <span className={cn("truncate font-medium", !person && "text-muted-foreground")} title={person?.fullName}>
-            {person ? person.fullName : t("vacant")}
+            {person ? person.fullName : t(hidden ? "hidden" : "vacant")}
           </span>
           <span className="truncate text-xs text-muted-foreground">{role}</span>
         </span>
       </span>
-      {(unit || count !== undefined) && (
+      {(unit || count != null) && (
         <span className="mt-2 flex items-start justify-between gap-2 border-t pt-2 text-xs">
           <span className="line-clamp-2 min-w-0 text-foreground/80" title={unit}>
             {unit}
           </span>
-          {count !== undefined && (
+          {count != null && (
             <span className="flex shrink-0 items-center gap-1 text-muted-foreground tabular-nums">
               <UsersRoundIcon className="size-3" aria-hidden />
               {count}

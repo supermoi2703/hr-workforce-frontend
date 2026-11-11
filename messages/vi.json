@@ -1467,6 +1467,7 @@
     },
     "Diagram": {
       "vacant": "Chưa có trưởng",
+      "hidden": "Không hiển thị",
       "companyLabel": "Sơ đồ công ty: giám đốc và các phòng ban",
       "unitLabel": "Sơ đồ {name}",
       "chainLabel": "Tuyến báo cáo của {name}",
@@ -1478,6 +1479,9 @@
       "emptyScope": "Chưa có ai",
       "members": "Thành viên",
       "emptyNode": "Đơn vị này chưa có ai",
+      "restrictedOverview": "Bạn xem được thành viên phòng ban của mình và trưởng các phòng ban.",
+      "restrictedDepartment": "Đơn vị ngoài phạm vi của bạn: chỉ hiện trưởng phòng.",
+      "restrictedTeam": "Team ngoài phạm vi của bạn: không hiện thành viên.",
       "withoutTeamSubtitle": "Nhân sự làm việc trực tiếp ở {name}, không thuộc team nào",
       "executiveBadge": "Ban Giám đốc",
       "searchTitle": "Kết quả cho “{keyword}”",
@@ -2430,6 +2434,7 @@
       "search": "Tìm theo tên hoặc mã",
       "listLabel": "Danh sách nhân viên",
       "noMatch": "Không tìm thấy nhân viên",
+      "typeMore": "Gõ ít nhất 2 ký tự của tên hoặc mã nhân viên",
       "loadFailed": "Không tải được danh sách"
     },
     "Errors": {

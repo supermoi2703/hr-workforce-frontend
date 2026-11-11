@@ -123,7 +123,7 @@ export function filterDepartments(departments: OrgChartDepartment[], text: strin
 }
 
 /** Số người ở nút đang chọn, để hiện ngay trên tiêu đề trước khi danh sách tải xong. */
-export function nodeCount(resolved: ResolvedNode): number {
+export function nodeCount(resolved: ResolvedNode): number | null {
   switch (resolved.kind) {
     case "department":
       return resolved.department.employeeCount;

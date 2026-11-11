@@ -20,7 +20,6 @@ import type { ProjectFilters } from "./types";
 
 // Phòng ban, văn phòng, phạm vi tạo dự án ít đổi: giữ 5 phút.
 const SLOW_STALE_TIME = 5 * 60_000;
-const EMPLOYEE_PAGE_SIZE = 20;
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -61,11 +60,14 @@ export function useOrgOffices() {
   return useQuery({ queryKey: projectKeys.offices, queryFn: getOrgOffices, staleTime: SLOW_STALE_TIME });
 }
 
+/** Số ký tự tối thiểu backend nhận để tìm người (tránh lộ danh bạ khi để trống). */
+export const EMPLOYEE_SEARCH_MIN_LENGTH = 2;
+
 export function useEmployeeOptions(keyword: string, enabled: boolean) {
   return useQuery({
     queryKey: projectKeys.employees(keyword),
-    queryFn: () => searchEmployeeOptions(keyword || undefined, EMPLOYEE_PAGE_SIZE),
-    enabled,
+    queryFn: () => searchEmployeeOptions(keyword),
+    enabled: enabled && keyword.length >= EMPLOYEE_SEARCH_MIN_LENGTH,
     placeholderData: keepPreviousData,
   });
 }

@@ -10,7 +10,7 @@ import type { OrgChartDepartment, OrgNode } from "../types";
 type OrgTreeProps = {
   /** Gốc của cây: "Toàn công ty" hoặc tên văn phòng đang xem. */
   rootLabel: string;
-  rootCount: number;
+  rootCount: number | null;
   departments: OrgChartDepartment[];
   selected?: OrgNode;
   onSelect: (node: OrgNode | undefined) => void;
@@ -130,7 +130,7 @@ export function OrgTree({ rootLabel, rootCount, departments, selected, onSelect,
                       />
                     </li>
                   ))}
-                  {department.withoutTeamCount > 0 && (
+                  {(department.withoutTeamCount ?? 0) > 0 && (
                     <li>
                       <TreeRow
                         level={2}
@@ -161,7 +161,8 @@ type TreeRowProps = {
   icon: ReactNode;
   label: string;
   hint?: string;
-  count: number;
+  /** null = không hiện (đơn vị ngoài phạm vi xem). */
+  count: number | null;
   active: boolean;
   onClick: () => void;
   toggle?: { open: boolean; label: string; onToggle: () => void };
@@ -214,14 +215,16 @@ function TreeRow({ level, departmentId, icon, label, hint, count, active, onClic
           {icon}
         </span>
         <span className="min-w-0 flex-1 truncate">{label}</span>
-        <span
-          className={cn(
-            "shrink-0 rounded-full px-1.5 text-xs tabular-nums",
-            active ? "bg-primary/15 text-primary" : "text-muted-foreground",
-          )}
-        >
-          {count}
-        </span>
+        {count != null && (
+          <span
+            className={cn(
+              "shrink-0 rounded-full px-1.5 text-xs tabular-nums",
+              active ? "bg-primary/15 text-primary" : "text-muted-foreground",
+            )}
+          >
+            {count}
+          </span>
+        )}
       </button>
     </div>
   );
