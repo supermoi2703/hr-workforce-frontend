@@ -65,7 +65,8 @@
     "signOut": "Đăng xuất",
     "roleLabel": "Vai trò:",
     "demoSignIn": "Đăng nhập giả lập",
-    "myProfile": "Hồ sơ của tôi"
+    "myProfile": "Hồ sơ của tôi",
+    "notifications": "Thông báo"
   },
   "Roles": {
     "ADMIN": "Quản trị",
@@ -2981,5 +2982,41 @@
     "lastDay": "Ngày cuối ở dự án",
     "lastDayInvalid": "Ngày cuối phải từ hôm nay trở đi.",
     "ended": "Đã kết thúc phân bổ"
+  },
+  "Notifications": {
+    "title": "Thông báo",
+    "pageDescription": "Những gì mới liên quan tới bạn: đơn cần duyệt, kết quả đơn của bạn, kỹ năng, dự án.",
+    "bell": "Thông báo",
+    "bellWithCount": "Thông báo, {count} chưa đọc",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "viewAll": "Xem tất cả",
+    "empty": "Chưa có thông báo nào.",
+    "emptyUnread": "Bạn đã đọc hết thông báo.",
+    "unread": "Chưa đọc",
+    "filter": "Lọc thông báo",
+    "tabs": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc"
+    },
+    "pageOf": "Trang {page}/{total}",
+    "previousPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "unknownType": "Có thông báo mới",
+    "detail": {
+      "comment": "Lý do: {text}",
+      "note": "Ghi chú: {text}"
+    },
+    "types": {
+      "APPROVAL_PENDING": "{approvalType} “{title}” đang chờ bạn duyệt",
+      "APPROVAL_REASSIGNED": "Bạn được giao duyệt {approvalType} “{title}”",
+      "APPROVAL_COMPLETED": "{approvalType} “{title}” {status, select, APPROVED {đã được duyệt} REJECTED {bị từ chối} other {đã bị rút}}",
+      "SKILL_DECLARED": "{employeeName} vừa khai kỹ năng {skillCode} mức {level}, chờ bạn xác nhận",
+      "SKILL_CONFIRMED": "Kỹ năng {skillCode} của bạn đã được chốt ở mức {confirmedLevel}",
+      "ALLOCATION_ENDED": "Phân bổ của bạn ở dự án {projectCode} kết thúc sau ngày {lastDay}",
+      "PROJECT_MANAGER_ASSIGNED": "Bạn làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
+      "PROJECT_MANAGER_REMOVED": "Bạn thôi làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
+      "CONTRACT_EXPIRING": "Hợp đồng {contractNumber} của {employeeName} hết hạn ngày {endDate}",
+      "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}"
+    }
   }
 }
