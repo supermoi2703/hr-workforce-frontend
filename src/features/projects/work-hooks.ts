@@ -7,6 +7,7 @@ import { isApiError } from "@/lib/api/errors";
 import type { PageParams } from "@/lib/api/types";
 import { getProjects } from "./api";
 import {
+  getAllocationPeople,
   getAllocationRequests,
   getAvailability,
   getBoard,
@@ -18,6 +19,7 @@ import {
   getMyWork,
   getOrgTeams,
   getOverview,
+  getPersonAllocations,
   getRisks,
   getSkillOptions,
   getSprintCapacity,
@@ -85,6 +87,23 @@ export const useAvailability = (projectId: string, employeeId: string | null, fr
     queryFn: () => getAvailability(projectId, employeeId!, from!, to),
     enabled: !!employeeId && !!from,
     retry: false,
+  });
+/** Lịch phân bổ một người; 403 (ngoài quyền xem) không thử lại. */
+export const usePersonAllocations = (employeeId: string | null, from?: string, to?: string) =>
+  useQuery({
+    queryKey: key("schedule", employeeId, from, to),
+    queryFn: () => getPersonAllocations(employeeId!, from, to),
+    enabled: !!employeeId,
+    retry: false,
+  });
+/** Ô chọn người của trang lịch. Từ khóa trống vẫn gọi: lấy `reach` và danh sách có hạn. */
+export const useAllocationPeople = (keyword: string, enabled = true) =>
+  useQuery({
+    queryKey: key("allocation-people", keyword),
+    queryFn: () => getAllocationPeople(keyword),
+    enabled,
+    placeholderData: keepPreviousData,
+    staleTime: 60_000,
   });
 export const useOrgTeams = (enabled: boolean) => useQuery({ queryKey: key("org-teams"), queryFn: getOrgTeams, enabled });
 /** Số dự án hiện một lần trong ô chọn dự án nguồn; muốn dự án khác thì gõ tìm. */

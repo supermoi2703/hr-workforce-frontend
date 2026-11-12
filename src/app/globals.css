@@ -31,6 +31,8 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-pending: var(--pending);
+  --color-pending-foreground: var(--pending-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-accent-foreground: var(--accent-foreground);
@@ -82,6 +84,9 @@
   --success-foreground: oklch(1 0 0);
   --warning: oklch(0.555 0.163 48.998);
   --warning-foreground: oklch(1 0 0);
+  /* Đang chờ duyệt dạng mảng màu (thanh, khối): amber-400, chữ amber-950. Khác warning (amber-700) vốn dành cho chữ nhỏ. */
+  --pending: oklch(0.828 0.189 84.429);
+  --pending-foreground: oklch(0.279 0.077 45.635);
   --info: oklch(0.5 0.134 242.749);
   --info-foreground: oklch(1 0 0);
   /* Biểu đồ: xanh thương hiệu, teal, amber, rose, violet */
@@ -124,6 +129,8 @@
   --success-foreground: oklch(0.262 0.051 172.552);
   --warning: oklch(0.828 0.189 84.429);
   --warning-foreground: oklch(0.279 0.077 45.635);
+  --pending: oklch(0.879 0.169 91.605);
+  --pending-foreground: oklch(0.279 0.077 45.635);
   --info: oklch(0.746 0.16 232.661);
   --info-foreground: oklch(0.293 0.066 243.157);
   --chart-1: oklch(0.707 0.165 254.624);
