@@ -1,5 +1,5 @@
 import type { Project, ProjectMember } from "./types";
-import type { AllocationRequest, Candidate } from "./work-types";
+import type { AllocationRequest, AllocationSegment, Candidate } from "./work-types";
 
 // Luật thuần của màn phân bổ (3.4). Khớp backend: README module project mục 8. Ngày dạng "yyyy-MM-dd" so sánh được
 // bằng chuỗi.
@@ -70,4 +70,113 @@ export function allApplied(requests: AllocationRequest[]): boolean {
 /** Dòng thành viên chưa kết thúc: hiện nút đổi % và kết thúc sớm. */
 export function isRunningMember(member: ProjectMember, today: string): boolean {
   return member.role === "MEMBER" && (member.toDate === null || member.toDate >= today);
+}
+
+// ===== Lịch phân bổ của một người (trang /allocations)
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const DAY_MS = 86_400_000;
+
+/** Số thứ tự ngày (UTC) của "yyyy-MM-dd"; null nếu không phải ngày hợp lệ. */
+function dayNumber(iso: string): number | null {
+  if (!ISO_DATE.test(iso)) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  const time = Date.UTC(year, month - 1, day);
+  const back = new Date(time);
+  if (back.getUTCFullYear() !== year || back.getUTCMonth() !== month - 1 || back.getUTCDate() !== day) return null;
+  return time / DAY_MS;
+}
+
+/** Số ngày từ `from` đến `to`, tính cả hai đầu. */
+function inclusiveDays(from: string, to: string): number {
+  const start = dayNumber(from);
+  const end = dayNumber(to);
+  return start === null || end === null ? 0 : Math.max(0, end - start + 1);
+}
+
+export type ScheduleRange = { from?: string; to?: string };
+
+/**
+ * Khoảng ngày đọc từ URL: bỏ giá trị không phải ngày, bỏ `to` nếu trước `from`. Thiếu thì để trống cho backend tự chọn
+ * (từ hôm nay, 180 ngày).
+ */
+export function scheduleRange(from: string | null, to: string | null): ScheduleRange {
+  const validFrom = from !== null && dayNumber(from) !== null ? from : undefined;
+  const validTo = to !== null && dayNumber(to) !== null ? to : undefined;
+  if (validFrom && validTo && validTo < validFrom) return { from: validFrom };
+  return { from: validFrom, to: validTo };
+}
+
+/**
+ * Vị trí trên trục [rangeFrom, rangeTo] (tính theo ngày, cả hai đầu). `startsBefore` / `endsAfter`: thanh còn tiếp ra ngoài
+ * khoảng đang xem (hoặc không có ngày kết thúc), để vẽ mũi tên.
+ */
+export type TimelineSpan = { start: string; end: string; leftPercent: number; widthPercent: number; startsBefore: boolean; endsAfter: boolean };
+
+/** Vị trí của khoảng [from, to] trên trục; `to` null = không thời hạn. Null nếu không có ngày nào nằm trong trục. */
+export function timelineSpan(from: string, to: string | null, rangeFrom: string, rangeTo: string): TimelineSpan | null {
+  const total = inclusiveDays(rangeFrom, rangeTo);
+  const origin = dayNumber(rangeFrom);
+  if (total === 0 || origin === null) return null;
+  const start = from > rangeFrom ? from : rangeFrom;
+  const end = to === null || to > rangeTo ? rangeTo : to;
+  const days = inclusiveDays(start, end);
+  const startDay = dayNumber(start);
+  if (days === 0 || startDay === null) return null;
+  return {
+    start,
+    end,
+    leftPercent: ((startDay - origin) / total) * 100,
+    widthPercent: (days / total) * 100,
+    startsBefore: from < rangeFrom,
+    endsAfter: to === null || to > rangeTo,
+  };
+}
+
+/** Vị trí (%) của một ngày trên trục, ở giữa ô ngày đó; null nếu ngoài khoảng. Dùng cho vạch "Hôm nay". */
+export function dayOffsetPercent(day: string, rangeFrom: string, rangeTo: string): number | null {
+  const span = timelineSpan(day, day, rangeFrom, rangeTo);
+  return span === null ? null : span.leftPercent + span.widthPercent / 2;
+}
+
+export type MonthTick = { date: string; month: number; year: number; leftPercent: number };
+
+/** Mốc đầu mỗi tháng nằm trong (rangeFrom, rangeTo]; ngày đầu khoảng không tính vì trục đã ghi ngày đó. */
+export function monthTicks(rangeFrom: string, rangeTo: string): MonthTick[] {
+  const start = dayNumber(rangeFrom);
+  if (start === null || dayNumber(rangeTo) === null || rangeTo < rangeFrom) return [];
+  const ticks: MonthTick[] = [];
+  let [year, month] = rangeFrom.split("-").map(Number);
+  for (;;) {
+    month += 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+    const date = `${year}-${String(month).padStart(2, "0")}-01`;
+    if (date > rangeTo) return ticks;
+    const span = timelineSpan(date, date, rangeFrom, rangeTo);
+    if (span) ticks.push({ date, month, year, leftPercent: span.leftPercent });
+  }
+}
+
+/** `pendingPercent`: riêng phần đang giữ cho đề xuất chờ duyệt (backend trả `heldPercent` là tổng, đã gồm phần đã duyệt). */
+export type SegmentBar = AllocationSegment & TimelineSpan & { pendingPercent: number };
+
+/**
+ * Đoạn của thanh tổng, rộng theo số ngày trong [from, to]. Đoạn không có ngày kết thúc kéo tới `to`; phần nằm ngoài khoảng
+ * bị cắt, đoạn không còn ngày nào bị bỏ.
+ */
+export function segmentBars(segments: AllocationSegment[], from: string, to: string): SegmentBar[] {
+  return segments.flatMap((segment) => {
+    const span = timelineSpan(segment.from, segment.to, from, to);
+    if (span === null) return [];
+    return [{ ...segment, ...span, pendingPercent: Math.max(0, segment.heldPercent - segment.approvedPercent) }];
+  });
+}
+
+/** % còn trống của đoạn chứa ngày `day`; null nếu ngày đó nằm ngoài lịch. */
+export function freePercentOn(segments: AllocationSegment[], day: string): number | null {
+  const segment = segments.find((s) => s.from <= day && (s.to === null || day <= s.to));
+  return segment ? segment.freePercent : null;
 }

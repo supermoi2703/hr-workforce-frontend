@@ -122,6 +122,9 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   một màu thương hiệu xanh dương (`primary`) chỉ dùng cho hành động chính, link và mục đang chọn.
 - Trạng thái: `<Badge variant="success | warning | info | destructive">` cho đúng giờ/đã duyệt, đi muộn/chờ duyệt,
   WFH/nghỉ có phép, vắng/từ chối.
+- Mảng màu "đang chờ" (thanh, khối trên biểu đồ / dòng thời gian): token `pending` (vàng cam, `bg-pending`,
+  `text-pending-foreground`). `warning` là sắc 700 dành cho chữ nhỏ, tô thành mảng lớn sẽ ra màu nâu. Ví dụ: trang
+  `/allocations` (`features/projects/components/allocation-timeline.tsx`).
 - Mỗi nhóm chức năng một màu cố định (`DomainTone` trong `components/shared/icon-tile.tsx`): `time` chấm công/bảng công,
   `leave` nghỉ phép/WFH, `approval` việc cần duyệt, `project` tổng quan/dự án/phân bổ/kỹ năng, `people` nhân viên/tổ chức,
   `money` lương, `neutral` quản trị. Dùng `<IconTile icon={...} tone="leave" />` và cùng tông đó cho badge/biểu đồ
