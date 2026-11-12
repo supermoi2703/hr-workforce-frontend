@@ -33,6 +33,7 @@
       "home": "Trang chủ",
       "dashboard": "Dashboard",
       "approvals": "Việc cần duyệt",
+      "announcements": "Bảng tin",
       "employees": "Nhân viên",
       "contracts": "Hợp đồng",
       "attendance": "Chấm công",
@@ -474,6 +475,14 @@
     "employee_transfer": {
       "name": "Đề xuất điều chuyển",
       "description": "Đề xuất chuyển nhân viên trong phạm vi dữ liệu sang văn phòng, phòng ban, team hoặc chức vụ khác"
+    },
+    "announcement_read": {
+      "name": "Xem bảng tin",
+      "description": "Xem thông báo đã đăng gửi tới văn phòng, phòng ban của bạn hoặc toàn công ty"
+    },
+    "announcement_manage": {
+      "name": "Quản lý bảng tin",
+      "description": "Tạo, sửa, đăng và gỡ thông báo; HR chỉ cho văn phòng của mình"
     }
   },
   "AuditActions": {
@@ -525,7 +534,11 @@
     "EMPLOYEE_SKILL_CONFIRMED": "Xác nhận kỹ năng",
     "TRANSFER_CREATED": "Đề xuất điều chuyển",
     "TRANSFER_APPLIED": "Điều chuyển có hiệu lực",
-    "TRANSFER_CANCELLED": "Hủy điều chuyển"
+    "TRANSFER_CANCELLED": "Hủy điều chuyển",
+    "ANNOUNCEMENT_CREATED": "Tạo bản nháp thông báo",
+    "ANNOUNCEMENT_UPDATED": "Sửa thông báo",
+    "ANNOUNCEMENT_PUBLISHED": "Đăng thông báo",
+    "ANNOUNCEMENT_REMOVED": "Gỡ thông báo"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -2981,5 +2994,104 @@
     "lastDay": "Ngày cuối ở dự án",
     "lastDayInvalid": "Ngày cuối phải từ hôm nay trở đi.",
     "ended": "Đã kết thúc phân bổ"
+  },
+  "Announcements": {
+    "metaTitle": "Bảng tin",
+    "title": "Bảng tin",
+    "description": "Tin tức và thông báo của công ty gửi tới bạn.",
+    "pinned": "Đã ghim",
+    "publishedBy": "đăng bởi {name}",
+    "categories": {
+      "POLICY": "Chính sách",
+      "EVENT": "Sự kiện",
+      "HEALTH": "Sức khỏe",
+      "OTHER": "Khác"
+    },
+    "statuses": {
+      "DRAFT": "Nháp",
+      "PUBLISHED": "Đã đăng",
+      "REMOVED": "Đã gỡ"
+    },
+    "audiences": {
+      "COMPANY": "Toàn công ty",
+      "OFFICE": "Văn phòng",
+      "DEPARTMENT": "Phòng ban"
+    },
+    "List": {
+      "empty": "Chưa có thông báo nào",
+      "emptyHint": "Thông báo mới gửi tới bạn sẽ hiện ở đây.",
+      "emptyFiltered": "Không có thông báo nào khớp bộ lọc",
+      "manage": "Quản lý bảng tin",
+      "searchPlaceholder": "Tìm theo tiêu đề",
+      "allCategories": "Tất cả loại",
+      "categoryFilter": "Lọc theo loại"
+    },
+    "Detail": {
+      "metaTitle": "Thông báo",
+      "back": "Về bảng tin"
+    },
+    "Manage": {
+      "metaTitle": "Quản lý bảng tin",
+      "title": "Quản lý bảng tin",
+      "descriptionCompany": "Tạo, đăng và gỡ thông báo cho toàn công ty, một văn phòng hoặc một phòng ban.",
+      "descriptionOffice": "Tạo, đăng và gỡ thông báo cho văn phòng của bạn.",
+      "backToBoard": "Về bảng tin",
+      "create": "Thông báo mới",
+      "allStatuses": "Mọi trạng thái",
+      "statusFilter": "Lọc theo trạng thái",
+      "empty": "Chưa có thông báo nào. Hãy tạo thông báo đầu tiên.",
+      "emptyFiltered": "Không có thông báo nào khớp bộ lọc",
+      "publishedAt": "đăng {date}",
+      "updatedAt": "sửa {date}",
+      "view": "Xem",
+      "edit": "Sửa",
+      "publish": "Đăng",
+      "remove": "Gỡ",
+      "publishTitle": "Đăng thông báo này?",
+      "publishDescription": "\"{title}\" sẽ hiện ngay cho mọi người thuộc đối tượng nhận. Sau đó vẫn sửa được chữ, nhưng không đổi được đối tượng nhận.",
+      "removeTitle": "Gỡ thông báo này?",
+      "removePublishedDescription": "\"{title}\" sẽ biến mất với người đọc. Không hoàn tác được.",
+      "removeDraftDescription": "Bản nháp \"{title}\" sẽ bị gỡ. Không hoàn tác được.",
+      "published": "Đã đăng thông báo",
+      "removed": "Đã gỡ thông báo"
+    },
+    "Form": {
+      "createTitle": "Thông báo mới",
+      "editTitle": "Sửa thông báo",
+      "createDescription": "Lưu ở dạng nháp. Khi sẵn sàng thì bấm Đăng ở danh sách.",
+      "editDescription": "Thông báo đã đăng giữ nguyên đối tượng nhận; vẫn sửa được chữ và ghim.",
+      "title": "Tiêu đề",
+      "category": "Loại",
+      "pinned": "Ghim lên đầu",
+      "pinnedHint": "Thông báo được ghim luôn nằm trên cùng.",
+      "audience": "Đối tượng nhận",
+      "office": "Văn phòng",
+      "department": "Phòng ban",
+      "choose": "Chọn",
+      "inactiveOption": "{name} (ngừng dùng)",
+      "ownOfficeOnly": "Thông báo này gửi tới văn phòng của bạn.",
+      "audienceLocked": "Thông báo đã đăng không đổi được đối tượng nhận.",
+      "content": "Nội dung",
+      "contentHint": "Markdown: **đậm**, danh sách, [liên kết](https://example.com). Ảnh và HTML thô không được hiển thị.",
+      "write": "Soạn",
+      "preview": "Xem trước",
+      "emptyPreview": "Chưa có gì để xem trước.",
+      "saveDraft": "Lưu nháp",
+      "save": "Lưu thay đổi",
+      "created": "Đã lưu nháp",
+      "saved": "Đã lưu thông báo"
+    },
+    "Validation": {
+      "required": "Bắt buộc",
+      "tooLong": "Quá dài"
+    },
+    "Errors": {
+      "notFound": "Thông báo không còn tồn tại hoặc bạn không xem được. Danh sách đã được tải lại.",
+      "audienceInvalid": "Văn phòng hoặc phòng ban không tồn tại, đã ngừng dùng, hoặc không khớp với đối tượng nhận.",
+      "audienceForbidden": "Bạn chỉ đăng được cho văn phòng của mình.",
+      "audienceLocked": "Thông báo đã đăng không đổi được đối tượng nhận. Danh sách đã được tải lại.",
+      "invalidState": "Không làm được việc này với trạng thái hiện tại của thông báo. Danh sách đã được tải lại.",
+      "versionConflict": "Người khác vừa sửa thông báo này. Danh sách đã được tải lại, hãy mở lại để xem bản mới nhất."
+    }
   }
 }

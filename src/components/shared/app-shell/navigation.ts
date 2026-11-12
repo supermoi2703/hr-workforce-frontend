@@ -12,6 +12,7 @@ import {
   KeyRoundIcon,
   LayersIcon,
   ListChecksIcon,
+  MegaphoneIcon,
   MessageSquareTextIcon,
   NetworkIcon,
   PaletteIcon,
@@ -81,6 +82,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "home", href: "/", icon: HouseIcon },
       { id: "dashboard", href: "/dashboard", icon: GaugeIcon, access: MANAGEMENT, task: "3.6" },
       { id: "approvals", href: "/approvals", icon: ClipboardCheckIcon, task: "1.6.2", owner: "cuongvv" },
+      { id: "announcements", href: "/announcements", icon: MegaphoneIcon, access: { permissions: ["announcement:read"] }, owner: "cuongvv" },
     ],
   },
   {

@@ -33,6 +33,7 @@
       "home": "Home",
       "dashboard": "Dashboard",
       "approvals": "Approvals",
+      "announcements": "Announcements",
       "employees": "Employees",
       "contracts": "Contracts",
       "attendance": "Attendance",
@@ -474,6 +475,14 @@
     "employee_transfer": {
       "name": "Propose transfers",
       "description": "Propose moving an employee in your data scope to another office, department, team or position"
+    },
+    "announcement_read": {
+      "name": "Read announcements",
+      "description": "Read published announcements addressed to your office, department or the whole company"
+    },
+    "announcement_manage": {
+      "name": "Manage announcements",
+      "description": "Create, edit, publish and remove announcements; HR only for their own office"
     }
   },
   "AuditActions": {
@@ -525,7 +534,11 @@
     "EMPLOYEE_SKILL_CONFIRMED": "Skill confirmed",
     "TRANSFER_CREATED": "Transfer proposed",
     "TRANSFER_APPLIED": "Transfer took effect",
-    "TRANSFER_CANCELLED": "Transfer cancelled"
+    "TRANSFER_CANCELLED": "Transfer cancelled",
+    "ANNOUNCEMENT_CREATED": "Announcement drafted",
+    "ANNOUNCEMENT_UPDATED": "Announcement edited",
+    "ANNOUNCEMENT_PUBLISHED": "Announcement published",
+    "ANNOUNCEMENT_REMOVED": "Announcement removed"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -2981,5 +2994,104 @@
     "lastDay": "Last day in the project",
     "lastDayInvalid": "The last day must be today or later.",
     "ended": "Allocation ended"
+  },
+  "Announcements": {
+    "metaTitle": "Announcements",
+    "title": "Announcements",
+    "description": "News and notices from the company that are addressed to you.",
+    "pinned": "Pinned",
+    "publishedBy": "posted by {name}",
+    "categories": {
+      "POLICY": "Policy",
+      "EVENT": "Event",
+      "HEALTH": "Health",
+      "OTHER": "Other"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published",
+      "REMOVED": "Removed"
+    },
+    "audiences": {
+      "COMPANY": "Whole company",
+      "OFFICE": "Office",
+      "DEPARTMENT": "Department"
+    },
+    "List": {
+      "empty": "No announcements yet",
+      "emptyHint": "New announcements for you will show up here.",
+      "emptyFiltered": "No announcement matches your filters",
+      "manage": "Manage announcements",
+      "searchPlaceholder": "Search by title",
+      "allCategories": "All categories",
+      "categoryFilter": "Filter by category"
+    },
+    "Detail": {
+      "metaTitle": "Announcement",
+      "back": "Back to announcements"
+    },
+    "Manage": {
+      "metaTitle": "Manage announcements",
+      "title": "Manage announcements",
+      "descriptionCompany": "Create, publish and remove announcements for the whole company, an office or a department.",
+      "descriptionOffice": "Create, publish and remove announcements for your own office.",
+      "backToBoard": "Back to announcements",
+      "create": "New announcement",
+      "allStatuses": "All statuses",
+      "statusFilter": "Filter by status",
+      "empty": "No announcements yet. Create the first one.",
+      "emptyFiltered": "No announcement matches your filters",
+      "publishedAt": "published {date}",
+      "updatedAt": "updated {date}",
+      "view": "View",
+      "edit": "Edit",
+      "publish": "Publish",
+      "remove": "Remove",
+      "publishTitle": "Publish this announcement?",
+      "publishDescription": "\"{title}\" becomes visible to everyone in its audience right away. You can still edit the text afterwards, but not the audience.",
+      "removeTitle": "Remove this announcement?",
+      "removePublishedDescription": "\"{title}\" disappears for readers. This cannot be undone.",
+      "removeDraftDescription": "The draft \"{title}\" will be removed. This cannot be undone.",
+      "published": "Announcement published",
+      "removed": "Announcement removed"
+    },
+    "Form": {
+      "createTitle": "New announcement",
+      "editTitle": "Edit announcement",
+      "createDescription": "It is saved as a draft. Publish it from the list when it is ready.",
+      "editDescription": "A published announcement keeps its audience; the text and pin can still change.",
+      "title": "Title",
+      "category": "Category",
+      "pinned": "Pin to the top",
+      "pinnedHint": "Pinned announcements are listed first.",
+      "audience": "Audience",
+      "office": "Office",
+      "department": "Department",
+      "choose": "Choose",
+      "inactiveOption": "{name} (no longer in use)",
+      "ownOfficeOnly": "This announcement goes to your own office.",
+      "audienceLocked": "The audience of a published announcement cannot change.",
+      "content": "Content",
+      "contentHint": "Markdown: **bold**, lists, [links](https://example.com). Images and raw HTML are not shown.",
+      "write": "Edit",
+      "preview": "Preview",
+      "emptyPreview": "Nothing to preview yet.",
+      "saveDraft": "Save draft",
+      "save": "Save changes",
+      "created": "Draft saved",
+      "saved": "Announcement saved"
+    },
+    "Validation": {
+      "required": "Required",
+      "tooLong": "Too long"
+    },
+    "Errors": {
+      "notFound": "The announcement no longer exists or is not available to you. The list was reloaded.",
+      "audienceInvalid": "The office or department is missing, no longer in use, or does not match the audience.",
+      "audienceForbidden": "You can only post to your own office.",
+      "audienceLocked": "The audience of a published announcement cannot change. The list was reloaded.",
+      "invalidState": "This action is not possible in the announcement's current state. The list was reloaded.",
+      "versionConflict": "Someone else just changed this announcement. The list was reloaded, open it again to see the latest version."
+    }
   }
 }
