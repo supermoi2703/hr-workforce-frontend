@@ -526,7 +526,24 @@
     "EMPLOYEE_SKILL_CONFIRMED": "Xác nhận kỹ năng",
     "TRANSFER_CREATED": "Đề xuất điều chuyển",
     "TRANSFER_APPLIED": "Điều chuyển có hiệu lực",
-    "TRANSFER_CANCELLED": "Hủy điều chuyển"
+    "TRANSFER_CANCELLED": "Hủy điều chuyển",
+    "ORG_UNIT_CREATED": "Tạo đơn vị tổ chức",
+    "ORG_UNIT_UPDATED": "Sửa đơn vị tổ chức",
+    "ORG_UNIT_DEACTIVATED": "Ngừng dùng đơn vị tổ chức",
+    "ORG_UNIT_ACTIVATED": "Dùng lại đơn vị tổ chức",
+    "ORG_UNIT_HEAD_CHANGED": "Đổi trưởng đơn vị",
+    "PROJECT_CREATED": "Tạo dự án",
+    "PROJECT_UPDATED": "Sửa dự án",
+    "PROJECT_CLOSED": "Đóng dự án",
+    "PROJECT_PM_CHANGED": "Đổi quản lý dự án",
+    "PROJECT_OBSERVER_ADDED": "Thêm người quan sát dự án",
+    "PROJECT_OBSERVER_REMOVED": "Bỏ người quan sát dự án",
+    "ALLOCATION_APPLIED": "Áp dụng phân bổ",
+    "ALLOCATION_ENDED": "Kết thúc phân bổ",
+    "SKILL_CREATED": "Thêm kỹ năng vào danh mục",
+    "SKILL_UPDATED": "Sửa kỹ năng trong danh mục",
+    "SKILL_DEACTIVATED": "Ngừng dùng kỹ năng",
+    "SKILL_ACTIVATED": "Dùng lại kỹ năng"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -642,7 +659,17 @@
       "before": "Trước",
       "after": "Sau",
       "effectiveDate": "Ngày hiệu lực",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "kind": "Loại đơn vị",
+      "employeeId": "Nhân viên",
+      "pm": "Quản lý dự án",
+      "percent": "Tỷ lệ (%)",
+      "percentBefore": "Tỷ lệ trước (%)",
+      "percentAfter": "Tỷ lệ sau (%)",
+      "lastDay": "Ngày cuối",
+      "requestId": "Mã đề xuất",
+      "selfLevel": "Mức tự khai",
+      "confirmed": "Đã xác nhận"
     },
     "values": {
       "phone": "Điện thoại",
@@ -694,6 +721,12 @@
       "TEAM": "Cấp dưới",
       "OFFICE": "Văn phòng",
       "ALL": "Toàn công ty"
+    },
+    "unitKinds": {
+      "OFFICE": "Văn phòng",
+      "DEPARTMENT": "Phòng ban",
+      "TEAM": "Team",
+      "POSITION": "Chức vụ"
     }
   },
   "Auth": {
