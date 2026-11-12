@@ -85,6 +85,21 @@ describe("formatMetadata", () => {
     minutes: (count) => `${count} min`,
   };
 
+  it("loại đơn vị (kind) dịch riêng, không lẫn với giá trị chung cùng mã", () => {
+    const withKinds: MetadataLabels = {
+      ...labels,
+      key: (key) => (key === "kind" ? "Unit type" : labels.key(key)),
+      // Bảng giá trị chung: TEAM là phạm vi dữ liệu
+      value: (value) => (value === "TEAM" ? "Subordinates" : labels.value(value)),
+      unitKind: (value) => ({ TEAM: "Team", DEPARTMENT: "Department" })[value] ?? null,
+    };
+    expect(formatMetadata({ kind: "TEAM" }, withKinds)).toEqual([{ key: "kind", label: "Unit type", value: "Team" }]);
+    // Khóa khác vẫn dùng bảng giá trị chung
+    expect(formatMetadata({ scope: "TEAM" }, withKinds)[0].value).toBe("Subordinates");
+    // Không có hàm unitKind (chỗ gọi cũ) → như trước
+    expect(formatMetadata({ kind: "TEAM" }, labels)[0].value).toBe("TEAM");
+  });
+
   it("nhãn khóa và giá trị đã biết", () => {
     expect(formatMetadata({ from: "ACTIVE", to: "LOCKED" }, labels)).toEqual([
       { key: "from", label: "Before", value: "Active" },
@@ -149,10 +164,18 @@ describe("lịch sử hồ sơ", () => {
 
 describe("bản dịch hành động", () => {
   it("mọi AuditAction đều có nhãn ở cả en và vi", () => {
-    expect(AUDIT_ACTIONS).toHaveLength(49);
+    expect(AUDIT_ACTIONS).toHaveLength(66);
     for (const action of AUDIT_ACTIONS) {
       expect(en.AuditActions).toHaveProperty(action);
       expect(vi.AuditActions).toHaveProperty(action);
+    }
+  });
+
+  it("khóa metadata và loại đơn vị của tổ chức / dự án / phân bổ / kỹ năng có nhãn ở cả en và vi", () => {
+    const keys = ["kind", "employeeId", "pm", "percent", "percentBefore", "percentAfter", "lastDay", "requestId", "selfLevel", "confirmed"];
+    for (const messages of [en, vi]) {
+      for (const key of keys) expect(messages.AuditLog.Meta).toHaveProperty(key);
+      for (const kind of ["OFFICE", "DEPARTMENT", "TEAM", "POSITION"]) expect(messages.AuditLog.unitKinds).toHaveProperty(kind);
     }
   });
 });

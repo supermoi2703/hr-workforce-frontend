@@ -526,7 +526,24 @@
     "EMPLOYEE_SKILL_CONFIRMED": "Skill confirmed",
     "TRANSFER_CREATED": "Transfer proposed",
     "TRANSFER_APPLIED": "Transfer took effect",
-    "TRANSFER_CANCELLED": "Transfer cancelled"
+    "TRANSFER_CANCELLED": "Transfer cancelled",
+    "ORG_UNIT_CREATED": "Org unit created",
+    "ORG_UNIT_UPDATED": "Org unit updated",
+    "ORG_UNIT_DEACTIVATED": "Org unit deactivated",
+    "ORG_UNIT_ACTIVATED": "Org unit reactivated",
+    "ORG_UNIT_HEAD_CHANGED": "Unit head changed",
+    "PROJECT_CREATED": "Project created",
+    "PROJECT_UPDATED": "Project updated",
+    "PROJECT_CLOSED": "Project closed",
+    "PROJECT_PM_CHANGED": "Project manager changed",
+    "PROJECT_OBSERVER_ADDED": "Project observer added",
+    "PROJECT_OBSERVER_REMOVED": "Project observer removed",
+    "ALLOCATION_APPLIED": "Allocation applied",
+    "ALLOCATION_ENDED": "Allocation ended",
+    "SKILL_CREATED": "Skill added to catalog",
+    "SKILL_UPDATED": "Catalog skill updated",
+    "SKILL_DEACTIVATED": "Skill deactivated",
+    "SKILL_ACTIVATED": "Skill reactivated"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -642,7 +659,17 @@
       "before": "Before",
       "after": "After",
       "effectiveDate": "Effective date",
-      "note": "Note"
+      "note": "Note",
+      "kind": "Unit type",
+      "employeeId": "Employee",
+      "pm": "Project manager",
+      "percent": "Percent (%)",
+      "percentBefore": "Percent before (%)",
+      "percentAfter": "Percent after (%)",
+      "lastDay": "Last day",
+      "requestId": "Request ID",
+      "selfLevel": "Self-declared level",
+      "confirmed": "Confirmed"
     },
     "values": {
       "phone": "Phone",
@@ -694,6 +721,12 @@
       "TEAM": "Team",
       "OFFICE": "Office",
       "ALL": "Whole company"
+    },
+    "unitKinds": {
+      "OFFICE": "Office",
+      "DEPARTMENT": "Department",
+      "TEAM": "Team",
+      "POSITION": "Position"
     }
   },
   "Auth": {
