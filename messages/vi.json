@@ -470,6 +470,10 @@
     "contract_manage": {
       "name": "Quản lý hợp đồng",
       "description": "Tạo, sửa, kết thúc hợp đồng và quản lý lịch sử lương"
+    },
+    "employee_transfer": {
+      "name": "Đề xuất điều chuyển",
+      "description": "Đề xuất chuyển nhân viên trong phạm vi dữ liệu sang văn phòng, phòng ban, team hoặc chức vụ khác"
     }
   },
   "AuditActions": {
@@ -518,7 +522,10 @@
     "APPROVAL_WITHDRAWN": "Rút đơn",
     "EMPLOYEE_SKILL_DECLARED": "Khai kỹ năng",
     "EMPLOYEE_SKILL_REMOVED": "Bỏ kỹ năng",
-    "EMPLOYEE_SKILL_CONFIRMED": "Xác nhận kỹ năng"
+    "EMPLOYEE_SKILL_CONFIRMED": "Xác nhận kỹ năng",
+    "TRANSFER_CREATED": "Đề xuất điều chuyển",
+    "TRANSFER_APPLIED": "Điều chuyển có hiệu lực",
+    "TRANSFER_CANCELLED": "Hủy điều chuyển"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -571,6 +578,7 @@
         "CONTRACT": "Hợp đồng và lương",
         "ACCOUNT": "Tài khoản",
         "APPROVAL": "Đơn từ",
+        "TRANSFER": "Điều chuyển",
         "SKILL": "Kỹ năng"
       }
     },
@@ -631,7 +639,9 @@
       "roles": "Vai trò",
       "skill": "Kỹ năng",
       "before": "Trước",
-      "after": "Sau"
+      "after": "Sau",
+      "effectiveDate": "Ngày hiệu lực",
+      "note": "Ghi chú"
     },
     "values": {
       "phone": "Điện thoại",
@@ -661,6 +671,7 @@
       "SERVICE": "Dịch vụ",
       "MANUAL": "Thao tác tay",
       "EMPLOYEE_TERMINATED": "Nhân viên nghỉ việc",
+      "ORG_UNIT_UNAVAILABLE": "Đơn vị đích không còn dùng",
       "LEAVE": "Đơn nghỉ",
       "LEAVE_CANCEL": "Hủy đơn nghỉ",
       "WFH": "Làm việc từ xa",
@@ -2173,7 +2184,8 @@
       "save": "Lưu thay đổi",
       "created": "Đã tạo hồ sơ {code}",
       "saved": "Đã lưu hồ sơ",
-      "employmentTypeHint": "Tự cập nhật theo hợp đồng đang hiệu lực."
+      "employmentTypeHint": "Tự cập nhật theo hợp đồng đang hiệu lực.",
+      "unitsLocked": "Văn phòng, phòng ban, team và chức vụ của người đang làm việc đổi qua tab Công tác (Đề xuất điều chuyển), vì cần duyệt và có ngày hiệu lực."
     },
     "Detail": {
       "metaTitle": "Hồ sơ nhân viên",
@@ -2185,6 +2197,7 @@
         "personal": "Cá nhân",
         "sensitive": "Nhạy cảm",
         "contracts": "Hợp đồng",
+        "transfers": "Công tác",
         "history": "Lịch sử"
       },
       "viewAuditLog": "Xem nhật ký",
@@ -2258,7 +2271,8 @@
       "alreadyHasAccount": "Nhân viên này đã có tài khoản. Hồ sơ đã được tải lại.",
       "terminated": "Nhân viên đã nghỉ việc nên không cấp được tài khoản.",
       "emailExists": "Email này đã thuộc tài khoản khác.",
-      "adminProtected": "Chỉ quản trị viên được thay đổi hồ sơ này."
+      "adminProtected": "Chỉ quản trị viên được thay đổi hồ sơ này.",
+      "unitChangeRequiresTransfer": "Người đang làm việc đổi văn phòng, phòng ban, team hoặc chức vụ qua Điều chuyển. Hồ sơ đã được tải lại."
     }
   },
   "Profile": {
@@ -2825,6 +2839,82 @@
       "salaryLocked": "Không sửa được mức lương này: đã có hiệu lực hoặc là mức đầu tiên của hợp đồng. Trang đã được tải lại.",
       "salaryOutOfRange": "Ngày hiệu lực phải nằm trong thời hạn hợp đồng.",
       "employeeTerminated": "Nhân viên đã nghỉ việc nên không tạo được hợp đồng mới.",
+      "employeeNotFound": "Nhân viên không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn."
+    }
+  },
+  "Transfers": {
+    "statuses": {
+      "PENDING": "Chờ duyệt",
+      "APPROVED": "Đã duyệt, chờ hiệu lực",
+      "APPLIED": "Đã áp dụng",
+      "REJECTED": "Bị từ chối",
+      "WITHDRAWN": "Đã rút",
+      "CANCELLED": "Đã hủy"
+    },
+    "kinds": {
+      "office": "Văn phòng",
+      "department": "Phòng ban",
+      "team": "Team",
+      "position": "Chức vụ"
+    },
+    "Fields": {
+      "office": "Văn phòng",
+      "department": "Phòng ban",
+      "team": "Team",
+      "position": "Chức vụ",
+      "effectiveDate": "Ngày hiệu lực",
+      "reason": "Lý do",
+      "cancelReason": "Lý do hủy"
+    },
+    "Tab": {
+      "empty": "Chưa có lần điều chuyển nào",
+      "propose": "Đề xuất điều chuyển",
+      "effective": "Hiệu lực {date}",
+      "viewApproval": "Xem đơn duyệt",
+      "cancel": "Hủy",
+      "changedTo": "đổi thành",
+      "reason": "Lý do: {reason}",
+      "appliedOn": "Hồ sơ đổi ngày {date}",
+      "cancelledBecause": "Đã hủy: {reason}",
+      "cancelReasons": {
+        "EMPLOYEE_TERMINATED": "nhân viên đã nghỉ việc",
+        "ORG_UNIT_UNAVAILABLE": "đơn vị đích không còn được dùng tới ngày hiệu lực"
+      }
+    },
+    "Form": {
+      "title": "Điều chuyển {name}",
+      "description": "Chọn nơi làm việc mới. Đề xuất đi qua bước duyệt; hồ sơ chỉ đổi khi duyệt xong và tới ngày hiệu lực.",
+      "current": "Hiện tại:",
+      "choose": "Chọn",
+      "noTeam": "Không thuộc team",
+      "inactiveOption": "{name} (ngừng dùng)",
+      "effectiveDateHint": "Từ hôm nay trở đi. Quản lý trực tiếp cũng đổi theo từ ngày này.",
+      "noChangeHint": "Hãy đổi ít nhất một trong văn phòng, phòng ban, team hoặc chức vụ.",
+      "submit": "Gửi đề xuất",
+      "sent": "Đã gửi đề xuất điều chuyển, đang chờ duyệt",
+      "unitHeadWarning": "{name} đang là trưởng phòng hoặc trưởng team. Hãy gán trưởng mới ở trang Tổ chức."
+    },
+    "Cancel": {
+      "title": "Hủy điều chuyển",
+      "description": "Hồ sơ giữ nguyên đơn vị hiện tại. Không hoàn tác được.",
+      "submit": "Hủy điều chuyển",
+      "success": "Đã hủy điều chuyển"
+    },
+    "Validation": {
+      "required": "Bắt buộc",
+      "tooLong": "Quá dài",
+      "pastDate": "Không được là ngày đã qua"
+    },
+    "Errors": {
+      "notFound": "Điều chuyển không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn.",
+      "self": "Bạn không tự đề xuất điều chuyển cho chính mình được.",
+      "onboarding": "Nhân viên chưa nhận việc. Hãy sửa trực tiếp ở hồ sơ.",
+      "alreadyOpen": "Nhân viên này đã có một điều chuyển đang chờ duyệt hoặc chờ hiệu lực. Danh sách đã được tải lại.",
+      "noChange": "Văn phòng, phòng ban, team và chức vụ đều giống hiện tại.",
+      "invalidDate": "Ngày hiệu lực không được là ngày đã qua.",
+      "notCancellable": "Chỉ hủy được điều chuyển đã duyệt mà chưa tới ngày hiệu lực. Đề xuất đang chờ duyệt thì rút ở trang Phê duyệt. Danh sách đã được tải lại.",
+      "orgUnitInvalid": "Văn phòng, phòng ban, team hoặc chức vụ đã ngừng dùng, hoặc team không thuộc phòng đã chọn. Hãy chọn lại.",
+      "terminated": "Nhân viên đã nghỉ việc nên không điều chuyển được.",
       "employeeNotFound": "Nhân viên không tồn tại hoặc nằm ngoài phạm vi dữ liệu của bạn."
     }
   },

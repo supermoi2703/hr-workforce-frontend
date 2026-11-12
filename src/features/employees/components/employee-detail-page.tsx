@@ -41,19 +41,21 @@ import { SensitiveSection } from "./sensitive-section";
 import { StatusDialog } from "./status-dialog";
 
 const LIST_PATH = "/employees";
-const TABS = ["overview", "personal", "sensitive", "contracts", "history"] as const;
+const TABS = ["overview", "personal", "sensitive", "contracts", "transfers", "history"] as const;
 type DetailTab = (typeof TABS)[number];
 
 type EmployeeDetailPageProps = {
   id: string;
   /** Nội dung tab "Hợp đồng" (feature không import nhau: route ghép vào). Chỉ hiện khi có contract:read. */
   renderContracts?: (employee: EmployeeDetail) => ReactNode;
+  /** Nội dung tab "Công tác" (lịch sử điều chuyển và nút đề xuất; route ghép vào). Chỉ tải khi đang mở tab. */
+  renderTransfers?: (employee: EmployeeDetail) => ReactNode;
   /** Nội dung tab "Lịch sử" (route ghép vào). Chỉ hiện và chỉ tải khi có employee:manage và đang mở tab. */
   renderHistory?: (employee: EmployeeDetail) => ReactNode;
 };
 
 /** Chi tiết một hồ sơ (employee:read): thông tin công việc, cá nhân, nhạy cảm theo quyền; sửa / đổi trạng thái / cấp tài khoản. */
-export function EmployeeDetailPage({ id, renderContracts, renderHistory }: EmployeeDetailPageProps) {
+export function EmployeeDetailPage({ id, renderContracts, renderTransfers, renderHistory }: EmployeeDetailPageProps) {
   const t = useTranslations("Employees.Detail");
   const query = useEmployee(id);
 
@@ -87,7 +89,12 @@ export function EmployeeDetailPage({ id, renderContracts, renderHistory }: Emplo
   return (
     <>
       {backLink}
-      <EmployeeDetailView employee={query.data} renderContracts={renderContracts} renderHistory={renderHistory} />
+      <EmployeeDetailView
+        employee={query.data}
+        renderContracts={renderContracts}
+        renderTransfers={renderTransfers}
+        renderHistory={renderHistory}
+      />
     </>
   );
 }
@@ -95,10 +102,12 @@ export function EmployeeDetailPage({ id, renderContracts, renderHistory }: Emplo
 function EmployeeDetailView({
   employee,
   renderContracts,
+  renderTransfers,
   renderHistory,
 }: {
   employee: EmployeeDetail;
   renderContracts?: EmployeeDetailPageProps["renderContracts"];
+  renderTransfers?: EmployeeDetailPageProps["renderTransfers"];
   renderHistory?: EmployeeDetailPageProps["renderHistory"];
 }) {
   const t = useTranslations("Employees.Detail");
@@ -123,6 +132,7 @@ function EmployeeDetailView({
     personal: employee.personal !== null,
     sensitive: actions.viewSensitive,
     contracts: showContracts,
+    transfers: renderTransfers !== undefined,
     history: showHistory,
   };
   const tabs = TABS.filter((tab) => visibleTab[tab]);
@@ -256,6 +266,9 @@ function EmployeeDetailView({
           </TabsContent>
         )}
         {showContracts && <TabsContent value="contracts">{renderContracts(employee)}</TabsContent>}
+        {renderTransfers && (
+          <TabsContent value="transfers">{tab === "transfers" && renderTransfers(employee)}</TabsContent>
+        )}
         {showHistory && <TabsContent value="history">{tab === "history" && renderHistory(employee)}</TabsContent>}
       </Tabs>
 

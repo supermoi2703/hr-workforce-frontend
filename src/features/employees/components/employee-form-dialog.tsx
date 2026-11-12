@@ -34,6 +34,8 @@ import { ChoiceSelect, type Choice } from "@/components/shared/choice-select";
 import { PersonalFields } from "./personal-fields";
 
 const FORM_ID = "employee-form";
+/** Bốn ô đơn vị: khóa khi sửa hồ sơ đã làm việc (backend EMPLOYEE_UNIT_CHANGE_REQUIRES_TRANSFER). */
+const UNIT_FIELDS: string[] = ["officeId", "positionId", "departmentId", "teamId"];
 
 type EmployeeFormDialogProps = {
   /** Có = sửa hồ sơ này; không = tạo mới. */
@@ -119,6 +121,8 @@ function EmployeeForm({ employee, onDone }: { employee?: EmployeeDetail; onDone:
   }, [editing, myOfficeId, form]);
 
   const departmentId = useWatch({ control: form.control, name: "departmentId" });
+  // Hồ sơ đã làm việc đổi đơn vị qua Điều chuyển (có duyệt, có ngày hiệu lực); chưa nhận việc thì sửa trực tiếp được.
+  const lockUnits = employee !== undefined && employee.status !== "ONBOARDING";
 
   const inactive = (unit: OrgUnit) => (unit.active ? unit.name : t("inactiveOption", { name: unit.name }));
   const choices = (units: OrgUnit[] | undefined, current?: string | null): Choice[] =>
@@ -190,7 +194,10 @@ function EmployeeForm({ employee, onDone }: { employee?: EmployeeDetail; onDone:
             placeholder={t("choose")}
             noneLabel={extra?.noneLabel}
             invalid={!!errors[name]}
-            disabled={org.isPending && name !== "level" && name !== "employmentType"}
+            disabled={
+              (org.isPending && name !== "level" && name !== "employmentType") ||
+              (lockUnits && UNIT_FIELDS.includes(name))
+            }
           />
           {extra?.hint && <FieldDescription>{extra.hint}</FieldDescription>}
           <FieldError errors={[errors[name]]} />
@@ -216,6 +223,7 @@ function EmployeeForm({ employee, onDone }: { employee?: EmployeeDetail; onDone:
       <form id={FORM_ID} onSubmit={form.handleSubmit(submit)} noValidate className="flex flex-col gap-6">
         <FieldSet>
           <FieldLegend>{t("work")}</FieldLegend>
+          {lockUnits && <FieldDescription>{t("unitsLocked")}</FieldDescription>}
           <div className="grid gap-4 sm:grid-cols-2">
             <Field data-invalid={!!errors.fullName}>
               <FieldLabel htmlFor="employee-full-name">{tFields("fullName")}</FieldLabel>

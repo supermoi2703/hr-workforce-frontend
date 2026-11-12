@@ -470,6 +470,10 @@
     "contract_manage": {
       "name": "Manage contracts",
       "description": "Create, change and end contracts, and manage salary history"
+    },
+    "employee_transfer": {
+      "name": "Propose transfers",
+      "description": "Propose moving an employee in your data scope to another office, department, team or position"
     }
   },
   "AuditActions": {
@@ -518,7 +522,10 @@
     "APPROVAL_WITHDRAWN": "Request withdrawn",
     "EMPLOYEE_SKILL_DECLARED": "Skill declared",
     "EMPLOYEE_SKILL_REMOVED": "Skill removed",
-    "EMPLOYEE_SKILL_CONFIRMED": "Skill confirmed"
+    "EMPLOYEE_SKILL_CONFIRMED": "Skill confirmed",
+    "TRANSFER_CREATED": "Transfer proposed",
+    "TRANSFER_APPLIED": "Transfer took effect",
+    "TRANSFER_CANCELLED": "Transfer cancelled"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -571,6 +578,7 @@
         "CONTRACT": "Contracts and salary",
         "ACCOUNT": "Account",
         "APPROVAL": "Requests",
+        "TRANSFER": "Transfers",
         "SKILL": "Skills"
       }
     },
@@ -631,7 +639,9 @@
       "roles": "Roles",
       "skill": "Skill",
       "before": "Before",
-      "after": "After"
+      "after": "After",
+      "effectiveDate": "Effective date",
+      "note": "Note"
     },
     "values": {
       "phone": "Phone",
@@ -661,6 +671,7 @@
       "SERVICE": "Service",
       "MANUAL": "Manual",
       "EMPLOYEE_TERMINATED": "Employee terminated",
+      "ORG_UNIT_UNAVAILABLE": "Target unit no longer in use",
       "LEAVE": "Leave",
       "LEAVE_CANCEL": "Leave cancellation",
       "WFH": "Work from home",
@@ -2173,7 +2184,8 @@
       "save": "Save changes",
       "created": "Profile {code} created",
       "saved": "Profile saved",
-      "employmentTypeHint": "Updated automatically from the active contract."
+      "employmentTypeHint": "Updated automatically from the active contract.",
+      "unitsLocked": "Office, department, team and position of a working employee change in the Work history tab (Propose transfer), because they need approval and an effective date."
     },
     "Detail": {
       "metaTitle": "Employee profile",
@@ -2185,6 +2197,7 @@
         "personal": "Personal",
         "sensitive": "Sensitive",
         "contracts": "Contracts",
+        "transfers": "Work history",
         "history": "History"
       },
       "viewAuditLog": "View audit log",
@@ -2258,7 +2271,8 @@
       "alreadyHasAccount": "This employee already has an account. The profile has been reloaded.",
       "terminated": "The employee has left the company, so an account can't be created.",
       "emailExists": "This email is already used by another account.",
-      "adminProtected": "Only an administrator can change this profile."
+      "adminProtected": "Only an administrator can change this profile.",
+      "unitChangeRequiresTransfer": "A working employee changes office, department, team or position through a transfer. The profile has been reloaded."
     }
   },
   "Profile": {
@@ -2825,6 +2839,82 @@
       "salaryLocked": "This salary can't be changed: it's already in effect or it's the first salary of the contract. The page has been reloaded.",
       "salaryOutOfRange": "The effective date must be inside the contract period.",
       "employeeTerminated": "The employee has left the company, so a new contract can't be created.",
+      "employeeNotFound": "The employee doesn't exist or is outside your data scope."
+    }
+  },
+  "Transfers": {
+    "statuses": {
+      "PENDING": "Pending approval",
+      "APPROVED": "Approved, waiting",
+      "APPLIED": "Applied",
+      "REJECTED": "Rejected",
+      "WITHDRAWN": "Withdrawn",
+      "CANCELLED": "Cancelled"
+    },
+    "kinds": {
+      "office": "Office",
+      "department": "Department",
+      "team": "Team",
+      "position": "Position"
+    },
+    "Fields": {
+      "office": "Office",
+      "department": "Department",
+      "team": "Team",
+      "position": "Position",
+      "effectiveDate": "Effective date",
+      "reason": "Reason",
+      "cancelReason": "Reason for cancelling"
+    },
+    "Tab": {
+      "empty": "No transfers yet",
+      "propose": "Propose transfer",
+      "effective": "Effective {date}",
+      "viewApproval": "View approval",
+      "cancel": "Cancel",
+      "changedTo": "changed to",
+      "reason": "Reason: {reason}",
+      "appliedOn": "Profile changed on {date}",
+      "cancelledBecause": "Cancelled: {reason}",
+      "cancelReasons": {
+        "EMPLOYEE_TERMINATED": "the employee left the company",
+        "ORG_UNIT_UNAVAILABLE": "the target unit was no longer in use on the effective date"
+      }
+    },
+    "Form": {
+      "title": "Transfer {name}",
+      "description": "Choose the new workplace. The proposal goes through approval; the profile only changes once it is approved and the effective date arrives.",
+      "current": "Currently:",
+      "choose": "Select",
+      "noTeam": "No team",
+      "inactiveOption": "{name} (no longer in use)",
+      "effectiveDateHint": "From today onwards. The direct manager changes from this date too.",
+      "noChangeHint": "Change at least one of office, department, team or position.",
+      "submit": "Send proposal",
+      "sent": "Transfer proposed, waiting for approval",
+      "unitHeadWarning": "{name} is a department or team head. Assign a new head on the Organization page."
+    },
+    "Cancel": {
+      "title": "Cancel transfer",
+      "description": "The profile keeps its current units. This can't be undone.",
+      "submit": "Cancel transfer",
+      "success": "Transfer cancelled"
+    },
+    "Validation": {
+      "required": "Required",
+      "tooLong": "Too long",
+      "pastDate": "Can't be a date in the past"
+    },
+    "Errors": {
+      "notFound": "The transfer doesn't exist or is outside your data scope.",
+      "self": "You can't propose a transfer for yourself.",
+      "onboarding": "The employee hasn't started yet. Edit the profile directly instead.",
+      "alreadyOpen": "This employee already has a transfer waiting for approval or for its effective date. The list has been reloaded.",
+      "noChange": "The office, department, team and position are all the same as the current ones.",
+      "invalidDate": "The effective date can't be in the past.",
+      "notCancellable": "Only an approved transfer that hasn't taken effect can be cancelled. Withdraw a pending one on the Approvals page. The list has been reloaded.",
+      "orgUnitInvalid": "An office, department, team or position is no longer in use, or the team isn't in the selected department. Choose again.",
+      "terminated": "The employee has left the company, so they can't be transferred.",
       "employeeNotFound": "The employee doesn't exist or is outside your data scope."
     }
   },
