@@ -65,7 +65,8 @@
     "signOut": "Sign out",
     "roleLabel": "Role:",
     "demoSignIn": "Demo sign-in",
-    "myProfile": "My profile"
+    "myProfile": "My profile",
+    "notifications": "Notifications"
   },
   "Roles": {
     "ADMIN": "Admin",
@@ -2981,5 +2982,41 @@
     "lastDay": "Last day in the project",
     "lastDayInvalid": "The last day must be today or later.",
     "ended": "Allocation ended"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "pageDescription": "What changed for you: requests to approve, decisions on your requests, skills, projects.",
+    "bell": "Notifications",
+    "bellWithCount": "Notifications, {count} unread",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all",
+    "empty": "No notifications yet.",
+    "emptyUnread": "You're all caught up.",
+    "unread": "Unread",
+    "filter": "Filter notifications",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "pageOf": "Page {page} of {total}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "unknownType": "New notification",
+    "detail": {
+      "comment": "Reason: {text}",
+      "note": "Note: {text}"
+    },
+    "types": {
+      "APPROVAL_PENDING": "{approvalType} “{title}” is waiting for your approval",
+      "APPROVAL_REASSIGNED": "You were assigned to approve {approvalType} “{title}”",
+      "APPROVAL_COMPLETED": "{approvalType} “{title}” was {status, select, APPROVED {approved} REJECTED {rejected} other {withdrawn}}",
+      "SKILL_DECLARED": "{employeeName} declared {skillCode} at level {level}, waiting for your confirmation",
+      "SKILL_CONFIRMED": "Your {skillCode} skill was confirmed at level {confirmedLevel}",
+      "ALLOCATION_ENDED": "Your allocation to project {projectCode} ends after {lastDay}",
+      "PROJECT_MANAGER_ASSIGNED": "You are the project manager of {projectCode} from {effectiveFrom}",
+      "PROJECT_MANAGER_REMOVED": "You are no longer the project manager of {projectCode} from {effectiveFrom}",
+      "CONTRACT_EXPIRING": "Contract {contractNumber} of {employeeName} expires on {endDate}",
+      "MISSING_CHECKOUT": "You did not check out on {workDate}"
+    }
   }
 }
