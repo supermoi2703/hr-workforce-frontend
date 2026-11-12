@@ -70,7 +70,7 @@ export const searchBySkills = (criteria: SkillSearchCriteria, params: PageParams
     },
   });
 
-// ===== Đơn vị tổ chức để lọc và hiện tên (mọi người đã đăng nhập đều xem được)
+// ===== Đơn vị tổ chức để lọc và hiện tên (khung cây tổ chức: mọi người đã đăng nhập đều xem được)
 
 export const getOrgChartForSkills = () => http.get<OrgChartForSkills>("/api/org-chart");
 export const getOfficesForSkills = () => http.get<OrgUnitOption[]>("/api/org-chart/offices");

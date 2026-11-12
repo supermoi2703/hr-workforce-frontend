@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { cn } from "@/lib/utils";
-import { useEmployeeOptions } from "../hooks";
+import { EMPLOYEE_SEARCH_MIN_LENGTH, useEmployeeOptions } from "../hooks";
 import type { ProjectPerson } from "../types";
 
 type EmployeePickerProps = {
@@ -23,8 +23,9 @@ type EmployeePickerProps = {
 };
 
 /**
- * Chọn một nhân viên đang làm việc: tìm ở backend theo tên hoặc mã trong danh bạ cây tổ chức, vì trưởng phòng role
- * Employee không có quyền employee:read. Dùng cho PM và người quan sát, nên được chọn người phòng khác.
+ * Chọn một nhân viên đang làm việc: tìm ở backend theo tên hoặc mã (GET /api/projects/people), vì trưởng phòng role
+ * Employee không có quyền employee:read và cây tổ chức chỉ cho thấy phòng mình. Dùng cho PM, người quan sát và đề xuất
+ * phân bổ, nên được chọn người phòng khác; phải gõ ít nhất 2 ký tự.
  */
 export function EmployeePicker({ value, onChange, disabled, invalid, id }: EmployeePickerProps) {
   const t = useTranslations("Projects.Picker");
@@ -32,6 +33,7 @@ export function EmployeePicker({ value, onChange, disabled, invalid, id }: Emplo
   const [text, setText] = useState("");
   const keyword = useDebouncedValue(text.trim());
   const options = useEmployeeOptions(keyword, open);
+  const tooShort = keyword.length < EMPLOYEE_SEARCH_MIN_LENGTH;
 
   function pick(person: ProjectPerson) {
     onChange(person);
@@ -67,16 +69,17 @@ export function EmployeePicker({ value, onChange, disabled, invalid, id }: Emplo
           />
         </div>
         <div className="max-h-64 overflow-y-auto p-1" role="listbox" aria-label={t("listLabel")}>
-          {options.isPending && (
+          {tooShort && <p className="px-3 py-6 text-center text-sm text-muted-foreground">{t("typeMore")}</p>}
+          {!tooShort && options.isPending && (
             <div className="space-y-1 p-1" aria-hidden>
               {[0, 1, 2].map((i) => (
                 <Skeleton key={i} className="h-9 w-full" />
               ))}
             </div>
           )}
-          {options.isError && <p className="px-3 py-6 text-center text-sm text-destructive">{t("loadFailed")}</p>}
-          {options.data?.length === 0 && <p className="px-3 py-6 text-center text-sm text-muted-foreground">{t("noMatch")}</p>}
-          {options.data?.map((person) => {
+          {!tooShort && options.isError && <p className="px-3 py-6 text-center text-sm text-destructive">{t("loadFailed")}</p>}
+          {!tooShort && options.data?.length === 0 && <p className="px-3 py-6 text-center text-sm text-muted-foreground">{t("noMatch")}</p>}
+          {!tooShort && options.data?.map((person) => {
             const reason = disabled?.get(person.id);
             const selected = value?.id === person.id;
             return (

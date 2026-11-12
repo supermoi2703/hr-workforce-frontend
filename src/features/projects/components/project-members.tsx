@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UserMinusIcon, UserPlusIcon } from "lucide-react";
+import { CalendarXIcon, PencilIcon, UserMinusIcon, UserPlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,13 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState, ErrorState } from "@/components/shared/states";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
-import { formatDate } from "@/lib/format";
+import { formatDate, todayIsoDate } from "@/lib/format";
+import { isRunningMember } from "../allocation-rules";
 import { removeProjectObserver } from "../api";
 import { useProjectErrorMessage, useProjectMutation } from "../hooks";
 import { hasHiddenPercent } from "../rules";
 import type { Project, ProjectMember } from "../types";
+import { EndAllocationDialog, ProposeAllocationDialog } from "./allocation-dialogs";
 import { ProjectRoleBadge } from "./project-badges";
 import { AddObserverDialog } from "./project-edit-dialogs";
 
@@ -30,16 +32,23 @@ type ProjectMembersProps = {
 
 /**
  * Người tham gia. Dự án đã đóng thì mọi người đã rời, nên hiện người có hiệu lực ngày đóng. Cột % trống khi người xem
- * không được xem (backend trả null); thành viên vào dự án qua đề xuất phân bổ (3.4), ở đây chỉ thêm người quan sát.
+ * không được xem (backend trả null). Thành viên vào dự án qua đề xuất phân bổ (3.4): mỗi giai đoạn một dòng, nên một người
+ * có thể có nhiều dòng (50% tới 30/11, 100% từ 01/12). Người quản lý thành viên đổi %, gia hạn, kết thúc sớm ở từng dòng.
  */
 export function ProjectMembers({ project, members, isPending, error, onRetry }: ProjectMembersProps) {
   const t = useTranslations("Projects.Members");
+  const tAllocations = useTranslations("Allocations");
   const { hasPermission } = useCurrentUser();
   const errorMessage = useProjectErrorMessage();
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<ProjectMember | null>(null);
+  const [changing, setChanging] = useState<ProjectMember | null>(null);
+  const [ending, setEnding] = useState<ProjectMember | null>(null);
   const remove = useProjectMutation((employeeId: string) => removeProjectObserver(project.id, employeeId));
-  const canManage = project.can.manageObservers;
+  const canObserve = project.can.manageObservers;
+  const canStaff = project.can.manageMembers && project.status === "ACTIVE";
+  const canManage = canObserve || canStaff;
+  const today = todayIsoDate();
   const profileLinks = hasPermission("employee:read");
 
   return (
@@ -49,7 +58,7 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
           <h2 className="font-heading text-lg font-semibold">{t("title")}</h2>
           {project.closedOn && <p className="text-sm text-muted-foreground">{t("onClosedDate")}</p>}
         </div>
-        {canManage && (
+        {canObserve && (
           <Button variant="outline" size="sm" onClick={() => setAdding(true)}>
             <UserPlusIcon /> {t("addObserver")}
           </Button>
@@ -77,7 +86,7 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
                   <TableHead className="text-right">{t("percent")}</TableHead>
                   <TableHead>{t("period")}</TableHead>
                   {canManage && (
-                    <TableHead className="w-12">
+                    <TableHead className="w-24">
                       <span className="sr-only">{t("actions")}</span>
                     </TableHead>
                   )}
@@ -112,16 +121,40 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
                     </TableCell>
                     {canManage && (
                       <TableCell>
-                        {member.role === "OBSERVER" && (
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("removeObserverOf", { name: member.employee.fullName })}
-                            onClick={() => setRemoving(member)}
-                          >
-                            <UserMinusIcon />
-                          </Button>
-                        )}
+                        <span className="flex justify-end gap-1">
+                          {canObserve && member.role === "OBSERVER" && (
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("removeObserverOf", { name: member.employee.fullName })}
+                              onClick={() => setRemoving(member)}
+                            >
+                              <UserMinusIcon />
+                            </Button>
+                          )}
+                          {canStaff && isRunningMember(member, today) && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={tAllocations("changeOf", { name: member.employee.fullName })}
+                                title={tAllocations("change")}
+                                onClick={() => setChanging(member)}
+                              >
+                                <PencilIcon />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={tAllocations("endOf", { name: member.employee.fullName })}
+                                title={tAllocations("end")}
+                                onClick={() => setEnding(member)}
+                              >
+                                <CalendarXIcon />
+                              </Button>
+                            </>
+                          )}
+                        </span>
                       </TableCell>
                     )}
                   </TableRow>
@@ -155,6 +188,14 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
             : undefined
         }
       />
+      <ProposeAllocationDialog
+        project={project}
+        open={!!changing}
+        onOpenChange={(open) => !open && setChanging(null)}
+        person={changing?.employee}
+        percent={changing?.allocationPercent}
+      />
+      <EndAllocationDialog project={project} member={ending} onClose={() => setEnding(null)} />
     </section>
   );
 }

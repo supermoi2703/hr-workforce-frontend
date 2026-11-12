@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations, type Messages } from "next-intl";
 import { isApiError } from "@/lib/api/errors";
 import type { PageParams } from "@/lib/api/types";
 import { getProjects } from "./api";
 import {
+  getAllocationRequests,
+  getAvailability,
   getBoard,
   getCandidates,
   getCapacity,
@@ -24,6 +26,7 @@ import {
   getTask,
   getTasks,
   getWorklogs,
+  type CandidateQuery,
 } from "./work-api";
 import { useProjectErrorMessage } from "./hooks";
 import type { TaskStatus } from "./work-types";
@@ -67,15 +70,38 @@ export const useSprints = (projectId: string, enabled: boolean) =>
 export const useSprintCapacity = (id: string | undefined) =>
   useQuery({ queryKey: key("sprint-capacity", id), queryFn: () => getSprintCapacity(id!), enabled: !!id });
 
-export const useCandidates = (projectId: string, teamId: string | null, sourceProjectId: string | null) =>
+export const useCandidates = (projectId: string, query: CandidateQuery) =>
   useQuery({
-    queryKey: key("candidates", projectId, teamId, sourceProjectId),
-    queryFn: () => getCandidates(projectId, teamId, sourceProjectId),
-    enabled: !!teamId || !!sourceProjectId,
+    queryKey: key("candidates", projectId, query),
+    queryFn: () => getCandidates(projectId, query),
+    enabled: !!query.sourceTeamId || !!query.sourceProjectId,
+  });
+/** Đề xuất phân bổ của dự án; chỉ người xem được % phân bổ mới gọi được. */
+export const useAllocationRequests = (projectId: string, enabled: boolean) =>
+  useQuery({ queryKey: key("allocation-requests", projectId), queryFn: () => getAllocationRequests(projectId), enabled });
+export const useAvailability = (projectId: string, employeeId: string | null, from: string | null, to: string | null) =>
+  useQuery({
+    queryKey: key("availability", projectId, employeeId, from, to),
+    queryFn: () => getAvailability(projectId, employeeId!, from!, to),
+    enabled: !!employeeId && !!from,
+    retry: false,
   });
 export const useOrgTeams = (enabled: boolean) => useQuery({ queryKey: key("org-teams"), queryFn: getOrgTeams, enabled });
-export const useSourceProjects = (enabled: boolean) =>
-  useQuery({ queryKey: key("source-projects"), queryFn: () => getProjects({}, { page: 0, size: 100 }), enabled });
+/** Số dự án hiện một lần trong ô chọn dự án nguồn; muốn dự án khác thì gõ tìm. */
+const SOURCE_PROJECT_PAGE_SIZE = 20;
+
+/** Dự án nguồn để lấy người: chưa gõ thì dự án đang chạy; có từ khóa thì tìm theo mã / tên, kể cả dự án đã đóng. */
+export const useSourceProjects = (keyword: string, enabled: boolean) =>
+  useQuery({
+    queryKey: key("source-projects", keyword),
+    queryFn: () =>
+      getProjects(
+        { q: keyword || undefined, status: keyword ? undefined : "ACTIVE" },
+        { page: 0, size: SOURCE_PROJECT_PAGE_SIZE },
+      ),
+    enabled,
+    placeholderData: keepPreviousData,
+  });
 
 /** Mọi thao tác ghi: xong thì tải lại toàn bộ dữ liệu dự án vì số liệu liên quan chéo nhau. */
 export function useWorkMutation<TInput, TResult>(mutationFn: (input: TInput) => Promise<TResult>) {

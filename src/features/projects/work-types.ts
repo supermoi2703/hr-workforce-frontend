@@ -198,6 +198,55 @@ export type Metrics = {
   sprints: { name: string; committedMinutes: number | null; doneMinutes: number }[];
 };
 
-export type Candidate = { person: Person; alreadyInProject: boolean };
+/** freePercent: % còn trống ít nhất trong khoảng đã hỏi (đã trừ đề xuất đang chờ, không tính dự án này); null khi chưa hỏi. */
+export type Candidate = { person: Person; alreadyInProject: boolean; freePercent: number | null };
+
+// ===== Phân bổ có duyệt (3.4), backend README module project mục 8
+
+export type AllocationRequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "WITHDRAWN";
+
+export type AllocationRequest = {
+  id: string;
+  projectId: string;
+  projectCode: string;
+  projectName: string;
+  employee: Person;
+  percent: number;
+  fromDate: string;
+  /** null = không có ngày kết thúc */
+  toDate: string | null;
+  note: string | null;
+  status: AllocationRequestStatus;
+  requestedBy: Person | null;
+  /** Đơn ở trang Phê duyệt: xem tiến độ, rút */
+  approvalRequestId: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+};
+
+export type AllocationInput = {
+  employeeIds: string[];
+  percent: number;
+  fromDate: string;
+  toDate: string | null;
+  note: string | null;
+};
+
+export type AllocationSegment = {
+  from: string;
+  to: string | null;
+  approvedPercent: number;
+  heldPercent: number;
+  freePercent: number;
+};
+
+export type Availability = {
+  employee: Person;
+  from: string;
+  to: string | null;
+  /** Mức tối đa đề xuất được trong cả khoảng */
+  freePercent: number;
+  segments: AllocationSegment[];
+};
 export type OrgTeam = { id: string; code: string; name: string; departmentName: string };
 export type SkillOption = { id: string; name: string; active: boolean };
