@@ -19,5 +19,5 @@
 - [ ] `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` chạy qua
 - [ ] Màn hình xử lý đủ trạng thái đang tải / lỗi / rỗng
 - [ ] Ẩn/hiện theo quyền đúng (thử đổi vai trò giả lập)
-- [ ] Biến môi trường mới (nếu có) đã thêm vào `.env.example`
+- [ ] Biến môi trường mới (nếu có) đã thêm vào `.env.example` và ghi việc khai trên Vercel vào `docs/05` mục 5.4 (repo backend)
 - [ ] Phần lớn code do AI agent sinh ra? Ghi rõ để reviewer soi kỹ hơn (docs/03)
