@@ -27,12 +27,13 @@ import { ErrorState, LoadingState } from "@/components/shared/states";
 import { applyServerFieldErrors } from "@/lib/forms";
 import { getAnnouncementError, hasFieldErrors } from "../error-messages";
 import {
+  useCategories,
   useCreateAnnouncement,
   useManagedAnnouncement,
   useRefreshAnnouncements,
   useUpdateAnnouncement,
 } from "../hooks";
-import { audienceOptions, isAudienceLocked, unitChoices } from "../rules";
+import { audienceOptions, categoryChoices, isAudienceLocked, unitChoices } from "../rules";
 import {
   announcementSchema,
   EMPTY_FORM,
@@ -42,12 +43,15 @@ import {
   type AnnouncementFormValues,
 } from "../schemas";
 import {
-  ANNOUNCEMENT_CATEGORIES,
   MAX_CONTENT_LENGTH,
   MAX_TITLE_LENGTH,
   type AnnouncementDetail,
+  type Category,
+  type CategoryRef,
+  type CoverUploader,
   type OrgOptions,
 } from "../types";
+import { CoverField } from "./cover-field";
 import { MarkdownContent } from "./markdown-content";
 
 const FORM_ID = "announcement-form";
@@ -59,6 +63,8 @@ type AnnouncementFormDialogProps = {
   /** Người đăng được chọn cả công ty / văn phòng / phòng ban (HR_COMPANY, ADMIN). HR văn phòng thì không. */
   companyWide: boolean;
   org: OrgOptions;
+  /** Tải ảnh bìa lên kho: route ghép từ features/files (feature không import nhau). */
+  uploader: CoverUploader;
   onClose: () => void;
 };
 
@@ -66,12 +72,27 @@ type AnnouncementFormDialogProps = {
  * Tạo hoặc sửa bài (announcement:manage). Tạo ra **nháp**; đăng là bước riêng ở danh sách. Bài đã đăng khóa đối tượng
  * nhận. Sửa luôn tải bản mới nhất để lấy đúng version.
  */
-export function AnnouncementFormDialog({ open, announcementId, companyWide, org, onClose }: AnnouncementFormDialogProps) {
+export function AnnouncementFormDialog({
+  open,
+  announcementId,
+  companyWide,
+  org,
+  uploader,
+  onClose,
+}: AnnouncementFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-2xl">
         {/* Chỉ dựng khi mở: mỗi lần mở điền lại dữ liệu mới nhất. */}
-        {open && <FormLoader announcementId={announcementId} companyWide={companyWide} org={org} onDone={onClose} />}
+        {open && (
+          <FormLoader
+            announcementId={announcementId}
+            companyWide={companyWide}
+            org={org}
+            uploader={uploader}
+            onDone={onClose}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -81,55 +102,71 @@ function FormLoader({
   announcementId,
   companyWide,
   org,
+  uploader,
   onDone,
 }: {
   announcementId: string | null;
   companyWide: boolean;
   org: OrgOptions;
+  uploader: CoverUploader;
   onDone: () => void;
 }) {
   const t = useTranslations("Announcements.Form");
   const query = useManagedAnnouncement(announcementId);
+  const categories = useCategories();
+  const title = t(announcementId === null ? "createTitle" : "editTitle");
 
-  if (announcementId === null) {
-    return <AnnouncementForm announcement={null} companyWide={companyWide} org={org} onDone={onDone} />;
-  }
-  if (query.isPending) {
+  // Cần danh sách loại trước khi dựng form: bài mới chọn sẵn loại đầu tiên.
+  const failed = categories.isError ? categories : query.isError ? query : null;
+  if (failed) {
     return (
       <>
         <DialogHeader>
-          <DialogTitle>{t("editTitle")}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <ErrorState error={failed.error} onRetry={() => failed.refetch()} />
+      </>
+    );
+  }
+  if (categories.isPending || (announcementId !== null && query.isPending)) {
+    return (
+      <>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <LoadingState />
       </>
     );
   }
-  if (query.isError) {
-    return (
-      <>
-        <DialogHeader>
-          <DialogTitle>{t("editTitle")}</DialogTitle>
-        </DialogHeader>
-        <ErrorState error={query.error} onRetry={() => query.refetch()} />
-      </>
-    );
-  }
-  return <AnnouncementForm announcement={query.data} companyWide={companyWide} org={org} onDone={onDone} />;
+  return (
+    <AnnouncementForm
+      announcement={announcementId === null ? null : (query.data ?? null)}
+      categories={categories.data ?? []}
+      companyWide={companyWide}
+      org={org}
+      uploader={uploader}
+      onDone={onDone}
+    />
+  );
 }
 
 function AnnouncementForm({
   announcement,
+  categories,
   companyWide,
   org,
+  uploader,
   onDone,
 }: {
   announcement: AnnouncementDetail | null;
+  /** Loại đang dùng. */
+  categories: Category[];
   companyWide: boolean;
   org: OrgOptions;
+  uploader: CoverUploader;
   onDone: () => void;
 }) {
   const t = useTranslations("Announcements.Form");
-  const tCategory = useTranslations("Announcements.categories");
   const tAudience = useTranslations("Announcements.audiences");
   const tValidation = useTranslations("Announcements.Validation");
   const tAnnouncementErrors = useTranslations("Announcements.Errors");
@@ -144,7 +181,8 @@ function AnnouncementForm({
   const schema = useMemo(() => announcementSchema(tValidation, companyWide), [tValidation, companyWide]);
   const form = useForm<AnnouncementFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: announcement ? toFormValues(announcement) : EMPTY_FORM,
+    // Bài mới chọn sẵn loại đầu tiên (theo thứ tự hiển thị); bài cũ giữ loại của nó
+    defaultValues: announcement ? toFormValues(announcement) : { ...EMPTY_FORM, categoryId: categories[0]?.id ?? "" },
   });
   const create = useCreateAnnouncement();
   const update = useUpdateAnnouncement(announcement?.id ?? "");
@@ -180,7 +218,14 @@ function AnnouncementForm({
       ? getAnnouncementError(mutation.error, tAnnouncementErrors, tErrors)
       : null;
 
-  const categoryChoices: Choice[] = ANNOUNCEMENT_CATEGORIES.map((value) => ({ value, label: tCategory(value) }));
+  // Loại đang dùng, cộng loại hiện tại của bài nếu nó đã ngừng dùng (bài cũ vẫn sửa được mà không phải đổi loại)
+  const activeRefs: CategoryRef[] = categories.map(({ id, name, color }) => ({ id, name, color }));
+  const categoryOptions: Choice[] = categoryChoices(activeRefs, announcement?.category).map((category) => ({
+    value: category.id,
+    label: activeRefs.some((active) => active.id === category.id)
+      ? category.name
+      : t("inactiveOption", { name: category.name }),
+  }));
   const audienceChoices: Choice[] = audienceOptions(companyWide).map((value) => ({ value, label: tAudience(value) }));
   const toChoices = (units: typeof org.offices, current: string | null): Choice[] =>
     unitChoices(units, current).map((unit) => ({
@@ -220,16 +265,19 @@ function AnnouncementForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <Controller
               control={form.control}
-              name="category"
+              name="categoryId"
               render={({ field }) => (
-                <Field>
+                <Field data-invalid={!!errors.categoryId}>
                   <FieldLabel htmlFor="announcement-category">{t("category")}</FieldLabel>
                   <ChoiceSelect
                     id="announcement-category"
                     value={field.value}
                     onChange={field.onChange}
-                    choices={categoryChoices}
+                    choices={categoryOptions}
+                    placeholder={t("choose")}
+                    invalid={!!errors.categoryId}
                   />
+                  <FieldError errors={[errors.categoryId]} />
                 </Field>
               )}
             />
@@ -251,6 +299,24 @@ function AnnouncementForm({
               )}
             />
           </div>
+
+          <Controller
+            control={form.control}
+            name="coverFileId"
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>{t("cover")}</FieldLabel>
+                <CoverField
+                  value={field.value}
+                  // Ảnh đang lưu của bài; ảnh vừa chọn dùng bản xem trước trên máy
+                  currentUrl={announcement?.coverFileId === field.value ? (announcement?.coverUrl ?? null) : null}
+                  onChange={field.onChange}
+                  uploader={uploader}
+                />
+                <FieldDescription>{t("coverOptional")}</FieldDescription>
+              </Field>
+            )}
+          />
 
           {companyWide ? (
             <div className="grid gap-4 sm:grid-cols-2">

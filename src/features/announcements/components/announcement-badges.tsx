@@ -2,14 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
-import type { AnnouncementAudience, AnnouncementCategory, AnnouncementStatus } from "../types";
-
-const CATEGORY_VARIANT: Record<AnnouncementCategory, "info" | "success" | "warning" | "secondary"> = {
-  POLICY: "info",
-  EVENT: "success",
-  HEALTH: "warning",
-  OTHER: "secondary",
-};
+import { categoryColorClass } from "../categories";
+import type { AnnouncementAudience, AnnouncementStatus, CategoryRef } from "../types";
 
 const STATUS_VARIANT: Record<AnnouncementStatus, "secondary" | "success" | "outline"> = {
   DRAFT: "secondary",
@@ -17,10 +11,13 @@ const STATUS_VARIANT: Record<AnnouncementStatus, "secondary" | "success" | "outl
   REMOVED: "outline",
 };
 
-/** Loại bài, cùng màu ở mọi màn hình. */
-export function AnnouncementCategoryBadge({ category }: { category: AnnouncementCategory }) {
-  const t = useTranslations("Announcements.categories");
-  return <Badge variant={CATEGORY_VARIANT[category]}>{t(category)}</Badge>;
+/** Loại bài: tên và một màu nhạt do HR chọn, không icon. Cùng kiểu ở mọi màn hình. */
+export function AnnouncementCategoryBadge({ category }: { category: Pick<CategoryRef, "name" | "color"> }) {
+  return (
+    <Badge variant="secondary" className={categoryColorClass(category.color)}>
+      {category.name}
+    </Badge>
+  );
 }
 
 /** Trạng thái bài (chỉ người quản lý thấy nháp và bài đã gỡ). */

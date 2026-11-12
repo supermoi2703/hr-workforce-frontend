@@ -2,11 +2,14 @@ import type { Messages } from "next-intl";
 import { z } from "zod";
 import {
   ANNOUNCEMENT_AUDIENCES,
-  ANNOUNCEMENT_CATEGORIES,
+  CATEGORY_COLORS,
+  MAX_CATEGORY_NAME_LENGTH,
   MAX_CONTENT_LENGTH,
   MAX_TITLE_LENGTH,
   type AnnouncementDetail,
+  type Category,
   type CreateAnnouncementInput,
+  type CreateCategoryInput,
   type UpdateAnnouncementInput,
 } from "./types";
 
@@ -15,15 +18,17 @@ type ValidationKey = keyof Messages["Announcements"]["Validation"];
 export type AnnouncementsValidationTranslator = (key: ValidationKey) => string;
 
 /**
- * Khớp CreateAnnouncementRequest của backend. Backend vẫn kiểm tra lại (đơn vị còn dùng, quyền nhắm đối tượng).
- * `companyWide` = người đăng được chọn đối tượng; HR văn phòng không có ô chọn nên không bắt chọn văn phòng.
+ * Khớp CreateAnnouncementRequest của backend. Backend vẫn kiểm tra lại (đơn vị còn dùng, loại đang dùng, quyền nhắm đối
+ * tượng, ảnh bìa). `companyWide` = người đăng được chọn đối tượng; HR văn phòng không có ô chọn nên không bắt chọn văn phòng.
  */
 export function announcementSchema(t: AnnouncementsValidationTranslator, companyWide: boolean) {
   return z
     .object({
       title: z.string().trim().min(1, t("required")).max(MAX_TITLE_LENGTH, t("tooLong")),
       content: z.string().trim().min(1, t("required")).max(MAX_CONTENT_LENGTH, t("tooLong")),
-      category: z.enum(ANNOUNCEMENT_CATEGORIES),
+      categoryId: z.string().min(1, t("required")),
+      /** "" = không có ảnh bìa. */
+      coverFileId: z.string(),
       pinned: z.boolean(),
       audienceType: z.enum(ANNOUNCEMENT_AUDIENCES),
       /** "" = chưa chọn. */
@@ -46,7 +51,8 @@ export type AnnouncementFormValues = z.infer<ReturnType<typeof announcementSchem
 export const EMPTY_FORM: AnnouncementFormValues = {
   title: "",
   content: "",
-  category: "OTHER",
+  categoryId: "",
+  coverFileId: "",
   pinned: false,
   audienceType: "OFFICE",
   officeId: "",
@@ -57,7 +63,8 @@ export function toFormValues(announcement: AnnouncementDetail): AnnouncementForm
   return {
     title: announcement.title,
     content: announcement.content,
-    category: announcement.category,
+    categoryId: announcement.category.id,
+    coverFileId: announcement.coverFileId ?? "",
     pinned: announcement.pinned,
     audienceType: announcement.audienceType,
     officeId: announcement.officeId ?? "",
@@ -74,7 +81,8 @@ export function toRequest(values: AnnouncementFormValues, companyWide: boolean):
   return {
     title: values.title.trim(),
     content: values.content.trim(),
-    category: values.category,
+    categoryId: values.categoryId,
+    coverFileId: values.coverFileId || null,
     pinned: values.pinned,
     audienceType,
     officeId: companyWide && audienceType === "OFFICE" ? values.officeId : null,
@@ -99,4 +107,28 @@ export function toUpdateRequest(
     };
   }
   return { ...request, version: announcement.version };
+}
+
+// ===== Loại bài =====
+
+/** Khớp CreateCategoryRequest của backend. Thứ tự là số nguyên, số nhỏ hiện trước. */
+export function categorySchema(t: AnnouncementsValidationTranslator) {
+  return z.object({
+    name: z.string().trim().min(1, t("required")).max(MAX_CATEGORY_NAME_LENGTH, t("tooLong")),
+    color: z.enum(CATEGORY_COLORS),
+    /** Chuỗi để gõ được dấu âm và ô trống; chuyển sang số khi gửi. */
+    sortOrder: z.string().trim().regex(/^-?\d{1,6}$/, t("invalidNumber")),
+  });
+}
+
+export type CategoryFormValues = z.infer<ReturnType<typeof categorySchema>>;
+
+export const EMPTY_CATEGORY_FORM: CategoryFormValues = { name: "", color: "SLATE", sortOrder: "0" };
+
+export function toCategoryFormValues(category: Category): CategoryFormValues {
+  return { name: category.name, color: category.color, sortOrder: String(category.sortOrder) };
+}
+
+export function toCategoryRequest(values: CategoryFormValues): CreateCategoryInput {
+  return { name: values.name.trim(), color: values.color, sortOrder: Number.parseInt(values.sortOrder, 10) };
 }

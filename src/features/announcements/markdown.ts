@@ -16,7 +16,6 @@ const ALLOWED_PROTOCOLS = ["http:", "https:", "mailto:"];
 export function safeUrl(url: string): string {
   const value = url.trim();
   if (value === "") return "";
-  // eslint-disable-next-line no-control-regex
   const compact = value.replace(/[\u0000-\u001f\u007f\s]/g, "");
   const match = /^([a-zA-Z][a-zA-Z0-9+.-]*:)/.exec(compact);
   if (!match) return value;

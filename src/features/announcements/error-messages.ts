@@ -13,6 +13,11 @@ const ERROR_KEYS: Record<string, AnnouncementsErrorKey> = {
   ANNOUNCEMENT_AUDIENCE_LOCKED: "audienceLocked",
   ANNOUNCEMENT_INVALID_STATE: "invalidState",
   ANNOUNCEMENT_VERSION_CONFLICT: "versionConflict",
+  ANNOUNCEMENT_COVER_INVALID: "coverInvalid",
+  ANNOUNCEMENT_CATEGORY_NOT_FOUND: "categoryNotFound",
+  ANNOUNCEMENT_CATEGORY_INVALID: "categoryInvalid",
+  ANNOUNCEMENT_CATEGORY_FORBIDDEN: "categoryForbidden",
+  ANNOUNCEMENT_CATEGORY_NAME_EXISTS: "categoryNameExists",
 };
 
 /** Dữ liệu trên màn hình đã cũ: báo rồi tải lại danh sách và bài đang mở. */
@@ -21,6 +26,8 @@ const STALE_CODES = new Set([
   "ANNOUNCEMENT_INVALID_STATE",
   "ANNOUNCEMENT_VERSION_CONFLICT",
   "ANNOUNCEMENT_AUDIENCE_LOCKED",
+  "ANNOUNCEMENT_CATEGORY_NOT_FOUND",
+  "ANNOUNCEMENT_CATEGORY_INVALID",
 ]);
 
 /** `stale` = nên tải lại danh sách và bài đang mở. */

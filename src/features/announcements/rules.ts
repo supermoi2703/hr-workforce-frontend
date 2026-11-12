@@ -8,6 +8,19 @@ export function canTargetCompanyWide(roles: readonly string[] | undefined): bool
   return (roles ?? []).some((role) => (COMPANY_WIDE_ROLES as readonly string[]).includes(role));
 }
 
+/**
+ * Quản lý loại bài (thêm, sửa, ngừng dùng): chỉ HR toàn công ty và Admin, vì loại dùng chung cả công ty. HR văn phòng chỉ
+ * chọn loại khi đăng bài. Backend trả 403 ANNOUNCEMENT_CATEGORY_FORBIDDEN nếu gọi sai.
+ */
+export const canManageCategories = canTargetCompanyWide;
+
+/** Loại chọn được cho bài: đang dùng, cộng loại hiện tại của bài nếu nó đã ngừng dùng (để ô chọn không bị trống). */
+export function categoryChoices<T extends { id: string }>(categories: readonly T[] | undefined, current?: T | null): T[] {
+  const list = [...(categories ?? [])];
+  if (current && !list.some((category) => category.id === current.id)) list.push(current);
+  return list;
+}
+
 /** Đối tượng nhận người đăng chọn được. HR văn phòng không có ô chọn: bài luôn gửi tới văn phòng của họ. */
 export function audienceOptions(companyWide: boolean): AnnouncementAudience[] {
   return companyWide ? ["COMPANY", "OFFICE", "DEPARTMENT"] : ["OFFICE"];

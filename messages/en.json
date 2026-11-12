@@ -538,7 +538,9 @@
     "ANNOUNCEMENT_CREATED": "Announcement drafted",
     "ANNOUNCEMENT_UPDATED": "Announcement edited",
     "ANNOUNCEMENT_PUBLISHED": "Announcement published",
-    "ANNOUNCEMENT_REMOVED": "Announcement removed"
+    "ANNOUNCEMENT_REMOVED": "Announcement removed",
+    "ANNOUNCEMENT_CATEGORY_CREATED": "Announcement category created",
+    "ANNOUNCEMENT_CATEGORY_UPDATED": "Announcement category changed"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -3001,11 +3003,40 @@
     "description": "News and notices from the company that are addressed to you.",
     "pinned": "Pinned",
     "publishedBy": "posted by {name}",
-    "categories": {
-      "POLICY": "Policy",
-      "EVENT": "Event",
-      "HEALTH": "Health",
-      "OTHER": "Other"
+    "Categories": {
+      "title": "Categories",
+      "description": "Categories are shared by the whole company. Each has a name and a soft colour. A category in use is never deleted: stop using it and old posts keep it.",
+      "empty": "No categories yet",
+      "order": "order {order}",
+      "inactive": "not in use",
+      "edit": "Edit",
+      "deactivate": "Stop using",
+      "activate": "Use again",
+      "add": "New category",
+      "created": "Category created",
+      "saved": "Category saved",
+      "deactivated": "Category is no longer in use",
+      "activated": "Category is in use again",
+      "colors": {
+        "SLATE": "Grey",
+        "BLUE": "Blue",
+        "GREEN": "Green",
+        "AMBER": "Amber",
+        "ROSE": "Rose",
+        "VIOLET": "Violet"
+      },
+      "Form": {
+        "createTitle": "New category",
+        "editTitle": "Edit category",
+        "description": "A name and one soft colour, picked from the list.",
+        "name": "Name",
+        "color": "Colour",
+        "order": "Order",
+        "orderHint": "A whole number: smaller shows first.",
+        "preview": "Preview:",
+        "previewName": "Category",
+        "save": "Save"
+      }
     },
     "statuses": {
       "DRAFT": "Draft",
@@ -3037,6 +3068,7 @@
       "descriptionOffice": "Create, publish and remove announcements for your own office.",
       "backToBoard": "Back to announcements",
       "create": "New announcement",
+      "categories": "Manage categories",
       "allStatuses": "All statuses",
       "statusFilter": "Filter by status",
       "empty": "No announcements yet. Create the first one.",
@@ -3076,6 +3108,13 @@
       "write": "Edit",
       "preview": "Preview",
       "emptyPreview": "Nothing to preview yet.",
+      "cover": "Cover image",
+      "coverOptional": "Optional. It can be changed or removed later, even after the announcement is published.",
+      "coverDrop": "Drop an image here or click to choose",
+      "coverHint": "JPEG, PNG or WebP. It is shrunk before upload.",
+      "coverUploading": "Uploading… {percent}%",
+      "coverRemove": "Remove the cover image",
+      "coverChange": "Choose another image",
       "saveDraft": "Save draft",
       "save": "Save changes",
       "created": "Draft saved",
@@ -3083,9 +3122,15 @@
     },
     "Validation": {
       "required": "Required",
-      "tooLong": "Too long"
+      "tooLong": "Too long",
+      "invalidNumber": "Enter a whole number"
     },
     "Errors": {
+      "coverInvalid": "The cover image is not valid. Choose and upload it again.",
+      "categoryNotFound": "The category no longer exists. The list was reloaded.",
+      "categoryInvalid": "The category is no longer in use. The list was reloaded, choose another one.",
+      "categoryForbidden": "Only company-wide HR and admins can manage categories.",
+      "categoryNameExists": "A category with this name already exists.",
       "notFound": "The announcement no longer exists or is not available to you. The list was reloaded.",
       "audienceInvalid": "The office or department is missing, no longer in use, or does not match the audience.",
       "audienceForbidden": "You can only post to your own office.",

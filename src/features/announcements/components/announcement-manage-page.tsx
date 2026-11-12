@@ -23,20 +23,28 @@ import {
   useRefreshAnnouncements,
   useRemoveAnnouncement,
 } from "../hooks";
-import { canEdit, canPublish, canRemove, canTargetCompanyWide, isReadable } from "../rules";
-import { ANNOUNCEMENT_STATUSES, type AnnouncementItem, type AnnouncementStatus, type OrgOptions } from "../types";
+import { canEdit, canManageCategories, canPublish, canRemove, canTargetCompanyWide, isReadable } from "../rules";
+import {
+  ANNOUNCEMENT_STATUSES,
+  type AnnouncementItem,
+  type AnnouncementStatus,
+  type CoverUploader,
+  type OrgOptions,
+} from "../types";
 import {
   AnnouncementAudienceLabel,
   AnnouncementCategoryBadge,
   AnnouncementStatusBadge,
 } from "./announcement-badges";
 import { AnnouncementFormDialog } from "./announcement-form-dialog";
+import { CategoryDialog } from "./category-dialog";
+import { CoverImage } from "./cover-image";
 
 /**
  * Quản lý bài đăng (announcement:manage): HR thấy bài của văn phòng mình, HR_COMPANY và Admin thấy tất cả. Tạo ra nháp,
  * đăng là bước riêng; bài đã đăng chỉ sửa chữ và ghim, không đổi đối tượng nhận. `org` do route truyền vào.
  */
-export function AnnouncementManagePage({ org }: { org: OrgOptions }) {
+export function AnnouncementManagePage({ org, uploader }: { org: OrgOptions; uploader: CoverUploader }) {
   const t = useTranslations("Announcements");
   const tManage = useTranslations("Announcements.Manage");
   const tStatus = useTranslations("Announcements.statuses");
@@ -54,6 +62,7 @@ export function AnnouncementManagePage({ org }: { org: OrgOptions }) {
   const filters = useMemo(() => ({ status: status || undefined, q: q || undefined }), [status, q]);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 });
   const [form, setForm] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   // Đổi bộ lọc thì về trang đầu (trang hiện tại có thể không còn trong kết quả mới).
   const [prevFilters, setPrevFilters] = useState(filters);
@@ -91,16 +100,19 @@ export function AnnouncementManagePage({ org }: { org: OrgOptions }) {
             </span>
           )}
         </div>
-        <div className="min-w-0">
-          <p className="font-medium break-words">{announcement.title}</p>
-          <p className="mt-0.5 line-clamp-1 text-sm break-words text-muted-foreground">{announcement.excerpt}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            <AnnouncementAudienceLabel audienceType={announcement.audienceType} audienceName={announcement.audienceName} />
-            {" · "}
-            {announcement.publishedAt
-              ? tManage("publishedAt", { date: formatDateTime(announcement.publishedAt) })
-              : tManage("updatedAt", { date: formatDateTime(announcement.updatedAt) })}
-          </p>
+        <div className="flex gap-3">
+          <CoverImage src={announcement.coverUrl} className="hidden w-28 shrink-0 self-start rounded-md sm:block" />
+          <div className="min-w-0">
+            <p className="font-medium break-words">{announcement.title}</p>
+            <p className="mt-0.5 line-clamp-1 text-sm break-words text-muted-foreground">{announcement.excerpt}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              <AnnouncementAudienceLabel audienceType={announcement.audienceType} audienceName={announcement.audienceName} />
+              {" · "}
+              {announcement.publishedAt
+                ? tManage("publishedAt", { date: formatDateTime(announcement.publishedAt) })
+                : tManage("updatedAt", { date: formatDateTime(announcement.updatedAt) })}
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {isReadable(announcement.status) && (
@@ -179,6 +191,11 @@ export function AnnouncementManagePage({ org }: { org: OrgOptions }) {
             <Link href="/announcements" className={buttonVariants({ variant: "outline" })}>
               {tManage("backToBoard")}
             </Link>
+            {canManageCategories(user?.roles) && (
+              <Button variant="outline" onClick={() => setCategoriesOpen(true)}>
+                {tManage("categories")}
+              </Button>
+            )}
             <Button onClick={() => setForm({ open: true, id: null })}>
               <PlusIcon />
               {tManage("create")}
@@ -215,8 +232,10 @@ export function AnnouncementManagePage({ org }: { org: OrgOptions }) {
         announcementId={form.id}
         companyWide={companyWide}
         org={org}
+        uploader={uploader}
         onClose={() => setForm({ open: false, id: null })}
       />
+      <CategoryDialog open={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
     </div>
   );
 }

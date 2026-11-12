@@ -4,8 +4,11 @@ import type {
   AnnouncementDetail,
   AnnouncementFilters,
   AnnouncementItem,
+  Category,
   CreateAnnouncementInput,
+  CreateCategoryInput,
   UpdateAnnouncementInput,
+  UpdateCategoryInput,
 } from "./types";
 
 const enc = encodeURIComponent;
@@ -13,7 +16,7 @@ const enc = encodeURIComponent;
 /** Bài đã đăng thuộc đối tượng nhận của mình (announcement:read): ghim trước, mới nhất trước. Thứ tự do server quyết. */
 export const getAnnouncements = (filters: AnnouncementFilters, params: PageParams) =>
   http.get<PageResponse<AnnouncementItem>>("/api/announcements", {
-    query: { ...toPageQuery({ ...params, sort: undefined }), category: filters.category, q: filters.q },
+    query: { ...toPageQuery({ ...params, sort: undefined }), categoryId: filters.categoryId, q: filters.q },
   });
 
 /** Ngoài đối tượng nhận, nháp hoặc đã gỡ → 404. */
@@ -41,3 +44,23 @@ export const publishAnnouncement = (id: string) =>
 
 export const removeAnnouncement = (id: string) =>
   http.post<AnnouncementDetail>(`/api/announcements/${enc(id)}/remove`);
+
+// ===== Loại bài =====
+
+/** Loại đang dùng, theo thứ tự hiển thị: bộ lọc và form chọn loại (announcement:read). */
+export const getCategories = () => http.get<Category[]>("/api/announcement-categories");
+
+/** Cả loại ngừng dùng: trang quản lý loại (announcement:manage). */
+export const getAllCategories = () => http.get<Category[]>("/api/announcement-categories/all");
+
+/** Chỉ HR toàn công ty và Admin; HR văn phòng nhận 403 ANNOUNCEMENT_CATEGORY_FORBIDDEN. */
+export const createCategory = (body: CreateCategoryInput) => http.post<Category>("/api/announcement-categories", body);
+
+export const updateCategory = (id: string, body: UpdateCategoryInput) =>
+  http.put<Category>(`/api/announcement-categories/${enc(id)}`, body);
+
+/** Ngừng dùng: bài cũ giữ loại, bài mới không chọn được. */
+export const deactivateCategory = (id: string) =>
+  http.post<Category>(`/api/announcement-categories/${enc(id)}/deactivate`);
+
+export const activateCategory = (id: string) => http.post<Category>(`/api/announcement-categories/${enc(id)}/activate`);

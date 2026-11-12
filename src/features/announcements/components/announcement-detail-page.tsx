@@ -7,6 +7,7 @@ import { ErrorState, LoadingState } from "@/components/shared/states";
 import { formatDateTime } from "@/lib/format";
 import { useAnnouncement } from "../hooks";
 import { AnnouncementAudienceLabel, AnnouncementCategoryBadge } from "./announcement-badges";
+import { CoverImage } from "./cover-image";
 import { MarkdownContent } from "./markdown-content";
 
 /** Một bài đã đăng. Bài ngoài đối tượng nhận, nháp hoặc đã gỡ là 404 (backend không lộ là có bài). */
@@ -27,7 +28,9 @@ export function AnnouncementDetailPage({ id }: { id: string }) {
       {query.isPending && <LoadingState />}
       {query.isError && <ErrorState error={query.error} onRetry={() => query.refetch()} />}
       {query.data && (
-        <article className="space-y-5 rounded-xl border bg-card p-5 sm:p-8">
+        <article className="overflow-hidden rounded-xl border bg-card">
+          <CoverImage src={query.data.coverUrl} />
+          <div className="space-y-5 p-5 sm:p-8">
           <header className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               {query.data.pinned && (
@@ -50,6 +53,7 @@ export function AnnouncementDetailPage({ id }: { id: string }) {
             </p>
           </header>
           <MarkdownContent>{query.data.content}</MarkdownContent>
+          </div>
         </article>
       )}
     </div>

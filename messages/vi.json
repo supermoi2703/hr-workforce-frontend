@@ -538,7 +538,9 @@
     "ANNOUNCEMENT_CREATED": "Tạo bản nháp thông báo",
     "ANNOUNCEMENT_UPDATED": "Sửa thông báo",
     "ANNOUNCEMENT_PUBLISHED": "Đăng thông báo",
-    "ANNOUNCEMENT_REMOVED": "Gỡ thông báo"
+    "ANNOUNCEMENT_REMOVED": "Gỡ thông báo",
+    "ANNOUNCEMENT_CATEGORY_CREATED": "Thêm loại thông báo",
+    "ANNOUNCEMENT_CATEGORY_UPDATED": "Sửa loại thông báo"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -3001,11 +3003,40 @@
     "description": "Tin tức và thông báo của công ty gửi tới bạn.",
     "pinned": "Đã ghim",
     "publishedBy": "đăng bởi {name}",
-    "categories": {
-      "POLICY": "Chính sách",
-      "EVENT": "Sự kiện",
-      "HEALTH": "Sức khỏe",
-      "OTHER": "Khác"
+    "Categories": {
+      "title": "Loại thông báo",
+      "description": "Loại dùng chung cho cả công ty. Mỗi loại có một tên và một màu nhạt. Loại không bị xóa: ngừng dùng thì bài cũ vẫn giữ loại đó.",
+      "empty": "Chưa có loại nào",
+      "order": "thứ tự {order}",
+      "inactive": "ngừng dùng",
+      "edit": "Sửa",
+      "deactivate": "Ngừng dùng",
+      "activate": "Dùng lại",
+      "add": "Thêm loại",
+      "created": "Đã thêm loại",
+      "saved": "Đã lưu loại",
+      "deactivated": "Đã ngừng dùng loại",
+      "activated": "Đã dùng lại loại",
+      "colors": {
+        "SLATE": "Xám",
+        "BLUE": "Xanh dương",
+        "GREEN": "Xanh lá",
+        "AMBER": "Vàng cam",
+        "ROSE": "Hồng",
+        "VIOLET": "Tím"
+      },
+      "Form": {
+        "createTitle": "Thêm loại",
+        "editTitle": "Sửa loại",
+        "description": "Một tên và một màu nhạt chọn từ danh sách.",
+        "name": "Tên",
+        "color": "Màu",
+        "order": "Thứ tự",
+        "orderHint": "Số nguyên: số nhỏ hiện trước.",
+        "preview": "Xem trước:",
+        "previewName": "Tên loại",
+        "save": "Lưu"
+      }
     },
     "statuses": {
       "DRAFT": "Nháp",
@@ -3037,6 +3068,7 @@
       "descriptionOffice": "Tạo, đăng và gỡ thông báo cho văn phòng của bạn.",
       "backToBoard": "Về bảng tin",
       "create": "Thông báo mới",
+      "categories": "Quản lý loại",
       "allStatuses": "Mọi trạng thái",
       "statusFilter": "Lọc theo trạng thái",
       "empty": "Chưa có thông báo nào. Hãy tạo thông báo đầu tiên.",
@@ -3076,6 +3108,13 @@
       "write": "Soạn",
       "preview": "Xem trước",
       "emptyPreview": "Chưa có gì để xem trước.",
+      "cover": "Ảnh bìa",
+      "coverOptional": "Không bắt buộc. Đổi hoặc bỏ được sau, kể cả khi thông báo đã đăng.",
+      "coverDrop": "Kéo ảnh vào đây hoặc bấm để chọn",
+      "coverHint": "JPEG, PNG hoặc WebP. Ảnh được thu nhỏ trước khi tải lên.",
+      "coverUploading": "Đang tải lên… {percent}%",
+      "coverRemove": "Bỏ ảnh bìa",
+      "coverChange": "Chọn ảnh khác",
       "saveDraft": "Lưu nháp",
       "save": "Lưu thay đổi",
       "created": "Đã lưu nháp",
@@ -3083,9 +3122,15 @@
     },
     "Validation": {
       "required": "Bắt buộc",
-      "tooLong": "Quá dài"
+      "tooLong": "Quá dài",
+      "invalidNumber": "Nhập một số nguyên"
     },
     "Errors": {
+      "coverInvalid": "Ảnh bìa không hợp lệ. Hãy chọn và tải lên lại.",
+      "categoryNotFound": "Loại không còn tồn tại. Danh sách đã được tải lại.",
+      "categoryInvalid": "Loại không còn được dùng. Danh sách đã được tải lại, hãy chọn loại khác.",
+      "categoryForbidden": "Chỉ HR toàn công ty và Admin quản lý được loại.",
+      "categoryNameExists": "Đã có một loại trùng tên này.",
       "notFound": "Thông báo không còn tồn tại hoặc bạn không xem được. Danh sách đã được tải lại.",
       "audienceInvalid": "Văn phòng hoặc phòng ban không tồn tại, đã ngừng dùng, hoặc không khớp với đối tượng nhận.",
       "audienceForbidden": "Bạn chỉ đăng được cho văn phòng của mình.",

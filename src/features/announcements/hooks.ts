@@ -3,16 +3,28 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { PageParams } from "@/lib/api/types";
 import {
+  activateCategory,
   createAnnouncement,
+  createCategory,
+  deactivateCategory,
+  getAllCategories,
   getAnnouncement,
   getAnnouncements,
+  getCategories,
   getManagedAnnouncement,
   getManagedAnnouncements,
   publishAnnouncement,
   removeAnnouncement,
   updateAnnouncement,
+  updateCategory,
 } from "./api";
-import type { AnnouncementFilters, CreateAnnouncementInput, UpdateAnnouncementInput } from "./types";
+import type {
+  AnnouncementFilters,
+  CreateAnnouncementInput,
+  CreateCategoryInput,
+  UpdateAnnouncementInput,
+  UpdateCategoryInput,
+} from "./types";
 
 /** Query key của domain bảng tin. Mọi key bắt đầu bằng "announcements" để invalidate cả nhóm sau khi ghi. */
 export const announcementKeys = {
@@ -21,18 +33,33 @@ export const announcementKeys = {
   detail: (id: string) => ["announcements", "detail", id] as const,
   managed: (filters: AnnouncementFilters, params: PageParams) => ["announcements", "managed", filters, params] as const,
   managedDetail: (id: string) => ["announcements", "managed-detail", id] as const,
+  categories: ["announcements", "categories"] as const,
+  allCategories: ["announcements", "categories", "all"] as const,
 };
+
+/**
+ * Link ảnh bìa sống 10 phút ở backend: dữ liệu đọc coi là cũ sau 8 phút để link được làm mới khi quay lại trang, và
+ * không để ảnh hỏng khi mở trang quá lâu.
+ */
+const READ_STALE_MS = 8 * 60 * 1000;
 
 export function useAnnouncements(filters: AnnouncementFilters, params: PageParams) {
   return useQuery({
     queryKey: announcementKeys.list(filters, params),
     queryFn: () => getAnnouncements(filters, params),
     placeholderData: keepPreviousData,
+    staleTime: READ_STALE_MS,
+    refetchInterval: READ_STALE_MS,
   });
 }
 
 export function useAnnouncement(id: string) {
-  return useQuery({ queryKey: announcementKeys.detail(id), queryFn: () => getAnnouncement(id) });
+  return useQuery({
+    queryKey: announcementKeys.detail(id),
+    queryFn: () => getAnnouncement(id),
+    staleTime: READ_STALE_MS,
+    refetchInterval: READ_STALE_MS,
+  });
 }
 
 export function useManagedAnnouncements(filters: AnnouncementFilters, params: PageParams) {
@@ -40,6 +67,8 @@ export function useManagedAnnouncements(filters: AnnouncementFilters, params: Pa
     queryKey: announcementKeys.managed(filters, params),
     queryFn: () => getManagedAnnouncements(filters, params),
     placeholderData: keepPreviousData,
+    staleTime: READ_STALE_MS,
+    refetchInterval: READ_STALE_MS,
   });
 }
 
@@ -52,6 +81,16 @@ export function useManagedAnnouncement(id: string | null) {
     // Mở form sửa luôn lấy version mới nhất, không dùng bản cũ trong bộ nhớ đệm.
     gcTime: 0,
   });
+}
+
+/** Loại đang dùng, cho bộ lọc và form chọn loại. */
+export function useCategories() {
+  return useQuery({ queryKey: announcementKeys.categories, queryFn: getCategories });
+}
+
+/** Cả loại ngừng dùng; chỉ gọi khi mở trang quản lý loại. */
+export function useAllCategories(enabled: boolean) {
+  return useQuery({ queryKey: announcementKeys.allCategories, queryFn: getAllCategories, enabled });
 }
 
 function useRefreshAfterWrite() {
@@ -82,4 +121,24 @@ export function usePublishAnnouncement() {
 export function useRemoveAnnouncement() {
   const refresh = useRefreshAfterWrite();
   return useMutation({ mutationFn: (id: string) => removeAnnouncement(id), onSuccess: refresh });
+}
+
+// Đổi loại ảnh hưởng cả danh sách bài (tên, màu nhãn): làm mới cả nhóm.
+export function useCreateCategory() {
+  const refresh = useRefreshAfterWrite();
+  return useMutation({ mutationFn: (body: CreateCategoryInput) => createCategory(body), onSuccess: refresh });
+}
+
+export function useUpdateCategory(id: string) {
+  const refresh = useRefreshAfterWrite();
+  return useMutation({ mutationFn: (body: UpdateCategoryInput) => updateCategory(id, body), onSuccess: refresh });
+}
+
+export function useSetCategoryActive() {
+  const refresh = useRefreshAfterWrite();
+  return useMutation({
+    mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+      active ? activateCategory(id) : deactivateCategory(id),
+    onSuccess: refresh,
+  });
 }
