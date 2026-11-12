@@ -12,6 +12,11 @@ npm install
 npm run dev                  # http://localhost:3000
 ```
 
+`.env.local` tạo từ bản cũ của `.env.example` thì so lại với bản mới, thêm các biến còn thiếu. Ví dụ
+`NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws` (chuông thông báo realtime; thiếu thì chuông chỉ tự cập nhật 30 giây một
+lần). Biến `NEXT_PUBLIC_*` chỉ được đọc lúc khởi động / build: sửa xong phải chạy lại `npm run dev`. Trên Vercel cũng
+phải khai, xem `docs/05` mục 5.4 của repo backend.
+
 Hai chế độ đăng nhập (`NEXT_PUBLIC_AUTH_MODE` trong `.env.local`, sửa xong chạy lại `npm run dev`):
 
 - `backend` (mặc định): đăng nhập thật ở `/login`. Cần backend + Postgres + Redis đang chạy; tài khoản mẫu
