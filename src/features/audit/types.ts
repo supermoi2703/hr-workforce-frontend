@@ -39,6 +39,9 @@ export const AUDIT_ACTIONS_BY_CATEGORY = {
     "CONTRACT_SALARY_ADDED",
     "CONTRACT_SALARY_UPDATED",
     "CONTRACT_SALARY_DELETED",
+    "TRANSFER_CREATED",
+    "TRANSFER_APPLIED",
+    "TRANSFER_CANCELLED",
     "ROLE_CREATED",
     "ROLE_UPDATED",
     "ROLE_DELETED",
@@ -83,7 +86,15 @@ export type AuditLogEntry = {
 };
 
 /** Nhóm sự kiện ở tab Lịch sử (enum EmployeeHistoryGroup). Nhóm người xem không có quyền thì backend bỏ qua. */
-export const EMPLOYEE_HISTORY_GROUPS = ["PROFILE", "SENSITIVE", "CONTRACT", "ACCOUNT", "APPROVAL", "SKILL"] as const;
+export const EMPLOYEE_HISTORY_GROUPS = [
+  "PROFILE",
+  "SENSITIVE",
+  "CONTRACT",
+  "ACCOUNT",
+  "APPROVAL",
+  "TRANSFER",
+  "SKILL",
+] as const;
 export type EmployeeHistoryGroup = (typeof EMPLOYEE_HISTORY_GROUPS)[number];
 
 /** Một dòng ở tab Lịch sử (EmployeeHistoryItem). Không có IP, thiết bị. `actorEmail` null = hệ thống. */

@@ -16,6 +16,7 @@ const ERROR_KEYS: Record<string, EmployeesErrorKey> = {
   EMPLOYEE_SENSITIVE_DUPLICATE: "sensitiveDuplicate",
   EMPLOYEE_ALREADY_HAS_ACCOUNT: "alreadyHasAccount",
   EMPLOYEE_TERMINATED: "terminated",
+  EMPLOYEE_UNIT_CHANGE_REQUIRES_TRANSFER: "unitChangeRequiresTransfer",
   EMAIL_ALREADY_EXISTS: "emailExists",
   ADMIN_ACCOUNT_PROTECTED: "adminProtected",
 };
@@ -28,7 +29,12 @@ const FIELD_ERRORS: Record<string, EmployeeErrorField> = {
 };
 
 /** Lỗi do dữ liệu trên màn hình đã cũ: báo rồi tải lại hồ sơ. */
-const STALE_CODES = new Set(["EMPLOYEE_VERSION_CONFLICT", "INVALID_EMPLOYEE_STATUS_TRANSITION", "EMPLOYEE_ALREADY_HAS_ACCOUNT"]);
+const STALE_CODES = new Set([
+  "EMPLOYEE_VERSION_CONFLICT",
+  "INVALID_EMPLOYEE_STATUS_TRANSITION",
+  "EMPLOYEE_ALREADY_HAS_ACCOUNT",
+  "EMPLOYEE_UNIT_CHANGE_REQUIRES_TRANSFER",
+]);
 
 export type EmployeeErrorField = "workEmail" | "officeId" | "terminationDate";
 
