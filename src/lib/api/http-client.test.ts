@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setAuthAdapter, type AuthAdapter } from "@/lib/auth/auth-adapter";
 import { ApiError } from "./errors";
-import { buildUrl, http } from "./http-client";
+import { buildUrl, download, filenameFromDisposition, http } from "./http-client";
 
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -154,5 +154,43 @@ describe("http với đăng nhập", () => {
     await expect(http.get("/api/x")).rejects.toMatchObject({ code: "INVALID_TOKEN" });
     expect(adapter.refreshAccessToken).not.toHaveBeenCalled();
     expect(adapter.onSessionExpired).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("download", () => {
+  it("trả Blob và tên file, gửi Accept */*, tự refresh như http", async () => {
+    setAuthAdapter({
+      getAccessToken: vi.fn(() => "old-token"),
+      refreshAccessToken: vi.fn(async () => "new-token"),
+      onSessionExpired: vi.fn(),
+    });
+    fetchMock.mockResolvedValueOnce(fail(401, "TOKEN_EXPIRED")).mockResolvedValueOnce(
+      new Response("xlsx-bytes", {
+        status: 200,
+        headers: { "content-type": "application/octet-stream", "content-disposition": 'attachment; filename="a.xlsx"' },
+      }),
+    );
+
+    const file = await download("/api/x/export", { query: { from: "2026-11-16" } });
+
+    expect(await file.blob.text()).toBe("xlsx-bytes");
+    expect(file.filename).toBe("a.xlsx");
+    expect(fetchMock.mock.calls[1][0]).toBe("/api/x/export?from=2026-11-16");
+    expect(new Headers(fetchMock.mock.calls[1][1]?.headers).get("Accept")).toBe("*/*");
+    expect(authHeaderOf(1)).toBe("Bearer new-token");
+  });
+
+  it("lỗi trả ApiResponse thì ném ApiError, kể cả khi HTTP 200 (không lưu JSON lỗi thành file)", async () => {
+    fetchMock.mockResolvedValueOnce(fail(403, "FORBIDDEN"));
+    await expect(download("/api/x/export")).rejects.toMatchObject({ status: 403, code: "FORBIDDEN" });
+
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { success: false, code: "EXPORT_FAILED", message: "x", timestamp: "" }));
+    await expect(download("/api/x/export")).rejects.toMatchObject({ code: "EXPORT_FAILED" });
+  });
+
+  it("đọc tên file từ Content-Disposition", () => {
+    expect(filenameFromDisposition("attachment; filename*=UTF-8''ngu%E1%BB%93n.xlsx")).toBe("nguồn.xlsx");
+    expect(filenameFromDisposition('attachment; filename="nguon-luc.xlsx"')).toBe("nguon-luc.xlsx");
+    expect(filenameFromDisposition(null)).toBeNull();
   });
 });

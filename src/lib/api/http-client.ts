@@ -89,7 +89,7 @@ function toApiError(status: number, body: unknown, headers?: Headers): ApiError 
 
 async function send(method: string, path: string, options: RequestOptions, token: string | null): Promise<Response> {
   const headers = new Headers(options.headers);
-  headers.set("Accept", "application/json");
+  if (!headers.has("Accept")) headers.set("Accept", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   let body: BodyInit | undefined;
@@ -114,28 +114,30 @@ async function send(method: string, path: string, options: RequestOptions, token
   }
 }
 
+/** Gửi kèm token; gặp TOKEN_EXPIRED thì refresh một lần rồi gửi lại; vẫn 401 thì báo hết phiên. */
+async function sendWithAuth(method: string, path: string, options: RequestOptions): Promise<Response> {
+  const adapter = getAuthAdapter();
+  const useAuth = !options.skipAuth;
+
+  let response = await send(method, path, options, useAuth ? adapter.getAccessToken() : null);
+  if (useAuth && response.status === 401) {
+    const body = await readJson(response.clone());
+    if (isApiResponse(body) && body.code === "TOKEN_EXPIRED") {
+      const newToken = await refreshAccessTokenOnce();
+      if (newToken) response = await send(method, path, options, newToken);
+    }
+    if (response.status === 401) adapter.onSessionExpired();
+  }
+  return response;
+}
+
 /**
  * Gọi API backend. `path` là đường dẫn tuyệt đối trên cùng origin, vd. `/api/employees`.
  * Trả về `data` của ApiResponse (hoặc nguyên JSON khi `envelope: false`), ném ApiError khi lỗi.
  */
 export async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
-  const adapter = getAuthAdapter();
-  const useAuth = !options.skipAuth;
-
-  let response = await send(method, path, options, useAuth ? adapter.getAccessToken() : null);
-  let body = await readJson(response);
-
-  if (useAuth && response.status === 401) {
-    const code = isApiResponse(body) ? body.code : undefined;
-    if (code === "TOKEN_EXPIRED") {
-      const newToken = await refreshAccessTokenOnce();
-      if (newToken) {
-        response = await send(method, path, options, newToken);
-        body = await readJson(response);
-      }
-    }
-    if (response.status === 401) adapter.onSessionExpired();
-  }
+  const response = await sendWithAuth(method, path, options);
+  const body = await readJson(response);
 
   if (!response.ok || (isApiResponse(body) && !body.success)) {
     throw toApiError(response.status, body, response.headers);
@@ -145,6 +147,41 @@ export async function request<T>(method: string, path: string, options: RequestO
   if (response.status === 204 || body === undefined) return undefined as T;
   if (!isApiResponse(body)) throw toApiError(response.status, body);
   return body.data as T;
+}
+
+export type DownloadedFile = { blob: Blob; filename: string | null };
+
+/** Tên file trong header Content-Disposition (`filename*=UTF-8''...` trước, rồi `filename="..."`). */
+export function filenameFromDisposition(header: string | null): string | null {
+  if (!header) return null;
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded[1].trim());
+    } catch {
+      // rơi xuống dạng thường
+    }
+  }
+  const plain = /filename="?([^";]+)"?/i.exec(header);
+  return plain ? plain[1].trim() : null;
+}
+
+/**
+ * Tải file (Excel, PDF...) qua cùng luồng đăng nhập với `http`: tự gắn token, tự refresh. Lỗi trả JSON ApiResponse như
+ * mọi API nên vẫn ném ApiError. Lưu file xuống máy bằng `saveFile` (lib/download).
+ */
+export async function download(path: string, options: Omit<RequestOptions, "body" | "envelope"> = {}): Promise<DownloadedFile> {
+  const headers = new Headers(options.headers);
+  if (!headers.has("Accept")) headers.set("Accept", "*/*");
+  const response = await sendWithAuth("GET", path, { ...options, headers });
+  if (!response.ok) {
+    throw toApiError(response.status, await readJson(response), response.headers);
+  }
+  const body = await readJson(response.clone());
+  if (isApiResponse(body) && !body.success) {
+    throw toApiError(response.status, body, response.headers);
+  }
+  return { blob: await response.blob(), filename: filenameFromDisposition(response.headers.get("content-disposition")) };
 }
 
 export const http = {

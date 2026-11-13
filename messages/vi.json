@@ -3280,5 +3280,240 @@
       "invalidState": "Không làm được việc này với trạng thái hiện tại của thông báo. Danh sách đã được tải lại.",
       "versionConflict": "Người khác vừa sửa thông báo này. Danh sách đã được tải lại, hãy mở lại để xem bản mới nhất."
     }
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "Filters": {
+      "label": "Bộ lọc",
+      "office": "Văn phòng",
+      "allOffices": "Mọi văn phòng",
+      "department": "Phòng ban",
+      "allDepartments": "Mọi phòng ban",
+      "range": "Khoảng thời gian",
+      "weeks": "{weeks} tuần từ tuần này",
+      "reset": "Bỏ lọc",
+      "hint": "Bộ lọc áp dụng cho khối Nguồn lực và Nhân sự."
+    },
+    "Common": {
+      "pending": "Chờ dữ liệu",
+      "pendingHint": "Sẽ hiện khi module {source} có dữ liệu.",
+      "sources": {
+        "worklog": "log giờ",
+        "timesheet": "bảng công",
+        "payroll": "lương"
+      },
+      "noDepartment": "Chưa có phòng",
+      "showAll": "Xem tất cả ({count})",
+      "showLess": "Thu gọn",
+      "people": "{count} người",
+      "weekOf": "Tuần {date}",
+      "other": "Khác"
+    },
+    "Me": {
+      "title": "Của tôi",
+      "noProject": "Hôm nay chưa ở dự án nào",
+      "noProfile": "Tài khoản chưa gắn hồ sơ nhân viên nên không có số liệu cá nhân.",
+      "status": {
+        "WORK": "Đủ công",
+        "LATE": "Đi muộn",
+        "EARLY": "Về sớm",
+        "LATE_EARLY": "Muộn và sớm",
+        "MISSING_OUT": "Thiếu giờ ra",
+        "IN_PROGRESS": "Đang làm",
+        "REMOTE": "Làm từ xa",
+        "ABSENT": "Vắng",
+        "UPCOMING": "Chưa tới giờ",
+        "HOLIDAY": "Ngày lễ",
+        "OFF": "Ngày nghỉ",
+        "LEAVE_PAID": "Nghỉ có lương",
+        "LEAVE_UNPAID": "Nghỉ không lương"
+      },
+      "timeTitle": "Thời gian của tôi theo dự án hôm nay",
+      "timeCenter": "đã phân bổ",
+      "free": "Còn trống",
+      "leaveTitle": "Phép năm {year}",
+      "leaveCenter": "ngày còn lại",
+      "used": "Đã dùng",
+      "available": "Còn lại",
+      "projectsTitle": "Dự án đang tham gia",
+      "role": {
+        "PM": "Quản lý dự án",
+        "MEMBER": "Thành viên"
+      }
+    },
+    "Resources": {
+      "title": "Nguồn lực",
+      "description": "{from} – {to} · {people}",
+      "export": "Xuất Excel",
+      "exporting": "Đang xuất…",
+      "exportFailed": "Không xuất được file",
+      "planned": "Utilization theo kế hoạch",
+      "plannedHint": "Trung bình % phân bổ mỗi ngày làm việc",
+      "limit": "Trần {limit}%",
+      "overLimit": "Vượt trần",
+      "actual": "Utilization thực tế",
+      "actualHint": "Giờ log ÷ giờ làm được",
+      "bench": "Chưa có dự án",
+      "benchDetail": "Không có phân bổ trong khoảng này",
+      "overloaded": "Quá tải",
+      "overloadedDetail": "Vượt trần hoặc việc nhiều hơn năng lực",
+      "billable": "Tính phí",
+      "billableDetail": "Phần thời gian ở dự án tính phí",
+      "split": {
+        "billable": "Tính phí",
+        "nonBillable": "Không tính phí",
+        "free": "Còn trống"
+      },
+      "trendTitle": "Utilization theo kế hoạch từng tuần",
+      "heatmapTitle": "Utilization theo phòng và tuần",
+      "heatmapDescription": "Ô càng đậm càng nhiều phân bổ. Ô đỏ là vượt trần.",
+      "heatLegendLow": "0%",
+      "heatLegendHigh": "{limit}%",
+      "heatLegendOver": "Trên {limit}%",
+      "heatCell": "{department}, {week}: {percent}%",
+      "heatCellEmpty": "{department}, {week}: không có ngày làm việc",
+      "department": "Phòng ban",
+      "departmentsTitle": "Utilization theo phòng",
+      "departmentsDescription": "Kế hoạch và thực tế, trung bình mỗi người",
+      "series": {
+        "planned": "Kế hoạch",
+        "actual": "Thực tế"
+      },
+      "distributionTitle": "Số người theo mức utilization",
+      "distributionDescription": "Bao nhiêu người ở mỗi mức kế hoạch",
+      "bucket": {
+        "0": "0%",
+        "1-50": "1–50%",
+        "51-80": "51–80%",
+        "81-100": "81–100%",
+        "over-100": "Trên 100%"
+      },
+      "overloadTitle": "Cảnh báo quá tải",
+      "overloadEmpty": "Không ai quá tải trong khoảng này.",
+      "benchTitle": "Chưa có dự án",
+      "benchEmpty": "Ai cũng có dự án trong khoảng này.",
+      "columns": {
+        "person": "Nhân viên",
+        "maxDaily": "Ngày cao nhất",
+        "firstOver": "Vượt trần từ",
+        "weeksOver": "Tuần quá tải việc",
+        "skills": "Kỹ năng nổi bật",
+        "count": "Số người"
+      },
+      "noSkills": "Chưa khai báo kỹ năng",
+      "weeksOverValue": "{count, plural, =0 {—} other {# tuần}}",
+      "plannedNow": "Kế hoạch tuần này",
+      "projectsTitle": "Top dự án theo FTE",
+      "projectsDescription": "FTE = thời gian quy ra số người làm toàn thời gian",
+      "projectsEmpty": "Không dự án nào có phân bổ trong khoảng này.",
+      "fte": "FTE",
+      "timeTitle": "Thời gian theo kế hoạch dành cho đâu",
+      "timeCenter": "kế hoạch"
+    },
+    "Team": {
+      "title": "Đội của tôi",
+      "description": "Cấp dưới của bạn trên sơ đồ tổ chức",
+      "people": "Số người",
+      "pendingApprovals": "Chờ bạn duyệt",
+      "planned": "Utilization theo kế hoạch",
+      "plannedDetail": "4 tuần tới",
+      "lateRate": "Tỉ lệ đi muộn",
+      "awayTitle": "Vắng trong tuần",
+      "awayEmpty": "Tuần này mọi người đều đi làm.",
+      "leave": "Nghỉ",
+      "remote": "WFH",
+      "part": {
+        "FULL_DAY": "Cả ngày",
+        "MORNING": "Sáng",
+        "AFTERNOON": "Chiều"
+      },
+      "membersTitle": "Utilization theo kế hoạch từng người",
+      "membersEmpty": "Hiện không có ai trong đội đang làm việc.",
+      "badges": {
+        "overAllocated": "Vượt trần",
+        "overCapacity": "Quá nhiều việc",
+        "bench": "Chưa có dự án"
+      },
+      "distributionTitle": "Đội theo mức utilization",
+      "distributionCenter": "người"
+    },
+    "Hr": {
+      "title": "Nhân sự",
+      "description": "Số người và biến động trong 12 tháng",
+      "headcount": "Số người đang làm",
+      "headcountDetail": "{onboarding} người sắp vào",
+      "last12Months": "12 tháng qua",
+      "turnover": "Tỉ lệ nghỉ việc",
+      "turnoverDetail": "Người nghỉ ÷ số người trung bình",
+      "attendance": "Đi làm hôm nay",
+      "payroll": "Quỹ lương",
+      "movementTitle": "Người vào và nghỉ theo tháng",
+      "departmentsTitle": "Số người theo phòng",
+      "contractsTitle": "Hợp đồng sắp hết hạn",
+      "contractsDescription": "{within60} trong 60 ngày tới, {within30} trong 30 ngày",
+      "contractsEmpty": "Không có hợp đồng nào hết hạn trong 60 ngày tới.",
+      "contractsChart": "Hợp đồng hết hạn theo tuần",
+      "endsOn": "Hết hạn {date}",
+      "series": {
+        "hires": "Người vào",
+        "terminations": "Người nghỉ",
+        "headcount": "Số người",
+        "contracts": "Hợp đồng"
+      },
+      "totalTitle": "Tổng số nhân viên",
+      "tenureTitle": "Thâm niên",
+      "levelTitle": "Cấp bậc",
+      "officeTitle": "Văn phòng",
+      "people": "người",
+      "hiresThisMonth": "Người vào tháng này",
+      "leaversThisMonth": "Người nghỉ tháng này",
+      "employmentType": {
+        "FULL_TIME": "Chính thức",
+        "PROBATION": "Thử việc",
+        "INTERN": "Thực tập",
+        "CONTRACTOR": "Cộng tác viên"
+      },
+      "tenure": {
+        "LT_1": "Dưới 1 năm",
+        "1_3": "1–3 năm",
+        "3_5": "3–5 năm",
+        "GT_5": "Từ 5 năm"
+      },
+      "level": {
+        "INTERN_FRESHER": "Intern / Fresher",
+        "JUNIOR": "Junior",
+        "MIDDLE": "Middle",
+        "SENIOR": "Senior",
+        "LEAD_PRINCIPAL": "Lead / Principal"
+      }
+    },
+    "Tabs": {
+      "label": "Các phần của dashboard",
+      "overview": "Tổng quan",
+      "resources": "Nguồn lực",
+      "hr": "Nhân sự",
+      "team": "Đội của tôi",
+      "me": "Của tôi"
+    },
+    "Hero": {
+      "endOfPeriod": "vào cuối kỳ",
+      "vsLastMonth": "so với tháng trước",
+      "vsEndOfLastMonth": "so với cuối tháng trước",
+      "points": " điểm"
+    },
+    "Overview": {
+      "remindersTitle": "Nhắc việc",
+      "remindersEmpty": "Không có việc cần chú ý.",
+      "reminders": {
+        "contracts": "Hợp đồng hết hạn trong 30 ngày",
+        "onboarding": "Người sắp vào làm",
+        "approvals": "Đơn chờ bạn duyệt",
+        "overloaded": "Người quá tải",
+        "bench": "Người chưa có dự án"
+      },
+      "trendTitle": "Utilization theo kế hoạch từng tuần",
+      "movementTitle": "Người vào và nghỉ theo tháng",
+      "open": "Mở"
+    }
   }
 }
