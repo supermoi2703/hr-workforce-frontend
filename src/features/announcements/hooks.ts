@@ -1,6 +1,7 @@
 "use client";
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocale } from "next-intl";
 import type { PageParams } from "@/lib/api/types";
 import {
   activateCategory,
@@ -19,13 +20,21 @@ import {
   updateAnnouncement,
   updateCategory,
 } from "./api";
+import { categoryName } from "./categories";
 import type {
   AnnouncementFilters,
+  CategoryRef,
   CreateAnnouncementInput,
   CreateCategoryInput,
   UpdateAnnouncementInput,
   UpdateCategoryInput,
 } from "./types";
+
+/** Hàm lấy tên loại theo ngôn ngữ giao diện đang dùng (xem `categoryName`). */
+export function useCategoryName(): (category: Pick<CategoryRef, "name" | "nameEn">) => string {
+  const locale = useLocale();
+  return (category) => categoryName(category, locale);
+}
 
 /** Query key của domain bảng tin. Mọi key bắt đầu bằng "announcements" để invalidate cả nhóm sau khi ghi. */
 export const announcementKeys = {

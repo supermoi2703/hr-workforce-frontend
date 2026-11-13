@@ -7,7 +7,7 @@ import { ErrorState } from "@/components/shared/states";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useAnnouncement } from "../hooks";
+import { useAnnouncement, useCategoryName } from "../hooks";
 import type { AnnouncementDetail } from "../types";
 import { AnnouncementAudienceLabel, AnnouncementCategoryBadge } from "./announcement-badges";
 import { PinnedLabel } from "./announcement-card";
@@ -81,6 +81,7 @@ function PlainHeader({ announcement }: { announcement: AnnouncementDetail }) {
 /** "Bảng tin › Tên loại": cả hai là liên kết (loại mở danh sách lọc theo loại). */
 function Crumbs({ announcement, onImage = false }: { announcement: AnnouncementDetail; onImage?: boolean }) {
   const t = useTranslations("Announcements.Board");
+  const nameOf = useCategoryName();
   const link = cn(
     "hover:underline hover:underline-offset-4 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
     onImage ? "text-white/85 hover:text-white" : "text-muted-foreground hover:text-foreground",
@@ -92,7 +93,7 @@ function Crumbs({ announcement, onImage = false }: { announcement: AnnouncementD
       </Link>
       <ChevronRightIcon className={cn("size-3.5", onImage ? "text-white/60" : "text-muted-foreground")} aria-hidden />
       <Link href={`/announcements/all?categoryId=${encodeURIComponent(announcement.category.id)}`} className={link}>
-        {announcement.category.name}
+        {nameOf(announcement.category)}
       </Link>
     </nav>
   );

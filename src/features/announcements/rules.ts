@@ -26,6 +26,19 @@ export function audienceOptions(companyWide: boolean): AnnouncementAudience[] {
   return companyWide ? ["COMPANY", "OFFICE", "DEPARTMENT"] : ["OFFICE"];
 }
 
+/** Khung cuộn còn nằm ở đầu chưa (dung sai vài px). Dùng để ẩn lớp mờ báo còn nội dung phía trên. */
+export function isScrolledToStart(scrollTop: number, tolerance = 4): boolean {
+  return scrollTop <= tolerance;
+}
+
+/**
+ * Khung cuộn đã tới cuối chưa (dung sai vài px vì `scrollTop` có số lẻ). Không cần cuộn (nội dung vừa khung) cũng là "đã tới
+ * cuối". Dùng để ẩn lớp mờ báo còn nội dung phía dưới.
+ */
+export function isScrolledToEnd(scrollTop: number, clientHeight: number, scrollHeight: number, tolerance = 4): boolean {
+  return scrollTop + clientHeight >= scrollHeight - tolerance;
+}
+
 /** Gỡ rồi thì không sửa, không đăng lại. */
 export const canEdit = (status: AnnouncementStatus) => status !== "REMOVED";
 

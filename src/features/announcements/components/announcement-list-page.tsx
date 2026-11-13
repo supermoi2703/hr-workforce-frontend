@@ -13,7 +13,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { cn } from "@/lib/utils";
-import { useAnnouncements, useCategories } from "../hooks";
+import { useAnnouncements, useCategories, useCategoryName } from "../hooks";
 import { FeaturedCard } from "./announcement-card";
 
 /**
@@ -25,6 +25,7 @@ export function AnnouncementListPage() {
   const tBoard = useTranslations("Announcements.Board");
   const params = useSearchParams();
   const categories = useCategories();
+  const nameOf = useCategoryName();
 
   /** "" = mọi loại. */
   const [categoryId, setCategoryId] = useState(params.get("categoryId") ?? "");
@@ -111,7 +112,7 @@ export function AnnouncementListPage() {
               active={categoryId === category.id}
               onClick={() => setCategoryId(category.id)}
             >
-              {category.name}
+              {nameOf(category)}
             </FilterChip>
           ))}
         </div>

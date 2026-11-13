@@ -27,6 +27,8 @@ export function CoverImage({ src, className }: { src: string | null; className?:
         src={src}
         alt=""
         loading="lazy"
+        // Ảnh kéo thả được theo mặc định: tắt để không tranh với cử chỉ kéo đổi tin của khối trang chủ
+        draggable={false}
         // Ảnh đã có sẵn trong bộ nhớ đệm có thể tải xong trước khi `onLoad` được gắn: kiểm tra `complete`
         ref={(img) => {
           if (img && img.complete && img.naturalWidth > 0 && loadedSrc !== src) setLoadedSrc(src);

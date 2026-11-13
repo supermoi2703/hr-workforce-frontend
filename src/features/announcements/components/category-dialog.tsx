@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon, PlusIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -76,8 +76,19 @@ function CategoryContent() {
   );
 }
 
+/**
+ * Tên ở ngôn ngữ còn lại, kèm mã ngôn ngữ ("EN: Policy" khi giao diện tiếng Việt, "VI: Chính sách" khi giao diện tiếng Anh);
+ * null khi loại chưa có tên tiếng Anh (khi đó chỉ có một tên để hiện).
+ */
+function otherName(category: Pick<Category, "name" | "nameEn">, locale: string): string | null {
+  const english = category.nameEn?.trim();
+  if (!english) return null;
+  return locale === "en" ? `VI: ${category.name}` : `EN: ${english}`;
+}
+
 function CategoryList({ onAdd, onEdit }: { onAdd: () => void; onEdit: (category: Category) => void }) {
   const t = useTranslations("Announcements.Categories");
+  const locale = useLocale();
   const tCommon = useTranslations("Common");
   const tAnnouncementErrors = useTranslations("Announcements.Errors");
   const tErrors = useTranslations("Errors");
@@ -113,6 +124,10 @@ function CategoryList({ onAdd, onEdit }: { onAdd: () => void; onEdit: (category:
           <li key={category.id} className="flex flex-wrap items-center gap-3 p-3">
             <div className={cn("flex min-w-0 flex-1 items-center gap-2", !category.active && "opacity-60")}>
               <AnnouncementCategoryBadge category={category} />
+              {/* Tên ở ngôn ngữ còn lại (nếu có) để HR thấy cả hai khi quản lý */}
+              {otherName(category, locale) && (
+                <span className="text-xs text-muted-foreground">{otherName(category, locale)}</span>
+              )}
               <span className="text-xs text-muted-foreground">{t("order", { order: category.sortOrder })}</span>
               {!category.active && <span className="text-xs text-muted-foreground">· {t("inactive")}</span>}
             </div>
@@ -168,7 +183,7 @@ function CategoryForm({ category, onBack }: { category: Category | null; onBack:
   const update = useUpdateCategory(category?.id ?? "");
   const mutation = editing ? update : create;
   const { errors } = form.formState;
-  const [name, color] = useWatch({ control: form.control, name: ["name", "color"] });
+  const [name, nameEn, color] = useWatch({ control: form.control, name: ["name", "nameEn", "color"] });
 
   function submit(values: CategoryFormValues) {
     const onSuccess = () => {
@@ -178,8 +193,9 @@ function CategoryForm({ category, onBack }: { category: Category | null; onBack:
     const onError = (error: unknown) => {
       if (applyServerFieldErrors(error, form.setError)) return;
       const { message, stale } = getAnnouncementError(error, tAnnouncementErrors, tErrors);
-      if (isNameError(error)) {
-        form.setError("name", { type: "server", message }, { shouldFocus: true });
+      const nameField = nameErrorField(error);
+      if (nameField) {
+        form.setError(nameField, { type: "server", message }, { shouldFocus: true });
       } else if (stale) {
         // Loại đã đổi hoặc đã bị xóa khỏi danh sách: báo, tải lại và về danh sách.
         toast.error(message);
@@ -195,7 +211,7 @@ function CategoryForm({ category, onBack }: { category: Category | null; onBack:
   }
 
   const formError =
-    mutation.isError && !hasFieldErrors(mutation.error) && !isNameError(mutation.error)
+    mutation.isError && !hasFieldErrors(mutation.error) && !nameErrorField(mutation.error)
       ? getAnnouncementError(mutation.error, tAnnouncementErrors, tErrors)
       : null;
 
@@ -224,6 +240,18 @@ function CategoryForm({ category, onBack }: { category: Category | null; onBack:
               {...form.register("name")}
             />
             <FieldError errors={[errors.name]} />
+          </Field>
+
+          <Field data-invalid={!!errors.nameEn}>
+            <FieldLabel htmlFor="announcement-category-name-en">{tForm("nameEn")}</FieldLabel>
+            <Input
+              id="announcement-category-name-en"
+              maxLength={MAX_CATEGORY_NAME_LENGTH}
+              aria-invalid={!!errors.nameEn}
+              {...form.register("nameEn")}
+            />
+            <FieldDescription>{tForm("nameEnHint")}</FieldDescription>
+            <FieldError errors={[errors.nameEn]} />
           </Field>
 
           <Controller
@@ -269,7 +297,7 @@ function CategoryForm({ category, onBack }: { category: Category | null; onBack:
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {tForm("preview")}
-            <AnnouncementCategoryBadge category={{ name: name.trim() || tForm("previewName"), color }} />
+            <AnnouncementCategoryBadge category={{ name: name.trim() || tForm("previewName"), nameEn: nameEn.trim() || null, color }} />
           </div>
         </FieldGroup>
       </form>
@@ -287,7 +315,10 @@ function CategoryForm({ category, onBack }: { category: Category | null; onBack:
   );
 }
 
-/** Trùng tên gắn vào ô tên thay vì Alert chung. */
-function isNameError(error: unknown): boolean {
-  return typeof error === "object" && error !== null && "code" in error && error.code === "ANNOUNCEMENT_CATEGORY_NAME_EXISTS";
+/** Trùng tên gắn vào đúng ô tên (tiếng Việt hay tiếng Anh) thay vì Alert chung. */
+function nameErrorField(error: unknown): "name" | "nameEn" | null {
+  const code = typeof error === "object" && error !== null && "code" in error ? error.code : null;
+  if (code === "ANNOUNCEMENT_CATEGORY_NAME_EXISTS") return "name";
+  if (code === "ANNOUNCEMENT_CATEGORY_NAME_EN_EXISTS") return "nameEn";
+  return null;
 }

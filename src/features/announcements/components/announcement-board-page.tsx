@@ -56,9 +56,10 @@ export function AnnouncementBoardPage() {
             <QuickNews items={query.data.quickNews} />
           </div>
         </div>
-        <div className="space-y-8 lg:col-span-8">
-          {query.data.sections.map((section) => (
-            <AnnouncementSection key={section.category.id} section={section} />
+        {/* Các khối loại đặt cạnh nhau; mỗi khối tự trượt qua các bài của nó */}
+        <div className="grid content-start gap-4 sm:grid-cols-2 lg:col-span-8">
+          {query.data.sections.map((section, index) => (
+            <AnnouncementSection key={section.category.id} section={section} blockIndex={index} />
           ))}
         </div>
       </div>
@@ -112,18 +113,13 @@ function BoardSkeleton() {
           </div>
         ))}
       </div>
-      <div className="space-y-8 lg:col-span-8">
-        {Array.from({ length: 2 }, (_, i) => (
-          <div key={i} className="space-y-3">
-            <Skeleton className="h-5 w-40" />
-            <div className="grid gap-4 md:grid-cols-5">
-              <Skeleton className="aspect-4/3 md:col-span-3" />
-              <div className="space-y-3 md:col-span-2">
-                {Array.from({ length: 3 }, (_, j) => (
-                  <Skeleton key={j} className="h-14" />
-                ))}
-              </div>
-            </div>
+      <div className="grid content-start gap-4 sm:grid-cols-2 lg:col-span-8">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="space-y-3 rounded-xl border p-4">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="aspect-video w-full" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-3 w-24" />
           </div>
         ))}
       </div>

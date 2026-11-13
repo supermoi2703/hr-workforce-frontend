@@ -21,9 +21,10 @@ export const getAnnouncements = (filters: AnnouncementFilters, params: PageParam
   });
 
 /**
- * Trang chủ bảng tin trong một lần gọi (announcement:read). Backend cắt `perCategory` ở 8 và `quick` ở 20; mặc định 4 và 8.
+ * Trang chủ bảng tin trong một lần gọi (announcement:read). Backend cắt `perCategory` ở 8 và `quick` ở 20. Mỗi khối loại tự
+ * trượt qua tối đa 5 bài nên mặc định lấy 5 bài mỗi loại và 8 tin nhanh.
  */
-export const getAnnouncementBoard = (perCategory = 4, quick = 8) =>
+export const getAnnouncementBoard = (perCategory = 5, quick = 8) =>
   http.get<AnnouncementBoard>("/api/announcements/board", { query: { perCategory, quick } });
 
 /** Ngoài đối tượng nhận, nháp hoặc đã gỡ → 404. */

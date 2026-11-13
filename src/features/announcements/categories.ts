@@ -1,4 +1,13 @@
-import { CATEGORY_COLORS, type CategoryColor } from "./types";
+import { CATEGORY_COLORS, type CategoryColor, type CategoryRef } from "./types";
+
+/**
+ * Tên loại để hiển thị theo ngôn ngữ giao diện: tiếng Anh dùng tên tiếng Anh nếu loại có (sau khi cắt khoảng trắng), ngược
+ * lại (hoặc ngôn ngữ khác) dùng tên tiếng Việt. Tên do HR nhập nên không dịch tự động.
+ */
+export function categoryName(category: Pick<CategoryRef, "name" | "nameEn">, locale: string): string {
+  const english = category.nameEn?.trim();
+  return locale === "en" && english ? english : category.name;
+}
 
 /**
  * Màu nhạt của loại bài: nền nhạt và chữ đậm cùng tông, có bản cho chế độ tối. Class viết nguyên chữ để Tailwind quét

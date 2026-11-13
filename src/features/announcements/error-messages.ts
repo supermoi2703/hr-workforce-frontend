@@ -18,6 +18,7 @@ const ERROR_KEYS: Record<string, AnnouncementsErrorKey> = {
   ANNOUNCEMENT_CATEGORY_INVALID: "categoryInvalid",
   ANNOUNCEMENT_CATEGORY_FORBIDDEN: "categoryForbidden",
   ANNOUNCEMENT_CATEGORY_NAME_EXISTS: "categoryNameExists",
+  ANNOUNCEMENT_CATEGORY_NAME_EN_EXISTS: "categoryNameEnExists",
 };
 
 /** Dữ liệu trên màn hình đã cũ: báo rồi tải lại danh sách và bài đang mở. */

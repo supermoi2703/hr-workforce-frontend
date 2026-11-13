@@ -27,6 +27,7 @@ import { applyServerFieldErrors } from "@/lib/forms";
 import { getAnnouncementError, hasFieldErrors } from "../error-messages";
 import {
   useCategories,
+  useCategoryName,
   useCreateAnnouncement,
   useManagedAnnouncement,
   useRefreshAnnouncements,
@@ -167,6 +168,7 @@ function AnnouncementForm({
   onDone: () => void;
 }) {
   const t = useTranslations("Announcements.Form");
+  const nameOf = useCategoryName();
   const tAudience = useTranslations("Announcements.audiences");
   const tValidation = useTranslations("Announcements.Validation");
   const tAnnouncementErrors = useTranslations("Announcements.Errors");
@@ -219,12 +221,12 @@ function AnnouncementForm({
       : null;
 
   // Loại đang dùng, cộng loại hiện tại của bài nếu nó đã ngừng dùng (bài cũ vẫn sửa được mà không phải đổi loại)
-  const activeRefs: CategoryRef[] = categories.map(({ id, name, color }) => ({ id, name, color }));
+  const activeRefs: CategoryRef[] = categories.map(({ id, name, nameEn, color }) => ({ id, name, nameEn, color }));
   const categoryOptions: Choice[] = categoryChoices(activeRefs, announcement?.category).map((category) => ({
     value: category.id,
     label: activeRefs.some((active) => active.id === category.id)
-      ? category.name
-      : t("inactiveOption", { name: category.name }),
+      ? nameOf(category)
+      : t("inactiveOption", { name: nameOf(category) }),
   }));
   const audienceChoices: Choice[] = audienceOptions(companyWide).map((value) => ({ value, label: tAudience(value) }));
   const toChoices = (units: typeof org.offices, current: string | null): Choice[] =>

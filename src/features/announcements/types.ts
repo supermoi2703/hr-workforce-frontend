@@ -17,12 +17,19 @@ export const MAX_CONTENT_LENGTH = 20000;
 export const MAX_CATEGORY_NAME_LENGTH = 50;
 
 /** Loại bài gọn, kèm trong mỗi bài. */
-export type CategoryRef = { id: string; name: string; color: CategoryColor };
+export type CategoryRef = {
+  id: string;
+  /** Tên tiếng Việt, luôn có. */
+  name: string;
+  /** Tên tiếng Anh, không bắt buộc: giao diện tiếng Anh dùng tên này, chưa có thì dùng `name` (xem categoryName). */
+  nameEn: string | null;
+  color: CategoryColor;
+};
 
 /** Loại bài đầy đủ (trang quản lý loại). */
 export type Category = CategoryRef & { sortOrder: number; active: boolean; version: number };
 
-export type CreateCategoryInput = { name: string; color: CategoryColor; sortOrder: number };
+export type CreateCategoryInput = { name: string; nameEn: string | null; color: CategoryColor; sortOrder: number };
 export type UpdateCategoryInput = CreateCategoryInput & { version: number };
 
 /** Một dòng danh sách, không có nội dung đầy đủ. */

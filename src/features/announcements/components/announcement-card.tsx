@@ -75,6 +75,40 @@ export function CompactRow({ announcement, className }: { announcement: Announce
   );
 }
 
+/**
+ * Thẻ trong khối tự chuyển tin ở trang chủ: ảnh bìa 16:9 (hoặc đoạn đầu của bài khi không có ảnh), tiêu đề tối đa hai dòng
+ * và ngày. Chiều cao cố định (vùng ảnh 16:9, tiêu đề dành sẵn hai dòng) nên khối không nhảy hình khi đổi tin và các khối
+ * trong lưới cao bằng nhau.
+ */
+export function SlideCard({ announcement }: { announcement: AnnouncementItem }) {
+  return (
+    <Link
+      href={`/announcements/${announcement.id}`}
+      // Liên kết kéo thả được theo mặc định, sẽ tranh với cử chỉ kéo đổi tin của khối
+      draggable={false}
+      className={cn("group block overflow-hidden rounded-lg border bg-card", FOCUS)}
+    >
+      <div className="relative aspect-video w-full overflow-hidden bg-muted">
+        {announcement.coverUrl ? (
+          <CoverImage src={announcement.coverUrl} className="absolute inset-0 aspect-auto h-full" />
+        ) : (
+          // Không có ảnh bìa: hiện đoạn đầu của bài thay vì ảnh giả, để mọi thẻ cao bằng nhau
+          <p className="line-clamp-5 p-4 text-sm break-words text-muted-foreground">{announcement.excerpt}</p>
+        )}
+      </div>
+      <div className="space-y-1.5 p-3">
+        <h3 className={cn("line-clamp-2 min-h-12 text-base leading-6 font-semibold break-words", TITLE_HOVER)}>
+          {announcement.title}
+        </h3>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {announcement.pinned && <PinnedLabel />}
+          <span>{formatDateTime(announcement.publishedAt)}</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 /** "Đã ghim ·" nằm cùng dòng với tiêu đề của hàng gọn. */
 function PinnedLabelInline() {
   const t = useTranslations("Announcements");

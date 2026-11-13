@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { categoryColorClass } from "../categories";
+import { useCategoryName } from "../hooks";
 import type { AnnouncementAudience, AnnouncementStatus, CategoryRef } from "../types";
 
 const STATUS_VARIANT: Record<AnnouncementStatus, "secondary" | "success" | "outline"> = {
@@ -12,10 +13,11 @@ const STATUS_VARIANT: Record<AnnouncementStatus, "secondary" | "success" | "outl
 };
 
 /** Loại bài: tên và một màu nhạt do HR chọn, không icon. Cùng kiểu ở mọi màn hình. */
-export function AnnouncementCategoryBadge({ category }: { category: Pick<CategoryRef, "name" | "color"> }) {
+export function AnnouncementCategoryBadge({ category }: { category: Pick<CategoryRef, "name" | "nameEn" | "color"> }) {
+  const nameOf = useCategoryName();
   return (
     <Badge variant="secondary" className={categoryColorClass(category.color)}>
-      {category.name}
+      {nameOf(category)}
     </Badge>
   );
 }

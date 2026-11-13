@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import en from "../../../messages/en.json";
 import vi from "../../../messages/vi.json";
 import { ApiError } from "@/lib/api/errors";
-import { CATEGORY_COLOR_CLASSES, CATEGORY_SWATCH_CLASSES, categoryColorClass } from "./categories";
+import { CATEGORY_COLOR_CLASSES, CATEGORY_SWATCH_CLASSES, categoryColorClass, categoryName } from "./categories";
 import { getAnnouncementError } from "./error-messages";
 import { fitWithin, MAX_COVER_EDGE, webpName } from "./image";
 import { DISALLOWED_ELEMENTS, safeUrl } from "./markdown";
@@ -17,6 +17,8 @@ import {
   categoryChoices,
   isAudienceLocked,
   isReadable,
+  isScrolledToEnd,
+  isScrolledToStart,
   unitChoices,
 } from "./rules";
 import {
@@ -44,7 +46,7 @@ const tErrors = createTranslator({ locale: "en", messages: en, namespace: "Error
 
 const HANOI = "office-hanoi";
 const PTPM = "dept-ptpm";
-const POLICY = { id: "cat-policy", name: "Chính sách", color: "BLUE" } as const;
+const POLICY = { id: "cat-policy", name: "Chính sách", nameEn: "Policy", color: "BLUE" } as const;
 
 function detail(patch: Partial<AnnouncementDetail> = {}): AnnouncementDetail {
   return {
@@ -111,6 +113,36 @@ describe("việc làm được theo trạng thái", () => {
   });
 });
 
+describe("isScrolledToStart (lớp mờ đầu cột Tin nhanh)", () => {
+  it("còn ở đầu khi chưa cuộn hoặc lệch vài px", () => {
+    expect(isScrolledToStart(0)).toBe(true);
+    expect(isScrolledToStart(3)).toBe(true);
+  });
+
+  it("đã cuộn xuống thì phía trên còn nội dung", () => {
+    expect(isScrolledToStart(5)).toBe(false);
+    expect(isScrolledToStart(120)).toBe(false);
+  });
+});
+
+describe("isScrolledToEnd (lớp mờ đáy cột Tin nhanh)", () => {
+  it("chưa cuộn tới cuối thì còn nội dung phía dưới", () => {
+    expect(isScrolledToEnd(0, 512, 900)).toBe(false);
+    expect(isScrolledToEnd(300, 512, 900)).toBe(false);
+  });
+
+  it("cuộn tới cuối, kể cả lệch vài px do số lẻ, thì coi là hết", () => {
+    expect(isScrolledToEnd(388, 512, 900)).toBe(true);
+    expect(isScrolledToEnd(385, 512, 900)).toBe(true); // lệch 3 px, trong dung sai
+    expect(isScrolledToEnd(380, 512, 900)).toBe(false); // lệch 8 px
+  });
+
+  it("nội dung vừa khung (không cần cuộn) cũng là đã tới cuối", () => {
+    expect(isScrolledToEnd(0, 512, 400)).toBe(true);
+    expect(isScrolledToEnd(0, 512, 512)).toBe(true);
+  });
+});
+
 describe("unitChoices và categoryChoices", () => {
   const units = [
     { id: "1", name: "Đang dùng", active: true },
@@ -125,8 +157,8 @@ describe("unitChoices và categoryChoices", () => {
   });
 
   it("loại ngừng dùng chỉ còn trong ô chọn khi bài đang mang loại đó", () => {
-    const active: CategoryRef[] = [POLICY, { id: "cat-event", name: "Sự kiện", color: "GREEN" }];
-    const retired: CategoryRef = { id: "cat-old", name: "Cũ", color: "SLATE" };
+    const active: CategoryRef[] = [POLICY, { id: "cat-event", name: "Sự kiện", nameEn: null, color: "GREEN" }];
+    const retired: CategoryRef = { id: "cat-old", name: "Cũ", nameEn: null, color: "SLATE" };
 
     expect(categoryChoices(active).map((c) => c.id)).toEqual(["cat-policy", "cat-event"]);
     expect(categoryChoices(active, retired).map((c) => c.id)).toEqual(["cat-policy", "cat-event", "cat-old"]);
@@ -315,26 +347,79 @@ describe("loại bài: schema và body", () => {
   const schema = categorySchema(tValidation);
 
   it("bắt buộc tên, tối đa 50 ký tự, màu trong danh sách, thứ tự là số nguyên", () => {
-    expect(schema.safeParse({ name: "Đào tạo", color: "VIOLET", sortOrder: "10" }).success).toBe(true);
-    expect(schema.safeParse({ name: "  ", color: "VIOLET", sortOrder: "10" }).success).toBe(false);
-    expect(schema.safeParse({ name: "x".repeat(51), color: "VIOLET", sortOrder: "10" }).success).toBe(false);
-    expect(schema.safeParse({ name: "Đào tạo", color: "HOT_PINK", sortOrder: "10" }).success).toBe(false);
-    expect(schema.safeParse({ name: "Đào tạo", color: "VIOLET", sortOrder: "1.5" }).success).toBe(false);
-    expect(schema.safeParse({ name: "Đào tạo", color: "VIOLET", sortOrder: "" }).success).toBe(false);
-    expect(schema.safeParse({ name: "Đào tạo", color: "VIOLET", sortOrder: "-5" }).success).toBe(true);
+    const base = { name: "Đào tạo", nameEn: "", color: "VIOLET", sortOrder: "10" };
+    expect(schema.safeParse(base).success).toBe(true);
+    expect(schema.safeParse({ ...base, name: "  " }).success).toBe(false);
+    expect(schema.safeParse({ ...base, name: "x".repeat(51) }).success).toBe(false);
+    expect(schema.safeParse({ ...base, color: "HOT_PINK" }).success).toBe(false);
+    expect(schema.safeParse({ ...base, sortOrder: "1.5" }).success).toBe(false);
+    expect(schema.safeParse({ ...base, sortOrder: "" }).success).toBe(false);
+    expect(schema.safeParse({ ...base, sortOrder: "-5" }).success).toBe(true);
   });
 
   it("body gửi backend: cắt khoảng trắng, thứ tự là số", () => {
-    expect(toCategoryRequest({ name: " Đào tạo ", color: "VIOLET", sortOrder: " 20 " })).toEqual({
+    expect(toCategoryRequest({ name: " Đào tạo ", nameEn: " Training ", color: "VIOLET", sortOrder: " 20 " })).toEqual({
       name: "Đào tạo",
+      nameEn: "Training",
       color: "VIOLET",
       sortOrder: 20,
     });
   });
 
   it("điền form từ loại có sẵn", () => {
-    const category: Category = { id: "c1", name: "Sự kiện", color: "GREEN", sortOrder: 20, active: true, version: 2 };
-    expect(toCategoryFormValues(category)).toEqual({ name: "Sự kiện", color: "GREEN", sortOrder: "20" });
+    const category: Category = {
+      id: "c1",
+      name: "Sự kiện",
+      nameEn: "Event",
+      color: "GREEN",
+      sortOrder: 20,
+      active: true,
+      version: 2,
+    };
+    expect(toCategoryFormValues(category)).toEqual({ name: "Sự kiện", nameEn: "Event", color: "GREEN", sortOrder: "20" });
+    // Chưa có tên tiếng Anh: ô để trống
+    expect(toCategoryFormValues({ ...category, nameEn: null }).nameEn).toBe("");
+  });
+});
+
+describe("categoryName (tên loại theo ngôn ngữ)", () => {
+  const withEnglish = { name: "Chính sách", nameEn: "Policy" };
+
+  it("giao diện tiếng Anh dùng tên tiếng Anh khi có", () => {
+    expect(categoryName(withEnglish, "en")).toBe("Policy");
+  });
+
+  it("giao diện tiếng Việt luôn dùng tên tiếng Việt", () => {
+    expect(categoryName(withEnglish, "vi")).toBe("Chính sách");
+  });
+
+  it("chưa có tên tiếng Anh (hoặc toàn khoảng trắng) thì tiếng Anh lùi về tên tiếng Việt", () => {
+    expect(categoryName({ name: "Đào tạo", nameEn: null }, "en")).toBe("Đào tạo");
+    expect(categoryName({ name: "Đào tạo", nameEn: "   " }, "en")).toBe("Đào tạo");
+  });
+
+  it("cắt khoảng trắng của tên tiếng Anh", () => {
+    expect(categoryName({ name: "Đào tạo", nameEn: " Training " }, "en")).toBe("Training");
+  });
+
+  it("ngôn ngữ khác dùng tên tiếng Việt", () => {
+    expect(categoryName(withEnglish, "fr")).toBe("Chính sách");
+  });
+});
+
+describe("categorySchema: tên tiếng Anh", () => {
+  const schema = categorySchema(tValidation);
+  const base = { name: "Đào tạo", color: "VIOLET", sortOrder: "1" };
+
+  it("không bắt buộc, tối đa 50 ký tự", () => {
+    expect(schema.safeParse({ ...base, nameEn: "" }).success).toBe(true);
+    expect(schema.safeParse({ ...base, nameEn: "Training" }).success).toBe(true);
+    expect(schema.safeParse({ ...base, nameEn: "x".repeat(51) }).success).toBe(false);
+  });
+
+  it("rỗng hoặc toàn khoảng trắng gửi lên là null", () => {
+    expect(toCategoryRequest({ ...base, color: "VIOLET", nameEn: "   " }).nameEn).toBeNull();
+    expect(toCategoryRequest({ ...base, color: "VIOLET", nameEn: "" }).nameEn).toBeNull();
   });
 });
 
@@ -367,6 +452,10 @@ describe("getAnnouncementError", () => {
     });
     expect(error("ANNOUNCEMENT_CATEGORY_NAME_EXISTS")).toEqual({
       message: en.Announcements.Errors.categoryNameExists,
+      stale: false,
+    });
+    expect(error("ANNOUNCEMENT_CATEGORY_NAME_EN_EXISTS")).toEqual({
+      message: en.Announcements.Errors.categoryNameEnExists,
       stale: false,
     });
     expect(error("ANNOUNCEMENT_CATEGORY_FORBIDDEN", 403).stale).toBe(false);

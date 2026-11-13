@@ -115,6 +115,8 @@ export function toUpdateRequest(
 export function categorySchema(t: AnnouncementsValidationTranslator) {
   return z.object({
     name: z.string().trim().min(1, t("required")).max(MAX_CATEGORY_NAME_LENGTH, t("tooLong")),
+    /** Tên tiếng Anh, không bắt buộc ("" = không có). */
+    nameEn: z.string().trim().max(MAX_CATEGORY_NAME_LENGTH, t("tooLong")),
     color: z.enum(CATEGORY_COLORS),
     /** Chuỗi để gõ được dấu âm và ô trống; chuyển sang số khi gửi. */
     sortOrder: z.string().trim().regex(/^-?\d{1,6}$/, t("invalidNumber")),
@@ -123,12 +125,17 @@ export function categorySchema(t: AnnouncementsValidationTranslator) {
 
 export type CategoryFormValues = z.infer<ReturnType<typeof categorySchema>>;
 
-export const EMPTY_CATEGORY_FORM: CategoryFormValues = { name: "", color: "SLATE", sortOrder: "0" };
+export const EMPTY_CATEGORY_FORM: CategoryFormValues = { name: "", nameEn: "", color: "SLATE", sortOrder: "0" };
 
 export function toCategoryFormValues(category: Category): CategoryFormValues {
-  return { name: category.name, color: category.color, sortOrder: String(category.sortOrder) };
+  return { name: category.name, nameEn: category.nameEn ?? "", color: category.color, sortOrder: String(category.sortOrder) };
 }
 
 export function toCategoryRequest(values: CategoryFormValues): CreateCategoryInput {
-  return { name: values.name.trim(), color: values.color, sortOrder: Number.parseInt(values.sortOrder, 10) };
+  return {
+    name: values.name.trim(),
+    nameEn: values.nameEn.trim() || null,
+    color: values.color,
+    sortOrder: Number.parseInt(values.sortOrder, 10),
+  };
 }

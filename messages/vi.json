@@ -3005,7 +3005,7 @@
     "publishedBy": "đăng bởi {name}",
     "Categories": {
       "title": "Loại thông báo",
-      "description": "Loại dùng chung cho cả công ty. Mỗi loại có một tên và một màu nhạt. Loại không bị xóa: ngừng dùng thì bài cũ vẫn giữ loại đó.",
+      "description": "Loại dùng chung cho cả công ty. Mỗi loại có tên tiếng Việt, tên tiếng Anh (không bắt buộc) và một màu nhạt. Loại không bị xóa: ngừng dùng thì bài cũ vẫn giữ loại đó.",
       "empty": "Chưa có loại nào",
       "order": "thứ tự {order}",
       "inactive": "ngừng dùng",
@@ -3028,8 +3028,10 @@
       "Form": {
         "createTitle": "Thêm loại",
         "editTitle": "Sửa loại",
-        "description": "Một tên và một màu nhạt chọn từ danh sách.",
-        "name": "Tên",
+        "description": "Tên tiếng Việt (bắt buộc), tên tiếng Anh (không bắt buộc) và một màu nhạt chọn từ danh sách.",
+        "name": "Tên tiếng Việt",
+        "nameEn": "Tên tiếng Anh",
+        "nameEnHint": "Hiện khi giao diện là tiếng Anh. Để trống thì dùng tên tiếng Việt.",
         "color": "Màu",
         "order": "Thứ tự",
         "orderHint": "Số nguyên: số nhỏ hiện trước.",
@@ -3041,12 +3043,15 @@
     "Board": {
       "quickNews": "Tin nhanh",
       "readMore": "Đọc thêm",
+      "viewAll": "Xem tất cả",
       "seeAll": "Xem tất cả ({count})",
       "seeMore": "Xem thêm",
       "allPosts": "Tất cả thông báo",
       "backToBoard": "Về trang chủ bảng tin",
       "latest": "Tin mới nhất",
       "sameCategory": "Cùng loại",
+      "carouselLabel": "Tin: {name}",
+      "slideLabel": "Tin {current}/{total}",
       "breadcrumbRoot": "Bảng tin"
     },
     "Editor": {
@@ -3156,6 +3161,7 @@
       "categoryInvalid": "Loại không còn được dùng. Danh sách đã được tải lại, hãy chọn loại khác.",
       "categoryForbidden": "Chỉ HR toàn công ty và Admin quản lý được loại.",
       "categoryNameExists": "Đã có một loại trùng tên này.",
+      "categoryNameEnExists": "Đã có một loại trùng tên tiếng Anh này.",
       "notFound": "Thông báo không còn tồn tại hoặc bạn không xem được. Danh sách đã được tải lại.",
       "audienceInvalid": "Văn phòng hoặc phòng ban không tồn tại, đã ngừng dùng, hoặc không khớp với đối tượng nhận.",
       "audienceForbidden": "Bạn chỉ đăng được cho văn phòng của mình.",

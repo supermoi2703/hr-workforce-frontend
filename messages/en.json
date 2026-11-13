@@ -3005,7 +3005,7 @@
     "publishedBy": "posted by {name}",
     "Categories": {
       "title": "Categories",
-      "description": "Categories are shared by the whole company. Each has a name and a soft colour. A category in use is never deleted: stop using it and old posts keep it.",
+      "description": "Categories are shared by the whole company. Each has a Vietnamese name, an optional English name and a soft colour. A category is never deleted: stop using it and old posts keep it.",
       "empty": "No categories yet",
       "order": "order {order}",
       "inactive": "not in use",
@@ -3028,8 +3028,10 @@
       "Form": {
         "createTitle": "New category",
         "editTitle": "Edit category",
-        "description": "A name and one soft colour, picked from the list.",
-        "name": "Name",
+        "description": "A name (Vietnamese, required), an optional English name and one soft colour, picked from the list.",
+        "name": "Vietnamese name",
+        "nameEn": "English name",
+        "nameEnHint": "Shown when the interface is in English. Leave it empty to use the Vietnamese name.",
         "color": "Colour",
         "order": "Order",
         "orderHint": "A whole number: smaller shows first.",
@@ -3041,12 +3043,15 @@
     "Board": {
       "quickNews": "Quick news",
       "readMore": "Read more",
+      "viewAll": "See all",
       "seeAll": "See all ({count})",
       "seeMore": "See more",
       "allPosts": "All announcements",
       "backToBoard": "Back to the board",
       "latest": "Latest news",
       "sameCategory": "In the same category",
+      "carouselLabel": "News: {name}",
+      "slideLabel": "News {current} of {total}",
       "breadcrumbRoot": "Announcements"
     },
     "Editor": {
@@ -3156,6 +3161,7 @@
       "categoryInvalid": "The category is no longer in use. The list was reloaded, choose another one.",
       "categoryForbidden": "Only company-wide HR and admins can manage categories.",
       "categoryNameExists": "A category with this name already exists.",
+      "categoryNameEnExists": "A category with this English name already exists.",
       "notFound": "The announcement no longer exists or is not available to you. The list was reloaded.",
       "audienceInvalid": "The office or department is missing, no longer in use, or does not match the audience.",
       "audienceForbidden": "You can only post to your own office.",
