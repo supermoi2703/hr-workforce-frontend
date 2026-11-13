@@ -23,6 +23,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-hero-foreground: var(--hero-foreground);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -89,12 +90,24 @@
   --pending-foreground: oklch(0.279 0.077 45.635);
   --info: oklch(0.5 0.134 242.749);
   --info-foreground: oklch(1 0 0);
-  /* Biểu đồ: xanh thương hiệu, teal, amber, rose, violet */
+  /* Biểu đồ: xanh thương hiệu, teal, amber, rose, violet. Thứ tự dùng cho chuỗi (đã kiểm mù màu): 1, 3, 2, 5, 4 */
   --chart-1: oklch(0.546 0.245 262.881);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.666 0.179 58.318);
   --chart-4: oklch(0.645 0.246 16.439);
   --chart-5: oklch(0.541 0.247 293.009);
+  /* Thẻ số màu đặc (dashboard): gradient theo nhóm chức năng, chữ trắng đạt >= 5:1 ở cả hai đầu. Dùng chung hai theme. */
+  --hero-foreground: oklch(1 0 0);
+  --hero-project-from: oklch(0.546 0.245 262.881); /* blue-600 */
+  --hero-project-to: oklch(0.457 0.24 277.023); /* indigo-700 */
+  --hero-people-from: oklch(0.541 0.281 293.009); /* violet-600 */
+  --hero-people-to: oklch(0.518 0.253 323.949); /* fuchsia-700 */
+  --hero-time-from: oklch(0.5 0.134 242.749); /* sky-700 */
+  --hero-time-to: oklch(0.546 0.245 262.881); /* blue-600 */
+  --hero-approval-from: oklch(0.553 0.195 38.402); /* orange-700 */
+  --hero-approval-to: oklch(0.505 0.213 27.518); /* red-700 */
+  --hero-leave-from: oklch(0.508 0.118 165.612); /* emerald-700 */
+  --hero-leave-to: oklch(0.511 0.096 186.391); /* teal-700 */
   --radius: 0.5rem;
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.33 0.035 265);
@@ -133,11 +146,11 @@
   --pending-foreground: oklch(0.279 0.077 45.635);
   --info: oklch(0.746 0.16 232.661);
   --info-foreground: oklch(0.293 0.066 243.157);
-  --chart-1: oklch(0.707 0.165 254.624);
-  --chart-2: oklch(0.777 0.152 181.912);
-  --chart-3: oklch(0.828 0.189 84.429);
-  --chart-4: oklch(0.712 0.194 13.428);
-  --chart-5: oklch(0.702 0.183 293.541);
+  --chart-1: oklch(0.623 0.214 259.815); /* blue-500: dải độ sáng biểu đồ trên nền tối (skill dataviz) */
+  --chart-2: oklch(0.6 0.118 184.704); /* teal-600 */
+  --chart-3: oklch(0.666 0.179 58.318); /* amber-600 */
+  --chart-4: oklch(0.645 0.246 16.439); /* rose-500 */
+  --chart-5: oklch(0.606 0.25 292.717); /* violet-500 */
   --sidebar: oklch(0.2 0.022 262);
   --sidebar-foreground: oklch(0.86 0.015 262);
   --sidebar-primary: oklch(0.623 0.214 259.815);
@@ -186,4 +199,21 @@
 /* Chế độ chỉ có icon: cột hẹp, vệt mờ ở mép đã đủ báo hiệu nên ẩn thanh cuộn. */
 [data-collapsible="icon"] [data-slot="sidebar-content"] {
   scrollbar-width: none;
+}
+
+/* Nền gradient của thẻ số màu đặc (dashboard), theo nhóm chức năng. */
+@utility bg-hero-project {
+  background-image: linear-gradient(135deg, var(--hero-project-from), var(--hero-project-to));
+}
+@utility bg-hero-people {
+  background-image: linear-gradient(135deg, var(--hero-people-from), var(--hero-people-to));
+}
+@utility bg-hero-time {
+  background-image: linear-gradient(135deg, var(--hero-time-from), var(--hero-time-to));
+}
+@utility bg-hero-approval {
+  background-image: linear-gradient(135deg, var(--hero-approval-from), var(--hero-approval-to));
+}
+@utility bg-hero-leave {
+  background-image: linear-gradient(135deg, var(--hero-leave-from), var(--hero-leave-to));
 }

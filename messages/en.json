@@ -3280,5 +3280,240 @@
       "invalidState": "This action is not possible in the announcement's current state. The list was reloaded.",
       "versionConflict": "Someone else just changed this announcement. The list was reloaded, open it again to see the latest version."
     }
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "Filters": {
+      "label": "Filters",
+      "office": "Office",
+      "allOffices": "All offices",
+      "department": "Department",
+      "allDepartments": "All departments",
+      "range": "Period",
+      "weeks": "{weeks} weeks from this week",
+      "reset": "Clear filters",
+      "hint": "Filters apply to Resources and HR."
+    },
+    "Common": {
+      "pending": "Waiting for data",
+      "pendingHint": "Shows once the {source} module provides data.",
+      "sources": {
+        "worklog": "work log",
+        "timesheet": "timesheet",
+        "payroll": "payroll"
+      },
+      "noDepartment": "No department",
+      "showAll": "Show all ({count})",
+      "showLess": "Show less",
+      "people": "{count, plural, one {# person} other {# people}}",
+      "weekOf": "Week of {date}",
+      "other": "Other"
+    },
+    "Me": {
+      "title": "My overview",
+      "noProject": "Not on a project today",
+      "noProfile": "Your account is not linked to an employee profile, so personal figures are not shown.",
+      "status": {
+        "WORK": "On time",
+        "LATE": "Late",
+        "EARLY": "Left early",
+        "LATE_EARLY": "Late and left early",
+        "MISSING_OUT": "Missing check-out",
+        "IN_PROGRESS": "Working",
+        "REMOTE": "Working from home",
+        "ABSENT": "Absent",
+        "UPCOMING": "Not started",
+        "HOLIDAY": "Holiday",
+        "OFF": "Day off",
+        "LEAVE_PAID": "Paid leave",
+        "LEAVE_UNPAID": "Unpaid leave"
+      },
+      "timeTitle": "My time by project today",
+      "timeCenter": "allocated",
+      "free": "Free",
+      "leaveTitle": "Annual leave {year}",
+      "leaveCenter": "days left",
+      "used": "Used",
+      "available": "Left",
+      "projectsTitle": "My projects",
+      "role": {
+        "PM": "Project manager",
+        "MEMBER": "Member"
+      }
+    },
+    "Resources": {
+      "title": "Resources",
+      "description": "{from} – {to} · {people}",
+      "export": "Export Excel",
+      "exporting": "Exporting…",
+      "exportFailed": "Could not export the file",
+      "planned": "Planned utilization",
+      "plannedHint": "Average allocation per working day",
+      "limit": "Limit {limit}%",
+      "overLimit": "Over the limit",
+      "actual": "Actual utilization",
+      "actualHint": "Logged hours ÷ available hours",
+      "bench": "On bench",
+      "benchDetail": "No project in this period",
+      "overloaded": "Overloaded",
+      "overloadedDetail": "Over the limit or more work than capacity",
+      "billable": "Billable",
+      "billableDetail": "Share of time on billable projects",
+      "split": {
+        "billable": "Billable",
+        "nonBillable": "Non-billable",
+        "free": "Free"
+      },
+      "trendTitle": "Planned utilization by week",
+      "heatmapTitle": "Planned utilization by department and week",
+      "heatmapDescription": "Darker means more allocated. Red cells are over the limit.",
+      "heatLegendLow": "0%",
+      "heatLegendHigh": "{limit}%",
+      "heatLegendOver": "Over {limit}%",
+      "heatCell": "{department}, {week}: {percent}%",
+      "heatCellEmpty": "{department}, {week}: no working days",
+      "department": "Department",
+      "departmentsTitle": "Utilization by department",
+      "departmentsDescription": "Planned and actual, average per person",
+      "series": {
+        "planned": "Planned",
+        "actual": "Actual"
+      },
+      "distributionTitle": "People by planned utilization",
+      "distributionDescription": "How many people sit in each band",
+      "bucket": {
+        "0": "0%",
+        "1-50": "1–50%",
+        "51-80": "51–80%",
+        "81-100": "81–100%",
+        "over-100": "Over 100%"
+      },
+      "overloadTitle": "Overload warnings",
+      "overloadEmpty": "Nobody is overloaded in this period.",
+      "benchTitle": "On bench",
+      "benchEmpty": "Everyone has a project in this period.",
+      "columns": {
+        "person": "Person",
+        "maxDaily": "Highest day",
+        "firstOver": "Over limit from",
+        "weeksOver": "Weeks over capacity",
+        "skills": "Top skills",
+        "count": "People"
+      },
+      "noSkills": "No skills recorded",
+      "weeksOverValue": "{count, plural, =0 {—} one {# week} other {# weeks}}",
+      "plannedNow": "Planned this week",
+      "projectsTitle": "Top projects by FTE",
+      "projectsDescription": "FTE = time converted to full-time people",
+      "projectsEmpty": "No project has allocations in this period.",
+      "fte": "FTE",
+      "timeTitle": "Where planned time goes",
+      "timeCenter": "planned"
+    },
+    "Team": {
+      "title": "My team",
+      "description": "Your reports on the org chart",
+      "people": "People",
+      "pendingApprovals": "Waiting for your approval",
+      "planned": "Planned utilization",
+      "plannedDetail": "Next 4 weeks",
+      "lateRate": "Late arrivals",
+      "awayTitle": "Away this week",
+      "awayEmpty": "Everyone is in this week.",
+      "leave": "Leave",
+      "remote": "WFH",
+      "part": {
+        "FULL_DAY": "All day",
+        "MORNING": "Morning",
+        "AFTERNOON": "Afternoon"
+      },
+      "membersTitle": "Planned utilization by person",
+      "membersEmpty": "Nobody in your team is working right now.",
+      "badges": {
+        "overAllocated": "Over limit",
+        "overCapacity": "Too much work",
+        "bench": "No project"
+      },
+      "distributionTitle": "Team by planned utilization",
+      "distributionCenter": "people"
+    },
+    "Hr": {
+      "title": "People",
+      "description": "Headcount and movement over 12 months",
+      "headcount": "Headcount",
+      "headcountDetail": "{onboarding} starting soon",
+      "last12Months": "Last 12 months",
+      "turnover": "Turnover",
+      "turnoverDetail": "Leavers ÷ average headcount",
+      "attendance": "Attendance today",
+      "payroll": "Payroll",
+      "movementTitle": "Hires and leavers by month",
+      "departmentsTitle": "Headcount by department",
+      "contractsTitle": "Contracts ending soon",
+      "contractsDescription": "{within60} in the next 60 days, {within30} within 30 days",
+      "contractsEmpty": "No contract ends in the next 60 days.",
+      "contractsChart": "Contracts ending by week",
+      "endsOn": "Ends {date}",
+      "series": {
+        "hires": "Hires",
+        "terminations": "Leavers",
+        "headcount": "Headcount",
+        "contracts": "Contracts"
+      },
+      "totalTitle": "Total employees",
+      "tenureTitle": "Tenure",
+      "levelTitle": "Level",
+      "officeTitle": "Office",
+      "people": "people",
+      "hiresThisMonth": "Hires this month",
+      "leaversThisMonth": "Leavers this month",
+      "employmentType": {
+        "FULL_TIME": "Full-time",
+        "PROBATION": "Probation",
+        "INTERN": "Intern",
+        "CONTRACTOR": "Contractor"
+      },
+      "tenure": {
+        "LT_1": "Under 1 year",
+        "1_3": "1–3 years",
+        "3_5": "3–5 years",
+        "GT_5": "5 years or more"
+      },
+      "level": {
+        "INTERN_FRESHER": "Intern / Fresher",
+        "JUNIOR": "Junior",
+        "MIDDLE": "Middle",
+        "SENIOR": "Senior",
+        "LEAD_PRINCIPAL": "Lead / Principal"
+      }
+    },
+    "Tabs": {
+      "label": "Dashboard sections",
+      "overview": "Overview",
+      "resources": "Resources",
+      "hr": "People",
+      "team": "My team",
+      "me": "Mine"
+    },
+    "Hero": {
+      "endOfPeriod": "at the end of the period",
+      "vsLastMonth": "vs last month",
+      "vsEndOfLastMonth": "vs end of last month",
+      "points": " pts"
+    },
+    "Overview": {
+      "remindersTitle": "Reminders",
+      "remindersEmpty": "Nothing needs your attention.",
+      "reminders": {
+        "contracts": "Contracts ending within 30 days",
+        "onboarding": "People starting soon",
+        "approvals": "Requests waiting for you",
+        "overloaded": "Overloaded people",
+        "bench": "People without a project"
+      },
+      "trendTitle": "Planned utilization by week",
+      "movementTitle": "Hires and leavers by month",
+      "open": "Open"
+    }
   }
 }

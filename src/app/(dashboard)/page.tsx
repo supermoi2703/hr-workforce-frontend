@@ -12,25 +12,65 @@ import {
   UserSearchIcon,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DOMAIN_TONE_TEXT, type DomainTone } from "@/components/shared/icon-tile";
 import { RequireAccess } from "@/components/shared/require-access";
 import { UserAvatar } from "@/components/shared/user-avatar";
+import { useMyDashboard } from "@/features/dashboard/hooks";
 import { BackendStatusCard } from "@/features/system/components/backend-status-card";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import type { Access } from "@/lib/auth/types";
-import { formatDate, formatLongDate, todayIsoDate } from "@/lib/format";
+import { formatDate, formatLongDate, formatTime, todayIsoDate } from "@/lib/format";
 import { MetricStrip, type Metric } from "./_components/metric-strip";
 import { WeekStrip, weekOf } from "./_components/week-strip";
 
-// Chỉ số trong ngày. Khi module tương ứng xong, truyền `value` và `detail` bằng dữ liệu thật
-// (vd. value: "08:12", detail: <Badge variant="success">Đúng giờ</Badge>).
-const METRICS: Metric[] = [
-  { label: "Giờ vào hôm nay", icon: TimerIcon, tone: "time", href: "/attendance" },
-  { label: "Ngày phép còn lại", icon: TreePalmIcon, tone: "leave", href: "/leave" },
-  { label: "Yêu cầu chờ duyệt", icon: ClipboardCheckIcon, tone: "approval", href: "/approvals" },
-  { label: "Dự án đang tham gia", icon: BriefcaseBusinessIcon, tone: "project", href: "/projects" },
-];
+type MeStatus = Parameters<ReturnType<typeof useTranslations<"Dashboard.Me.status">>>[0];
+
+/**
+ * Chỉ số trong ngày, lấy từ `/api/dashboard/me` (3.6). Chưa có số (chưa gắn hồ sơ, đang tải) thì để trống, ô tự hiện
+ * "Chưa có dữ liệu". Phân tích dài hạn của cá nhân nằm ở /dashboard, tab Của tôi.
+ */
+function useTodayMetrics(): Metric[] {
+  const tStatus = useTranslations("Dashboard.Me.status");
+  const me = useMyDashboard().data;
+  const today = me?.today;
+  const leave = me?.leave;
+  return [
+    {
+      label: "Giờ vào hôm nay",
+      icon: TimerIcon,
+      tone: "time",
+      href: "/attendance",
+      value: today?.firstIn ? formatTime(today.firstIn) : undefined,
+      detail: today && tStatus.has(today.status as MeStatus) ? tStatus(today.status as MeStatus) : undefined,
+    },
+    {
+      label: "Ngày phép còn lại",
+      icon: TreePalmIcon,
+      tone: "leave",
+      href: "/leave",
+      value: leave ? `${leave.available} ngày` : undefined,
+      detail: leave ? `Đã dùng ${leave.used}/${leave.annualDays} ngày` : undefined,
+    },
+    {
+      label: "Đơn của tôi đang chờ",
+      icon: ClipboardCheckIcon,
+      tone: "approval",
+      href: "/approvals?tab=mine",
+      value: me ? me.pendingRequests : undefined,
+      detail: me ? "Chờ người khác duyệt" : undefined,
+    },
+    {
+      label: "Dự án đang tham gia",
+      icon: BriefcaseBusinessIcon,
+      tone: "project",
+      href: "/projects",
+      value: me ? me.projects.length : undefined,
+      detail: me && me.projects.length ? `${me.allocatedPercent}% thời gian` : undefined,
+    },
+  ];
+}
 
 const QUICK_LINKS: { title: string; href: string; icon: LucideIcon; tone: DomainTone; access?: Access }[] = [
   { title: "Tạo đơn nghỉ phép", href: "/leave", icon: FilePlus2Icon, tone: "leave" },
@@ -51,6 +91,7 @@ function greeting(now: Date): string {
 
 export default function HomePage() {
   const { user, can } = useCurrentUser();
+  const metrics = useTodayMetrics();
   const now = new Date();
   const today = todayIsoDate(now);
   const week = weekOf(today);
@@ -69,7 +110,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <MetricStrip metrics={METRICS} />
+      <MetricStrip metrics={metrics} />
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <Card>

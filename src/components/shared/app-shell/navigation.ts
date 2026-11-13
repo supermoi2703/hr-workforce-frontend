@@ -65,7 +65,6 @@ export type NavGroup = {
   collapsible?: boolean;
 };
 
-const MANAGEMENT: Access = { roles: ["ADMIN", "HR", "MANAGER"] };
 const HR_ONLY: Access = { roles: ["ADMIN", "HR"] };
 
 /**
@@ -80,7 +79,7 @@ export const NAV_GROUPS: NavGroup[] = [
     owner: "quangnn",
     items: [
       { id: "home", href: "/", icon: HouseIcon },
-      { id: "dashboard", href: "/dashboard", icon: GaugeIcon, access: MANAGEMENT, task: "3.6" },
+      { id: "dashboard", href: "/dashboard", icon: GaugeIcon, task: "3.6" },
       { id: "approvals", href: "/approvals", icon: ClipboardCheckIcon, task: "1.6.2", owner: "cuongvv" },
       { id: "announcements", href: "/announcements", icon: MegaphoneIcon, access: { permissions: ["announcement:read"] }, owner: "cuongvv" },
     ],

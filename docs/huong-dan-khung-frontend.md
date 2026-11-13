@@ -67,6 +67,9 @@ export const createLeaveRequest = (body: CreateLeaveRequest) =>
   (`code` là ErrorCode của backend, `fieldErrors` là lỗi theo từng ô).
 - Không gọi `fetch` trực tiếp trong feature.
 - Upload file: truyền `FormData` làm body.
+- Tải file (Excel, PDF...): `download(path, { query })` trong `lib/api/http-client`. Hàm này cũng tự gắn token, tự refresh,
+  và ném `ApiError` khi backend trả lỗi. Trả về `{ blob, filename }`; lưu xuống máy bằng `saveFile(blob, filename)` trong
+  `lib/download`. Ví dụ: nút "Xuất Excel" ở `/dashboard`.
 - Hiển thị lỗi cho người dùng: `const errorMessage = useErrorMessage()` (từ `lib/api/use-error-message`) rồi
   `errorMessage(error)`; câu thông báo theo ngôn ngữ đang chọn (xem mục 8).
 
@@ -132,8 +135,15 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
 - Có người trong danh sách thì dùng `<UserAvatar name={...} seed={mã nhân viên hoặc id} />`: hiện chữ cái đầu trên màu
   riêng của từng người (cùng người luôn cùng màu), có ảnh thì truyền thêm `imageUrl`.
 - Font Be Vietnam Pro, 3 độ đậm 400/500/600. Bảng và thẻ `<time>` tự dùng chữ số đều chiều rộng.
-- Trang chủ (`src/app/(dashboard)/page.tsx`) có chỗ chờ sẵn cho dữ liệu thật:
-  - Hàng chỉ số (`METRICS`): truyền `value` và `detail` khi module có dữ liệu, vd. giờ vào hôm nay, số ngày phép còn lại.
+- Biểu đồ: dùng `components/ui/chart` (shadcn, trên Recharts) với `ChartContainer` / `ChartTooltip` / `ChartLegend`.
+  Màu lấy từ token `--chart-*`. Có nhiều chuỗi thì dùng theo thứ tự `--chart-1, 3, 2, 5, 4` (xanh, cam, teal, tím, hồng):
+  thứ tự này đã kiểm phân biệt được với người mù màu ở cả hai theme. Màu đi theo nhóm, không theo thứ hạng; vượt ngưỡng
+  thì dùng màu trạng thái kèm chữ. Ví dụ đầy đủ: `features/dashboard` (donut, biểu đồ vùng, heatmap).
+- Thẻ số nổi bật nền màu đặc (hàng đầu trang phân tích): utility `bg-hero-project | people | time | approval | leave`
+  (gradient theo nhóm, chữ trắng đạt tương phản ≥ 5:1). Không dùng cho nội dung thường.
+- Trang chủ (`src/app/(dashboard)/page.tsx`) là chỗ làm việc trong ngày; phân tích theo phạm vi nằm ở `/dashboard`.
+  - Hàng chỉ số lấy từ `/api/dashboard/me` (`useMyDashboard` trong `features/dashboard`): giờ vào, phép còn, đơn chờ, dự
+    án.
   - Dải tuần (`_components/week-strip.tsx`): gắn trạng thái từng ngày qua prop `dayContent` (theo ngày `yyyy-MM-dd`).
   - Không đặt số liệu giả: chưa có dữ liệu thì để trống, ô tự hiện "Chưa có dữ liệu".
 
