@@ -1,6 +1,6 @@
 // Kiểu dữ liệu khớp module file của backend (modules/file trong hr-workforce-backend).
 
-export type FilePurpose = "CHECKIN_PHOTO" | "LEAVE_ATTACHMENT";
+export type FilePurpose = "CHECKIN_PHOTO" | "LEAVE_ATTACHMENT" | "ANNOUNCEMENT_COVER";
 
 export type FileStatus = "PENDING" | "ACTIVE" | "DELETED";
 
@@ -47,6 +47,11 @@ export type DownloadUrlResponse = {
 export const CLIENT_UPLOAD_RULES: Partial<Record<FilePurpose, { contentTypes: string[]; maxSizeBytes: number }>> = {
   LEAVE_ATTACHMENT: {
     contentTypes: ["application/pdf", "image/jpeg", "image/png"],
+    maxSizeBytes: 5 * 1024 * 1024,
+  },
+  // Ảnh bìa bài bảng tin. Trình duyệt nén thành WebP trước khi tải lên (xem features/announcements/image.ts).
+  ANNOUNCEMENT_COVER: {
+    contentTypes: ["image/webp", "image/jpeg", "image/png"],
     maxSizeBytes: 5 * 1024 * 1024,
   },
 };

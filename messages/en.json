@@ -33,6 +33,7 @@
       "home": "Home",
       "dashboard": "Dashboard",
       "approvals": "Approvals",
+      "announcements": "Announcements",
       "employees": "Employees",
       "contracts": "Contracts",
       "attendance": "Attendance",
@@ -475,6 +476,14 @@
     "employee_transfer": {
       "name": "Propose transfers",
       "description": "Propose moving an employee in your data scope to another office, department, team or position"
+    },
+    "announcement_read": {
+      "name": "Read announcements",
+      "description": "Read published announcements addressed to your office, department or the whole company"
+    },
+    "announcement_manage": {
+      "name": "Manage announcements",
+      "description": "Create, edit, publish and remove announcements; HR only for their own office"
     }
   },
   "AuditActions": {
@@ -527,6 +536,12 @@
     "TRANSFER_CREATED": "Transfer proposed",
     "TRANSFER_APPLIED": "Transfer took effect",
     "TRANSFER_CANCELLED": "Transfer cancelled",
+    "ANNOUNCEMENT_CREATED": "Announcement drafted",
+    "ANNOUNCEMENT_UPDATED": "Announcement edited",
+    "ANNOUNCEMENT_PUBLISHED": "Announcement published",
+    "ANNOUNCEMENT_REMOVED": "Announcement removed",
+    "ANNOUNCEMENT_CATEGORY_CREATED": "Announcement category created",
+    "ANNOUNCEMENT_CATEGORY_UPDATED": "Announcement category changed",
     "ORG_UNIT_CREATED": "Org unit created",
     "ORG_UNIT_UPDATED": "Org unit updated",
     "ORG_UNIT_DEACTIVATED": "Org unit deactivated",
@@ -3091,6 +3106,179 @@
       "PROJECT_MANAGER_REMOVED": "You are no longer the project manager of {projectCode} from {effectiveFrom}",
       "CONTRACT_EXPIRING": "Contract {contractNumber} of {employeeName} expires on {endDate}",
       "MISSING_CHECKOUT": "You did not check out on {workDate}"
+    }
+  },
+  "Announcements": {
+    "metaTitle": "Announcements",
+    "title": "Announcements",
+    "description": "News and notices from the company that are addressed to you.",
+    "pinned": "Pinned",
+    "publishedBy": "posted by {name}",
+    "Categories": {
+      "title": "Categories",
+      "description": "Categories are shared by the whole company. Each has a Vietnamese name, an optional English name and a soft colour. A category is never deleted: stop using it and old posts keep it.",
+      "empty": "No categories yet",
+      "order": "order {order}",
+      "inactive": "not in use",
+      "edit": "Edit",
+      "deactivate": "Stop using",
+      "activate": "Use again",
+      "add": "New category",
+      "created": "Category created",
+      "saved": "Category saved",
+      "deactivated": "Category is no longer in use",
+      "activated": "Category is in use again",
+      "colors": {
+        "SLATE": "Grey",
+        "BLUE": "Blue",
+        "GREEN": "Green",
+        "AMBER": "Amber",
+        "ROSE": "Rose",
+        "VIOLET": "Violet"
+      },
+      "Form": {
+        "createTitle": "New category",
+        "editTitle": "Edit category",
+        "description": "A name (Vietnamese, required), an optional English name and one soft colour, picked from the list.",
+        "name": "Vietnamese name",
+        "nameEn": "English name",
+        "nameEnHint": "Shown when the interface is in English. Leave it empty to use the Vietnamese name.",
+        "color": "Colour",
+        "order": "Order",
+        "orderHint": "A whole number: smaller shows first.",
+        "preview": "Preview:",
+        "previewName": "Category",
+        "save": "Save"
+      }
+    },
+    "Board": {
+      "quickNews": "Quick news",
+      "readMore": "Read more",
+      "viewAll": "See all",
+      "seeAll": "See all ({count})",
+      "seeMore": "See more",
+      "allPosts": "All announcements",
+      "backToBoard": "Back to the board",
+      "latest": "Latest news",
+      "sameCategory": "In the same category",
+      "carouselLabel": "News: {name}",
+      "slideLabel": "News {current} of {total}",
+      "breadcrumbRoot": "Announcements"
+    },
+    "Editor": {
+      "toolbar": "Text formatting",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "sizeLarge": "Large heading",
+      "sizeMedium": "Medium heading",
+      "sizeSmall": "Small heading",
+      "bulletList": "Bulleted list",
+      "numberedList": "Numbered list",
+      "quote": "Quote",
+      "link": "Link (Ctrl+K)",
+      "linkPlaceholder": "link text",
+      "rule": "Horizontal line"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published",
+      "REMOVED": "Removed"
+    },
+    "audiences": {
+      "COMPANY": "Whole company",
+      "OFFICE": "Office",
+      "DEPARTMENT": "Department"
+    },
+    "List": {
+      "empty": "No announcements yet",
+      "emptyHint": "New announcements for you will show up here.",
+      "emptyFiltered": "No announcement matches your filters",
+      "manage": "Manage announcements",
+      "searchPlaceholder": "Search by title",
+      "allCategories": "All categories",
+      "categoryFilter": "Filter by category"
+    },
+    "Detail": {
+      "metaTitle": "Announcement",
+      "back": "Back to announcements"
+    },
+    "Manage": {
+      "metaTitle": "Manage announcements",
+      "title": "Manage announcements",
+      "descriptionCompany": "Create, publish and remove announcements for the whole company, an office or a department.",
+      "descriptionOffice": "Create, publish and remove announcements for your own office.",
+      "backToBoard": "Back to announcements",
+      "create": "New announcement",
+      "categories": "Manage categories",
+      "allStatuses": "All statuses",
+      "statusFilter": "Filter by status",
+      "empty": "No announcements yet. Create the first one.",
+      "emptyFiltered": "No announcement matches your filters",
+      "publishedAt": "published {date}",
+      "updatedAt": "updated {date}",
+      "view": "View",
+      "edit": "Edit",
+      "publish": "Publish",
+      "remove": "Remove",
+      "publishTitle": "Publish this announcement?",
+      "publishDescription": "\"{title}\" becomes visible to everyone in its audience right away. You can still edit the text afterwards, but not the audience.",
+      "removeTitle": "Remove this announcement?",
+      "removePublishedDescription": "\"{title}\" disappears for readers. This cannot be undone.",
+      "removeDraftDescription": "The draft \"{title}\" will be removed. This cannot be undone.",
+      "published": "Announcement published",
+      "removed": "Announcement removed"
+    },
+    "Form": {
+      "createTitle": "New announcement",
+      "editTitle": "Edit announcement",
+      "createDescription": "It is saved as a draft. Publish it from the list when it is ready.",
+      "editDescription": "A published announcement keeps its audience; the text and pin can still change.",
+      "title": "Title",
+      "category": "Category",
+      "pinned": "Pin to the top",
+      "pinnedHint": "Pinned announcements are listed first.",
+      "audience": "Audience",
+      "office": "Office",
+      "department": "Department",
+      "choose": "Choose",
+      "inactiveOption": "{name} (no longer in use)",
+      "ownOfficeOnly": "This announcement goes to your own office.",
+      "audienceLocked": "The audience of a published announcement cannot change.",
+      "content": "Content",
+      "contentHint": "Use the toolbar or type Markdown. Images and raw HTML are not shown.",
+      "write": "Edit",
+      "preview": "Preview",
+      "emptyPreview": "Nothing to preview yet.",
+      "cover": "Cover image",
+      "coverOptional": "Optional. It can be changed or removed later, even after the announcement is published.",
+      "coverDrop": "Drop an image here or click to choose",
+      "coverHint": "JPEG, PNG or WebP. It is shrunk before upload.",
+      "coverUploading": "Uploading… {percent}%",
+      "coverRemove": "Remove the cover image",
+      "coverChange": "Choose another image",
+      "saveDraft": "Save draft",
+      "save": "Save changes",
+      "created": "Draft saved",
+      "saved": "Announcement saved"
+    },
+    "Validation": {
+      "required": "Required",
+      "tooLong": "Too long",
+      "invalidNumber": "Enter a whole number"
+    },
+    "Errors": {
+      "coverInvalid": "The cover image is not valid. Choose and upload it again.",
+      "categoryNotFound": "The category no longer exists. The list was reloaded.",
+      "categoryInvalid": "The category is no longer in use. The list was reloaded, choose another one.",
+      "categoryForbidden": "Only company-wide HR and admins can manage categories.",
+      "categoryNameExists": "A category with this name already exists.",
+      "categoryNameEnExists": "A category with this English name already exists.",
+      "notFound": "The announcement no longer exists or is not available to you. The list was reloaded.",
+      "audienceInvalid": "The office or department is missing, no longer in use, or does not match the audience.",
+      "audienceForbidden": "You can only post to your own office.",
+      "audienceLocked": "The audience of a published announcement cannot change. The list was reloaded.",
+      "invalidState": "This action is not possible in the announcement's current state. The list was reloaded.",
+      "versionConflict": "Someone else just changed this announcement. The list was reloaded, open it again to see the latest version."
     }
   }
 }

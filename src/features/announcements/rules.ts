@@ -1,0 +1,58 @@
+import type { AnnouncementAudience, AnnouncementStatus, UnitOption } from "./types";
+
+/** Role được nhắm cả công ty và phòng ban (backend: roles.data_scope = ALL). HR văn phòng chỉ nhắm văn phòng mình. */
+const COMPANY_WIDE_ROLES = ["ADMIN", "HR_COMPANY"] as const;
+
+/** Chỉ để ẩn / hiện ô chọn: backend vẫn là nơi kiểm tra quyền (403 ANNOUNCEMENT_AUDIENCE_FORBIDDEN). */
+export function canTargetCompanyWide(roles: readonly string[] | undefined): boolean {
+  return (roles ?? []).some((role) => (COMPANY_WIDE_ROLES as readonly string[]).includes(role));
+}
+
+/**
+ * Quản lý loại bài (thêm, sửa, ngừng dùng): chỉ HR toàn công ty và Admin, vì loại dùng chung cả công ty. HR văn phòng chỉ
+ * chọn loại khi đăng bài. Backend trả 403 ANNOUNCEMENT_CATEGORY_FORBIDDEN nếu gọi sai.
+ */
+export const canManageCategories = canTargetCompanyWide;
+
+/** Loại chọn được cho bài: đang dùng, cộng loại hiện tại của bài nếu nó đã ngừng dùng (để ô chọn không bị trống). */
+export function categoryChoices<T extends { id: string }>(categories: readonly T[] | undefined, current?: T | null): T[] {
+  const list = [...(categories ?? [])];
+  if (current && !list.some((category) => category.id === current.id)) list.push(current);
+  return list;
+}
+
+/** Đối tượng nhận người đăng chọn được. HR văn phòng không có ô chọn: bài luôn gửi tới văn phòng của họ. */
+export function audienceOptions(companyWide: boolean): AnnouncementAudience[] {
+  return companyWide ? ["COMPANY", "OFFICE", "DEPARTMENT"] : ["OFFICE"];
+}
+
+/** Khung cuộn còn nằm ở đầu chưa (dung sai vài px). Dùng để ẩn lớp mờ báo còn nội dung phía trên. */
+export function isScrolledToStart(scrollTop: number, tolerance = 4): boolean {
+  return scrollTop <= tolerance;
+}
+
+/**
+ * Khung cuộn đã tới cuối chưa (dung sai vài px vì `scrollTop` có số lẻ). Không cần cuộn (nội dung vừa khung) cũng là "đã tới
+ * cuối". Dùng để ẩn lớp mờ báo còn nội dung phía dưới.
+ */
+export function isScrolledToEnd(scrollTop: number, clientHeight: number, scrollHeight: number, tolerance = 4): boolean {
+  return scrollTop + clientHeight >= scrollHeight - tolerance;
+}
+
+/** Gỡ rồi thì không sửa, không đăng lại. */
+export const canEdit = (status: AnnouncementStatus) => status !== "REMOVED";
+
+export const canPublish = (status: AnnouncementStatus) => status === "DRAFT";
+
+export const canRemove = (status: AnnouncementStatus) => status !== "REMOVED";
+
+/** Người đã thấy bài không được mất bài vì đổi đối tượng nhận (backend ANNOUNCEMENT_AUDIENCE_LOCKED). */
+export const isAudienceLocked = (status: AnnouncementStatus) => status === "PUBLISHED";
+
+/** Bài đã đăng mới có trang đọc; nháp và bài đã gỡ chỉ mở ở form sửa. */
+export const isReadable = (status: AnnouncementStatus) => status === "PUBLISHED";
+
+/** Lựa chọn cho ô chọn đơn vị: đơn vị đang dùng, cộng đơn vị hiện tại nếu nó đã ngừng dùng (để ô không bị trống). */
+export function unitChoices(units: readonly UnitOption[] | undefined, currentId?: string | null): UnitOption[] {
+  return (units ?? []).filter((unit) => unit.active || unit.id === currentId);
+}

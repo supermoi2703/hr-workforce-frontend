@@ -164,7 +164,7 @@ describe("lịch sử hồ sơ", () => {
 
 describe("bản dịch hành động", () => {
   it("mọi AuditAction đều có nhãn ở cả en và vi", () => {
-    expect(AUDIT_ACTIONS).toHaveLength(66);
+    expect(AUDIT_ACTIONS).toHaveLength(72);
     for (const action of AUDIT_ACTIONS) {
       expect(en.AuditActions).toHaveProperty(action);
       expect(vi.AuditActions).toHaveProperty(action);

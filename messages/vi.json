@@ -33,6 +33,7 @@
       "home": "Trang chủ",
       "dashboard": "Dashboard",
       "approvals": "Việc cần duyệt",
+      "announcements": "Bảng tin",
       "employees": "Nhân viên",
       "contracts": "Hợp đồng",
       "attendance": "Chấm công",
@@ -475,6 +476,14 @@
     "employee_transfer": {
       "name": "Đề xuất điều chuyển",
       "description": "Đề xuất chuyển nhân viên trong phạm vi dữ liệu sang văn phòng, phòng ban, team hoặc chức vụ khác"
+    },
+    "announcement_read": {
+      "name": "Xem bảng tin",
+      "description": "Xem thông báo đã đăng gửi tới văn phòng, phòng ban của bạn hoặc toàn công ty"
+    },
+    "announcement_manage": {
+      "name": "Quản lý bảng tin",
+      "description": "Tạo, sửa, đăng và gỡ thông báo; HR chỉ cho văn phòng của mình"
     }
   },
   "AuditActions": {
@@ -527,6 +536,12 @@
     "TRANSFER_CREATED": "Đề xuất điều chuyển",
     "TRANSFER_APPLIED": "Điều chuyển có hiệu lực",
     "TRANSFER_CANCELLED": "Hủy điều chuyển",
+    "ANNOUNCEMENT_CREATED": "Tạo bản nháp thông báo",
+    "ANNOUNCEMENT_UPDATED": "Sửa thông báo",
+    "ANNOUNCEMENT_PUBLISHED": "Đăng thông báo",
+    "ANNOUNCEMENT_REMOVED": "Gỡ thông báo",
+    "ANNOUNCEMENT_CATEGORY_CREATED": "Thêm loại thông báo",
+    "ANNOUNCEMENT_CATEGORY_UPDATED": "Sửa loại thông báo",
     "ORG_UNIT_CREATED": "Tạo đơn vị tổ chức",
     "ORG_UNIT_UPDATED": "Sửa đơn vị tổ chức",
     "ORG_UNIT_DEACTIVATED": "Ngừng dùng đơn vị tổ chức",
@@ -3091,6 +3106,179 @@
       "PROJECT_MANAGER_REMOVED": "Bạn thôi làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
       "CONTRACT_EXPIRING": "Hợp đồng {contractNumber} của {employeeName} hết hạn ngày {endDate}",
       "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}"
+    }
+  },
+  "Announcements": {
+    "metaTitle": "Bảng tin",
+    "title": "Bảng tin",
+    "description": "Tin tức và thông báo của công ty gửi tới bạn.",
+    "pinned": "Đã ghim",
+    "publishedBy": "đăng bởi {name}",
+    "Categories": {
+      "title": "Loại thông báo",
+      "description": "Loại dùng chung cho cả công ty. Mỗi loại có tên tiếng Việt, tên tiếng Anh (không bắt buộc) và một màu nhạt. Loại không bị xóa: ngừng dùng thì bài cũ vẫn giữ loại đó.",
+      "empty": "Chưa có loại nào",
+      "order": "thứ tự {order}",
+      "inactive": "ngừng dùng",
+      "edit": "Sửa",
+      "deactivate": "Ngừng dùng",
+      "activate": "Dùng lại",
+      "add": "Thêm loại",
+      "created": "Đã thêm loại",
+      "saved": "Đã lưu loại",
+      "deactivated": "Đã ngừng dùng loại",
+      "activated": "Đã dùng lại loại",
+      "colors": {
+        "SLATE": "Xám",
+        "BLUE": "Xanh dương",
+        "GREEN": "Xanh lá",
+        "AMBER": "Vàng cam",
+        "ROSE": "Hồng",
+        "VIOLET": "Tím"
+      },
+      "Form": {
+        "createTitle": "Thêm loại",
+        "editTitle": "Sửa loại",
+        "description": "Tên tiếng Việt (bắt buộc), tên tiếng Anh (không bắt buộc) và một màu nhạt chọn từ danh sách.",
+        "name": "Tên tiếng Việt",
+        "nameEn": "Tên tiếng Anh",
+        "nameEnHint": "Hiện khi giao diện là tiếng Anh. Để trống thì dùng tên tiếng Việt.",
+        "color": "Màu",
+        "order": "Thứ tự",
+        "orderHint": "Số nguyên: số nhỏ hiện trước.",
+        "preview": "Xem trước:",
+        "previewName": "Tên loại",
+        "save": "Lưu"
+      }
+    },
+    "Board": {
+      "quickNews": "Tin nhanh",
+      "readMore": "Đọc thêm",
+      "viewAll": "Xem tất cả",
+      "seeAll": "Xem tất cả ({count})",
+      "seeMore": "Xem thêm",
+      "allPosts": "Tất cả thông báo",
+      "backToBoard": "Về trang chủ bảng tin",
+      "latest": "Tin mới nhất",
+      "sameCategory": "Cùng loại",
+      "carouselLabel": "Tin: {name}",
+      "slideLabel": "Tin {current}/{total}",
+      "breadcrumbRoot": "Bảng tin"
+    },
+    "Editor": {
+      "toolbar": "Định dạng chữ",
+      "bold": "In đậm (Ctrl+B)",
+      "italic": "In nghiêng (Ctrl+I)",
+      "sizeLarge": "Tiêu đề lớn",
+      "sizeMedium": "Tiêu đề vừa",
+      "sizeSmall": "Tiêu đề nhỏ",
+      "bulletList": "Danh sách chấm",
+      "numberedList": "Danh sách số",
+      "quote": "Trích dẫn",
+      "link": "Liên kết (Ctrl+K)",
+      "linkPlaceholder": "tên liên kết",
+      "rule": "Đường kẻ ngang"
+    },
+    "statuses": {
+      "DRAFT": "Nháp",
+      "PUBLISHED": "Đã đăng",
+      "REMOVED": "Đã gỡ"
+    },
+    "audiences": {
+      "COMPANY": "Toàn công ty",
+      "OFFICE": "Văn phòng",
+      "DEPARTMENT": "Phòng ban"
+    },
+    "List": {
+      "empty": "Chưa có thông báo nào",
+      "emptyHint": "Thông báo mới gửi tới bạn sẽ hiện ở đây.",
+      "emptyFiltered": "Không có thông báo nào khớp bộ lọc",
+      "manage": "Quản lý bảng tin",
+      "searchPlaceholder": "Tìm theo tiêu đề",
+      "allCategories": "Tất cả loại",
+      "categoryFilter": "Lọc theo loại"
+    },
+    "Detail": {
+      "metaTitle": "Thông báo",
+      "back": "Về bảng tin"
+    },
+    "Manage": {
+      "metaTitle": "Quản lý bảng tin",
+      "title": "Quản lý bảng tin",
+      "descriptionCompany": "Tạo, đăng và gỡ thông báo cho toàn công ty, một văn phòng hoặc một phòng ban.",
+      "descriptionOffice": "Tạo, đăng và gỡ thông báo cho văn phòng của bạn.",
+      "backToBoard": "Về bảng tin",
+      "create": "Thông báo mới",
+      "categories": "Quản lý loại",
+      "allStatuses": "Mọi trạng thái",
+      "statusFilter": "Lọc theo trạng thái",
+      "empty": "Chưa có thông báo nào. Hãy tạo thông báo đầu tiên.",
+      "emptyFiltered": "Không có thông báo nào khớp bộ lọc",
+      "publishedAt": "đăng {date}",
+      "updatedAt": "sửa {date}",
+      "view": "Xem",
+      "edit": "Sửa",
+      "publish": "Đăng",
+      "remove": "Gỡ",
+      "publishTitle": "Đăng thông báo này?",
+      "publishDescription": "\"{title}\" sẽ hiện ngay cho mọi người thuộc đối tượng nhận. Sau đó vẫn sửa được chữ, nhưng không đổi được đối tượng nhận.",
+      "removeTitle": "Gỡ thông báo này?",
+      "removePublishedDescription": "\"{title}\" sẽ biến mất với người đọc. Không hoàn tác được.",
+      "removeDraftDescription": "Bản nháp \"{title}\" sẽ bị gỡ. Không hoàn tác được.",
+      "published": "Đã đăng thông báo",
+      "removed": "Đã gỡ thông báo"
+    },
+    "Form": {
+      "createTitle": "Thông báo mới",
+      "editTitle": "Sửa thông báo",
+      "createDescription": "Lưu ở dạng nháp. Khi sẵn sàng thì bấm Đăng ở danh sách.",
+      "editDescription": "Thông báo đã đăng giữ nguyên đối tượng nhận; vẫn sửa được chữ và ghim.",
+      "title": "Tiêu đề",
+      "category": "Loại",
+      "pinned": "Ghim lên đầu",
+      "pinnedHint": "Thông báo được ghim luôn nằm trên cùng.",
+      "audience": "Đối tượng nhận",
+      "office": "Văn phòng",
+      "department": "Phòng ban",
+      "choose": "Chọn",
+      "inactiveOption": "{name} (ngừng dùng)",
+      "ownOfficeOnly": "Thông báo này gửi tới văn phòng của bạn.",
+      "audienceLocked": "Thông báo đã đăng không đổi được đối tượng nhận.",
+      "content": "Nội dung",
+      "contentHint": "Dùng thanh công cụ hoặc gõ Markdown. Ảnh và HTML thô không được hiển thị.",
+      "write": "Soạn",
+      "preview": "Xem trước",
+      "emptyPreview": "Chưa có gì để xem trước.",
+      "cover": "Ảnh bìa",
+      "coverOptional": "Không bắt buộc. Đổi hoặc bỏ được sau, kể cả khi thông báo đã đăng.",
+      "coverDrop": "Kéo ảnh vào đây hoặc bấm để chọn",
+      "coverHint": "JPEG, PNG hoặc WebP. Ảnh được thu nhỏ trước khi tải lên.",
+      "coverUploading": "Đang tải lên… {percent}%",
+      "coverRemove": "Bỏ ảnh bìa",
+      "coverChange": "Chọn ảnh khác",
+      "saveDraft": "Lưu nháp",
+      "save": "Lưu thay đổi",
+      "created": "Đã lưu nháp",
+      "saved": "Đã lưu thông báo"
+    },
+    "Validation": {
+      "required": "Bắt buộc",
+      "tooLong": "Quá dài",
+      "invalidNumber": "Nhập một số nguyên"
+    },
+    "Errors": {
+      "coverInvalid": "Ảnh bìa không hợp lệ. Hãy chọn và tải lên lại.",
+      "categoryNotFound": "Loại không còn tồn tại. Danh sách đã được tải lại.",
+      "categoryInvalid": "Loại không còn được dùng. Danh sách đã được tải lại, hãy chọn loại khác.",
+      "categoryForbidden": "Chỉ HR toàn công ty và Admin quản lý được loại.",
+      "categoryNameExists": "Đã có một loại trùng tên này.",
+      "categoryNameEnExists": "Đã có một loại trùng tên tiếng Anh này.",
+      "notFound": "Thông báo không còn tồn tại hoặc bạn không xem được. Danh sách đã được tải lại.",
+      "audienceInvalid": "Văn phòng hoặc phòng ban không tồn tại, đã ngừng dùng, hoặc không khớp với đối tượng nhận.",
+      "audienceForbidden": "Bạn chỉ đăng được cho văn phòng của mình.",
+      "audienceLocked": "Thông báo đã đăng không đổi được đối tượng nhận. Danh sách đã được tải lại.",
+      "invalidState": "Không làm được việc này với trạng thái hiện tại của thông báo. Danh sách đã được tải lại.",
+      "versionConflict": "Người khác vừa sửa thông báo này. Danh sách đã được tải lại, hãy mở lại để xem bản mới nhất."
     }
   }
 }
