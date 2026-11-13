@@ -115,7 +115,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "skills", href: "/skills", icon: BadgeCheckIcon, task: "3.9" },
       { id: "projects", href: "/projects", icon: BriefcaseBusinessIcon, task: "3.1, 3.2" },
       { id: "myWork", href: "/my-work", icon: ListChecksIcon, task: "3.11" },
-      { id: "allocations", href: "/allocations", icon: LayersIcon, access: MANAGEMENT, task: "3.4" },
+      { id: "allocations", href: "/allocations", icon: LayersIcon, task: "3.4" },
     ],
   },
   {

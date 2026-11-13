@@ -75,6 +75,7 @@ export function useMetadataLabels(): MetadataLabels {
   const tStatus = useTranslations("UserStatus");
   const tRole = useTranslations("Roles");
   const tPermission = useTranslations("Permissions");
+  const tUnitKind = useTranslations("AuditLog.unitKinds");
 
   return useMemo<MetadataLabels>(
     () => ({
@@ -89,7 +90,8 @@ export function useMetadataLabels(): MetadataLabels {
         return null;
       },
       minutes: (count) => tMeta("minutes", { count }),
+      unitKind: (value) => (tUnitKind.has(value as never) ? tUnitKind(value as never) : null),
     }),
-    [tMeta, tValues, tStatus, tRole, tPermission],
+    [tMeta, tValues, tStatus, tRole, tPermission, tUnitKind],
   );
 }

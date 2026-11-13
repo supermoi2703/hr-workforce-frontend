@@ -12,6 +12,11 @@ npm install
 npm run dev                  # http://localhost:3000
 ```
 
+`.env.local` tạo từ bản cũ của `.env.example` thì so lại với bản mới, thêm các biến còn thiếu. Ví dụ
+`NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws` (chuông thông báo realtime; thiếu thì chuông chỉ tự cập nhật 30 giây một
+lần). Biến `NEXT_PUBLIC_*` chỉ được đọc lúc khởi động / build: sửa xong phải chạy lại `npm run dev`. Trên Vercel cũng
+phải khai, xem `docs/05` mục 5.4 của repo backend.
+
 Hai chế độ đăng nhập (`NEXT_PUBLIC_AUTH_MODE` trong `.env.local`, sửa xong chạy lại `npm run dev`):
 
 - `backend` (mặc định): đăng nhập thật ở `/login`. Cần backend + Postgres + Redis đang chạy; tài khoản mẫu
@@ -117,6 +122,9 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   một màu thương hiệu xanh dương (`primary`) chỉ dùng cho hành động chính, link và mục đang chọn.
 - Trạng thái: `<Badge variant="success | warning | info | destructive">` cho đúng giờ/đã duyệt, đi muộn/chờ duyệt,
   WFH/nghỉ có phép, vắng/từ chối.
+- Mảng màu "đang chờ" (thanh, khối trên biểu đồ / dòng thời gian): token `pending` (vàng cam, `bg-pending`,
+  `text-pending-foreground`). `warning` là sắc 700 dành cho chữ nhỏ, tô thành mảng lớn sẽ ra màu nâu. Ví dụ: trang
+  `/allocations` (`features/projects/components/allocation-timeline.tsx`).
 - Mỗi nhóm chức năng một màu cố định (`DomainTone` trong `components/shared/icon-tile.tsx`): `time` chấm công/bảng công,
   `leave` nghỉ phép/WFH, `approval` việc cần duyệt, `project` tổng quan/dự án/phân bổ/kỹ năng, `people` nhân viên/tổ chức,
   `money` lương, `neutral` quản trị. Dùng `<IconTile icon={...} tone="leave" />` và cùng tông đó cho badge/biểu đồ

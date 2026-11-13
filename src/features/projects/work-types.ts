@@ -1,3 +1,5 @@
+import type { EmployeeOption, ProjectRole } from "./types";
+
 export const TASK_TYPES = ["TASK", "STORY", "BUG"] as const;
 export type TaskType = (typeof TASK_TYPES)[number];
 export const TASK_PRIORITIES = ["URGENT", "HIGH", "MEDIUM", "LOW"] as const;
@@ -236,7 +238,9 @@ export type AllocationSegment = {
   from: string;
   to: string | null;
   approvedPercent: number;
+  /** Tổng đã duyệt cộng phần tạm giữ cho đề xuất đang chờ (luôn ≥ approvedPercent), không phải riêng phần đang chờ */
   heldPercent: number;
+  /** 100 trừ heldPercent, không âm */
   freePercent: number;
 };
 
@@ -248,5 +252,37 @@ export type Availability = {
   freePercent: number;
   segments: AllocationSegment[];
 };
+// ===== Lịch phân bổ của một người: trang /allocations (backend README module project mục 8.6)
+
+/** Một dòng lịch: phân bổ đã duyệt (APPROVED) hoặc đề xuất đang chờ (PENDING, có đơn ở trang Phê duyệt). */
+export type PersonAllocationItem = {
+  projectId: string;
+  projectCode: string;
+  projectName: string;
+  projectClosed: boolean;
+  role: ProjectRole;
+  percent: number;
+  fromDate: string;
+  /** null = không có ngày kết thúc */
+  toDate: string | null;
+  status: AllocationRequestStatus;
+  requestId: string | null;
+  approvalRequestId: string | null;
+};
+
+export type PersonAllocations = {
+  employee: Person;
+  from: string;
+  to: string;
+  items: PersonAllocationItem[];
+  /** Chia [from, to] thành các đoạn liền nhau; mỗi đoạn tổng đã duyệt + đang giữ + còn trống = 100 */
+  segments: AllocationSegment[];
+};
+
+/** SELF: chỉ chính mình; SCOPED: danh sách có hạn (cấp dưới, văn phòng của HR); ALL: tìm cả công ty. */
+export type AllocationViewerReach = "SELF" | "SCOPED" | "ALL";
+
+export type AllocationPeople = { reach: AllocationViewerReach; people: EmployeeOption[] };
+
 export type OrgTeam = { id: string; code: string; name: string; departmentName: string };
 export type SkillOption = { id: string; name: string; active: boolean };

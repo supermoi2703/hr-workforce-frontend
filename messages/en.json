@@ -66,7 +66,8 @@
     "signOut": "Sign out",
     "roleLabel": "Role:",
     "demoSignIn": "Demo sign-in",
-    "myProfile": "My profile"
+    "myProfile": "My profile",
+    "notifications": "Notifications"
   },
   "Roles": {
     "ADMIN": "Admin",
@@ -540,7 +541,24 @@
     "ANNOUNCEMENT_PUBLISHED": "Announcement published",
     "ANNOUNCEMENT_REMOVED": "Announcement removed",
     "ANNOUNCEMENT_CATEGORY_CREATED": "Announcement category created",
-    "ANNOUNCEMENT_CATEGORY_UPDATED": "Announcement category changed"
+    "ANNOUNCEMENT_CATEGORY_UPDATED": "Announcement category changed",
+    "ORG_UNIT_CREATED": "Org unit created",
+    "ORG_UNIT_UPDATED": "Org unit updated",
+    "ORG_UNIT_DEACTIVATED": "Org unit deactivated",
+    "ORG_UNIT_ACTIVATED": "Org unit reactivated",
+    "ORG_UNIT_HEAD_CHANGED": "Unit head changed",
+    "PROJECT_CREATED": "Project created",
+    "PROJECT_UPDATED": "Project updated",
+    "PROJECT_CLOSED": "Project closed",
+    "PROJECT_PM_CHANGED": "Project manager changed",
+    "PROJECT_OBSERVER_ADDED": "Project observer added",
+    "PROJECT_OBSERVER_REMOVED": "Project observer removed",
+    "ALLOCATION_APPLIED": "Allocation applied",
+    "ALLOCATION_ENDED": "Allocation ended",
+    "SKILL_CREATED": "Skill added to catalog",
+    "SKILL_UPDATED": "Catalog skill updated",
+    "SKILL_DEACTIVATED": "Skill deactivated",
+    "SKILL_ACTIVATED": "Skill reactivated"
   },
   "AuditLog": {
     "metaTitle": "Audit log",
@@ -656,7 +674,17 @@
       "before": "Before",
       "after": "After",
       "effectiveDate": "Effective date",
-      "note": "Note"
+      "note": "Note",
+      "kind": "Unit type",
+      "employeeId": "Employee",
+      "pm": "Project manager",
+      "percent": "Percent (%)",
+      "percentBefore": "Percent before (%)",
+      "percentAfter": "Percent after (%)",
+      "lastDay": "Last day",
+      "requestId": "Request ID",
+      "selfLevel": "Self-declared level",
+      "confirmed": "Confirmed"
     },
     "values": {
       "phone": "Phone",
@@ -708,6 +736,12 @@
       "TEAM": "Team",
       "OFFICE": "Office",
       "ALL": "Whole company"
+    },
+    "unitKinds": {
+      "OFFICE": "Office",
+      "DEPARTMENT": "Department",
+      "TEAM": "Team",
+      "POSITION": "Position"
     }
   },
   "Auth": {
@@ -2995,7 +3029,84 @@
     "endNowHint": "From today this person is no longer in the project; their open tasks become unassigned.",
     "lastDay": "Last day in the project",
     "lastDayInvalid": "The last day must be today or later.",
-    "ended": "Allocation ended"
+    "ended": "Allocation ended",
+    "Schedule": {
+      "title": "Allocations",
+      "description": "One person's allocation schedule across all projects: which projects, what percent, until when, and how much is free. View only; propose allocations from a project's Staffing tab.",
+      "person": "Person",
+      "from": "From",
+      "to": "To",
+      "resetRange": "Back to next 180 days",
+      "mine": "My schedule",
+      "pickTitle": "Pick someone to view",
+      "pickDescription": "This account has no employee profile, so it has no schedule of its own. Pick a person above.",
+      "forbiddenTitle": "You can't view this schedule",
+      "forbidden": "You can't view this person's allocation schedule. Pick someone else or go back to your own.",
+      "myScheduleTitle": "My allocation schedule",
+      "scheduleOf": "Allocation schedule of {name}",
+      "period": "{from} – {to}",
+      "freeToday": "{percent}% free today",
+      "legendApproved": "Approved",
+      "legendHeld": "Pending (capacity held)",
+      "legendFree": "Free",
+      "segmentShort": "Approved {approved}% · Held {held}% ·",
+      "segmentApprovedOnly": "Approved {approved}% ·",
+      "free": "Free {percent}%",
+      "empty": "No allocations in this period",
+      "closed": "Closed",
+      "noEnd": "open-ended",
+      "statusApproved": "Approved",
+      "statusPending": "Pending",
+      "openApproval": "View request",
+      "total": "Total",
+      "totalHint": "Free capacity per period",
+      "today": "Today",
+      "full": "Full",
+      "freeShort": "{percent}% free",
+      "usedApproved": "Approved {approved}%",
+      "usedWithPending": "Approved {approved}% · pending {pending}%",
+      "totalBlockLabel": "{from} – {to}: {free}% free, {approved}% approved, {pending}% pending",
+      "barPending": "{percent}% · pending",
+      "barLabel": "{project}: {percent}%, {period}, {status}",
+      "monthTick": "{month, select, 1 {Jan} 2 {Feb} 3 {Mar} 4 {Apr} 5 {May} 6 {Jun} 7 {Jul} 8 {Aug} 9 {Sep} 10 {Oct} 11 {Nov} other {Dec}}{withYear, select, true { {year}} other {}}",
+      "segmentsTitle": "By period"
+    }
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "pageDescription": "What changed for you: requests to approve, decisions on your requests, skills, projects.",
+    "bell": "Notifications",
+    "bellWithCount": "Notifications, {count} unread",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all",
+    "empty": "No notifications yet.",
+    "emptyUnread": "You're all caught up.",
+    "unread": "Unread",
+    "filter": "Filter notifications",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "pageOf": "Page {page} of {total}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "unknownType": "New notification",
+    "detail": {
+      "comment": "Reason: {text}",
+      "note": "Note: {text}"
+    },
+    "types": {
+      "APPROVAL_PENDING": "{approvalType} “{title}” is waiting for your approval",
+      "APPROVAL_REASSIGNED": "You were assigned to approve {approvalType} “{title}”",
+      "APPROVAL_COMPLETED": "{approvalType} “{title}” was {status, select, APPROVED {approved} REJECTED {rejected} other {withdrawn}}",
+      "SKILL_DECLARED": "{employeeName} declared {skillCode} at level {level}, waiting for your confirmation",
+      "SKILL_CONFIRMED": "Your {skillCode} skill was confirmed at level {confirmedLevel}",
+      "ALLOCATION_ENDED": "Your allocation to project {projectCode} ends after {lastDay}",
+      "PROJECT_MANAGER_ASSIGNED": "You are the project manager of {projectCode} from {effectiveFrom}",
+      "PROJECT_MANAGER_REMOVED": "You are no longer the project manager of {projectCode} from {effectiveFrom}",
+      "CONTRACT_EXPIRING": "Contract {contractNumber} of {employeeName} expires on {endDate}",
+      "MISSING_CHECKOUT": "You did not check out on {workDate}"
+    }
   },
   "Announcements": {
     "metaTitle": "Announcements",

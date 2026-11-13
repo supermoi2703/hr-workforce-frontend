@@ -66,7 +66,8 @@
     "signOut": "Đăng xuất",
     "roleLabel": "Vai trò:",
     "demoSignIn": "Đăng nhập giả lập",
-    "myProfile": "Hồ sơ của tôi"
+    "myProfile": "Hồ sơ của tôi",
+    "notifications": "Thông báo"
   },
   "Roles": {
     "ADMIN": "Quản trị",
@@ -540,7 +541,24 @@
     "ANNOUNCEMENT_PUBLISHED": "Đăng thông báo",
     "ANNOUNCEMENT_REMOVED": "Gỡ thông báo",
     "ANNOUNCEMENT_CATEGORY_CREATED": "Thêm loại thông báo",
-    "ANNOUNCEMENT_CATEGORY_UPDATED": "Sửa loại thông báo"
+    "ANNOUNCEMENT_CATEGORY_UPDATED": "Sửa loại thông báo",
+    "ORG_UNIT_CREATED": "Tạo đơn vị tổ chức",
+    "ORG_UNIT_UPDATED": "Sửa đơn vị tổ chức",
+    "ORG_UNIT_DEACTIVATED": "Ngừng dùng đơn vị tổ chức",
+    "ORG_UNIT_ACTIVATED": "Dùng lại đơn vị tổ chức",
+    "ORG_UNIT_HEAD_CHANGED": "Đổi trưởng đơn vị",
+    "PROJECT_CREATED": "Tạo dự án",
+    "PROJECT_UPDATED": "Sửa dự án",
+    "PROJECT_CLOSED": "Đóng dự án",
+    "PROJECT_PM_CHANGED": "Đổi quản lý dự án",
+    "PROJECT_OBSERVER_ADDED": "Thêm người quan sát dự án",
+    "PROJECT_OBSERVER_REMOVED": "Bỏ người quan sát dự án",
+    "ALLOCATION_APPLIED": "Áp dụng phân bổ",
+    "ALLOCATION_ENDED": "Kết thúc phân bổ",
+    "SKILL_CREATED": "Thêm kỹ năng vào danh mục",
+    "SKILL_UPDATED": "Sửa kỹ năng trong danh mục",
+    "SKILL_DEACTIVATED": "Ngừng dùng kỹ năng",
+    "SKILL_ACTIVATED": "Dùng lại kỹ năng"
   },
   "AuditLog": {
     "metaTitle": "Nhật ký hệ thống",
@@ -656,7 +674,17 @@
       "before": "Trước",
       "after": "Sau",
       "effectiveDate": "Ngày hiệu lực",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "kind": "Loại đơn vị",
+      "employeeId": "Nhân viên",
+      "pm": "Quản lý dự án",
+      "percent": "Tỷ lệ (%)",
+      "percentBefore": "Tỷ lệ trước (%)",
+      "percentAfter": "Tỷ lệ sau (%)",
+      "lastDay": "Ngày cuối",
+      "requestId": "Mã đề xuất",
+      "selfLevel": "Mức tự khai",
+      "confirmed": "Đã xác nhận"
     },
     "values": {
       "phone": "Điện thoại",
@@ -708,6 +736,12 @@
       "TEAM": "Cấp dưới",
       "OFFICE": "Văn phòng",
       "ALL": "Toàn công ty"
+    },
+    "unitKinds": {
+      "OFFICE": "Văn phòng",
+      "DEPARTMENT": "Phòng ban",
+      "TEAM": "Team",
+      "POSITION": "Chức vụ"
     }
   },
   "Auth": {
@@ -2995,7 +3029,84 @@
     "endNowHint": "Từ hôm nay người này không còn ở dự án; việc đang mở về Chưa giao.",
     "lastDay": "Ngày cuối ở dự án",
     "lastDayInvalid": "Ngày cuối phải từ hôm nay trở đi.",
-    "ended": "Đã kết thúc phân bổ"
+    "ended": "Đã kết thúc phân bổ",
+    "Schedule": {
+      "title": "Phân bổ nhân sự",
+      "description": "Lịch phân bổ của một người trên mọi dự án: đang ở dự án nào, bao nhiêu %, đến khi nào, còn trống bao nhiêu. Chỉ để xem; đề xuất phân bổ làm ở tab Nhân sự của dự án.",
+      "person": "Người",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "resetRange": "Về 180 ngày tới",
+      "mine": "Lịch của tôi",
+      "pickTitle": "Chọn một người để xem",
+      "pickDescription": "Tài khoản này không gắn hồ sơ nhân viên, nên không có lịch riêng. Chọn một người ở ô phía trên.",
+      "forbiddenTitle": "Không xem được lịch này",
+      "forbidden": "Bạn không xem được lịch phân bổ của người này. Chọn người khác hoặc quay về lịch của bạn.",
+      "myScheduleTitle": "Lịch phân bổ của tôi",
+      "scheduleOf": "Lịch phân bổ của {name}",
+      "period": "{from} – {to}",
+      "freeToday": "Hôm nay còn trống {percent}%",
+      "legendApproved": "Đã duyệt",
+      "legendHeld": "Chờ duyệt (đang giữ chỗ)",
+      "legendFree": "Còn trống",
+      "segmentShort": "Đã duyệt {approved}% · Đang giữ {held}% ·",
+      "segmentApprovedOnly": "Đã duyệt {approved}% ·",
+      "free": "Trống {percent}%",
+      "empty": "Không có phân bổ nào trong khoảng này",
+      "closed": "Đã đóng",
+      "noEnd": "không thời hạn",
+      "statusApproved": "Đã duyệt",
+      "statusPending": "Chờ duyệt",
+      "openApproval": "Xem đơn",
+      "total": "Tổng",
+      "totalHint": "Còn trống theo từng đoạn ngày",
+      "today": "Hôm nay",
+      "full": "Kín 100%",
+      "freeShort": "Trống {percent}%",
+      "usedApproved": "Đã duyệt {approved}%",
+      "usedWithPending": "Duyệt {approved}% · chờ {pending}%",
+      "totalBlockLabel": "{from} – {to}: còn trống {free}%, đã duyệt {approved}%, đang chờ {pending}%",
+      "barPending": "{percent}% · chờ duyệt",
+      "barLabel": "{project}: {percent}%, {period}, {status}",
+      "monthTick": "T{month}{withYear, select, true {/{year}} other {}}",
+      "segmentsTitle": "Theo đoạn ngày"
+    }
+  },
+  "Notifications": {
+    "title": "Thông báo",
+    "pageDescription": "Những gì mới liên quan tới bạn: đơn cần duyệt, kết quả đơn của bạn, kỹ năng, dự án.",
+    "bell": "Thông báo",
+    "bellWithCount": "Thông báo, {count} chưa đọc",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "viewAll": "Xem tất cả",
+    "empty": "Chưa có thông báo nào.",
+    "emptyUnread": "Bạn đã đọc hết thông báo.",
+    "unread": "Chưa đọc",
+    "filter": "Lọc thông báo",
+    "tabs": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc"
+    },
+    "pageOf": "Trang {page}/{total}",
+    "previousPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "unknownType": "Có thông báo mới",
+    "detail": {
+      "comment": "Lý do: {text}",
+      "note": "Ghi chú: {text}"
+    },
+    "types": {
+      "APPROVAL_PENDING": "{approvalType} “{title}” đang chờ bạn duyệt",
+      "APPROVAL_REASSIGNED": "Bạn được giao duyệt {approvalType} “{title}”",
+      "APPROVAL_COMPLETED": "{approvalType} “{title}” {status, select, APPROVED {đã được duyệt} REJECTED {bị từ chối} other {đã bị rút}}",
+      "SKILL_DECLARED": "{employeeName} vừa khai kỹ năng {skillCode} mức {level}, chờ bạn xác nhận",
+      "SKILL_CONFIRMED": "Kỹ năng {skillCode} của bạn đã được chốt ở mức {confirmedLevel}",
+      "ALLOCATION_ENDED": "Phân bổ của bạn ở dự án {projectCode} kết thúc sau ngày {lastDay}",
+      "PROJECT_MANAGER_ASSIGNED": "Bạn làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
+      "PROJECT_MANAGER_REMOVED": "Bạn thôi làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
+      "CONTRACT_EXPIRING": "Hợp đồng {contractNumber} của {employeeName} hết hạn ngày {endDate}",
+      "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}"
+    }
   },
   "Announcements": {
     "metaTitle": "Bảng tin",

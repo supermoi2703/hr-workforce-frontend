@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
   Breadcrumb,
@@ -39,6 +39,9 @@ function AppBreadcrumbs() {
     crumbs.push({ label: tShell("account") });
   } else if (pathname === "/profile") {
     crumbs.push({ label: tShell("myProfile") });
+  } else if (pathname === "/notifications") {
+    // Mở từ chuông trên header.
+    crumbs.push({ label: tShell("notifications") });
   }
 
   return (
@@ -63,7 +66,8 @@ function AppBreadcrumbs() {
   );
 }
 
-export function AppHeader() {
+/** `actions`: nút thêm trước menu tài khoản (vd chuông thông báo). */
+export function AppHeader({ actions }: { actions?: ReactNode }) {
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-card px-4">
       <SidebarTrigger className="-ml-1" />
@@ -73,6 +77,7 @@ export function AppHeader() {
         <RoleSwitcher />
         <LanguageToggle />
         <ThemeToggle />
+        {actions}
         <UserMenu />
       </div>
     </header>

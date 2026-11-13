@@ -2,6 +2,7 @@ import { http, toPageQuery } from "@/lib/api/http-client";
 import type { PageParams, PageResponse } from "@/lib/api/types";
 import type {
   AllocationInput,
+  AllocationPeople,
   AllocationRequest,
   AllocationRequestStatus,
   Availability,
@@ -12,6 +13,7 @@ import type {
   MyWork,
   OrgTeam,
   Overview,
+  PersonAllocations,
   Risk,
   SkillOption,
   Sprint,
@@ -60,6 +62,13 @@ export const getAvailability = (projectId: string, employeeId: string, from: str
 export const endAllocation = (projectId: string, employeeId: string, lastDay: string | null) =>
   http.post<void>(`/api/projects/${enc(projectId)}/members/${enc(employeeId)}/end`, { lastDay });
 export const getOrgTeams = () => http.get<OrgTeam[]>("/api/teams");
+
+/** Lịch phân bổ của một người trên mọi dự án; không có from / to thì backend lấy 180 ngày tới. */
+export const getPersonAllocations = (employeeId: string, from?: string, to?: string) =>
+  http.get<PersonAllocations>("/api/allocations", { query: { employeeId, from, to } });
+/** Người mình mở được lịch (không gồm mình); `reach` cho biết kiểu ô chọn người. */
+export const getAllocationPeople = (keyword?: string) =>
+  http.get<AllocationPeople>("/api/allocations/people", { query: { keyword: keyword || undefined } });
 export const setSprintMode = (projectId: string, enabled: boolean) =>
   http.put<void>(`/api/projects/${enc(projectId)}/sprint-mode`, { enabled });
 

@@ -6,6 +6,11 @@ export type MetadataLabels = {
   value: (value: string) => string | null;
   /** "15 phút" từ số phút. */
   minutes: (count: number) => string;
+  /**
+   * Nhãn loại đơn vị tổ chức (khóa `kind`: OFFICE, DEPARTMENT, TEAM, POSITION). Tách khỏi `value` vì cùng mã TEAM ở bảng
+   * giá trị chung là phạm vi dữ liệu ("Cấp dưới"). Không truyền / không có bản dịch thì dùng `value`.
+   */
+  unitKind?: (value: string) => string | null;
 };
 
 export type MetadataRow = { key: string; label: string; value: string };
@@ -65,7 +70,9 @@ export function formatMetadata(metadata: Record<string, unknown> | null | undefi
     const text =
       key === "retryAfterSeconds" && typeof value === "number"
         ? labels.minutes(Math.max(1, Math.ceil(value / 60)))
-        : formatValue(value, labels);
+        : key === "kind" && typeof value === "string"
+          ? (labels.unitKind?.(value) ?? formatValue(value, labels))
+          : formatValue(value, labels);
     return { key, label: labels.key(key) ?? key, value: text };
   });
 }
