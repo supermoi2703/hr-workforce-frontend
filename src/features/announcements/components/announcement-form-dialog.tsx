@@ -21,7 +21,6 @@ import {
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
 import { ChoiceSelect, type Choice } from "@/components/shared/choice-select";
 import { ErrorState, LoadingState } from "@/components/shared/states";
 import { applyServerFieldErrors } from "@/lib/forms";
@@ -53,6 +52,7 @@ import {
 } from "../types";
 import { CoverField } from "./cover-field";
 import { MarkdownContent } from "./markdown-content";
+import { MarkdownEditor } from "./markdown-editor";
 
 const FORM_ID = "announcement-form";
 
@@ -398,12 +398,20 @@ function AnnouncementForm({
                 )}
               </div>
             ) : (
-              <Textarea
-                id="announcement-content"
-                rows={10}
-                maxLength={MAX_CONTENT_LENGTH}
-                aria-invalid={!!errors.content}
-                {...form.register("content")}
+              <Controller
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <MarkdownEditor
+                    id="announcement-content"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    maxLength={MAX_CONTENT_LENGTH}
+                    invalid={!!errors.content}
+                    rows={12}
+                  />
+                )}
               />
             )}
             <FieldDescription>{t("contentHint")}</FieldDescription>

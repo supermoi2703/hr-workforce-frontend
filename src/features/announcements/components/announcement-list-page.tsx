@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { PaginationState } from "@tanstack/react-table";
-import { MegaphoneIcon, PinIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { ArrowLeftIcon, MegaphoneIcon, SearchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,22 +12,23 @@ import { DataTablePagination } from "@/components/shared/data-table/data-table-p
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useCurrentUser } from "@/lib/auth/auth-provider";
-import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useAnnouncements, useCategories } from "../hooks";
-import { AnnouncementAudienceLabel, AnnouncementCategoryBadge } from "./announcement-badges";
-import { CoverImage } from "./cover-image";
+import { FeaturedCard } from "./announcement-card";
 
-/** Bảng tin: bài đã đăng thuộc đối tượng nhận của mình, ghim trước rồi mới nhất trước. */
+/**
+ * Tất cả bài đã đăng thuộc đối tượng nhận của mình, ghim trước rồi mới nhất trước, có lọc loại, tìm theo tiêu đề và phân
+ * trang. Bộ lọc ban đầu đọc từ URL (`?categoryId=&q=`) để "Xem tất cả" của từng khối loại ở trang chủ mở đúng loại.
+ */
 export function AnnouncementListPage() {
   const t = useTranslations("Announcements");
-  const { hasPermission } = useCurrentUser();
+  const tBoard = useTranslations("Announcements.Board");
+  const params = useSearchParams();
   const categories = useCategories();
 
   /** "" = mọi loại. */
-  const [categoryId, setCategoryId] = useState("");
-  const [keyword, setKeyword] = useState("");
+  const [categoryId, setCategoryId] = useState(params.get("categoryId") ?? "");
+  const [keyword, setKeyword] = useState(params.get("q") ?? "");
   const q = useDebouncedValue(keyword.trim());
   const filters = useMemo(() => ({ categoryId: categoryId || undefined, q: q || undefined }), [categoryId, q]);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 });
@@ -57,36 +59,10 @@ export function AnnouncementListPage() {
   } else {
     content = (
       <>
-        <ul className="grid gap-3">
+        <ul className="grid gap-4 sm:grid-cols-2">
           {query.data.content.map((announcement) => (
-            <li key={announcement.id}>
-              <Link
-                href={`/announcements/${announcement.id}`}
-                className="block overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-              >
-                <CoverImage src={announcement.coverUrl} className="max-h-56" />
-                <div className="p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {announcement.pinned && (
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
-                        <PinIcon className="size-3.5" aria-hidden />
-                        {t("pinned")}
-                      </span>
-                    )}
-                    <AnnouncementCategoryBadge category={announcement.category} />
-                    <span className="text-xs text-muted-foreground">{formatDateTime(announcement.publishedAt)}</span>
-                  </div>
-                  <h2 className="mt-2 font-semibold break-words">{announcement.title}</h2>
-                  <p className="mt-1 line-clamp-2 text-sm break-words text-muted-foreground">{announcement.excerpt}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    <AnnouncementAudienceLabel
-                      audienceType={announcement.audienceType}
-                      audienceName={announcement.audienceName}
-                    />
-                    {announcement.publishedByName && <> · {t("publishedBy", { name: announcement.publishedByName })}</>}
-                  </p>
-                </div>
-              </Link>
+            <li key={announcement.id} className="flex">
+              <FeaturedCard announcement={announcement} className="w-full" />
             </li>
           ))}
         </ul>
@@ -103,15 +79,13 @@ export function AnnouncementListPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t("title")}
+        title={tBoard("allPosts")}
         description={t("description")}
         actions={
-          hasPermission("announcement:manage") && (
-            <Link href="/announcements/manage" className={buttonVariants({ variant: "outline" })}>
-              <SettingsIcon />
-              {t("List.manage")}
-            </Link>
-          )
+          <Link href="/announcements" className={buttonVariants({ variant: "outline" })}>
+            <ArrowLeftIcon />
+            {tBoard("backToBoard")}
+          </Link>
         }
       />
 

@@ -48,6 +48,12 @@ export type AnnouncementItem = {
   updatedAt: string;
 };
 
+/** Một khối loại ở trang chủ bảng tin. `total` là tổng số bài của loại mà người xem được xem ("Xem tất cả (N)"). */
+export type BoardSection = { category: CategoryRef; total: number; items: AnnouncementItem[] };
+
+/** Trang chủ bảng tin trong một lần gọi: tin nhanh (ghim trước, mọi loại) và mỗi loại đang dùng có bài một khối. */
+export type AnnouncementBoard = { quickNews: AnnouncementItem[]; sections: BoardSection[] };
+
 export type AnnouncementDetail = Omit<AnnouncementItem, "excerpt"> & {
   /** Markdown thô: hiển thị qua MarkdownContent, không render HTML. */
   content: string;

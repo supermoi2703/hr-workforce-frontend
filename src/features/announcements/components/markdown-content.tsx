@@ -25,9 +25,11 @@ export function MarkdownContent({ children, className }: { children: string; cla
           a: (props) => (
             <a {...domProps(props)} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2" />
           ),
-          h1: (props) => <h2 {...domProps(props)} className="pt-2 text-lg font-semibold" />,
-          h2: (props) => <h3 {...domProps(props)} className="pt-2 text-base font-semibold" />,
+          // Ba cỡ chữ của thanh công cụ: # lớn, ## vừa, ### nhỏ (đậm cùng cỡ chữ thường)
+          h1: (props) => <h2 {...domProps(props)} className="pt-2 text-xl font-semibold tracking-tight" />,
+          h2: (props) => <h3 {...domProps(props)} className="pt-2 text-lg font-semibold" />,
           h3: (props) => <h4 {...domProps(props)} className="pt-1 font-semibold" />,
+          hr: (props) => <hr {...domProps(props)} className="my-4 border-border" />,
           ul: (props) => <ul {...domProps(props)} className="list-disc space-y-1 pl-5" />,
           ol: (props) => <ol {...domProps(props)} className="list-decimal space-y-1 pl-5" />,
           blockquote: (props) => <blockquote {...domProps(props)} className="border-l-2 pl-3 text-muted-foreground" />,

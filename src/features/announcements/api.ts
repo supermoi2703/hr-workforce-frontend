@@ -1,6 +1,7 @@
 import { http, toPageQuery } from "@/lib/api/http-client";
 import type { PageParams, PageResponse } from "@/lib/api/types";
 import type {
+  AnnouncementBoard,
   AnnouncementDetail,
   AnnouncementFilters,
   AnnouncementItem,
@@ -18,6 +19,12 @@ export const getAnnouncements = (filters: AnnouncementFilters, params: PageParam
   http.get<PageResponse<AnnouncementItem>>("/api/announcements", {
     query: { ...toPageQuery({ ...params, sort: undefined }), categoryId: filters.categoryId, q: filters.q },
   });
+
+/**
+ * Trang chủ bảng tin trong một lần gọi (announcement:read). Backend cắt `perCategory` ở 8 và `quick` ở 20; mặc định 4 và 8.
+ */
+export const getAnnouncementBoard = (perCategory = 4, quick = 8) =>
+  http.get<AnnouncementBoard>("/api/announcements/board", { query: { perCategory, quick } });
 
 /** Ngoài đối tượng nhận, nháp hoặc đã gỡ → 404. */
 export const getAnnouncement = (id: string) => http.get<AnnouncementDetail>(`/api/announcements/${enc(id)}`);

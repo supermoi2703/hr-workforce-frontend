@@ -3038,6 +3038,31 @@
         "save": "Lưu"
       }
     },
+    "Board": {
+      "quickNews": "Tin nhanh",
+      "readMore": "Đọc thêm",
+      "seeAll": "Xem tất cả ({count})",
+      "seeMore": "Xem thêm",
+      "allPosts": "Tất cả thông báo",
+      "backToBoard": "Về trang chủ bảng tin",
+      "latest": "Tin mới nhất",
+      "sameCategory": "Cùng loại",
+      "breadcrumbRoot": "Bảng tin"
+    },
+    "Editor": {
+      "toolbar": "Định dạng chữ",
+      "bold": "In đậm (Ctrl+B)",
+      "italic": "In nghiêng (Ctrl+I)",
+      "sizeLarge": "Tiêu đề lớn",
+      "sizeMedium": "Tiêu đề vừa",
+      "sizeSmall": "Tiêu đề nhỏ",
+      "bulletList": "Danh sách chấm",
+      "numberedList": "Danh sách số",
+      "quote": "Trích dẫn",
+      "link": "Liên kết (Ctrl+K)",
+      "linkPlaceholder": "tên liên kết",
+      "rule": "Đường kẻ ngang"
+    },
     "statuses": {
       "DRAFT": "Nháp",
       "PUBLISHED": "Đã đăng",
@@ -3104,7 +3129,7 @@
       "ownOfficeOnly": "Thông báo này gửi tới văn phòng của bạn.",
       "audienceLocked": "Thông báo đã đăng không đổi được đối tượng nhận.",
       "content": "Nội dung",
-      "contentHint": "Markdown: **đậm**, danh sách, [liên kết](https://example.com). Ảnh và HTML thô không được hiển thị.",
+      "contentHint": "Dùng thanh công cụ hoặc gõ Markdown. Ảnh và HTML thô không được hiển thị.",
       "write": "Soạn",
       "preview": "Xem trước",
       "emptyPreview": "Chưa có gì để xem trước.",

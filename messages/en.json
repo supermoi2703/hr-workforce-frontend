@@ -3038,6 +3038,31 @@
         "save": "Save"
       }
     },
+    "Board": {
+      "quickNews": "Quick news",
+      "readMore": "Read more",
+      "seeAll": "See all ({count})",
+      "seeMore": "See more",
+      "allPosts": "All announcements",
+      "backToBoard": "Back to the board",
+      "latest": "Latest news",
+      "sameCategory": "In the same category",
+      "breadcrumbRoot": "Announcements"
+    },
+    "Editor": {
+      "toolbar": "Text formatting",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "sizeLarge": "Large heading",
+      "sizeMedium": "Medium heading",
+      "sizeSmall": "Small heading",
+      "bulletList": "Bulleted list",
+      "numberedList": "Numbered list",
+      "quote": "Quote",
+      "link": "Link (Ctrl+K)",
+      "linkPlaceholder": "link text",
+      "rule": "Horizontal line"
+    },
     "statuses": {
       "DRAFT": "Draft",
       "PUBLISHED": "Published",
@@ -3104,7 +3129,7 @@
       "ownOfficeOnly": "This announcement goes to your own office.",
       "audienceLocked": "The audience of a published announcement cannot change.",
       "content": "Content",
-      "contentHint": "Markdown: **bold**, lists, [links](https://example.com). Images and raw HTML are not shown.",
+      "contentHint": "Use the toolbar or type Markdown. Images and raw HTML are not shown.",
       "write": "Edit",
       "preview": "Preview",
       "emptyPreview": "Nothing to preview yet.",

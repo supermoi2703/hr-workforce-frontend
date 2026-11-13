@@ -9,6 +9,7 @@ import {
   deactivateCategory,
   getAllCategories,
   getAnnouncement,
+  getAnnouncementBoard,
   getAnnouncements,
   getCategories,
   getManagedAnnouncement,
@@ -30,6 +31,7 @@ import type {
 export const announcementKeys = {
   all: ["announcements"] as const,
   list: (filters: AnnouncementFilters, params: PageParams) => ["announcements", "list", filters, params] as const,
+  board: ["announcements", "board"] as const,
   detail: (id: string) => ["announcements", "detail", id] as const,
   managed: (filters: AnnouncementFilters, params: PageParams) => ["announcements", "managed", filters, params] as const,
   managedDetail: (id: string) => ["announcements", "managed-detail", id] as const,
@@ -48,6 +50,16 @@ export function useAnnouncements(filters: AnnouncementFilters, params: PageParam
     queryKey: announcementKeys.list(filters, params),
     queryFn: () => getAnnouncements(filters, params),
     placeholderData: keepPreviousData,
+    staleTime: READ_STALE_MS,
+    refetchInterval: READ_STALE_MS,
+  });
+}
+
+/** Trang chủ bảng tin; trang chi tiết dùng lại chính dữ liệu này cho cột "Tin mới nhất" và "Cùng loại". */
+export function useAnnouncementBoard() {
+  return useQuery({
+    queryKey: announcementKeys.board,
+    queryFn: () => getAnnouncementBoard(),
     staleTime: READ_STALE_MS,
     refetchInterval: READ_STALE_MS,
   });
