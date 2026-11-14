@@ -3299,7 +3299,6 @@
       "pendingHint": "Sẽ hiện khi module {source} có dữ liệu.",
       "sources": {
         "worklog": "log giờ",
-        "timesheet": "bảng công",
         "payroll": "lương"
       },
       "noDepartment": "Chưa có phòng",
@@ -3417,7 +3416,7 @@
       "pendingApprovals": "Chờ bạn duyệt",
       "planned": "Utilization theo kế hoạch",
       "plannedDetail": "4 tuần tới",
-      "lateRate": "Tỉ lệ đi muộn",
+      "lateRate": "Đi muộn tháng này",
       "awayTitle": "Vắng trong tuần",
       "awayEmpty": "Tuần này mọi người đều đi làm.",
       "leave": "Nghỉ",
@@ -3435,7 +3434,9 @@
         "bench": "Chưa có dự án"
       },
       "distributionTitle": "Đội theo mức utilization",
-      "distributionCenter": "người"
+      "distributionCenter": "người",
+      "lateRateDetail": "{count} lượt · {people} người",
+      "lateRateNone": "Chưa có bảng công"
     },
     "Hr": {
       "title": "Nhân sự",
@@ -3445,7 +3446,7 @@
       "last12Months": "12 tháng qua",
       "turnover": "Tỉ lệ nghỉ việc",
       "turnoverDetail": "Người nghỉ ÷ số người trung bình",
-      "attendance": "Đi làm hôm nay",
+      "attendance": "Chấm công hôm nay",
       "payroll": "Quỹ lương",
       "movementTitle": "Người vào và nghỉ theo tháng",
       "departmentsTitle": "Số người theo phòng",
@@ -3485,7 +3486,16 @@
         "MIDDLE": "Middle",
         "SENIOR": "Senior",
         "LEAD_PRINCIPAL": "Lead / Principal"
-      }
+      },
+      "attendanceAsOf": "{expected} người phải làm, tính tới {time}",
+      "attendanceOff": "Hôm nay không ai phải làm",
+      "attendanceGroups": {
+        "present": "Có mặt",
+        "remote": "WFH",
+        "notCheckedIn": "Chưa chấm công",
+        "onLeave": "Nghỉ"
+      },
+      "attendanceLate": "{count} đi muộn"
     },
     "Tabs": {
       "label": "Các phần của dashboard",

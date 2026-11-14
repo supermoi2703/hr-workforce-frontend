@@ -3299,7 +3299,6 @@
       "pendingHint": "Shows once the {source} module provides data.",
       "sources": {
         "worklog": "work log",
-        "timesheet": "timesheet",
         "payroll": "payroll"
       },
       "noDepartment": "No department",
@@ -3417,7 +3416,7 @@
       "pendingApprovals": "Waiting for your approval",
       "planned": "Planned utilization",
       "plannedDetail": "Next 4 weeks",
-      "lateRate": "Late arrivals",
+      "lateRate": "Late this month",
       "awayTitle": "Away this week",
       "awayEmpty": "Everyone is in this week.",
       "leave": "Leave",
@@ -3435,7 +3434,9 @@
         "bench": "No project"
       },
       "distributionTitle": "Team by planned utilization",
-      "distributionCenter": "people"
+      "distributionCenter": "people",
+      "lateRateDetail": "{count, plural, one {# time} other {# times}} · {people, plural, one {# person} other {# people}}",
+      "lateRateNone": "No timesheet yet"
     },
     "Hr": {
       "title": "People",
@@ -3485,7 +3486,16 @@
         "MIDDLE": "Middle",
         "SENIOR": "Senior",
         "LEAD_PRINCIPAL": "Lead / Principal"
-      }
+      },
+      "attendanceAsOf": "{expected} expected to work, as of {time}",
+      "attendanceOff": "Nobody is expected to work today",
+      "attendanceGroups": {
+        "present": "In the office",
+        "remote": "WFH",
+        "notCheckedIn": "Not checked in",
+        "onLeave": "On leave"
+      },
+      "attendanceLate": "{count} late"
     },
     "Tabs": {
       "label": "Dashboard sections",

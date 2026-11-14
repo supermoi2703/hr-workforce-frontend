@@ -87,6 +87,9 @@ export type AwayDay = { date: string; kind: "LEAVE" | "REMOTE"; part: LeavePart 
 
 export type AwayPerson = { person: PersonRef; days: AwayDay[] };
 
+/** Đi muộn của đội từ `from` (ngày 1 tháng này) tới hôm nay. */
+export type TeamLateness = { from: string; ratePercent: number; lateCount: number; latePeople: number };
+
 export type TeamDashboard = {
   people: number;
   pendingApprovals: number;
@@ -94,7 +97,8 @@ export type TeamDashboard = {
   awayThisWeek: AwayPerson[];
   plannedPercent: number;
   members: PersonUtilization[];
-  lateRatePercent: number | null;
+  /** null = trong tháng chưa có ngày đi làm nào trên bảng công. */
+  lateness: TeamLateness | null;
 };
 
 // ===== HR =====
@@ -112,6 +116,20 @@ export type ContractsExpiring = {
   weeks: { weekStart: string; count: number }[];
 };
 
+/**
+ * Chấm công hôm nay tính tới `asOf`. `expected = present + remote + notCheckedIn`; `late` nằm trong số đã chấm;
+ * `onLeave` (nghỉ cả ngày có đơn, nghỉ dài hạn) không tính vào `expected`.
+ */
+export type AttendanceToday = {
+  asOf: string;
+  expected: number;
+  present: number;
+  remote: number;
+  late: number;
+  onLeave: number;
+  notCheckedIn: number;
+};
+
 /** Một phần của cơ cấu: `key` là mã nhóm (dịch ở FE) hoặc id văn phòng (kèm `label`). */
 export type Slice = { key: string; label: string | null; count: number };
 
@@ -125,7 +143,8 @@ export type HrDashboard = {
   departments: DepartmentCount[];
   /** null = không có quyền xem hợp đồng. */
   contracts: ContractsExpiring | null;
-  attendanceRatePercent: number | null;
+  /** null = hôm nay không ai phải làm. */
+  attendanceToday: AttendanceToday | null;
   payroll: { month: string; amount: number }[] | null;
   byEmploymentType: Slice[];
   byTenure: Slice[];
