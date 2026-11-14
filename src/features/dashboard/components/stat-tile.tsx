@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { IconTile, type DomainTone } from "@/components/shared/icon-tile";
 import { cn } from "@/lib/utils";
 
-export type PendingSource = "worklog" | "timesheet" | "payroll";
+export type PendingSource = "worklog" | "payroll";
 
 type StatTileProps = {
   label: string;

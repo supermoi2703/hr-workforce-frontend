@@ -27,11 +27,11 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
-import { APP_LOCALE, formatDate, formatNumber } from "@/lib/format";
+import { APP_LOCALE, formatDate, formatNumber, formatTime } from "@/lib/format";
 import type { HrQuery } from "../api";
 import { useHrDashboard } from "../hooks";
 import { change, lastTwo, SERIES_COLORS, withSeriesColors } from "../rules";
-import type { ContractsExpiring, DepartmentCount, HrDashboard, MonthPoint, Slice } from "../types";
+import type { AttendanceToday, ContractsExpiring, DepartmentCount, HrDashboard, MonthPoint, Slice } from "../types";
 import { BlockSection, Panel } from "./block-section";
 import { DonutChart } from "./donut-chart";
 import { HeroRow, HeroStat } from "./hero-stat";
@@ -191,13 +191,11 @@ function HrView({ data }: { data: HrDashboard }) {
       <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
         {data.contracts && <ContractsPanel contracts={data.contracts} />}
         <div className="grid gap-3">
-          <StatTile
-            label={t("attendance")}
-            icon={TimerIcon}
-            tone="time"
-            value={data.attendanceRatePercent === null ? null : `${data.attendanceRatePercent}%`}
-            pending="timesheet"
-          />
+          {data.attendanceToday ? (
+            <AttendancePanel attendance={data.attendanceToday} />
+          ) : (
+            <StatTile label={t("attendance")} icon={TimerIcon} tone="time" value="—" detail={t("attendanceOff")} />
+          )}
           {data.payroll ? (
             <Panel title={t("payroll")}>
               <PayrollBars payroll={data.payroll} />
@@ -208,6 +206,40 @@ function HrView({ data }: { data: HrDashboard }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Chấm công hôm nay theo nhóm, tính tới lúc tải trang. "Chưa chấm công" lúc đầu giờ gồm cả người chưa tới giờ vào làm,
+ * nên ghi kèm giờ tính. Nhóm có chữ, không phụ thuộc màu.
+ */
+function AttendancePanel({ attendance }: { attendance: AttendanceToday }) {
+  const t = useTranslations("Dashboard.Hr");
+  const groups = [
+    { key: "present", value: attendance.present, detail: attendance.late ? t("attendanceLate", { count: attendance.late }) : null },
+    { key: "remote", value: attendance.remote, detail: null },
+    { key: "notCheckedIn", value: attendance.notCheckedIn, detail: null },
+    { key: "onLeave", value: attendance.onLeave, detail: null },
+  ] as const;
+
+  return (
+    <Panel
+      title={t("attendance")}
+      description={t("attendanceAsOf", {
+        expected: formatNumber(attendance.expected),
+        time: formatTime(attendance.asOf),
+      })}
+    >
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {groups.map((group) => (
+          <div key={group.key} className="grid content-start gap-0.5">
+            <dt className="text-xs text-muted-foreground">{t(`attendanceGroups.${group.key}`)}</dt>
+            <dd className="text-2xl font-semibold tracking-tight tabular-nums">{formatNumber(group.value)}</dd>
+            {group.detail && <dd className="text-xs text-muted-foreground">{group.detail}</dd>}
+          </div>
+        ))}
+      </dl>
+    </Panel>
   );
 }
 

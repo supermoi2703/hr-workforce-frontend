@@ -81,8 +81,12 @@ function TeamView({ data }: { data: TeamDashboard }) {
           label={t("lateRate")}
           icon={TimerIcon}
           tone="time"
-          value={data.lateRatePercent === null ? null : `${data.lateRatePercent}%`}
-          pending="timesheet"
+          value={data.lateness ? `${data.lateness.ratePercent}%` : "—"}
+          detail={
+            data.lateness
+              ? t("lateRateDetail", { count: data.lateness.lateCount, people: data.lateness.latePeople })
+              : t("lateRateNone")
+          }
         />
       </HeroRow>
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] xl:items-start">
