@@ -7,14 +7,26 @@ import { isApiError } from "@/lib/api/errors";
 import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
   approve,
+  cancelExplanation,
   cancelLeave,
   cancelRemoteWork,
+  decideMissingOut,
+  decideMissingOutBatch,
+  getLockCheck,
   getMyBalance,
   getMyRemoteUsage,
   getMySchedule,
   getTeamTimesheet,
   getTimesheet,
+  hrDecideExplanation,
+  listHrExplanations,
   listInbox,
+  listLateChanges,
+  listMyExplanations,
+  listPendingDecisions,
+  listTimesheetPeriods,
+  lockTimesheetPeriod,
+  submitExplanation,
   listLeaveTypes,
   listMyLeave,
   listMyRemoteWork,
@@ -29,7 +41,7 @@ import {
   withdrawRemoteWork,
   withdrawShiftChange,
 } from "./api";
-import type { ApprovalSummary, LeaveDraft, RemoteWorkDraft, TimeApprovalType } from "./types";
+import type { ApprovalSummary, DecisionBody, ExplanationBody, LeaveDraft, RemoteWorkDraft, TimeApprovalType } from "./types";
 
 /** Loại yêu cầu duyệt của cụm công & phép, hiện ở tab "Cần tôi duyệt". */
 export const TIME_APPROVAL_TYPES: TimeApprovalType[] = ["LEAVE", "LEAVE_CANCEL", "WFH", "WFH_CANCEL", "SHIFT_CHANGE"];
@@ -50,6 +62,12 @@ export const timesheetKeys = {
   remoteUsage: ["timesheet", "remote-usage"] as const,
   remotePreview: (draft: RemoteWorkDraft | null) => ["timesheet", "remote-preview", draft] as const,
   inbox: ["timesheet", "inbox"] as const,
+  myExplanations: ["timesheet", "my-explanations"] as const,
+  hrExplanations: ["timesheet", "hr-explanations"] as const,
+  pending: (from: string, to: string) => ["timesheet", "pending-decisions", from, to] as const,
+  periods: (year: number) => ["timesheet", "periods", year] as const,
+  lockCheck: (month: string) => ["timesheet", "lock-check", month] as const,
+  lateChanges: (month: string) => ["timesheet", "late-changes", month] as const,
 };
 
 export function useMyTimesheet(from: string, to: string) {
@@ -129,6 +147,44 @@ export function useTimeInbox() {
   });
 }
 
+export function useMyExplanations() {
+  return useQuery({ queryKey: timesheetKeys.myExplanations, queryFn: listMyExplanations });
+}
+
+export function useHrExplanations() {
+  return useQuery({ queryKey: timesheetKeys.hrExplanations, queryFn: listHrExplanations });
+}
+
+/** Ngày thiếu giờ ra chờ HR quyết, lọc theo khoảng ngày (không có phân trang ở backend). */
+export function usePendingDecisions(from: string, to: string) {
+  return useQuery({
+    queryKey: timesheetKeys.pending(from, to),
+    queryFn: () => listPendingDecisions(from, to),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useTimesheetPeriods(year: number) {
+  return useQuery({ queryKey: timesheetKeys.periods(year), queryFn: () => listTimesheetPeriods(year) });
+}
+
+export function useLockCheck(month: string | null) {
+  return useQuery({
+    queryKey: timesheetKeys.lockCheck(month ?? ""),
+    queryFn: () => getLockCheck(month!),
+    enabled: !!month,
+    staleTime: 0,
+  });
+}
+
+export function useLateChanges(month: string | null, enabled: boolean) {
+  return useQuery({
+    queryKey: timesheetKeys.lateChanges(month ?? ""),
+    queryFn: () => listLateChanges(month!),
+    enabled: !!month && enabled,
+  });
+}
+
 // Đơn từ thay đổi số dư, bảng công và hộp việc: làm mới cả cụm sau mỗi thao tác.
 function useInvalidateAll() {
   const queryClient = useQueryClient();
@@ -190,6 +246,40 @@ export function useCancelRemoteWork() {
   });
 }
 
+export function useSubmitExplanation() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: (body: ExplanationBody) => submitExplanation(body), onSuccess: invalidate });
+}
+
+export function useCancelExplanation() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: cancelExplanation, onSuccess: invalidate });
+}
+
+export function useHrDecideExplanation() {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: ({ id, approved, reason }: { id: string; approved: boolean; reason: string }) =>
+      hrDecideExplanation(id, approved, reason),
+    onSuccess: invalidate,
+  });
+}
+
+export function useDecideMissingOut() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: (body: DecisionBody) => decideMissingOut(body), onSuccess: invalidate });
+}
+
+export function useDecideMissingOutBatch() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: (items: DecisionBody[]) => decideMissingOutBatch(items), onSuccess: invalidate });
+}
+
+export function useLockPeriod() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: lockTimesheetPeriod, onSuccess: invalidate });
+}
+
 export function useDecide() {
   const invalidate = useInvalidateAll();
   return useMutation({
@@ -227,6 +317,21 @@ const ERROR_KEYS: Record<string, TimesheetErrorKey> = {
   APPROVAL_ALREADY_DECIDED: "approvalAlreadyDecided",
   NOT_CURRENT_APPROVER: "notCurrentApprover",
   EMPLOYEE_PROFILE_REQUIRED: "employeeProfileRequired",
+  EXPLANATION_EXPIRED: "explanationExpired",
+  EXPLANATION_DAY_NOT_ELIGIBLE: "explanationNotEligible",
+  EXPLANATION_PENDING: "explanationPending",
+  PERIOD_LOCKED: "periodLocked",
+  PERIOD_NOT_LOCKED: "periodNotLocked",
+  PERIOD_NOT_ENDED: "periodNotEnded",
+  PERIOD_LOCK_SCOPE: "periodLockScope",
+  PERIOD_LOCK_IN_PROGRESS: "periodLockInProgress",
+  LOCK_BLOCKED_MISSING_OUT: "lockBlockedMissingOut",
+  LOCK_RECOMPUTE_FAILED: "lockRecomputeFailed",
+  INVALID_PERIOD: "invalidPeriod",
+  REASON_REQUIRED: "reasonRequired",
+  SELF_ADJUST_FORBIDDEN: "selfDecideForbidden",
+  CONFLICT: "decisionConflict",
+  FORBIDDEN: "selfDecideForbidden",
 };
 
 /** Mã lỗi (từ API hoặc từ trường problem của bản xem trước) → câu thông báo. */

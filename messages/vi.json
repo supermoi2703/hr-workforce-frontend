@@ -57,7 +57,9 @@
       "devUi": "Component mẫu",
       "devError": "Trang lỗi mẫu",
       "policies": "Cài đặt chính sách",
-      "myWork": "Việc của tôi"
+      "myWork": "Việc của tôi",
+      "missingOut": "Thiếu check-out",
+      "timesheetPeriods": "Kỳ công"
     }
   },
   "Shell": {
@@ -1037,7 +1039,22 @@
       "remoteRequests": "Đơn làm từ xa",
       "remotePunchHint": "Ngày này làm từ xa: chấm công cá nhân một lần vào, một lần ra, đúng giờ như ngày thường.",
       "outsideOfficeHint": "Có chấm cá nhân nhưng không có đơn làm từ xa đã duyệt. HR sẽ rà soát ngày này.",
-      "requestRemote": "Xin làm từ xa ngày này"
+      "requestRemote": "Xin làm từ xa ngày này",
+      "awaitingHr": "Chờ HR quyết",
+      "explain": "Gửi giải trình",
+      "explanation": {
+        "title": "Giải trình công",
+        "status": {
+          "PENDING": "Đang chờ",
+          "APPROVED": "Đã duyệt",
+          "REJECTED": "Bị từ chối",
+          "WITHDRAWN": "Đã hủy"
+        },
+        "route": {
+          "HR": "Chờ HR xử lý",
+          "APPROVAL": "Chờ quản lý trực tiếp duyệt"
+        }
+      }
     },
     "table": {
       "date": "Ngày",
@@ -1135,7 +1152,21 @@
       "remoteWeekLimit": "Đã hết số ngày làm từ xa chủ động của tuần này.",
       "remoteMonthLimit": "Đã hết số ngày làm từ xa chủ động của tháng này.",
       "remoteNotCancellable": "Chỉ hủy được đơn đã duyệt của ngày chưa tới, và chưa có yêu cầu hủy đang chờ.",
-      "unknown": "Không gửi được đơn này."
+      "unknown": "Không gửi được đơn này.",
+      "explanationExpired": "Đã quá 7 ngày, không giải trình được ngày này nữa.",
+      "explanationNotEligible": "Ngày này không cần hoặc không thể giải trình.",
+      "explanationPending": "Ngày này đã có giải trình đang chờ xử lý.",
+      "periodLocked": "Kỳ công đã chốt, không sửa được. HR sẽ ghi nhận thay đổi muộn nếu cần.",
+      "periodNotLocked": "Kỳ công chưa chốt nên chưa ghi thay đổi muộn được.",
+      "periodNotEnded": "Tháng này chưa kết thúc, chưa chốt kỳ được.",
+      "periodLockScope": "Chỉ HR toàn công ty mới chốt được kỳ công.",
+      "periodLockInProgress": "Kỳ công đang được chốt bởi một lần khác, vui lòng thử lại sau.",
+      "lockBlockedMissingOut": "Còn ngày thiếu check-out chưa quyết, hãy xử lý hết rồi chốt lại.",
+      "lockRecomputeFailed": "Tính lại bảng công khi chốt kỳ bị lỗi, kỳ chưa được chốt. Thử lại sau.",
+      "invalidPeriod": "Kỳ công không hợp lệ.",
+      "reasonRequired": "Cần nhập lý do.",
+      "selfDecideForbidden": "Bạn không xử lý được công của chính mình hoặc của người ngoài phạm vi của bạn.",
+      "decisionConflict": "Dữ liệu vừa được người khác thay đổi, hãy tải lại rồi thử lại."
     },
     "remotePart": {
       "FULL_DAY": "WFH cả ngày",
@@ -1143,7 +1174,18 @@
       "AFTERNOON": "WFH chiều"
     },
     "requestRemote": "Xin làm từ xa",
-    "outsideOffice": "Chấm ngoài văn phòng"
+    "outsideOffice": "Chấm ngoài văn phòng",
+    "explainDialog": {
+      "title": "Giải trình ngày {date}",
+      "description": "Khai giờ vào và/hoặc giờ ra thật của ngày này kèm lý do. Chỉ giải trình được ngày đã qua trong 7 ngày.",
+      "claimedIn": "Giờ vào",
+      "claimedOut": "Giờ ra",
+      "claimHint": "Nhập ít nhất một giờ; nếu nhập cả hai thì giờ ra phải sau giờ vào.",
+      "reason": "Lý do",
+      "cancel": "Hủy",
+      "send": "Gửi giải trình",
+      "sent": "Đã gửi giải trình"
+    }
   },
   "Leave": {
     "metaTitle": "Nghỉ phép",
@@ -3944,6 +3986,105 @@
       "error": {
         "NO_EMAIL": "Không có email"
       }
+    }
+  },
+  "MissingOut": {
+    "title": "Xử lý thiếu check-out",
+    "description": "Ngày có check-in nhưng không có check-out cần HR quyết công. Chốt kỳ công chỉ được khi đã quyết hết.",
+    "tabs": {
+      "pending": "Chờ quyết",
+      "explanations": "Giải trình chờ HR"
+    },
+    "previous": "Tháng trước",
+    "next": "Tháng sau",
+    "monthLabel": "Tháng {month}/{year}",
+    "empty": "Không có ngày nào chờ quyết",
+    "emptyHint": "Các ngày thiếu check-out của tháng này đã được xử lý.",
+    "employee": "Nhân viên",
+    "date": "Ngày",
+    "in": "Giờ vào",
+    "late": "Muộn (phút)",
+    "outsideOffice": "Ngoài văn phòng",
+    "decide": "Quyết định",
+    "claimed": "Giờ khai",
+    "reason": "Lý do",
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+    "explanationsEmpty": "Không có giải trình nào chờ HR",
+    "decideDialog": {
+      "title": "Quyết công ngày thiếu check-out",
+      "checkedIn": "vào lúc {time}",
+      "choice": "Cách tính công",
+      "choices": {
+        "FULL": "Tính đủ công (1)",
+        "HALF": "Tính nửa công (0,5)",
+        "ZERO": "Không tính công (0)"
+      },
+      "choiceHints": {
+        "FULL": "Coi như làm đủ ngày.",
+        "HALF": "Chỉ tính nửa ngày.",
+        "ZERO": "Ngày này không có công."
+      },
+      "reason": "Lý do (bắt buộc)",
+      "cancel": "Hủy",
+      "confirm": "Lưu quyết định",
+      "done": "Đã lưu quyết định"
+    },
+    "explanationDialog": {
+      "approveTitle": "Duyệt giải trình",
+      "rejectTitle": "Từ chối giải trình",
+      "reason": "Lý do (bắt buộc)",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận",
+      "approved": "Đã duyệt giải trình",
+      "rejected": "Đã từ chối giải trình"
+    }
+  },
+  "TimesheetPeriods": {
+    "title": "Kỳ công",
+    "description": "Chốt bảng công từng tháng trước khi tính lương. Kỳ đã chốt không mở lại được.",
+    "year": "Năm",
+    "empty": "Chưa có kỳ nào",
+    "pick": "Chọn một kỳ để xem chi tiết",
+    "month": "Tháng",
+    "status": "Trạng thái",
+    "blockers": "Ngày còn chặn",
+    "lockedAt": "Chốt lúc",
+    "statuses": {
+      "OPEN": "Đang mở",
+      "LOCKED": "Đã chốt"
+    },
+    "officeScope": "Bạn chỉ thấy phần của văn phòng mình.",
+    "blockedTitle": "Còn {count} ngày thiếu check-out chưa quyết",
+    "blockersMore": "Và {count} ngày nữa.",
+    "goDecide": "Đi xử lý thiếu check-out",
+    "noBlockers": "Không còn ngày nào chặn chốt kỳ.",
+    "warnings": {
+      "pendingExplanations": "Giải trình đang chờ",
+      "pendingLeaveRequests": "Đơn nghỉ đang chờ",
+      "absentUnexplained": "Ngày vắng chưa giải trình",
+      "employeesWithoutRows": "Nhân viên chưa có dòng công"
+    },
+    "lock": "Chốt kỳ",
+    "lockCompanyOnly": "Chỉ HR toàn công ty chốt được kỳ.",
+    "confirmTitle": "Chốt kỳ công {month}?",
+    "confirmDescription": "Chốt kỳ sẽ khóa bảng công, không mở lại. Sau đó mọi thay đổi chỉ được ghi nhận dưới dạng thay đổi muộn.",
+    "cancel": "Hủy",
+    "confirmLock": "Chốt kỳ",
+    "locked": "Đã chốt kỳ {month}",
+    "alreadyLocked": "Kỳ này đã được chốt trước đó",
+    "summary": "Đã tính lại {employees} nhân viên, {days} ngày ({changed} ngày thay đổi).",
+    "lateChanges": "Thay đổi muộn",
+    "lateChangesEmpty": "Chưa có thay đổi muộn nào.",
+    "consumed": "Lương đã dùng",
+    "notConsumed": "Chờ lương",
+    "proposed": "đề xuất {value} công",
+    "sources": {
+      "EXPLANATION_APPROVED": "Giải trình duyệt sau chốt",
+      "LEAVE_APPROVED": "Đơn nghỉ duyệt sau chốt",
+      "WFH_APPROVED": "Đơn WFH duyệt sau chốt",
+      "INCIDENT": "Sự cố chấm công",
+      "HR_REQUEST": "HR ghi tay"
     }
   }
 }

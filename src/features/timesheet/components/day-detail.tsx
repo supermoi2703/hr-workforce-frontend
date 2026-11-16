@@ -1,13 +1,15 @@
 "use client";
 
-import { HousePlusIcon, TreePalmIcon } from "lucide-react";
+import { HousePlusIcon, MessageSquareWarningIcon, TreePalmIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DetailList, DetailRow } from "@/components/shared/detail-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatLongDate, formatNumber, formatTime } from "@/lib/format";
+import { awaitingHrDecision, canExplain, latestExplanationOn } from "../explanation";
 import { canRequestLeave, canRequestRemote, hhmm, remoteRequestsOn, requestsOn } from "../calendar";
-import type { LeaveRequest, RemoteWorkRequest, TimesheetDay } from "../types";
+import type { Explanation, LeaveRequest, RemoteWorkRequest, TimesheetDay } from "../types";
+import { Badge } from "@/components/ui/badge";
 import { DayStatusBadge, LeaveStatusBadge } from "./status-badge";
 
 type DayDetailProps = {
@@ -16,18 +18,23 @@ type DayDetailProps = {
   today: string;
   requests: LeaveRequest[];
   remote: RemoteWorkRequest[];
+  /** Giải trình của tôi (mới nhất trước), để hiện trạng thái và ẩn nút khi đang chờ. */
+  explanations: Explanation[];
+  onExplain: () => void;
   onRequestLeave: () => void;
   onRequestRemote: () => void;
 };
 
 /** Chi tiết một ngày bấm trên lịch: giờ phải có mặt, vào / ra, muộn / sớm, công, đơn nghỉ, WFH; nút xin nghỉ, xin WFH. */
-export function DayDetail({ day, date, today, requests, remote, onRequestLeave, onRequestRemote }: DayDetailProps) {
+export function DayDetail({ day, date, today, requests, remote, explanations, onExplain, onRequestLeave, onRequestRemote }: DayDetailProps) {
   const t = useTranslations("Timesheet.day");
   const tStatus = useTranslations("Timesheet");
   const tLeave = useTranslations("Leave");
   const onDay = requestsOn(requests, date);
   const remoteOnDay = remoteRequestsOn(remote, date);
   const past = date < today;
+  const waitingHr = awaitingHrDecision(day);
+  const explanation = latestExplanationOn(explanations, date);
 
   return (
     <Card>
@@ -71,7 +78,9 @@ export function DayDetail({ day, date, today, requests, remote, onRequestLeave, 
               </DetailRow>
             )}
             {(past || date === today) && day.dayType === "WORKING_DAY" && (
-              <DetailRow label={t("paidUnits")}>{formatNumber(day.paidUnits)}</DetailRow>
+              <DetailRow label={t("paidUnits")}>
+                {waitingHr ? <Badge variant="warning">{t("awaitingHr")}</Badge> : formatNumber(day.paidUnits)}
+              </DetailRow>
             )}
           </DetailList>
         )}
@@ -107,9 +116,24 @@ export function DayDetail({ day, date, today, requests, remote, onRequestLeave, 
         {day?.remotePart && date >= today && <p className="text-sm text-muted-foreground">{t("remotePunchHint")}</p>}
         {day?.outsideOffice && <p className="text-sm text-warning">{t("outsideOfficeHint")}</p>}
 
-        {day?.status === "MISSING_OUT" || day?.status === "ABSENT" ? (
-          <p className="text-sm text-muted-foreground">{t("explainLater")}</p>
-        ) : null}
+        {explanation && (
+          <div className="space-y-1 rounded-lg border p-2 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-medium">{t("explanation.title")}</span>
+              <Badge variant={explanation.status === "APPROVED" ? "success" : explanation.status === "REJECTED" ? "destructive" : explanation.status === "PENDING" ? "warning" : "secondary"}>
+                {t(`explanation.status.${explanation.status}`)}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">{t(`explanation.route.${explanation.route}`)}</p>
+            {explanation.decisionNote && <p className="text-xs">{explanation.decisionNote}</p>}
+          </div>
+        )}
+
+        {canExplain(day, today, explanations) && (
+          <Button variant="outline" className="w-full" onClick={onExplain}>
+            <MessageSquareWarningIcon /> {t("explain")}
+          </Button>
+        )}
 
         {canRequestRemote(day, today, requests, remote) && (
           <Button variant="outline" className="w-full" onClick={onRequestRemote}>
