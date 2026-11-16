@@ -3562,7 +3562,8 @@
       "title": "Kỳ lương {month}",
       "range": "Từ {from} đến {to}",
       "employees": "{count} phiếu",
-      "deadline": "hạn thắc mắc {date}"
+      "deadline": "hạn thắc mắc {date}",
+      "inputs": "Khoản nhập"
     },
     "stepper": {
       "title": "Trạng thái kỳ lương",
@@ -3701,7 +3702,102 @@
       "periodNotFound": "Không có kỳ lương này.",
       "payslipNotFound": "Không có phiếu lương này.",
       "periodNotEnded": "Tháng chưa kết thúc.",
-      "forbidden": "Bạn không có quyền thực hiện thao tác này."
+      "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+      "inputExists": "Nhân viên này đã có giá trị hiện hành cho khoản này trong kỳ. Hãy sửa dòng đó.",
+      "inputNotFound": "Khoản nhập không còn hoặc đã bị thay. Hãy tải lại trang.",
+      "reasonRequired": "Cần lý do ít nhất 10 ký tự."
+    },
+    "inputs": {
+      "metaTitle": "Nhập khoản lương",
+      "title": "Nhập khoản - kỳ {month}",
+      "description": "Thưởng, điều chỉnh, giờ OT và hệ số KPI không tự suy ra được.",
+      "back": "Về kỳ {month}",
+      "notFound": "Không có kỳ lương này.",
+      "add": "Thêm dòng",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "history": "Lịch sử",
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "actions": "Thao tác",
+      "readOnly": "Bạn chỉ xem được khoản nhập, không sửa được.",
+      "lock": {
+        "pendingApproval": {
+          "title": "Đang chờ duyệt",
+          "description": "Đang chờ duyệt, không sửa được khoản nhập. Đợi duyệt xong hoặc trả lại bảng lương."
+        },
+        "closedPeriod": {
+          "title": "Kỳ đã duyệt",
+          "description": "Kỳ đã duyệt, phát hành hoặc đóng nên không sửa được. Cần sửa thì nhập khoản điều chỉnh ở kỳ sau."
+        }
+      },
+      "savedNotice": {
+        "title": "Đã lưu",
+        "description": "Khoản nhập chưa vào phiếu cho tới khi tính lại.",
+        "go": "Về trang kỳ để tính lại"
+      },
+      "groups": {
+        "bonus": "Thưởng",
+        "adjust": "Điều chỉnh",
+        "ot": "Giờ OT",
+        "kpi": "Hệ số KPI"
+      },
+      "codes": {
+        "BONUS": "Thưởng",
+        "KPI_BONUS": "Thưởng vượt KPI",
+        "ADJUST": "Điều chỉnh (ADJUST)",
+        "OT_HOURS_NORMAL": "Giờ OT ngày thường",
+        "OT_HOURS_WEEKLY_OFF": "Giờ OT ngày nghỉ tuần",
+        "OT_HOURS_HOLIDAY": "Giờ OT ngày lễ",
+        "KPI_COEFFICIENT": "Hệ số KPI"
+      },
+      "employee": "Nhân viên",
+      "employeeHint": "Tạm thời nhập id nhân viên (UUID).",
+      "code": "Khoản",
+      "value": "Giá trị",
+      "unitMoney": "đ",
+      "unitHours": "giờ",
+      "unitCoefficient": "hệ số",
+      "kpiHint": "Hệ số dạng thập phân, 1 = 100%. Trần do công ty định.",
+      "adjustHint": "Dương = truy lĩnh, âm = truy thu. Số nguyên đồng, khác 0.",
+      "sourceMonth": "Kỳ gốc",
+      "reason": "Lý do",
+      "reasonHint": "Ít nhất 10 ký tự.",
+      "createdBy": "Người nhập",
+      "empty": "Chưa có khoản nhập.",
+      "emptyHint": "Thêm thưởng, OT, điều chỉnh hoặc hệ số KPI.",
+      "addTitle": "Thêm khoản nhập",
+      "addDescription": "Khoản nhập chỉ vào phiếu sau khi tính lại kỳ.",
+      "editTitle": "Sửa khoản nhập",
+      "editDescription": "Dòng mới thay dòng hiện hành, dòng cũ vẫn lưu trong lịch sử.",
+      "saved": "Đã lưu khoản nhập.",
+      "deleted": "Đã xóa khoản nhập.",
+      "deleteTitle": "Xóa khoản nhập?",
+      "deleteDescription": "{code} sẽ không còn được tính. Dòng vẫn lưu trong lịch sử.",
+      "historyTitle": "Lịch sử khoản nhập",
+      "deletedAt": "xóa lúc {at}",
+      "state": {
+        "current": "Hiện hành",
+        "superseded": "Đã thay",
+        "deleted": "Đã xóa"
+      },
+      "validation": {
+        "employeeRequired": "Chưa nhập nhân viên.",
+        "employeeInvalid": "Id nhân viên phải là UUID.",
+        "valueRequired": "Hãy nhập một số.",
+        "valueInteger": "Số tiền phải là số nguyên đồng.",
+        "valueNegative": "Giá trị không được âm.",
+        "valueZero": "Khoản điều chỉnh không được bằng 0.",
+        "valueTooLarge": "Số tiền quá lớn.",
+        "otDecimals": "Giờ có tối đa 2 số lẻ.",
+        "otTooLarge": "Giờ không vượt 744 trong tháng.",
+        "kpiDecimals": "Hệ số có tối đa 4 số lẻ.",
+        "sourceRequired": "Chọn kỳ gốc cần điều chỉnh.",
+        "sourceInvalid": "Kỳ gốc không hợp lệ.",
+        "sourceSame": "Kỳ gốc phải khác kỳ đang nhập.",
+        "reasonShort": "Lý do cần ít nhất 10 ký tự.",
+        "reasonLong": "Lý do quá dài (tối đa 1000 ký tự)."
+      }
     }
   }
 }

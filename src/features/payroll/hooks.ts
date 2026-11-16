@@ -8,7 +8,11 @@ import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
   calculatePeriod,
   closePeriod,
+  addInput,
+  deleteInput,
   getPayslip,
+  listInputs,
+  updateInput,
   getPeriod,
   getSheet,
   listPeriods,
@@ -19,12 +23,15 @@ import {
   submitPeriod,
   type SheetQuery,
 } from "./api";
+import type { InputCreateBody, InputUpdateBody } from "./types";
 
 export const payrollKeys = {
   all: ["payroll"] as const,
   periods: (year: number) => ["payroll", "periods", year] as const,
   period: (month: string) => ["payroll", "period", month] as const,
   sheet: (month: string, query: SheetQuery) => ["payroll", "sheet", month, query] as const,
+  inputs: (month: string, employeeId: string | undefined, history: boolean) =>
+    ["payroll", "inputs", month, employeeId ?? "", history] as const,
   payslip: (month: string, employeeId: string) => ["payroll", "payslip", month, employeeId] as const,
 };
 
@@ -47,6 +54,13 @@ export const usePayslip = (month: string, employeeId: string | null) =>
     queryKey: payrollKeys.payslip(month, employeeId ?? ""),
     queryFn: () => getPayslip(month, employeeId as string),
     enabled: !!employeeId,
+  });
+
+export const useInputs = (month: string, employeeId?: string, includeHistory = false, enabled = true) =>
+  useQuery({
+    queryKey: payrollKeys.inputs(month, employeeId, includeHistory),
+    queryFn: () => listInputs(month, employeeId, includeHistory),
+    enabled,
   });
 
 /** Mọi thao tác làm đổi trạng thái kỳ hoặc bảng lương: làm mới danh sách, chi tiết kỳ và bảng lương. */
@@ -90,6 +104,27 @@ export function useClosePeriod(month: string) {
   return useMutation({ mutationFn: () => closePeriod(month), onSuccess: invalidate });
 }
 
+export function useAddInput(month: string) {
+  const invalidate = useInvalidate();
+  return useMutation({ mutationFn: (body: InputCreateBody) => addInput(month, body), onSuccess: invalidate });
+}
+
+export function useUpdateInput() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: InputUpdateBody }) => updateInput(id, body),
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteInput() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => deleteInput(id, reason),
+    onSuccess: invalidate,
+  });
+}
+
 type ErrorKey = keyof Messages["Payroll"]["errors"];
 
 // Mã lỗi backend của module lương → key trong messages (Payroll.errors.*).
@@ -104,6 +139,9 @@ const ERROR_KEYS: Record<string, ErrorKey> = {
   PAYROLL_PERIOD_NOT_FOUND: "periodNotFound",
   PAYSLIP_NOT_FOUND: "payslipNotFound",
   PERIOD_NOT_ENDED: "periodNotEnded",
+  PAYROLL_INPUT_EXISTS: "inputExists",
+  PAYROLL_INPUT_NOT_FOUND: "inputNotFound",
+  REASON_REQUIRED: "reasonRequired",
   FORBIDDEN: "forbidden",
 };
 

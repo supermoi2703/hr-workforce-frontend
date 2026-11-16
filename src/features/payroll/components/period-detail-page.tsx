@@ -65,7 +65,14 @@ export function PeriodDetailPage({ month }: { month: string }) {
             {p.complaintDeadline && ` · ${t("detail.deadline", { date: formatDate(p.complaintDeadline) })}`}
           </span>
         }
-        actions={<PeriodActions period={p} onCalculated={setResult} />}
+        actions={
+          <>
+            <Link href={`/payroll/${p.month}/inputs`} className={buttonVariants({ variant: "outline" })}>
+              {t("detail.inputs")}
+            </Link>
+            <PeriodActions period={p} onCalculated={setResult} />
+          </>
+        }
       />
 
       {p.pendingApproval && (

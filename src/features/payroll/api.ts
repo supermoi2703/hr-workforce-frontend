@@ -1,5 +1,14 @@
 import { http } from "@/lib/api/http-client";
-import type { CalculateResponse, PayslipDetail, PeriodDetail, PeriodRow, SheetResponse } from "./types";
+import type {
+  CalculateResponse,
+  InputCreateBody,
+  InputUpdateBody,
+  PayrollInput,
+  PayslipDetail,
+  PeriodDetail,
+  PeriodRow,
+  SheetResponse,
+} from "./types";
 
 const base = (month: string) => `/api/payroll/periods/${encodeURIComponent(month)}`;
 
@@ -29,3 +38,14 @@ export const getSheet = (month: string, query: SheetQuery) =>
 
 export const getPayslip = (month: string, employeeId: string) =>
   http.get<PayslipDetail>(`${base(month)}/payslips/${employeeId}`);
+
+// ===== Khoản nhập =====
+
+export const listInputs = (month: string, employeeId?: string, includeHistory = false) =>
+  http.get<PayrollInput[]>(`${base(month)}/inputs`, { query: { employeeId, includeHistory: includeHistory || undefined } });
+
+export const addInput = (month: string, body: InputCreateBody) => http.post<PayrollInput>(`${base(month)}/inputs`, body);
+
+export const updateInput = (id: string, body: InputUpdateBody) => http.put<PayrollInput>(`/api/payroll/inputs/${id}`, body);
+
+export const deleteInput = (id: string, reason: string) => http.delete<void>(`/api/payroll/inputs/${id}`, { body: { reason } });

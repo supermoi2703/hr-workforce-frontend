@@ -142,3 +142,49 @@ export type SheetFilters = {
   hasWarning: boolean;
   q: string;
 };
+
+// ===== Khoản nhập (PayrollInputDtos) =====
+
+export type PayrollInputCode =
+  | "BONUS"
+  | "KPI_BONUS"
+  | "ADJUST"
+  | "OT_HOURS_NORMAL"
+  | "OT_HOURS_WEEKLY_OFF"
+  | "OT_HOURS_HOLIDAY"
+  | "KPI_COEFFICIENT";
+
+/** Một dòng khoản nhập. `current` false: dòng đã bị thay (supersededBy) hoặc xóa mềm (deletedAt). */
+export type PayrollInput = {
+  id: string;
+  month: string;
+  employeeId: string;
+  code: PayrollInputCode;
+  amount: number | null;
+  quantity: number | null;
+  adjustSourceMonth: string | null;
+  reason: string;
+  current: boolean;
+  supersededBy: string | null;
+  createdAt: string;
+  createdBy: string | null;
+  deletedAt: string | null;
+  deletedBy: string | null;
+  deleteReason: string | null;
+};
+
+export type InputCreateBody = {
+  employeeId: string;
+  code: PayrollInputCode;
+  amount?: number;
+  quantity?: number;
+  adjustSourceMonth?: string;
+  reason: string;
+};
+
+export type InputUpdateBody = {
+  amount?: number;
+  quantity?: number;
+  adjustSourceMonth?: string;
+  reason: string;
+};

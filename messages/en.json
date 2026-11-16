@@ -3562,7 +3562,8 @@
       "title": "Payroll {month}",
       "range": "From {from} to {to}",
       "employees": "{count} payslips",
-      "deadline": "query deadline {date}"
+      "deadline": "query deadline {date}",
+      "inputs": "Inputs"
     },
     "stepper": {
       "title": "Period status",
@@ -3701,7 +3702,102 @@
       "periodNotFound": "This payroll period does not exist.",
       "payslipNotFound": "This payslip does not exist.",
       "periodNotEnded": "The month has not ended yet.",
-      "forbidden": "You do not have permission to do this."
+      "forbidden": "You do not have permission to do this.",
+      "inputExists": "This employee already has a current value for this input in the period. Edit it instead.",
+      "inputNotFound": "This input does not exist or was already replaced. Reload the page.",
+      "reasonRequired": "A reason of at least 10 characters is required."
+    },
+    "inputs": {
+      "metaTitle": "Payroll inputs",
+      "title": "Payroll inputs - {month}",
+      "description": "Bonuses, adjustments, overtime hours and KPI coefficients that are not derived automatically.",
+      "back": "Back to period {month}",
+      "notFound": "This payroll period does not exist.",
+      "add": "Add line",
+      "edit": "Edit",
+      "delete": "Delete",
+      "history": "History",
+      "cancel": "Cancel",
+      "save": "Save",
+      "actions": "Actions",
+      "readOnly": "You can view inputs but not change them.",
+      "lock": {
+        "pendingApproval": {
+          "title": "Waiting for approval",
+          "description": "Waiting for approval: inputs cannot be edited until the request is decided or returned."
+        },
+        "closedPeriod": {
+          "title": "Period is approved",
+          "description": "The period is approved, published or closed, so inputs cannot be edited. Corrections go into a later period as an adjustment."
+        }
+      },
+      "savedNotice": {
+        "title": "Saved",
+        "description": "Inputs are not on the payslips until the period is recalculated.",
+        "go": "Back to the period to recalculate"
+      },
+      "groups": {
+        "bonus": "Bonuses",
+        "adjust": "Adjustments",
+        "ot": "Overtime hours",
+        "kpi": "KPI coefficient"
+      },
+      "codes": {
+        "BONUS": "Bonus",
+        "KPI_BONUS": "KPI over-achievement bonus",
+        "ADJUST": "Adjustment",
+        "OT_HOURS_NORMAL": "OT hours, weekday",
+        "OT_HOURS_WEEKLY_OFF": "OT hours, weekly off",
+        "OT_HOURS_HOLIDAY": "OT hours, holiday",
+        "KPI_COEFFICIENT": "KPI coefficient"
+      },
+      "employee": "Employee",
+      "employeeHint": "Enter the employee id (UUID) for now.",
+      "code": "Type",
+      "value": "Value",
+      "unitMoney": "VND",
+      "unitHours": "hours",
+      "unitCoefficient": "coefficient",
+      "kpiHint": "Decimal coefficient, 1 = 100%. The upper limit is set by the company.",
+      "adjustHint": "Positive = back pay, negative = recovery. Whole dong, not zero.",
+      "sourceMonth": "Source period",
+      "reason": "Reason",
+      "reasonHint": "At least 10 characters.",
+      "createdBy": "Entered by",
+      "empty": "No inputs yet.",
+      "emptyHint": "Add a bonus, overtime hours, an adjustment or a KPI coefficient.",
+      "addTitle": "Add input",
+      "addDescription": "The input only counts after the period is recalculated.",
+      "editTitle": "Edit input",
+      "editDescription": "A new line replaces the current one; the old line stays in the history.",
+      "saved": "Input saved.",
+      "deleted": "Input deleted.",
+      "deleteTitle": "Delete this input?",
+      "deleteDescription": "{code} will no longer count. It stays in the history.",
+      "historyTitle": "Input history",
+      "deletedAt": "deleted {at}",
+      "state": {
+        "current": "Current",
+        "superseded": "Replaced",
+        "deleted": "Deleted"
+      },
+      "validation": {
+        "employeeRequired": "Enter the employee.",
+        "employeeInvalid": "The employee id must be a UUID.",
+        "valueRequired": "Enter a number.",
+        "valueInteger": "Amount must be a whole number of dong.",
+        "valueNegative": "The value cannot be negative.",
+        "valueZero": "An adjustment cannot be zero.",
+        "valueTooLarge": "The amount is too large.",
+        "otDecimals": "Hours can have at most 2 decimals.",
+        "otTooLarge": "Hours cannot exceed 744 in a month.",
+        "kpiDecimals": "The coefficient can have at most 4 decimals.",
+        "sourceRequired": "Pick the period being corrected.",
+        "sourceInvalid": "Source period is not a valid month.",
+        "sourceSame": "The source period must differ from this period.",
+        "reasonShort": "The reason needs at least 10 characters.",
+        "reasonLong": "The reason is too long (max 1000)."
+      }
     }
   }
 }
