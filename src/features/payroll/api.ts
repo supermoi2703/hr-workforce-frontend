@@ -1,6 +1,15 @@
 import { http } from "@/lib/api/http-client";
+import type { PageResponse } from "@/lib/api/types";
 import type {
   CalculateResponse,
+  ComplaintView,
+  EmployeeOption,
+  FeedbackKind,
+  FeedbackStatus,
+  FeedbackView,
+  MyPayslip,
+  MyPeriod,
+  ResolveBody,
   InputCreateBody,
   InputUpdateBody,
   PayrollInput,
@@ -49,3 +58,27 @@ export const addInput = (month: string, body: InputCreateBody) => http.post<Payr
 export const updateInput = (id: string, body: InputUpdateBody) => http.put<PayrollInput>(`/api/payroll/inputs/${id}`, body);
 
 export const deleteInput = (id: string, reason: string) => http.delete<void>(`/api/payroll/inputs/${id}`, { body: { reason } });
+
+// ===== Phiếu của tôi =====
+
+export const listMyPeriods = () => http.get<MyPeriod[]>("/api/payroll/me/periods");
+
+export const getMyPayslip = (month: string) => http.get<MyPayslip>(`/api/payroll/me/payslips/${encodeURIComponent(month)}`);
+
+export const sendFeedback = (month: string, kind: FeedbackKind, note?: string) =>
+  http.post<FeedbackView>(`/api/payroll/me/payslips/${encodeURIComponent(month)}/feedback`, { kind, note });
+
+// ===== Thắc mắc =====
+
+export type ComplaintQuery = { month: string; status?: FeedbackStatus; page: number; size: number };
+
+export const listComplaints = (query: ComplaintQuery) =>
+  http.get<PageResponse<ComplaintView>>("/api/payroll/complaints", { query });
+
+export const resolveComplaint = (id: string, body: ResolveBody) =>
+  http.post<ComplaintView>(`/api/payroll/complaints/${id}/resolve`, body);
+
+// ===== Tìm nhân viên cho form nhập khoản (cần employee:read) =====
+
+export const searchEmployees = (keyword: string) =>
+  http.get<PageResponse<EmployeeOption>>("/api/employees", { query: { keyword, page: 0, size: 8 } });

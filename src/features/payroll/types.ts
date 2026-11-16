@@ -188,3 +188,61 @@ export type InputUpdateBody = {
   adjustSourceMonth?: string;
   reason: string;
 };
+
+// ===== Phiếu của tôi, phản hồi, thắc mắc =====
+
+export type FeedbackKind = "CONFIRM" | "DISPUTE";
+export type FeedbackStatus = "OPEN" | "RESOLVED";
+export type FeedbackDecision = "ACCEPTED" | "REJECTED";
+export type PayslipAckStatus = "PENDING" | "CONFIRMED" | "DISPUTED";
+
+export type MyPeriod = {
+  month: string;
+  status: PayrollPeriodStatus;
+  publishedAt: string | null;
+  complaintDeadline: string | null;
+  ackStatus: PayslipAckStatus;
+};
+
+export type FeedbackView = {
+  kind: FeedbackKind;
+  note: string | null;
+  status: FeedbackStatus;
+  decision: FeedbackDecision | null;
+  decisionReason: string | null;
+  handledAt: string | null;
+};
+
+export type MyPayslip = {
+  payslip: PayslipDetail;
+  periodStatus: PayrollPeriodStatus;
+  complaintDeadline: string | null;
+  ackStatus: PayslipAckStatus;
+  feedback: FeedbackView | null;
+  canRespond: boolean;
+};
+
+export type ComplaintView = {
+  id: string;
+  month: string;
+  employeeId: string;
+  employeeCode: string | null;
+  fullName: string | null;
+  note: string | null;
+  createdAt: string;
+  status: FeedbackStatus;
+  decision: FeedbackDecision | null;
+  decisionReason: string | null;
+  handledAt: string | null;
+  adjustInputId: string | null;
+};
+
+export type ResolveBody = {
+  decision: FeedbackDecision;
+  reason: string;
+  adjustAmount?: number;
+  targetMonth?: string;
+};
+
+/** Một dòng trong ô chọn nhân viên (GET /api/employees). */
+export type EmployeeOption = { id: string; employeeCode: string; fullName: string };

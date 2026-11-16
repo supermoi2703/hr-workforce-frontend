@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeftIcon, HourglassIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { RequireAccess } from "@/components/shared/require-access";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -70,6 +71,13 @@ export function PeriodDetailPage({ month }: { month: string }) {
             <Link href={`/payroll/${p.month}/inputs`} className={buttonVariants({ variant: "outline" })}>
               {t("detail.inputs")}
             </Link>
+            {(p.status === "PUBLISHED" || p.status === "CLOSED") && (
+              <RequireAccess access={{ permissions: ["payroll:manage"] }} fallback={null}>
+                <Link href={`/payroll/complaints?month=${p.month}`} className={buttonVariants({ variant: "outline" })}>
+                  {t("detail.complaints")}
+                </Link>
+              </RequireAccess>
+            )}
             <PeriodActions period={p} onCalculated={setResult} />
           </>
         }

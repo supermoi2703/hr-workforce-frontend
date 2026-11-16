@@ -10,7 +10,14 @@ import {
   closePeriod,
   addInput,
   deleteInput,
+  getMyPayslip,
   getPayslip,
+  listComplaints,
+  listMyPeriods,
+  resolveComplaint,
+  searchEmployees,
+  sendFeedback,
+  type ComplaintQuery,
   listInputs,
   updateInput,
   getPeriod,
@@ -23,7 +30,7 @@ import {
   submitPeriod,
   type SheetQuery,
 } from "./api";
-import type { InputCreateBody, InputUpdateBody } from "./types";
+import type { FeedbackKind, InputCreateBody, InputUpdateBody, ResolveBody } from "./types";
 
 export const payrollKeys = {
   all: ["payroll"] as const,
@@ -32,6 +39,10 @@ export const payrollKeys = {
   sheet: (month: string, query: SheetQuery) => ["payroll", "sheet", month, query] as const,
   inputs: (month: string, employeeId: string | undefined, history: boolean) =>
     ["payroll", "inputs", month, employeeId ?? "", history] as const,
+  myPeriods: ["payroll", "me", "periods"] as const,
+  myPayslip: (month: string) => ["payroll", "me", "payslip", month] as const,
+  complaints: (query: ComplaintQuery) => ["payroll", "complaints", query] as const,
+  employees: (keyword: string) => ["payroll", "employees", keyword] as const,
   payslip: (month: string, employeeId: string) => ["payroll", "payslip", month, employeeId] as const,
 };
 
@@ -61,6 +72,28 @@ export const useInputs = (month: string, employeeId?: string, includeHistory = f
     queryKey: payrollKeys.inputs(month, employeeId, includeHistory),
     queryFn: () => listInputs(month, employeeId, includeHistory),
     enabled,
+  });
+
+export const useMyPeriods = () => useQuery({ queryKey: payrollKeys.myPeriods, queryFn: listMyPeriods });
+
+export const useMyPayslip = (month: string | null) =>
+  useQuery({ queryKey: payrollKeys.myPayslip(month ?? ""), queryFn: () => getMyPayslip(month as string), enabled: !!month });
+
+export const useComplaints = (query: ComplaintQuery, enabled = true) =>
+  useQuery({
+    queryKey: payrollKeys.complaints(query),
+    queryFn: () => listComplaints(query),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+/** Gợi ý nhân viên theo từ khóa (đã debounce ở nơi gọi); chỉ gọi khi đủ dài. */
+export const useEmployeeSearch = (keyword: string, enabled: boolean) =>
+  useQuery({
+    queryKey: payrollKeys.employees(keyword),
+    queryFn: () => searchEmployees(keyword),
+    enabled: enabled && keyword.length >= 2,
+    staleTime: 30_000,
   });
 
 /** Mọi thao tác làm đổi trạng thái kỳ hoặc bảng lương: làm mới danh sách, chi tiết kỳ và bảng lương. */
@@ -125,6 +158,22 @@ export function useDeleteInput() {
   });
 }
 
+export function useSendFeedback(month: string) {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ kind, note }: { kind: FeedbackKind; note?: string }) => sendFeedback(month, kind, note),
+    onSuccess: invalidate,
+  });
+}
+
+export function useResolveComplaint() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: ResolveBody }) => resolveComplaint(id, body),
+    onSuccess: invalidate,
+  });
+}
+
 type ErrorKey = keyof Messages["Payroll"]["errors"];
 
 // Mã lỗi backend của module lương → key trong messages (Payroll.errors.*).
@@ -142,6 +191,10 @@ const ERROR_KEYS: Record<string, ErrorKey> = {
   PAYROLL_INPUT_EXISTS: "inputExists",
   PAYROLL_INPUT_NOT_FOUND: "inputNotFound",
   REASON_REQUIRED: "reasonRequired",
+  FEEDBACK_EXPIRED: "feedbackExpired",
+  FEEDBACK_ALREADY_SENT: "feedbackAlreadySent",
+  COMPLAINT_NOT_FOUND: "complaintNotFound",
+  COMPLAINT_ALREADY_RESOLVED: "complaintAlreadyResolved",
   FORBIDDEN: "forbidden",
 };
 

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { useAddInput, usePayrollErrorMessage, useUpdateInput } from "../hooks";
 import {
   buildInputBody,
@@ -20,7 +21,8 @@ import {
   type InputErrors,
   type InputFormValues,
 } from "../inputs";
-import type { PayrollInput, PayrollInputCode } from "../types";
+import type { EmployeeOption, PayrollInput, PayrollInputCode } from "../types";
+import { EmployeeCombobox } from "./employee-combobox";
 
 type InputFormDialogProps = {
   month: string;
@@ -38,6 +40,10 @@ export function InputFormDialog({ month, codes, input, onClose, onSaved }: Input
   const add = useAddInput(month);
   const update = useUpdateInput();
   const editing = !!input;
+  const { can } = useCurrentUser();
+  // Có employee:read thì tìm theo mã/tên; không thì nhập UUID.
+  const canSearch = can({ permissions: ["employee:read"] });
+  const [employee, setEmployee] = useState<EmployeeOption | null>(null);
   const [values, setValues] = useState<InputFormValues>({
     employeeId: input?.employeeId ?? "",
     code: input?.code ?? codes[0],
@@ -82,14 +88,28 @@ export function InputFormDialog({ month, codes, input, onClose, onSaved }: Input
           {!editing && (
             <div className="space-y-1">
               <Label htmlFor="input-employee">{t("employee")}</Label>
-              <Input
-                id="input-employee"
-                value={values.employeeId}
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                aria-invalid={!!errors.employeeId}
-                onChange={(e) => set("employeeId", e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">{t("employeeHint")}</p>
+              {canSearch ? (
+                <EmployeeCombobox
+                  id="input-employee"
+                  value={employee}
+                  invalid={!!errors.employeeId}
+                  onChange={(next) => {
+                    setEmployee(next);
+                    set("employeeId", next?.id ?? "");
+                  }}
+                />
+              ) : (
+                <>
+                  <Input
+                    id="input-employee"
+                    value={values.employeeId}
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    aria-invalid={!!errors.employeeId}
+                    onChange={(e) => set("employeeId", e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">{t("employeeHint")}</p>
+                </>
+              )}
               {fieldError("employeeId")}
             </div>
           )}
