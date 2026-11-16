@@ -246,3 +246,27 @@ export type ResolveBody = {
 
 /** Một dòng trong ô chọn nhân viên (GET /api/employees). */
 export type EmployeeOption = { id: string; employeeCode: string; fullName: string };
+
+// ===== Gửi phiếu qua mail (PayrollMailDtos); mail chỉ là thông báo, không có số tiền =====
+
+export type MailStatus = "PENDING" | "SENT" | "FAILED";
+
+export type MailPreview = { subject: string; body: string };
+
+export type MailQueued = { queued: number };
+
+export type MailStatusRow = {
+  employeeId: string;
+  employeeCode: string | null;
+  fullName: string | null;
+  maskedEmail: string | null;
+  status: MailStatus;
+  error: string | null;
+  attempts: number;
+  sentAt: string | null;
+};
+
+export type MailStatusResponse = {
+  rows: import("@/lib/api/types").PageResponse<MailStatusRow>;
+  counts: Partial<Record<MailStatus, number>>;
+};

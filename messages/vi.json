@@ -3564,7 +3564,9 @@
       "employees": "{count} phiếu",
       "deadline": "hạn thắc mắc {date}",
       "inputs": "Khoản nhập",
-      "complaints": "Thắc mắc"
+      "complaints": "Thắc mắc",
+      "mail": "Gửi phiếu qua mail",
+      "mailLocked": "Chỉ gửi được sau khi phát hành"
     },
     "stepper": {
       "title": "Trạng thái kỳ lương",
@@ -3712,7 +3714,8 @@
       "complaintNotFound": "Không có thắc mắc này.",
       "complaintAlreadyResolved": "Thắc mắc này đã được xử lý. Hãy tải lại trang.",
       "targetLocked": "Kỳ nhận điều chỉnh đã duyệt hoặc đang chờ duyệt. Chọn kỳ khác hoặc mở kỳ sau.",
-      "targetNotFound": "Kỳ nhận chưa mở. Hãy mở kỳ đó trước."
+      "targetNotFound": "Kỳ nhận chưa mở. Hãy mở kỳ đó trước.",
+      "periodNotPublished": "Chỉ gửi được sau khi phát hành."
     },
     "inputs": {
       "metaTitle": "Nhập khoản lương",
@@ -3899,6 +3902,47 @@
         "targetRequired": "Chọn kỳ nhận điều chỉnh.",
         "targetInvalid": "Tháng không hợp lệ.",
         "targetSame": "Phải khác kỳ của thắc mắc."
+      }
+    },
+    "mail": {
+      "metaTitle": "Gửi phiếu qua mail",
+      "title": "Gửi phiếu qua mail - kỳ {month}",
+      "description": "Nhân viên nhận thông báo kèm liên kết tới phiếu lương. Mail không có số tiền.",
+      "back": "Về kỳ {month}",
+      "notFound": "Không có kỳ lương này.",
+      "notPublished": "Chỉ gửi được sau khi phát hành.",
+      "intro": "Lời nhắn đầu mail (không bắt buộc)",
+      "introPlaceholder": "Ví dụ: phiếu lương đã sẵn sàng, bạn nhớ xem trước hạn thắc mắc.",
+      "introTooLong": "tối đa {max} ký tự",
+      "noAmounts": "Chỉ gửi thông báo: không có PDF và không có số tiền trong mail.",
+      "preview": "Xem trước mail",
+      "previewTitle": "Xem trước mail",
+      "previewDescription": "Mail mẫu với tên giả. Chưa gửi gì cả.",
+      "subject": "Tiêu đề",
+      "close": "Đóng",
+      "sendAll": "Gửi cho cả kỳ",
+      "confirmTitle": "Gửi cho {count} người?",
+      "confirmDescription": "Người đã nhận mail rồi sẽ được bỏ qua.",
+      "retryFailed": "Gửi lại thất bại",
+      "retryOne": "Gửi lại",
+      "queued": "Đã xếp hàng {count} mail.",
+      "retryQueued": "Đã xếp hàng lại {count} mail.",
+      "statusTitle": "Trạng thái gửi",
+      "summary": "Đã gửi {sent}/{total} | Thất bại {failed}",
+      "summaryPending": "{count} đang xếp hàng",
+      "employee": "Nhân viên",
+      "email": "Email",
+      "status": "Trạng thái",
+      "attempts": "Số lần thử",
+      "sentAt": "Thời điểm gửi",
+      "empty": "Chưa gửi mail nào.",
+      "state": {
+        "PENDING": "Đang xếp hàng",
+        "SENT": "Đã gửi",
+        "FAILED": "Thất bại"
+      },
+      "error": {
+        "NO_EMAIL": "Không có email"
       }
     }
   }
