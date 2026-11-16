@@ -3525,5 +3525,183 @@
       "movementTitle": "Hires and leavers by month",
       "open": "Open"
     }
+  },
+  "Payroll": {
+    "metaTitle": "Payroll",
+    "title": "Payroll",
+    "description": "Payroll periods, payroll calculation and approval.",
+    "cancel": "Cancel",
+    "status": {
+      "OPEN": "Open",
+      "LOCKED": "Locked",
+      "CALCULATED": "Calculated",
+      "APPROVED": "Approved",
+      "PUBLISHED": "Published",
+      "CLOSED": "Closed"
+    },
+    "list": {
+      "year": "Year",
+      "openPeriod": "Open period",
+      "openTitle": "Open a payroll period",
+      "openDescription": "Pick the month to open. A month can only have one period.",
+      "openConfirm": "Open period",
+      "cancel": "Cancel",
+      "opened": "Period {month} opened.",
+      "month": "Month",
+      "status": "Status",
+      "employees": "Payslips",
+      "gross": "Total gross",
+      "net": "Total net",
+      "publishedAt": "Published at",
+      "complaintDeadline": "Query deadline",
+      "empty": "No payroll period",
+      "emptyHint": "No period was opened in {year}."
+    },
+    "detail": {
+      "back": "All periods",
+      "title": "Payroll {month}",
+      "range": "From {from} to {to}",
+      "employees": "{count} payslips",
+      "deadline": "query deadline {date}"
+    },
+    "stepper": {
+      "title": "Period status",
+      "by": "by {id}"
+    },
+    "log": {
+      "title": "Status history",
+      "empty": "No history yet.",
+      "transition": "{from} → {to}",
+      "created": "Created as {to}",
+      "by": "by {id}"
+    },
+    "pending": {
+      "title": "Waiting for approval",
+      "description": "Waiting for approval: payroll cannot be recalculated and inputs cannot be edited.",
+      "link": "Open approvals"
+    },
+    "actions": {
+      "LOCK": "Lock period",
+      "CALCULATE": "Calculate payroll",
+      "SUBMIT": "Submit for approval",
+      "PUBLISH": "Publish",
+      "REVOKE_APPROVAL": "Revoke approval",
+      "CLOSE": "Close period"
+    },
+    "confirm": {
+      "lockTitle": "Lock this period?",
+      "lockDescription": "Inputs for the month are frozen so payroll can be calculated.",
+      "calculateTitle": "Calculate payroll?",
+      "calculateDescription": "Payslips are generated for every employee with a contract.",
+      "recalculate": "This period is already calculated. The period's payslips will be replaced.",
+      "publishTitle": "Publish payslips?",
+      "publishDescription": "Employees can see their payslips and the query period starts.",
+      "closeTitle": "Close this period?",
+      "closeDescription": "A closed period can no longer be changed."
+    },
+    "submit": {
+      "title": "Submit for approval",
+      "description": "The approver will review the period's totals.",
+      "note": "Note (optional)",
+      "notePlaceholder": "Anything the approver should know"
+    },
+    "revoke": {
+      "title": "Revoke approval",
+      "description": "The period returns to the calculated status so it can be fixed.",
+      "reason": "Reason",
+      "hint": "At least {min} characters."
+    },
+    "done": {
+      "locked": "Period locked.",
+      "submitted": "Submitted for approval.",
+      "published": "Payslips published.",
+      "revoked": "Approval revoked.",
+      "closed": "Period closed."
+    },
+    "calc": {
+      "title": "Calculation result",
+      "payslips": "{count} payslips generated",
+      "warnings": "{count} with warnings",
+      "errors": "{count} with errors",
+      "skipped": "{count} skipped (no contract)",
+      "gross": "Gross",
+      "net": "Net"
+    },
+    "sheet": {
+      "title": "Payslips",
+      "search": "Search by code or name",
+      "onlyWarnings": "Only with warnings",
+      "empty": "No payslips.",
+      "emptyFiltered": "No payslip matches the filter.",
+      "emptyNotCalculated": "No payslips yet. Click Calculate payroll.",
+      "code": "Code",
+      "name": "Name",
+      "office": "Office",
+      "days": "Days W/N",
+      "blockA": "Block A",
+      "blockB": "Block B",
+      "adjust": "Adjust",
+      "gross": "Gross",
+      "si": "Employee insurance",
+      "pit": "Tax",
+      "net": "Net",
+      "nonDeductible": "No deductions",
+      "warning": "Warnings",
+      "view": "Details",
+      "totals": "Total",
+      "totalsFiltered": "Total (filtered)",
+      "lines": "{count} payslips"
+    },
+    "drawer": {
+      "title": "Payslip",
+      "snapshot": "Inputs used",
+      "lines": "Payslip lines",
+      "noLines": "No lines.",
+      "totals": "Totals",
+      "nonDeductible": "No deductions",
+      "standardDays": "Standard days (N)",
+      "paidDays": "Paid days (W)",
+      "otNormal": "OT hours, weekday",
+      "otWeeklyOff": "OT hours, weekly off",
+      "otHoliday": "OT hours, holiday",
+      "dependents": "Dependents",
+      "kpi": "KPI coefficient",
+      "baseSalary": "Base salary",
+      "lunch": "Lunch allowance",
+      "otherAllowance": "Other allowance",
+      "performance": "Performance salary",
+      "insuranceSalary": "Insurance salary",
+      "blockA": "Block A",
+      "blockB": "Block B",
+      "adjust": "Adjust",
+      "gross": "Gross",
+      "si": "Employee insurance",
+      "taxable": "Taxable income",
+      "assessable": "Assessable income",
+      "pit": "Personal income tax",
+      "net": "Net",
+      "base": "base",
+      "rate": "rate",
+      "groups": {
+        "INCOME_A": "Block A",
+        "INCOME_B": "Block B",
+        "ADJUST": "Adjustment",
+        "DEDUCTION": "Deduction",
+        "INFO": "Info"
+      }
+    },
+    "errors": {
+      "invalidTransition": "The period cannot move to that status from its current one. Reload the page.",
+      "periodNotLocked": "Lock the period before calculating payroll.",
+      "calcInProgress": "Someone is already calculating this period. Try again in a moment.",
+      "lockedForInput": "Inputs cannot be changed: the period is approved or waiting for approval.",
+      "noApprover": "No other active account can approve payroll. Ask an administrator to grant the approval permission.",
+      "closeBlocked": "The period cannot be closed before the query deadline or while queries are unresolved.",
+      "periodExists": "This month already has a payroll period.",
+      "periodNotFound": "This payroll period does not exist.",
+      "payslipNotFound": "This payslip does not exist.",
+      "periodNotEnded": "The month has not ended yet.",
+      "forbidden": "You do not have permission to do this."
+    }
   }
 }

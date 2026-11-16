@@ -3525,5 +3525,183 @@
       "movementTitle": "Người vào và nghỉ theo tháng",
       "open": "Mở"
     }
+  },
+  "Payroll": {
+    "metaTitle": "Bảng lương",
+    "title": "Kỳ lương",
+    "description": "Các kỳ lương, tính lương và duyệt.",
+    "cancel": "Hủy",
+    "status": {
+      "OPEN": "Đang mở",
+      "LOCKED": "Đã khóa",
+      "CALCULATED": "Đã tính",
+      "APPROVED": "Đã duyệt",
+      "PUBLISHED": "Đã phát hành",
+      "CLOSED": "Đã đóng"
+    },
+    "list": {
+      "year": "Năm",
+      "openPeriod": "Mở kỳ",
+      "openTitle": "Mở kỳ lương",
+      "openDescription": "Chọn tháng cần mở. Mỗi tháng chỉ có một kỳ.",
+      "openConfirm": "Mở kỳ",
+      "cancel": "Hủy",
+      "opened": "Đã mở kỳ {month}.",
+      "month": "Tháng",
+      "status": "Trạng thái",
+      "employees": "Số phiếu",
+      "gross": "Tổng Gross",
+      "net": "Tổng Net",
+      "publishedAt": "Ngày phát hành",
+      "complaintDeadline": "Hạn thắc mắc",
+      "empty": "Chưa có kỳ lương",
+      "emptyHint": "Năm {year} chưa mở kỳ lương nào."
+    },
+    "detail": {
+      "back": "Tất cả kỳ lương",
+      "title": "Kỳ lương {month}",
+      "range": "Từ {from} đến {to}",
+      "employees": "{count} phiếu",
+      "deadline": "hạn thắc mắc {date}"
+    },
+    "stepper": {
+      "title": "Trạng thái kỳ lương",
+      "by": "bởi {id}"
+    },
+    "log": {
+      "title": "Nhật ký chuyển trạng thái",
+      "empty": "Chưa có nhật ký.",
+      "transition": "{from} → {to}",
+      "created": "Tạo ở trạng thái {to}",
+      "by": "bởi {id}"
+    },
+    "pending": {
+      "title": "Đang chờ duyệt",
+      "description": "Đang chờ duyệt, không tính lại và không sửa khoản nhập.",
+      "link": "Mở trang duyệt"
+    },
+    "actions": {
+      "LOCK": "Khóa kỳ",
+      "CALCULATE": "Tính lương",
+      "SUBMIT": "Gửi duyệt",
+      "PUBLISH": "Phát hành",
+      "REVOKE_APPROVAL": "Thu hồi duyệt",
+      "CLOSE": "Đóng kỳ"
+    },
+    "confirm": {
+      "lockTitle": "Khóa kỳ lương?",
+      "lockDescription": "Dữ liệu đầu vào của tháng được chốt để tính lương.",
+      "calculateTitle": "Tính lương?",
+      "calculateDescription": "Hệ thống tạo phiếu lương cho mọi nhân viên có hợp đồng.",
+      "recalculate": "Kỳ đã được tính. Phiếu của kỳ sẽ được thay thế.",
+      "publishTitle": "Phát hành phiếu lương?",
+      "publishDescription": "Nhân viên sẽ xem được phiếu lương và bắt đầu hạn thắc mắc.",
+      "closeTitle": "Đóng kỳ lương?",
+      "closeDescription": "Kỳ đã đóng không thể thay đổi nữa."
+    },
+    "submit": {
+      "title": "Gửi duyệt",
+      "description": "Người duyệt sẽ xem tổng quỹ lương của kỳ.",
+      "note": "Ghi chú (không bắt buộc)",
+      "notePlaceholder": "Điều người duyệt cần biết"
+    },
+    "revoke": {
+      "title": "Thu hồi duyệt",
+      "description": "Kỳ quay về trạng thái đã tính để chỉnh sửa.",
+      "reason": "Lý do",
+      "hint": "Ít nhất {min} ký tự."
+    },
+    "done": {
+      "locked": "Đã khóa kỳ.",
+      "submitted": "Đã gửi duyệt.",
+      "published": "Đã phát hành phiếu lương.",
+      "revoked": "Đã thu hồi duyệt.",
+      "closed": "Đã đóng kỳ."
+    },
+    "calc": {
+      "title": "Kết quả tính lương",
+      "payslips": "Đã tạo {count} phiếu",
+      "warnings": "{count} phiếu có cảnh báo",
+      "errors": "{count} phiếu lỗi",
+      "skipped": "{count} nhân viên bỏ qua (không có hợp đồng)",
+      "gross": "Gross",
+      "net": "Net"
+    },
+    "sheet": {
+      "title": "Bảng lương",
+      "search": "Tìm theo mã hoặc tên",
+      "onlyWarnings": "Chỉ phiếu có cảnh báo",
+      "empty": "Không có phiếu lương.",
+      "emptyFiltered": "Không có phiếu nào khớp bộ lọc.",
+      "emptyNotCalculated": "Chưa có bảng lương. Bấm Tính lương.",
+      "code": "Mã",
+      "name": "Tên",
+      "office": "Văn phòng",
+      "days": "Công W/N",
+      "blockA": "Khối A",
+      "blockB": "Khối B",
+      "adjust": "ADJUST",
+      "gross": "Gross",
+      "si": "BH NLĐ",
+      "pit": "Thuế",
+      "net": "Net",
+      "nonDeductible": "Không khấu trừ",
+      "warning": "Cảnh báo",
+      "view": "Chi tiết",
+      "totals": "Tổng",
+      "totalsFiltered": "Tổng (theo bộ lọc)",
+      "lines": "{count} phiếu"
+    },
+    "drawer": {
+      "title": "Phiếu lương",
+      "snapshot": "Dữ liệu đã dùng để tính",
+      "lines": "Các dòng phiếu",
+      "noLines": "Chưa có dòng nào.",
+      "totals": "Tổng hợp",
+      "nonDeductible": "Không khấu trừ",
+      "standardDays": "Công chuẩn (N)",
+      "paidDays": "Công hưởng lương (W)",
+      "otNormal": "Giờ OT ngày thường",
+      "otWeeklyOff": "Giờ OT ngày nghỉ tuần",
+      "otHoliday": "Giờ OT ngày lễ",
+      "dependents": "Người phụ thuộc",
+      "kpi": "Hệ số KPI",
+      "baseSalary": "Lương cơ bản",
+      "lunch": "Phụ cấp ăn trưa",
+      "otherAllowance": "Phụ cấp khác",
+      "performance": "Lương hiệu suất",
+      "insuranceSalary": "Lương đóng BH",
+      "blockA": "Khối A",
+      "blockB": "Khối B",
+      "adjust": "ADJUST",
+      "gross": "Gross",
+      "si": "BH người lao động",
+      "taxable": "Thu nhập tính thuế",
+      "assessable": "Thu nhập chịu thuế",
+      "pit": "Thuế TNCN",
+      "net": "Net",
+      "base": "cơ sở",
+      "rate": "tỷ lệ",
+      "groups": {
+        "INCOME_A": "Khối A",
+        "INCOME_B": "Khối B",
+        "ADJUST": "Điều chỉnh",
+        "DEDUCTION": "Khấu trừ",
+        "INFO": "Thông tin"
+      }
+    },
+    "errors": {
+      "invalidTransition": "Kỳ lương không chuyển sang trạng thái đó được từ trạng thái hiện tại. Hãy tải lại trang.",
+      "periodNotLocked": "Cần khóa kỳ trước khi tính lương.",
+      "calcInProgress": "Đang có người tính lương kỳ này. Thử lại sau ít phút.",
+      "lockedForInput": "Không sửa được khoản nhập: kỳ đã duyệt hoặc đang chờ duyệt.",
+      "noApprover": "Chưa có tài khoản nào khác được duyệt lương. Nhờ quản trị viên cấp quyền duyệt lương.",
+      "closeBlocked": "Chưa đóng kỳ được: chưa hết hạn thắc mắc hoặc còn thắc mắc chưa xử lý.",
+      "periodExists": "Tháng này đã có kỳ lương.",
+      "periodNotFound": "Không có kỳ lương này.",
+      "payslipNotFound": "Không có phiếu lương này.",
+      "periodNotEnded": "Tháng chưa kết thúc.",
+      "forbidden": "Bạn không có quyền thực hiện thao tác này."
+    }
   }
 }
