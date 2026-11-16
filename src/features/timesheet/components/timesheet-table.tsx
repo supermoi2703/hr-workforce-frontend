@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { formatDate, formatNumber, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { hhmm, weekdayIndex } from "../calendar";
+import { awaitingHrDecision } from "../explanation";
 import type { EmployeeTimesheet } from "../types";
 import { DayStatusBadge } from "./status-badge";
 
@@ -59,7 +60,13 @@ export function TimesheetTable({ sheet, today, onSelect }: { sheet: EmployeeTime
                     {day.outsideOffice && <Badge variant="warning">{t("outsideOffice")}</Badge>}
                   </span>
                 </TableCell>
-                <TableCell className="text-right tabular-nums">{working || day.dayType === "HOLIDAY" ? formatNumber(day.paidUnits) : "—"}</TableCell>
+                <TableCell className="text-right tabular-nums">{awaitingHrDecision(day) ? (
+                    <Badge variant="warning">{t("day.awaitingHr")}</Badge>
+                  ) : working || day.dayType === "HOLIDAY" ? (
+                    formatNumber(day.paidUnits)
+                  ) : (
+                    "—"
+                  )}</TableCell>
               </TableRow>
             );
           })}

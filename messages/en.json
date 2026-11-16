@@ -57,7 +57,9 @@
       "devUi": "UI components",
       "devError": "Error page demo",
       "policies": "Policy settings",
-      "myWork": "My work"
+      "myWork": "My work",
+      "missingOut": "Missing check-out",
+      "timesheetPeriods": "Timesheet periods"
     }
   },
   "Shell": {
@@ -1037,7 +1039,22 @@
       "remoteRequests": "Remote work requests",
       "remotePunchHint": "Remote day: use the personal punch once in and once out, on time as on any other day.",
       "outsideOfficeHint": "There is a personal punch but no approved remote work request. HR will review this day.",
-      "requestRemote": "Request WFH for this day"
+      "requestRemote": "Request WFH for this day",
+      "awaitingHr": "Awaiting HR decision",
+      "explain": "Submit explanation",
+      "explanation": {
+        "title": "Attendance explanation",
+        "status": {
+          "PENDING": "Pending",
+          "APPROVED": "Approved",
+          "REJECTED": "Rejected",
+          "WITHDRAWN": "Withdrawn"
+        },
+        "route": {
+          "HR": "Waiting for HR",
+          "APPROVAL": "Waiting for your direct manager"
+        }
+      }
     },
     "table": {
       "date": "Date",
@@ -1135,7 +1152,21 @@
       "remoteWeekLimit": "You have used your personal remote work days for this week.",
       "remoteMonthLimit": "You have used your personal remote work days for this month.",
       "remoteNotCancellable": "Only an approved request for a future day without a pending cancellation can be cancelled.",
-      "unknown": "This request cannot be sent."
+      "unknown": "This request cannot be sent.",
+      "explanationExpired": "More than 7 days have passed; this day can no longer be explained.",
+      "explanationNotEligible": "This day does not need or cannot take an explanation.",
+      "explanationPending": "This day already has a pending explanation.",
+      "periodLocked": "The timesheet period is locked and cannot be changed. HR can record a late change if needed.",
+      "periodNotLocked": "The period is not locked yet, so a late change cannot be recorded.",
+      "periodNotEnded": "This month has not ended yet, so it cannot be locked.",
+      "periodLockScope": "Only company-wide HR can lock a period.",
+      "periodLockInProgress": "Another lock of this period is in progress, try again later.",
+      "lockBlockedMissingOut": "Some missing check-out days are still undecided. Decide them all, then lock again.",
+      "lockRecomputeFailed": "Recomputing the timesheet failed while locking; the period is not locked. Try again later.",
+      "invalidPeriod": "Invalid period.",
+      "reasonRequired": "A reason is required.",
+      "selfDecideForbidden": "You cannot handle your own timesheet or one outside your scope.",
+      "decisionConflict": "The data was just changed by someone else, reload and try again."
     },
     "remotePart": {
       "FULL_DAY": "WFH full day",
@@ -1143,7 +1174,18 @@
       "AFTERNOON": "WFH afternoon"
     },
     "requestRemote": "Request WFH",
-    "outsideOffice": "Punched outside office"
+    "outsideOffice": "Punched outside office",
+    "explainDialog": {
+      "title": "Explain {date}",
+      "description": "State your real check-in and/or check-out time for this day with a reason. Only past days within 7 days can be explained.",
+      "claimedIn": "Check-in",
+      "claimedOut": "Check-out",
+      "claimHint": "Enter at least one time; if both, check-out must be after check-in.",
+      "reason": "Reason",
+      "cancel": "Cancel",
+      "send": "Submit explanation",
+      "sent": "Explanation submitted"
+    }
   },
   "Leave": {
     "metaTitle": "Leave",
@@ -3944,6 +3986,105 @@
       "error": {
         "NO_EMAIL": "No email address"
       }
+    }
+  },
+  "MissingOut": {
+    "title": "Missing check-out",
+    "description": "Days with a check-in but no check-out need an HR decision. A period can only be locked once all are decided.",
+    "tabs": {
+      "pending": "To decide",
+      "explanations": "Explanations for HR"
+    },
+    "previous": "Previous month",
+    "next": "Next month",
+    "monthLabel": "{month}/{year}",
+    "empty": "No days waiting for a decision",
+    "emptyHint": "Missing check-out days of this month are all handled.",
+    "employee": "Employee",
+    "date": "Date",
+    "in": "Check-in",
+    "late": "Late (min)",
+    "outsideOffice": "Outside office",
+    "decide": "Decide",
+    "claimed": "Claimed times",
+    "reason": "Reason",
+    "approve": "Approve",
+    "reject": "Reject",
+    "explanationsEmpty": "No explanations waiting for HR",
+    "decideDialog": {
+      "title": "Decide a missing check-out day",
+      "checkedIn": "in at {time}",
+      "choice": "How to count",
+      "choices": {
+        "FULL": "Full day (1)",
+        "HALF": "Half day (0.5)",
+        "ZERO": "No credit (0)"
+      },
+      "choiceHints": {
+        "FULL": "Treat as a full working day.",
+        "HALF": "Count half a day only.",
+        "ZERO": "No work credit for this day."
+      },
+      "reason": "Reason (required)",
+      "cancel": "Cancel",
+      "confirm": "Save decision",
+      "done": "Decision saved"
+    },
+    "explanationDialog": {
+      "approveTitle": "Approve explanation",
+      "rejectTitle": "Reject explanation",
+      "reason": "Reason (required)",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "approved": "Explanation approved",
+      "rejected": "Explanation rejected"
+    }
+  },
+  "TimesheetPeriods": {
+    "title": "Timesheet periods",
+    "description": "Close each month timesheet before payroll. A locked period cannot be reopened.",
+    "year": "Year",
+    "empty": "No periods",
+    "pick": "Pick a period to see details",
+    "month": "Month",
+    "status": "Status",
+    "blockers": "Blocking days",
+    "lockedAt": "Locked at",
+    "statuses": {
+      "OPEN": "Open",
+      "LOCKED": "Locked"
+    },
+    "officeScope": "You only see your own office.",
+    "blockedTitle": "{count} missing check-out day(s) still undecided",
+    "blockersMore": "And {count} more.",
+    "goDecide": "Go to missing check-out",
+    "noBlockers": "Nothing blocks locking this period.",
+    "warnings": {
+      "pendingExplanations": "Pending explanations",
+      "pendingLeaveRequests": "Pending leave requests",
+      "absentUnexplained": "Absent days without explanation",
+      "employeesWithoutRows": "Employees without timesheet rows"
+    },
+    "lock": "Lock period",
+    "lockCompanyOnly": "Only company-wide HR can lock a period.",
+    "confirmTitle": "Lock period {month}?",
+    "confirmDescription": "Locking freezes the timesheet and cannot be undone. Afterwards changes are only recorded as late changes.",
+    "cancel": "Cancel",
+    "confirmLock": "Lock period",
+    "locked": "Period {month} locked",
+    "alreadyLocked": "This period was already locked",
+    "summary": "Recomputed {employees} employees, {days} days ({changed} changed).",
+    "lateChanges": "Late changes",
+    "lateChangesEmpty": "No late changes yet.",
+    "consumed": "Used by payroll",
+    "notConsumed": "Waiting for payroll",
+    "proposed": "proposed {value} units",
+    "sources": {
+      "EXPLANATION_APPROVED": "Explanation approved after lock",
+      "LEAVE_APPROVED": "Leave approved after lock",
+      "WFH_APPROVED": "Remote work approved after lock",
+      "INCIDENT": "Punch incident",
+      "HR_REQUEST": "Entered by HR"
     }
   }
 }

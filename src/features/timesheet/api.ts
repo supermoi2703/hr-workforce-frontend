@@ -2,6 +2,16 @@ import { http } from "@/lib/api/http-client";
 import type { PageResponse } from "@/lib/api/types";
 import type {
   ApprovalSummary,
+  BatchItemResult,
+  DecisionBody,
+  DecisionResult,
+  Explanation,
+  ExplanationBody,
+  LateChange,
+  LockCheck,
+  LockResult,
+  PendingDecisionDay,
+  PeriodRow,
   EmployeeTimesheet,
   LeaveBalance,
   LeaveDraft,
@@ -85,3 +95,38 @@ export const approve = (id: string, comment?: string) =>
 
 export const reject = (id: string, comment: string) =>
   http.post<ApprovalSummary>(`/api/approvals/${id}/reject`, { comment });
+
+// ===== Giải trình công =====
+
+export const submitExplanation = (body: ExplanationBody) => http.post<Explanation>("/api/attendance-explanations", body);
+
+export const listMyExplanations = () => http.get<Explanation[]>("/api/attendance-explanations/me");
+
+export const cancelExplanation = (id: string) => http.post<Explanation>(`/api/attendance-explanations/${id}/cancel`);
+
+/** HR: giải trình của ngày thiếu giờ ra đang chờ HR. */
+export const listHrExplanations = () => http.get<Explanation[]>("/api/attendance-explanations/hr-queue");
+
+export const hrDecideExplanation = (id: string, approved: boolean, reason: string) =>
+  http.post<Explanation>(`/api/attendance-explanations/${id}/${approved ? "hr-approve" : "hr-reject"}`, { reason });
+
+// ===== HR quyết ngày thiếu giờ ra =====
+
+export const listPendingDecisions = (from?: string, to?: string) =>
+  http.get<PendingDecisionDay[]>("/api/timesheet-days/pending-decisions", { query: { from, to } });
+
+export const decideMissingOut = (body: DecisionBody) =>
+  http.post<DecisionResult>("/api/timesheet-days/decisions", body);
+
+export const decideMissingOutBatch = (items: DecisionBody[]) =>
+  http.post<BatchItemResult[]>("/api/timesheet-days/decisions/batch", { items });
+
+// ===== Kỳ công =====
+
+export const listTimesheetPeriods = (year: number) => http.get<PeriodRow[]>("/api/timesheet-days/periods", { query: { year } });
+
+export const getLockCheck = (month: string) => http.get<LockCheck>(`/api/timesheet-days/periods/${month}/lock-check`);
+
+export const lockTimesheetPeriod = (month: string) => http.post<LockResult>(`/api/timesheet-days/periods/${month}/lock`);
+
+export const listLateChanges = (month: string) => http.get<LateChange[]>("/api/timesheet-days/late-changes", { query: { month } });

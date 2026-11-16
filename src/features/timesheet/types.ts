@@ -35,7 +35,8 @@ export type TimesheetDay = {
   lateMinutes: number;
   earlyMinutes: number;
   workedMinutes: number;
-  paidUnits: number;
+  /** null = ngày thiếu giờ ra đang chờ HR quyết (chưa có công). */
+  paidUnits: number | null;
   leavePart: LeavePart | null;
   leaveTypeCode: string | null;
   /** Buổi WFH đã duyệt, kể cả khi chưa đủ lần chấm và ngày tương lai. */
@@ -228,4 +229,134 @@ export type LeaveBalance = {
   held: number;
   available: number;
   entries: { kind: BalanceEntryKind; days: number; period: string | null; requestId: string | null; note: string | null; createdAt: string }[];
+};
+
+// ===== Giải trình công, HR quyết thiếu giờ ra, kỳ công =====
+
+export type ExplanationStatus = "PENDING" | "APPROVED" | "REJECTED" | "WITHDRAWN";
+
+/** HR: ngày thiếu giờ ra do HR xử lý; APPROVAL: các loại khác do quản lý trực tiếp duyệt qua /api/approvals. */
+export type Explanation = {
+  id: string;
+  employeeId: string;
+  employeeName: string | null;
+  workDate: string;
+  claimedIn: string | null;
+  claimedOut: string | null;
+  reason: string;
+  attachmentFileId: string | null;
+  status: ExplanationStatus;
+  route: "HR" | "APPROVAL";
+  approvalRequestId: string | null;
+  appliedAs: string | null;
+  decisionNote: string | null;
+  createdAt: string;
+};
+
+export type ExplanationBody = { workDate: string; claimedIn: string | null; claimedOut: string | null; reason: string };
+
+export type DecisionChoice = "FULL" | "HALF" | "ZERO";
+
+export type PendingDecisionDay = {
+  employeeId: string;
+  employeeCode: string | null;
+  fullName: string | null;
+  officeId: string | null;
+  workDate: string;
+  firstIn: string | null;
+  lateMinutes: number;
+  outsideOffice: boolean;
+};
+
+export type DecisionBody = {
+  employeeId: string;
+  workDate: string;
+  choice: DecisionChoice;
+  reason: string;
+  currentDecisionId?: string | null;
+};
+
+export type DecisionResult = {
+  decisionId: string;
+  employeeId: string;
+  workDate: string;
+  choice: DecisionChoice;
+  paidUnits: number;
+  status: TimesheetStatus;
+  changed: boolean;
+  needsReview: boolean;
+};
+
+export type BatchItemResult = {
+  employeeId: string | null;
+  workDate: string | null;
+  success: boolean;
+  decision: DecisionResult | null;
+  errorCode: string | null;
+  httpStatus: number;
+  message: string | null;
+};
+
+export type PeriodStatus = "OPEN" | "LOCKED";
+
+export type PeriodRow = {
+  month: string;
+  status: PeriodStatus;
+  startDate: string;
+  endDate: string;
+  lockedAt: string | null;
+  lockedByName: string | null;
+  canLock: boolean;
+  blockerCount: number;
+};
+
+export type LockBlocker = {
+  employeeId: string;
+  employeeCode: string | null;
+  name: string | null;
+  officeId: string | null;
+  date: string;
+  reason: string;
+};
+
+export type LockWarnings = {
+  pendingExplanations: number;
+  pendingLeaveRequests: number;
+  absentUnexplained: number;
+  employeesWithoutRows: number;
+};
+
+export type LockCheck = {
+  month: string;
+  status: PeriodStatus;
+  canLock: boolean;
+  scope: "COMPANY" | "OFFICE";
+  blockers: LockBlocker[];
+  blockerTotal: number;
+  warnings: LockWarnings;
+};
+
+export type LockResult = {
+  month: string;
+  status: PeriodStatus;
+  lockedAt: string | null;
+  lockedBy: string | null;
+  summary: { employees: number; days: number; changedDays: number; warnings: LockWarnings } | null;
+  warnings: LockWarnings | null;
+  alreadyLocked: boolean;
+};
+
+export type LateChange = {
+  id: string;
+  employeeId: string;
+  workDate: string;
+  month: string;
+  source: "EXPLANATION_APPROVED" | "LEAVE_APPROVED" | "WFH_APPROVED" | "INCIDENT" | "HR_REQUEST";
+  refType: string | null;
+  refId: string | null;
+  proposedPaidUnits: number | null;
+  reason: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  consumedPayrollPeriod: string | null;
 };

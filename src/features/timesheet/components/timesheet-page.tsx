@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { todayIsoDate } from "@/lib/format";
 import { freeParts, monthRange, shiftMonth } from "../calendar";
-import { useMyLeave, useMyRemoteWork, useMyTimesheet } from "../hooks";
+import { useMyExplanations, useMyLeave, useMyRemoteWork, useMyTimesheet } from "../hooks";
 import { DayDetail } from "./day-detail";
+import { ExplanationDialog } from "./explanation-dialog";
 import { LeaveRequestDialog } from "./leave-request-dialog";
 import { MonthCalendar } from "./month-calendar";
 import { MySchedulePanel } from "./my-schedule-panel";
@@ -39,6 +40,8 @@ export function TimesheetPage() {
   const leave = useMyLeave();
   const requests = leave.data ?? [];
   const remote = useMyRemoteWork().data ?? [];
+  const explanations = useMyExplanations().data ?? [];
+  const [explaining, setExplaining] = useState<string | null>(null);
   // HR toàn công ty chưa xem được: API cần chọn văn phòng mà tab này chưa có ô chọn.
   const canSeeTeam = hasRole("MANAGER") || (hasRole("HR") && !hasRole("HR_COMPANY"));
 
@@ -112,6 +115,8 @@ export function TimesheetPage() {
                 day={sheet.data.days.find((day) => day.workDate === selected)}
                 requests={requests}
                 remote={remote}
+                explanations={explanations}
+                onExplain={() => setExplaining(selected)}
                 onRequestLeave={() => setRequesting(selected)}
                 onRequestRemote={() => setRequestingRemote(selected)}
               />
@@ -140,6 +145,7 @@ export function TimesheetPage() {
         </TabsContent>
       </Tabs>
 
+      {explaining && <ExplanationDialog date={explaining} onClose={() => setExplaining(null)} />}
       {requesting && (
         <LeaveRequestDialog
           initialDate={requesting}
