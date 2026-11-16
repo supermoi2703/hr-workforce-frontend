@@ -3564,7 +3564,9 @@
       "employees": "{count} payslips",
       "deadline": "query deadline {date}",
       "inputs": "Inputs",
-      "complaints": "Queries"
+      "complaints": "Queries",
+      "mail": "Send payslips by mail",
+      "mailLocked": "Only available after the period is published"
     },
     "stepper": {
       "title": "Period status",
@@ -3712,7 +3714,8 @@
       "complaintNotFound": "This query does not exist.",
       "complaintAlreadyResolved": "This query was already resolved. Reload the page.",
       "targetLocked": "The period receiving the adjustment is approved or waiting for approval. Pick another period or open a later one.",
-      "targetNotFound": "The receiving period is not open yet. Open it first."
+      "targetNotFound": "The receiving period is not open yet. Open it first.",
+      "periodNotPublished": "Mail can only be sent after the period is published."
     },
     "inputs": {
       "metaTitle": "Payroll inputs",
@@ -3899,6 +3902,47 @@
         "targetRequired": "Pick the period that receives the adjustment.",
         "targetInvalid": "Not a valid month.",
         "targetSame": "It must differ from the period of the query."
+      }
+    },
+    "mail": {
+      "metaTitle": "Send payslips by mail",
+      "title": "Send payslips by mail - {month}",
+      "description": "Employees get a notification with a link to their payslip. The mail has no amounts.",
+      "back": "Back to period {month}",
+      "notFound": "This payroll period does not exist.",
+      "notPublished": "Mail can only be sent after the period is published.",
+      "intro": "Opening message (optional)",
+      "introPlaceholder": "For example: payslips are ready, please check them before the deadline.",
+      "introTooLong": "at most {max} characters",
+      "noAmounts": "Notification mode only: no PDF and no amounts in the mail.",
+      "preview": "Preview mail",
+      "previewTitle": "Mail preview",
+      "previewDescription": "Sample with a made-up name. Nothing is sent.",
+      "subject": "Subject",
+      "close": "Close",
+      "sendAll": "Send to the whole period",
+      "confirmTitle": "Send to {count} people?",
+      "confirmDescription": "People who already received the mail are skipped.",
+      "retryFailed": "Resend failed",
+      "retryOne": "Resend",
+      "queued": "{count} mails queued.",
+      "retryQueued": "{count} mails queued again.",
+      "statusTitle": "Delivery status",
+      "summary": "Sent {sent}/{total} | Failed {failed}",
+      "summaryPending": "{count} in queue",
+      "employee": "Employee",
+      "email": "Email",
+      "status": "Status",
+      "attempts": "Attempts",
+      "sentAt": "Sent at",
+      "empty": "No mail sent yet.",
+      "state": {
+        "PENDING": "Queued",
+        "SENT": "Sent",
+        "FAILED": "Failed"
+      },
+      "error": {
+        "NO_EMAIL": "No email address"
       }
     }
   }

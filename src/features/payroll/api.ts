@@ -11,6 +11,9 @@ import type {
   MyPeriod,
   ResolveBody,
   InputCreateBody,
+  MailPreview,
+  MailQueued,
+  MailStatusResponse,
   InputUpdateBody,
   PayrollInput,
   PayslipDetail,
@@ -82,3 +85,17 @@ export const resolveComplaint = (id: string, body: ResolveBody) =>
 
 export const searchEmployees = (keyword: string) =>
   http.get<PageResponse<EmployeeOption>>("/api/employees", { query: { keyword, page: 0, size: 8 } });
+
+// ===== Gửi phiếu qua mail =====
+
+export const previewMail = (month: string, intro?: string) =>
+  http.get<MailPreview>(`${base(month)}/mail/preview`, { query: { intro } });
+
+export const sendMailToAll = (month: string, intro?: string) =>
+  http.post<MailQueued>(`${base(month)}/mail`, { scope: "ALL", intro });
+
+export const retryMail = (month: string, employeeIds?: string[]) =>
+  http.post<MailQueued>(`${base(month)}/mail/retry`, { employeeIds });
+
+export const getMailStatus = (month: string, page: number, size: number) =>
+  http.get<MailStatusResponse>(`${base(month)}/mail/status`, { query: { page, size } });

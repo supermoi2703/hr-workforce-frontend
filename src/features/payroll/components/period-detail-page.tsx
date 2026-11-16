@@ -8,7 +8,7 @@ import { RequireAccess } from "@/components/shared/require-access";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { isApiError } from "@/lib/api/errors";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { usePeriod } from "../hooks";
@@ -78,6 +78,19 @@ export function PeriodDetailPage({ month }: { month: string }) {
                 </Link>
               </RequireAccess>
             )}
+            <RequireAccess access={{ permissions: ["payroll:manage"] }} fallback={null}>
+              {p.status === "PUBLISHED" ? (
+                <Link href={`/payroll/${p.month}/mail`} className={buttonVariants({ variant: "outline" })}>
+                  {t("detail.mail")}
+                </Link>
+              ) : (
+                <span title={t("detail.mailLocked")} className="inline-flex">
+                  <Button variant="outline" disabled aria-label={`${t("detail.mail")}: ${t("detail.mailLocked")}`}>
+                    {t("detail.mail")}
+                  </Button>
+                </span>
+              )}
+            </RequireAccess>
             <PeriodActions period={p} onCalculated={setResult} />
           </>
         }

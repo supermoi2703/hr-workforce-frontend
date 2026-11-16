@@ -10,7 +10,11 @@ import {
   closePeriod,
   addInput,
   deleteInput,
+  getMailStatus,
   getMyPayslip,
+  previewMail,
+  retryMail,
+  sendMailToAll,
   getPayslip,
   listComplaints,
   listMyPeriods,
@@ -30,6 +34,7 @@ import {
   submitPeriod,
   type SheetQuery,
 } from "./api";
+import { mailRefetchInterval } from "./mail";
 import type { FeedbackKind, InputCreateBody, InputUpdateBody, ResolveBody } from "./types";
 
 export const payrollKeys = {
@@ -39,6 +44,7 @@ export const payrollKeys = {
   sheet: (month: string, query: SheetQuery) => ["payroll", "sheet", month, query] as const,
   inputs: (month: string, employeeId: string | undefined, history: boolean) =>
     ["payroll", "inputs", month, employeeId ?? "", history] as const,
+  mailStatus: (month: string, page: number, size: number) => ["payroll", "mail", month, page, size] as const,
   myPeriods: ["payroll", "me", "periods"] as const,
   myPayslip: (month: string) => ["payroll", "me", "payslip", month] as const,
   complaints: (query: ComplaintQuery) => ["payroll", "complaints", query] as const,
@@ -158,6 +164,34 @@ export function useDeleteInput() {
   });
 }
 
+/** Trạng thái mail từng người; tự làm mới mỗi 5 giây khi còn PENDING. */
+export const useMailStatus = (month: string, page: number, size: number, enabled = true) =>
+  useQuery({
+    queryKey: payrollKeys.mailStatus(month, page, size),
+    queryFn: () => getMailStatus(month, page, size),
+    placeholderData: keepPreviousData,
+    enabled,
+    refetchInterval: (query) => mailRefetchInterval(query.state.data?.counts),
+  });
+
+export const usePreviewMail = (month: string) => useMutation({ mutationFn: (intro?: string) => previewMail(month, intro) });
+
+export function useSendMail(month: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (intro?: string) => sendMailToAll(month, intro),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["payroll", "mail", month] }),
+  });
+}
+
+export function useRetryMail(month: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (employeeIds?: string[]) => retryMail(month, employeeIds),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["payroll", "mail", month] }),
+  });
+}
+
 export function useSendFeedback(month: string) {
   const invalidate = useInvalidate();
   return useMutation({
@@ -187,6 +221,7 @@ const ERROR_KEYS: Record<string, ErrorKey> = {
   PAYROLL_PERIOD_EXISTS: "periodExists",
   PAYROLL_PERIOD_NOT_FOUND: "periodNotFound",
   PAYSLIP_NOT_FOUND: "payslipNotFound",
+  PERIOD_NOT_PUBLISHED: "periodNotPublished",
   PERIOD_NOT_ENDED: "periodNotEnded",
   PAYROLL_INPUT_EXISTS: "inputExists",
   PAYROLL_INPUT_NOT_FOUND: "inputNotFound",
