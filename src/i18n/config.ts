@@ -1,8 +1,9 @@
 /** Ngôn ngữ giao diện. Thêm ngôn ngữ: thêm mã ở đây + file messages/<mã>.json + nhãn trong LOCALE_LABELS. */
-export const LOCALES = ["en", "vi"] as const;
+export const LOCALES = ["vi", "en"] as const;
 export type AppLocale = (typeof LOCALES)[number];
 
-export const DEFAULT_LOCALE: AppLocale = "en";
+/** Người dùng chưa chọn ngôn ngữ (chưa có cookie) thấy tiếng Việt: công ty dùng hệ thống ở Việt Nam. */
+export const DEFAULT_LOCALE: AppLocale = "vi";
 
 /** Cookie lưu ngôn ngữ người dùng chọn (server đọc khi render nên không bị nháy chữ). */
 export const LOCALE_COOKIE = "NEXT_LOCALE";
