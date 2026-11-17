@@ -11,6 +11,7 @@ export const NOTIFICATION_TYPES = [
   "CONTRACT_EXPIRING",
   "MISSING_CHECKOUT",
   "PAYSLIP_PUBLISHED",
+  "ANNOUNCEMENT_PUBLISHED",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

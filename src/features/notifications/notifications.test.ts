@@ -65,6 +65,12 @@ describe("messageValues", () => {
       messageValues(notification("PAYSLIP_PUBLISHED", { period: "2026-11", complaintDeadline: "2026-12-05" }), helpers),
     ).toEqual({ period: "11/2026", complaintDeadline: "d(2026-12-05)" });
   });
+
+  it("bảng tin: chỉ cần tiêu đề", () => {
+    expect(messageValues(notification("ANNOUNCEMENT_PUBLISHED", { announcementId: "a1", title: "Lịch nghỉ Tết" }), helpers)).toEqual({
+      title: "Lịch nghỉ Tết",
+    });
+  });
 });
 
 describe("detailOf", () => {

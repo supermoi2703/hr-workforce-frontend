@@ -3117,7 +3117,7 @@
   },
   "Notifications": {
     "title": "Thông báo",
-    "pageDescription": "Những gì mới liên quan tới bạn: đơn cần duyệt, kết quả đơn của bạn, kỹ năng, dự án.",
+    "pageDescription": "Những gì mới liên quan tới bạn: đơn cần duyệt, kết quả đơn của bạn, kỹ năng, dự án, lương, bảng tin.",
     "bell": "Thông báo",
     "bellWithCount": "Thông báo, {count} chưa đọc",
     "markAllRead": "Đánh dấu tất cả đã đọc",
@@ -3149,7 +3149,8 @@
       "PROJECT_MANAGER_REMOVED": "Bạn thôi làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
       "CONTRACT_EXPIRING": "Hợp đồng {contractNumber} của {employeeName} hết hạn ngày {endDate}",
       "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}",
-      "PAYSLIP_PUBLISHED": "Phiếu lương tháng {period} đã phát hành. Có thắc mắc thì gửi trước hết ngày {complaintDeadline}"
+      "PAYSLIP_PUBLISHED": "Phiếu lương tháng {period} đã phát hành. Có thắc mắc thì gửi trước hết ngày {complaintDeadline}",
+      "ANNOUNCEMENT_PUBLISHED": "Bảng tin có bài mới: “{title}”"
     }
   },
   "Announcements": {
