@@ -1,5 +1,7 @@
 import type { PayrollPeriodStatus, PayrollWarning, RawWarning } from "./types";
 
+export const LEGACY_WARNING = "LEGACY";
+
 /** Các mã cảnh báo phiếu lương backend có thể trả; dùng cho bộ lọc "Loại cảnh báo". */
 export const WARNING_CODES = [
   "W_GT_N",
@@ -9,9 +11,10 @@ export const WARNING_CODES = [
   "NET_BELOW_MIN_WAGE",
   "NO_CONTRACT",
   "REGION_FALLBACK",
+  "TIMESHEET_PENDING",
+  "PAID_OUTSIDE_CONTRACT",
+  LEGACY_WARNING,
 ] as const;
-
-export const LEGACY_WARNING = "LEGACY";
 
 /** Chuẩn hóa cảnh báo: backend cũ trả chuỗi, backend mới trả {code, params, text}. */
 export function normalizeWarnings(raw: RawWarning[] | null | undefined): PayrollWarning[] {

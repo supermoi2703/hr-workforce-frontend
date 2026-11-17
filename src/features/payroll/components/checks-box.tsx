@@ -15,6 +15,7 @@ type ChecksBoxProps = { month: string; checks: PeriodChecks | undefined; loading
 /** Hộp kiểm tra trước thao tác: đỏ = chặn, vàng = cảnh báo, xanh = không có vấn đề. Không có dữ liệu (backend cũ) thì ẩn. */
 export function ChecksBox({ month, checks, loading }: ChecksBoxProps) {
   const t = useTranslations("Payroll.checks");
+  const tStatus = useTranslations("Payroll.status");
   const warningLabel = useWarningLabel();
 
   if (loading) {
@@ -30,7 +31,9 @@ export function ChecksBox({ month, checks, loading }: ChecksBoxProps) {
     const count = item.count ?? 0;
     const key = item.code as Parameters<typeof t>[0];
     if (!isSheetWarning(item.code)) {
-      const label = t.has(key) ? t(key, { ...warningParams(item.params), count }) : item.code;
+      const raw = warningParams(item.params);
+      const status = typeof raw.status === "string" && tStatus.has(raw.status as never) ? tStatus(raw.status as never) : raw.status;
+      const label = t.has(key) ? t(key, { ...raw, ...(status === undefined ? {} : { status }), count }) : item.code;
       return item.code === "TIMESHEET_NOT_LOCKED" ? (
         <>
           {label}{" "}

@@ -4003,7 +4003,10 @@
       "NET_NEGATIVE": "Thực lĩnh âm",
       "NET_BELOW_MIN_WAGE": "Thực lĩnh nhỏ hơn lương tối thiểu vùng",
       "NO_CONTRACT": "Có công nhưng không có hợp đồng",
-      "REGION_FALLBACK": "Văn phòng chưa khai vùng lương"
+      "REGION_FALLBACK": "Văn phòng vùng {region} chưa có mức lương tối thiểu riêng, đang dùng mức chung",
+      "TIMESHEET_PENDING": "Còn {days} ngày công chờ HR quyết",
+      "PAID_OUTSIDE_CONTRACT": "Có công ngoài thời hạn hợp đồng",
+      "LEGACY": "Cảnh báo cũ"
     },
     "checks": {
       "loading": "Đang kiểm tra...",
@@ -4015,7 +4018,9 @@
       "PENDING_APPROVAL": "Kỳ đang chờ duyệt.",
       "SINGLE_APPROVER": "Cần ít nhất 2 người có quyền duyệt; bạn không tự duyệt được",
       "RECIPIENTS": "Phiếu sẽ hiện cho {count} nhân viên",
-      "sheetWarning": "{count} phiếu: {label}"
+      "sheetWarning": "{count} phiếu: {label}",
+      "INVALID_STATUS": "Kỳ đang ở trạng thái {status}, chưa làm được bước này",
+      "NO_APPROVER": "Không còn ai khác có quyền duyệt; cần thêm tài khoản HR toàn công ty"
     },
     "review": {
       "metaTitle": "Duyệt bảng lương",

@@ -4003,7 +4003,10 @@
       "NET_NEGATIVE": "Net pay is negative",
       "NET_BELOW_MIN_WAGE": "Net pay is below the regional minimum wage",
       "NO_CONTRACT": "Has worked days but no contract",
-      "REGION_FALLBACK": "Office has no pay region set"
+      "REGION_FALLBACK": "Region {region} has no minimum wage of its own, the general rate is used",
+      "TIMESHEET_PENDING": "{days} days of work still awaiting HR decision",
+      "PAID_OUTSIDE_CONTRACT": "Has worked days outside the contract term",
+      "LEGACY": "Legacy warning"
     },
     "checks": {
       "loading": "Checking...",
@@ -4015,7 +4018,9 @@
       "PENDING_APPROVAL": "The period is awaiting approval.",
       "SINGLE_APPROVER": "At least 2 people with approval rights are needed; you cannot approve your own submission",
       "RECIPIENTS": "Payslips will be visible to {count} employees",
-      "sheetWarning": "{count} payslips: {label}"
+      "sheetWarning": "{count} payslips: {label}",
+      "INVALID_STATUS": "The period is in status {status}; this step is not available yet",
+      "NO_APPROVER": "No one else has approval rights; add a company-wide HR account"
     },
     "review": {
       "metaTitle": "Approve payroll",
