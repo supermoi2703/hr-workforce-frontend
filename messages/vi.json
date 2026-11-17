@@ -3326,6 +3326,44 @@
       "versionConflict": "Người khác vừa sửa thông báo này. Danh sách đã được tải lại, hãy mở lại để xem bản mới nhất."
     }
   },
+  "Home": {
+    "greeting": {
+      "morning": "Chào buổi sáng, {name}",
+      "noon": "Chào buổi trưa, {name}",
+      "afternoon": "Chào buổi chiều, {name}",
+      "evening": "Chào buổi tối, {name}"
+    },
+    "metrics": {
+      "checkIn": "Giờ vào hôm nay",
+      "leaveLeft": "Ngày phép còn lại",
+      "leaveValue": "{count} ngày",
+      "leaveUsed": "Đã dùng {used}/{total} ngày",
+      "pending": "Đơn của tôi đang chờ",
+      "pendingDetail": "Chờ người khác duyệt",
+      "projects": "Dự án đang tham gia",
+      "projectsDetail": "{percent}% thời gian"
+    },
+    "noData": "Chưa có dữ liệu",
+    "week": {
+      "title": "Tuần này",
+      "days": {
+        "mon": "T2",
+        "tue": "T3",
+        "wed": "T4",
+        "thu": "T5",
+        "fri": "T6",
+        "sat": "T7",
+        "sun": "CN"
+      }
+    },
+    "quickLinks": {
+      "title": "Truy cập nhanh",
+      "leave": "Tạo đơn nghỉ phép",
+      "payslips": "Xem phiếu lương",
+      "officeCalendar": "Lịch làm việc văn phòng",
+      "employees": "Tra cứu nhân viên"
+    }
+  },
   "Dashboard": {
     "title": "Dashboard",
     "Filters": {
@@ -3366,7 +3404,7 @@
         "IN_PROGRESS": "Đang làm",
         "REMOTE": "Làm từ xa",
         "ABSENT": "Vắng",
-        "UPCOMING": "Chưa tới giờ",
+        "UPCOMING": "Chưa chấm công",
         "HOLIDAY": "Ngày lễ",
         "OFF": "Ngày nghỉ",
         "LEAVE_PAID": "Nghỉ có lương",
