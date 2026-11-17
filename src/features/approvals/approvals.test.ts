@@ -162,6 +162,7 @@ describe("parseTitle / sourceLink / personLabel", () => {
   it("chỉ loại đã có trang mới có link", () => {
     expect(sourceLink("LEAVE")).toBe("/leave");
     expect(sourceLink("SHIFT_CHANGE")).toBe("/timesheets");
+    expect(sourceLink("PAYROLL_APPROVAL")).toBe("/payroll");
     expect(sourceLink("ALLOCATION")).toBeNull();
   });
 

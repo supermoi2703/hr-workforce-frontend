@@ -12,6 +12,7 @@ import {
   FileClockIcon,
   FolderMinusIcon,
   GraduationCapIcon,
+  ReceiptTextIcon,
   RepeatIcon,
   Undo2Icon,
 } from "lucide-react";
@@ -44,6 +45,8 @@ function iconOf(notification: AppNotification): ReactNode {
       return <FileClockIcon />;
     case "MISSING_CHECKOUT":
       return <ClockAlertIcon />;
+    case "PAYSLIP_PUBLISHED":
+      return <ReceiptTextIcon />;
     default:
       return <BellIcon />;
   }
