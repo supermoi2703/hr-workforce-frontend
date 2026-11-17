@@ -6,6 +6,11 @@ import { useTranslations, type Messages } from "next-intl";
 import { isApiError } from "@/lib/api/errors";
 import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
+  approvePayroll,
+  exportSheet,
+  getApprovalSummary,
+  getChecks,
+  rejectPayroll,
   calculatePeriod,
   closePeriod,
   addInput,
@@ -35,7 +40,7 @@ import {
   type SheetQuery,
 } from "./api";
 import { mailRefetchInterval } from "./mail";
-import type { FeedbackKind, InputCreateBody, InputUpdateBody, ResolveBody } from "./types";
+import type { CheckStep, FeedbackKind, InputCreateBody, InputUpdateBody, ResolveBody } from "./types";
 
 export const payrollKeys = {
   all: ["payroll"] as const,
@@ -49,6 +54,8 @@ export const payrollKeys = {
   myPayslip: (month: string) => ["payroll", "me", "payslip", month] as const,
   complaints: (query: ComplaintQuery) => ["payroll", "complaints", query] as const,
   employees: (keyword: string) => ["payroll", "employees", keyword] as const,
+  checks: (month: string, step: CheckStep) => ["payroll", "checks", month, step] as const,
+  approvalSummary: (month: string) => ["payroll", "approval-summary", month] as const,
   payslip: (month: string, employeeId: string) => ["payroll", "payslip", month, employeeId] as const,
 };
 
@@ -72,6 +79,32 @@ export const usePayslip = (month: string, employeeId: string | null) =>
     queryFn: () => getPayslip(month, employeeId as string),
     enabled: !!employeeId,
   });
+
+/** Hộp kiểm tra trước thao tác; lỗi (backend cũ chưa có) thì coi như không có hộp, không chặn nút. */
+export const useChecks = (month: string, step: CheckStep, enabled: boolean) =>
+  useQuery({
+    queryKey: payrollKeys.checks(month, step),
+    queryFn: () => getChecks(month, step),
+    enabled,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+export const useApprovalSummary = (month: string) =>
+  useQuery({ queryKey: payrollKeys.approvalSummary(month), queryFn: () => getApprovalSummary(month) });
+
+export const useExportSheet = (month: string) =>
+  useMutation({ mutationFn: (query: Omit<SheetQuery, "page" | "size">) => exportSheet(month, query) });
+
+export function useDecidePayroll() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ id, decision, comment }: { id: string; decision: "approve" | "reject"; comment: string }) =>
+      decision === "approve" ? approvePayroll(id, comment || null) : rejectPayroll(id, comment),
+    onSuccess: invalidate,
+  });
+}
 
 export const useInputs = (month: string, employeeId?: string, includeHistory = false, enabled = true) =>
   useQuery({
@@ -230,6 +263,7 @@ const ERROR_KEYS: Record<string, ErrorKey> = {
   FEEDBACK_ALREADY_SENT: "feedbackAlreadySent",
   COMPLAINT_NOT_FOUND: "complaintNotFound",
   COMPLAINT_ALREADY_RESOLVED: "complaintAlreadyResolved",
+  PAYROLL_SHEET_EMPTY: "sheetEmpty",
   FORBIDDEN: "forbidden",
 };
 

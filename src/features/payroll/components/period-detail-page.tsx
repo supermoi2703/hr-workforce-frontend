@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeftIcon, HourglassIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { RequireAccess } from "@/components/shared/require-access";
@@ -25,6 +26,7 @@ export function PeriodDetailPage({ month }: { month: string }) {
   const validMonth = isValidMonth(month);
   const period = usePeriod(validMonth ? month : "");
   const [result, setResult] = useState<CalculateResponse | null>(null);
+  const warningType = useSearchParams().get("warningType") ?? undefined;
 
   const back = (
     <Link href="/payroll" className={buttonVariants({ variant: "ghost", size: "sm" })}>
@@ -91,6 +93,11 @@ export function PeriodDetailPage({ month }: { month: string }) {
                 </span>
               )}
             </RequireAccess>
+            {p.pendingApproval && (
+              <Link href={`/payroll/${p.month}/review`} className={buttonVariants({ variant: "default" })}>
+                {t("detail.review")}
+              </Link>
+            )}
             <PeriodActions period={p} onCalculated={setResult} />
           </>
         }
@@ -141,7 +148,7 @@ export function PeriodDetailPage({ month }: { month: string }) {
           <EmptyState title={t("sheet.emptyNotCalculated")} />
         </section>
       ) : (
-        <PayslipSheet month={p.month} status={p.status} />
+        <PayslipSheet key={warningType ?? ""} month={p.month} status={p.status} employees={p.employees} initialWarningType={warningType} />
       )}
     </div>
   );

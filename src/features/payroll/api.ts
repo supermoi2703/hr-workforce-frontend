@@ -1,4 +1,4 @@
-import { http } from "@/lib/api/http-client";
+import { download, http, type DownloadedFile } from "@/lib/api/http-client";
 import type { PageResponse } from "@/lib/api/types";
 import type {
   CalculateResponse,
@@ -17,6 +17,9 @@ import type {
   InputUpdateBody,
   PayrollInput,
   PayslipDetail,
+  PeriodChecks,
+  CheckStep,
+  PayrollApprovalSummary,
   PeriodDetail,
   PeriodRow,
   SheetResponse,
@@ -43,13 +46,28 @@ export const publishPeriod = (month: string) => http.post<PeriodDetail>(`${base(
 
 export const closePeriod = (month: string) => http.post<PeriodDetail>(`${base(month)}/close`);
 
-export type SheetQuery = { page: number; size: number; hasWarning?: boolean; q?: string; officeId?: string; departmentId?: string };
+export type SheetQuery = { page: number; size: number; hasWarning?: boolean; q?: string; officeId?: string; departmentId?: string; warningType?: string };
 
 export const getSheet = (month: string, query: SheetQuery) =>
   http.get<SheetResponse>(`${base(month)}/payslips`, { query });
 
 export const getPayslip = (month: string, employeeId: string) =>
   http.get<PayslipDetail>(`${base(month)}/payslips/${employeeId}`);
+
+/** Tải Excel bảng lương theo cùng bộ lọc với bảng (không phân trang). */
+export const exportSheet = (month: string, query: Omit<SheetQuery, "page" | "size">): Promise<DownloadedFile> =>
+  download(`${base(month)}/export.xlsx`, { query });
+
+export const getChecks = (month: string, step: CheckStep) => http.get<PeriodChecks>(`${base(month)}/checks`, { query: { step } });
+
+export const getApprovalSummary = (month: string) => http.get<PayrollApprovalSummary>(`${base(month)}/approval-summary`);
+
+// Dùng chung API duyệt của module approvals nhưng gọi trực tiếp (không import chéo feature).
+export const approvePayroll = (approvalRequestId: string, comment: string | null) =>
+  http.post<unknown>(`/api/approvals/${approvalRequestId}/approve`, { comment });
+
+export const rejectPayroll = (approvalRequestId: string, comment: string) =>
+  http.post<unknown>(`/api/approvals/${approvalRequestId}/reject`, { comment });
 
 // ===== Khoản nhập =====
 
