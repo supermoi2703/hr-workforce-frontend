@@ -7,10 +7,10 @@ describe("resolveLocale", () => {
     expect(resolveLocale("en")).toBe("en");
   });
 
-  it("thiếu hoặc lạ (cookie bị sửa tay) thì về mặc định tiếng Anh", () => {
-    expect(DEFAULT_LOCALE).toBe("en");
-    for (const value of [undefined, null, "", "fr", "VI", "vi-VN", 1]) {
-      expect(resolveLocale(value)).toBe("en");
+  it("thiếu hoặc lạ (cookie bị sửa tay) thì về mặc định tiếng Việt", () => {
+    expect(DEFAULT_LOCALE).toBe("vi");
+    for (const value of [undefined, null, "", "fr", "EN", "en-US", 1]) {
+      expect(resolveLocale(value)).toBe("vi");
     }
   });
 });

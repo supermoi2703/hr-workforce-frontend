@@ -147,9 +147,9 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   - Dải tuần (`_components/week-strip.tsx`): gắn trạng thái từng ngày qua prop `dayContent` (theo ngày `yyyy-MM-dd`).
   - Không đặt số liệu giả: chưa có dữ liệu thì để trống, ô tự hiện "Chưa có dữ liệu".
 
-## 8. Đa ngôn ngữ (tiếng Anh / tiếng Việt)
+## 8. Đa ngôn ngữ (tiếng Việt / tiếng Anh)
 
-Dùng [next-intl](https://next-intl.dev). Mặc định tiếng Anh; người dùng đổi bằng nút ngôn ngữ trên header (hoặc ở trang
+Dùng [next-intl](https://next-intl.dev). Mặc định tiếng Việt; người dùng đổi bằng nút ngôn ngữ trên header (hoặc ở trang
 đăng nhập). Lựa chọn lưu ở cookie `NEXT_LOCALE`, URL không đổi (không có `/en`, `/vi`).
 
 - **Không viết chữ cứng** trong component (kể cả `aria-label`, `placeholder`, câu báo lỗi zod). Thêm key vào **cả**
