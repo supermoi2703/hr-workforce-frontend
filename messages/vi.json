@@ -5,6 +5,7 @@
   },
   "Common": {
     "retry": "Thử lại",
+    "toggleSidebar": "Thu gọn / mở rộng menu",
     "backToHome": "Về trang chủ",
     "confirm": "Xác nhận",
     "cancel": "Hủy"
@@ -3572,6 +3573,9 @@
       },
       "attendanceAsOf": "{expected} người phải làm, tính tới {time}",
       "attendanceOff": "Hôm nay không ai phải làm",
+      "missingOut": "Quên chấm ra chờ quyết",
+      "missingOutDetail": "Tháng này {thisMonth} · tháng trước {previousMonth}",
+      "missingOutNone": "Không có ngày nào chờ",
       "attendanceGroups": {
         "present": "Có mặt",
         "remote": "WFH",

@@ -4,6 +4,7 @@ import { useId } from "react";
 
 import {
   BadgeCheckIcon,
+  ClockAlertIcon,
   GraduationCapIcon,
   HandshakeIcon,
   HourglassIcon,
@@ -195,6 +196,21 @@ function HrView({ data }: { data: HrDashboard }) {
             <AttendancePanel attendance={data.attendanceToday} />
           ) : (
             <StatTile label={t("attendance")} icon={TimerIcon} tone="time" value="—" detail={t("attendanceOff")} />
+          )}
+          {data.missingOut && (
+            <StatTile
+              label={t("missingOut")}
+              icon={ClockAlertIcon}
+              tone="time"
+              href="/attendance/missing-out"
+              value={data.missingOut.thisMonth + data.missingOut.previousMonth}
+              detail={
+                data.missingOut.thisMonth + data.missingOut.previousMonth === 0
+                  ? t("missingOutNone")
+                  : t("missingOutDetail", data.missingOut)
+              }
+              alert={data.missingOut.previousMonth > 0}
+            />
           )}
           {data.payroll ? (
             <Panel title={t("payroll")}>
