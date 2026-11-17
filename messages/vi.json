@@ -1475,7 +1475,8 @@
       "ATTENDANCE_EXPLANATION": "Giải trình chấm công",
       "ALLOCATION": "Phân bổ dự án",
       "TRANSFER": "Điều chuyển",
-      "SALARY_ADJUSTMENT": "Điều chỉnh lương"
+      "SALARY_ADJUSTMENT": "Điều chỉnh lương",
+      "PAYROLL_APPROVAL": "Duyệt bảng lương"
     },
     "status": {
       "PENDING": "Chờ duyệt",
@@ -3147,7 +3148,8 @@
       "PROJECT_MANAGER_ASSIGNED": "Bạn làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
       "PROJECT_MANAGER_REMOVED": "Bạn thôi làm quản lý dự án {projectCode} từ ngày {effectiveFrom}",
       "CONTRACT_EXPIRING": "Hợp đồng {contractNumber} của {employeeName} hết hạn ngày {endDate}",
-      "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}"
+      "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}",
+      "PAYSLIP_PUBLISHED": "Phiếu lương tháng {period} đã phát hành. Có thắc mắc thì gửi trước hết ngày {complaintDeadline}"
     }
   },
   "Announcements": {

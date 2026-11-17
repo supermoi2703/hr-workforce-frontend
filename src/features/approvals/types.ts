@@ -14,6 +14,7 @@ export const APPROVAL_TYPES = [
   "ALLOCATION",
   "TRANSFER",
   "SALARY_ADJUSTMENT",
+  "PAYROLL_APPROVAL",
 ] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 

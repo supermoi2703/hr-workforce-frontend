@@ -59,6 +59,12 @@ describe("messageValues", () => {
   it("loại lạ (backend mới thêm) → không tham số", () => {
     expect(messageValues(notification("SOMETHING_NEW"), helpers)).toEqual({});
   });
+
+  it("phiếu lương: kỳ hiện MM/yyyy, hạn thắc mắc là ngày", () => {
+    expect(
+      messageValues(notification("PAYSLIP_PUBLISHED", { period: "2026-11", complaintDeadline: "2026-12-05" }), helpers),
+    ).toEqual({ period: "11/2026", complaintDeadline: "d(2026-12-05)" });
+  });
 });
 
 describe("detailOf", () => {
@@ -100,6 +106,8 @@ describe("câu dịch", () => {
     contractNumber: "HD-01",
     endDate: "2026-12-31",
     workDate: "2026-11-11",
+    period: "2026-11",
+    complaintDeadline: "2026-12-05",
   };
 
   it.each([

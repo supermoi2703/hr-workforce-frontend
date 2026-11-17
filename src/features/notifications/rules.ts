@@ -31,10 +31,19 @@ const PARAM_KEYS: Record<NotificationType, readonly string[]> = {
   PROJECT_MANAGER_REMOVED: ["projectCode", "effectiveFrom"],
   CONTRACT_EXPIRING: ["contractNumber", "employeeName", "endDate"],
   MISSING_CHECKOUT: ["workDate"],
+  PAYSLIP_PUBLISHED: ["period", "complaintDeadline"],
 };
 
 /** Tham số là ngày (yyyy-MM-dd) cần định dạng theo kiểu Việt Nam trước khi ghép câu. */
-const DATE_KEYS = new Set(["lastDay", "effectiveFrom", "endDate", "workDate"]);
+const DATE_KEYS = new Set(["lastDay", "effectiveFrom", "endDate", "workDate", "complaintDeadline"]);
+
+/** Tham số là tháng (yyyy-MM, ví dụ kỳ lương) hiển thị dạng MM/yyyy. */
+const MONTH_KEYS = new Set(["period"]);
+
+function formatMonth(value: string): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  return match ? `${match[2]}/${match[1]}` : value;
+}
 
 /**
  * Giá trị để ghép câu `Notifications.types.<TYPE>`: đủ mọi tham số câu cần (thiếu → "—"), ngày đã định dạng, loại đơn
@@ -52,6 +61,8 @@ export function messageValues(
       values[key] = "—";
     } else if (key === "approvalType") {
       values[key] = helpers.translateApprovalType(String(raw));
+    } else if (MONTH_KEYS.has(key)) {
+      values[key] = formatMonth(String(raw));
     } else if (DATE_KEYS.has(key)) {
       values[key] = helpers.formatDate(String(raw));
     } else {

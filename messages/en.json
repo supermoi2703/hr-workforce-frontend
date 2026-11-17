@@ -1475,7 +1475,8 @@
       "ATTENDANCE_EXPLANATION": "Attendance explanation",
       "ALLOCATION": "Project allocation",
       "TRANSFER": "Transfer",
-      "SALARY_ADJUSTMENT": "Salary adjustment"
+      "SALARY_ADJUSTMENT": "Salary adjustment",
+      "PAYROLL_APPROVAL": "Payroll approval"
     },
     "status": {
       "PENDING": "Pending",
@@ -3147,7 +3148,8 @@
       "PROJECT_MANAGER_ASSIGNED": "You are the project manager of {projectCode} from {effectiveFrom}",
       "PROJECT_MANAGER_REMOVED": "You are no longer the project manager of {projectCode} from {effectiveFrom}",
       "CONTRACT_EXPIRING": "Contract {contractNumber} of {employeeName} expires on {endDate}",
-      "MISSING_CHECKOUT": "You did not check out on {workDate}"
+      "MISSING_CHECKOUT": "You did not check out on {workDate}",
+      "PAYSLIP_PUBLISHED": "Your payslip for {period} has been published. Send any questions by {complaintDeadline}"
     }
   },
   "Announcements": {
