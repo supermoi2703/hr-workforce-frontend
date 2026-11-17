@@ -68,6 +68,10 @@ export type CalculateResponse = {
   totalNet: number | null;
 };
 
+/** Cảnh báo phiếu lương; backend cũ trả chuỗi, backend mới trả object (xem warnings.ts để chuẩn hóa). */
+export type PayrollWarning = { code: string; params: Record<string, unknown> | null; text: string | null };
+export type RawWarning = string | { code: string; params?: Record<string, unknown> | null; text?: string | null };
+
 export type PayslipRow = {
   employeeId: string;
   employeeCode: string;
@@ -87,7 +91,7 @@ export type PayslipRow = {
   pit: number;
   net: number;
   nonDeductible: boolean;
-  warnings: string[];
+  warnings: RawWarning[];
 };
 
 export type SheetTotals = {
@@ -143,7 +147,7 @@ export type PayslipDetail = {
   pit: number;
   net: number;
   nonDeductible: boolean;
-  warnings: string[];
+  warnings: RawWarning[];
   calculatedAt: string | null;
   lines: PayslipLineView[];
 };
@@ -284,4 +288,34 @@ export type MailStatusRow = {
 export type MailStatusResponse = {
   rows: import("@/lib/api/types").PageResponse<MailStatusRow>;
   counts: Partial<Record<MailStatus, number>>;
+};
+
+// ===== Hộp kiểm tra trước thao tác (GET /checks?step=) =====
+
+export type CheckStep = "calculate" | "submit" | "publish";
+export type CheckItem = { code: string; count?: number | null; params?: Record<string, unknown> | null };
+export type PeriodChecks = { step: CheckStep; blockers: CheckItem[]; warnings: CheckItem[] };
+
+// ===== Trang người duyệt (GET /approval-summary) =====
+
+export type ApprovalSummaryTotals = { employees: number; gross: number; si: number; pit: number; net: number };
+
+export type ApprovalOfficeRow = { officeId: string | null; officeName: string | null; employees: number; net: number; prevNet: number | null };
+
+export type ApprovalInputSummary = { code: string; lines: number; amount: number | null };
+
+export type PayrollApprovalSummary = {
+  month: string;
+  status: PayrollPeriodStatus;
+  totals: ApprovalSummaryTotals;
+  prevTotals: ApprovalSummaryTotals | null;
+  byOffice: ApprovalOfficeRow[];
+  warnings: { code: string; count: number; params?: Record<string, unknown> | null }[];
+  inputsSummary: ApprovalInputSummary[];
+  submittedBy: string | null;
+  submittedByName: string | null;
+  submittedAt: string | null;
+  note: string | null;
+  approvalRequestId: string | null;
+  canDecide: boolean;
 };

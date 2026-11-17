@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { TriangleAlertIcon } from "lucide-react";
+import { DownloadIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { ChoiceSelect } from "@/components/shared/choice-select";
 import { createDataTableColumns, DataTable, useDataTableState } from "@/components/shared/data-table/data-table";
 import { EmptyState } from "@/components/shared/states";
 import { Badge } from "@/components/ui/badge";
@@ -13,16 +15,23 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { formatCurrency, formatNumber } from "@/lib/format";
-import { useSheet } from "../hooks";
+import { saveFile } from "@/lib/download";
+import { useExportSheet, usePayrollErrorMessage, useSheet } from "../hooks";
+import { useWarningLabel } from "../use-warning-label";
+import { canExportSheet, normalizeWarnings, WARNING_CODES } from "../warnings";
 import { displayName } from "../names";
 import type { PayrollPeriodStatus, PayslipRow } from "../types";
 import { PayslipDrawer } from "./payslip-drawer";
 
-type PayslipSheetProps = { month: string; status: PayrollPeriodStatus };
+type PayslipSheetProps = { month: string; status: PayrollPeriodStatus; employees: number; initialWarningType?: string };
 
 /** Bảng lương của kỳ: phân trang phía server, lọc cảnh báo và tìm theo mã/tên; bấm "Xem" mở chi tiết phiếu. */
-export function PayslipSheet({ month, status }: PayslipSheetProps) {
+export function PayslipSheet({ month, status, employees, initialWarningType }: PayslipSheetProps) {
   const t = useTranslations("Payroll.sheet");
+  const warningLabel = useWarningLabel();
+  const errorMessage = usePayrollErrorMessage();
+  const exporter = useExportSheet(month);
+  const [warningType, setWarningType] = useState(initialWarningType ?? "");
   const [hasWarning, setHasWarning] = useState(false);
   const [keyword, setKeyword] = useState("");
   const q = useDebouncedValue(keyword.trim());
@@ -30,7 +39,7 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
   const tableState = useDataTableState();
 
   // Đổi bộ lọc thì về trang đầu.
-  const filterKey = `${hasWarning}|${q}`;
+  const filterKey = `${hasWarning}|${q}|${warningType}`;
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
   if (prevFilterKey !== filterKey) {
     setPrevFilterKey(filterKey);
@@ -44,6 +53,7 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
     size: tableState.pageParams.size,
     hasWarning: hasWarning || undefined,
     q: q || undefined,
+    warningType: warningType || undefined,
   });
   const tableQuery = {
     data: sheet.data?.payslips,
@@ -53,7 +63,17 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
     refetch: sheet.refetch,
   };
   const totals = sheet.data?.totals;
-  const filtered = hasWarning || q !== "";
+  const filtered = hasWarning || q !== "" || warningType !== "";
+  const exportable = canExportSheet(status, employees);
+
+  async function doExport() {
+    try {
+      const file = await exporter.mutateAsync({ hasWarning: hasWarning || undefined, q: q || undefined, warningType: warningType || undefined });
+      saveFile(file.blob, file.filename ?? `payroll-${month}.xlsx`);
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  }
 
   const columns = useMemo(() => {
     const col = createDataTableColumns<PayslipRow>();
@@ -96,7 +116,7 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
         id: "warnings",
         header: () => <span className="sr-only">{t("warning")}</span>,
         cell: (c) => {
-          const warnings = c.row.original.warnings;
+          const warnings = normalizeWarnings(c.row.original.warnings);
           if (warnings.length === 0) return null;
           return (
             <Tooltip>
@@ -105,10 +125,8 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
               </TooltipTrigger>
               <TooltipContent>
                 <ul className="space-y-0.5">
-                  {warnings.map((code) => (
-                    <li key={code}>
-                      {code}
-                    </li>
+                  {warnings.map((warning, index) => (
+                    <li key={`${warning.code}-${index}`}>{warningLabel(warning)}</li>
                   ))}
                 </ul>
               </TooltipContent>
@@ -126,7 +144,7 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
         ),
       }),
     ]);
-  }, [t]);
+  }, [t, warningLabel]);
 
   return (
     <section className="space-y-3">
@@ -144,6 +162,20 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
           <Checkbox checked={hasWarning} onCheckedChange={(checked) => setHasWarning(checked === true)} />
           {t("onlyWarnings")}
         </Label>
+        <ChoiceSelect
+          className="w-56"
+          value={warningType}
+          onChange={setWarningType}
+          noneLabel={t("allWarningTypes")}
+          ariaLabel={t("warningType")}
+          choices={WARNING_CODES.map((code) => ({ value: code, label: warningLabel({ code }) }))}
+        />
+        <div className="ml-auto flex flex-col items-end gap-1">
+          <Button variant="outline" onClick={doExport} disabled={!exportable || exporter.isPending}>
+            <DownloadIcon /> {t("export")}
+          </Button>
+          <p className="text-xs text-muted-foreground">{exportable ? t("exportNotice") : t("exportLocked")}</p>
+        </div>
       </div>
 
       <DataTable

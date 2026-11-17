@@ -3608,7 +3608,8 @@
       "inputs": "Inputs",
       "complaints": "Queries",
       "mail": "Send payslips by mail",
-      "mailLocked": "Only available after the period is published"
+      "mailLocked": "Only available after the period is published",
+      "review": "Review for approval"
     },
     "stepper": {
       "title": "Period status",
@@ -3696,7 +3697,13 @@
       "view": "Details",
       "totals": "Total",
       "totalsFiltered": "Total (filtered)",
-      "lines": "{count} payslips"
+      "lines": "{count} payslips",
+      "warningType": "Warning type",
+      "allWarningTypes": "All warning types",
+      "export": "Export Excel",
+      "exportNotice": "The file contains payroll data; do not share it.",
+      "exportLocked": "Period not calculated yet, cannot export",
+      "warningLine": "{count} payslips: {label}"
     },
     "drawer": {
       "office": "Office",
@@ -3758,7 +3765,8 @@
       "complaintAlreadyResolved": "This query was already resolved. Reload the page.",
       "targetLocked": "The period receiving the adjustment is approved or waiting for approval. Pick another period or open a later one.",
       "targetNotFound": "The receiving period is not open yet. Open it first.",
-      "periodNotPublished": "Mail can only be sent after the period is published."
+      "periodNotPublished": "Mail can only be sent after the period is published.",
+      "sheetEmpty": "Period not calculated yet, cannot export"
     },
     "inputs": {
       "metaTitle": "Payroll inputs",
@@ -3987,6 +3995,69 @@
       "error": {
         "NO_EMAIL": "No email address"
       }
+    },
+    "warnings": {
+      "W_GT_N": "Worked days W ({w}) exceed standard days N ({n})",
+      "KPI_MISSING": "No KPI coefficient, performance pay counted as 0",
+      "OT_MONTH_CAP": "OT {hours} h exceeds {cap} h/month",
+      "NET_NEGATIVE": "Net pay is negative",
+      "NET_BELOW_MIN_WAGE": "Net pay is below the regional minimum wage",
+      "NO_CONTRACT": "Has worked days but no contract",
+      "REGION_FALLBACK": "Region {region} has no minimum wage of its own, the general rate is used",
+      "TIMESHEET_PENDING": "{days} days of work still awaiting HR decision",
+      "PAID_OUTSIDE_CONTRACT": "Has worked days outside the contract term",
+      "LEGACY": "Legacy warning"
+    },
+    "checks": {
+      "loading": "Checking...",
+      "none": "No issues",
+      "TIMESHEET_NOT_LOCKED": "The timesheet period is not locked.",
+      "goTimesheets": "Go lock the timesheet period",
+      "OFFICE_REGION_MISSING": "{count} offices have no pay region",
+      "NO_CONTRACT_WITH_WORK": "{count} employees have worked days but no contract",
+      "PENDING_APPROVAL": "The period is awaiting approval.",
+      "SINGLE_APPROVER": "At least 2 people with approval rights are needed; you cannot approve your own submission",
+      "RECIPIENTS": "Payslips will be visible to {count} employees",
+      "sheetWarning": "{count} payslips: {label}",
+      "INVALID_STATUS": "The period is in status {status}; this step is not available yet",
+      "NO_APPROVER": "No one else has approval rights; add a company-wide HR account"
+    },
+    "review": {
+      "metaTitle": "Approve payroll",
+      "back": "Back to period",
+      "notFound": "Payroll period not found.",
+      "title": "Approve payroll {month}",
+      "submitted": "Submitted by {name} at {at}",
+      "note": "Submitter's note",
+      "approve": "Approve",
+      "reject": "Send back",
+      "cancel": "Cancel",
+      "blocked": {
+        "submitter": "You submitted this sheet, so you cannot approve it.",
+        "notPending": "The sheet is no longer pending, or it is not your turn to decide."
+      },
+      "employees": "Employees",
+      "vsPrev": "{pct}% vs last month",
+      "byOffice": "By office",
+      "noOffice": "No office data.",
+      "prevNet": "Net last month",
+      "warnings": "Warnings",
+      "noWarnings": "No warnings.",
+      "inputs": "Inputs this period",
+      "noInputs": "No inputs.",
+      "inputLine": "{code}: {lines} lines, {amount}",
+      "approveTitle": "Approve payroll {month}?",
+      "approveDescription": "After approval the payroll can be published.",
+      "rejectTitle": "Send back payroll {month}?",
+      "rejectDescription": "The payroll returns for edits and recalculation.",
+      "comment": "Comment (optional)",
+      "reason": "Reason",
+      "reasonHint": "At least {min} characters.",
+      "done": {
+        "approved": "Payroll approved",
+        "rejected": "Payroll sent back"
+      },
+      "conflict": "The sheet was already handled by someone else"
     }
   },
   "MissingOut": {

@@ -10,6 +10,8 @@ import { formatCurrency, formatNumber } from "@/lib/format";
 import { usePayslip } from "../hooks";
 import { displayName } from "../names";
 import type { PayslipDetail } from "../types";
+import { useWarningLabel } from "../use-warning-label";
+import { normalizeWarnings } from "../warnings";
 
 type PayslipDrawerProps = { month: string; employeeId: string | null; onClose: () => void };
 
@@ -43,6 +45,8 @@ export function PayslipDrawer({ month, employeeId, onClose }: PayslipDrawerProps
 function Body({ p }: { p: PayslipDetail }) {
   const t = useTranslations("Payroll.drawer");
   const tGroup = useTranslations("Payroll.drawer.groups");
+  const warningLabel = useWarningLabel();
+  const warnings = normalizeWarnings(p.warnings);
 
   const facts: [string, string][] = [
     [t("office"), displayName(p.officeName, p.officeId)],
@@ -75,13 +79,13 @@ function Body({ p }: { p: PayslipDetail }) {
     <>
       {p.nonDeductible && <Badge variant="info">{t("nonDeductible")}</Badge>}
 
-      {p.warnings.length > 0 && (
+      {warnings.length > 0 && (
         <Alert>
           <TriangleAlertIcon />
           <AlertDescription>
             <ul className="list-disc space-y-0.5 pl-4">
-              {p.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
+              {warnings.map((warning, index) => (
+                <li key={`${warning.code}-${index}`}>{warningLabel(warning)}</li>
               ))}
             </ul>
           </AlertDescription>

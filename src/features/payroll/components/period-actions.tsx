@@ -11,6 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import {
   useCalculatePeriod,
+  useChecks,
   useClosePeriod,
   useLockPeriod,
   usePayrollErrorMessage,
@@ -18,8 +19,10 @@ import {
   useRevokeApproval,
   useSubmitPeriod,
 } from "../hooks";
+import { hasBlockers } from "../checks";
+import { ChecksBox } from "./checks-box";
 import { isValidRevokeReason, knownActions, MIN_REVOKE_REASON } from "../status";
-import type { CalculateResponse, PayrollAction, PeriodDetail } from "../types";
+import type { CalculateResponse, CheckStep, PayrollAction, PeriodDetail } from "../types";
 
 type PeriodActionsProps = {
   period: PeriodDetail;
@@ -82,9 +85,10 @@ export function PeriodActions({ period, onCalculated }: PeriodActionsProps) {
         );
       case "CALCULATE":
         return (
-          <ConfirmDialog
+          <CheckedConfirm
             key={action}
-            trigger={<Button />}
+            month={month}
+            step="calculate"
             triggerLabel={label(action)}
             title={t("confirm.calculateTitle")}
             description={period.status === "CALCULATED" ? t("confirm.recalculate") : t("confirm.calculateDescription")}
@@ -99,9 +103,10 @@ export function PeriodActions({ period, onCalculated }: PeriodActionsProps) {
         );
       case "PUBLISH":
         return (
-          <ConfirmDialog
+          <CheckedConfirm
             key={action}
-            trigger={<Button />}
+            month={month}
+            step="publish"
             triggerLabel={label(action)}
             title={t("confirm.publishTitle")}
             description={t("confirm.publishDescription")}
@@ -139,6 +144,8 @@ export function PeriodActions({ period, onCalculated }: PeriodActionsProps) {
           label={t("submit.note")}
           placeholder={t("submit.notePlaceholder")}
           confirmLabel={label("SUBMIT")}
+          month={month}
+          checkStep="submit"
           optional
           onClose={() => setDialog(null)}
           onConfirm={(note) => run(() => submit.mutateAsync(note || undefined), "done.submitted")}
@@ -167,6 +174,9 @@ type NoteDialogProps = {
   placeholder?: string;
   hint?: string;
   confirmLabel: string;
+  /** Có thì hiện hộp kiểm tra của bước này phía trên ô ghi chú; có blocker thì khóa nút xác nhận. */
+  month?: string;
+  checkStep?: CheckStep;
   /** true: ô ghi chú có thể để trống. */
   optional?: boolean;
   validate?: (value: string) => boolean;
@@ -181,12 +191,16 @@ function NoteDialog({
   placeholder,
   hint,
   confirmLabel,
+  month,
+  checkStep,
   optional,
   validate,
   onClose,
   onConfirm,
 }: NoteDialogProps) {
   const t = useTranslations("Payroll");
+  const checks = useChecks(month ?? "", checkStep ?? "submit", !!month && !!checkStep);
+  const blocked = hasBlockers(checks.data);
   const [value, setValue] = useState("");
   const [pending, setPending] = useState(false);
   const trimmed = value.trim();
@@ -211,6 +225,7 @@ function NoteDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
+        {month && checkStep && <ChecksBox month={month} checks={checks.data} loading={checks.isPending} />}
         <div className="space-y-1">
           <Label htmlFor="payroll-note">{label}</Label>
           <Textarea
@@ -228,11 +243,62 @@ function NoteDialog({
           <Button variant="outline" onClick={onClose} disabled={pending}>
             {t("cancel")}
           </Button>
-          <Button onClick={confirm} disabled={!valid || pending}>
+          <Button onClick={confirm} disabled={!valid || pending || blocked}>
             {pending && <Spinner />} {confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+type CheckedConfirmProps = {
+  month: string;
+  step: CheckStep;
+  triggerLabel: string;
+  title: string;
+  description: string;
+  onConfirm: () => Promise<unknown>;
+};
+
+/** Hộp xác nhận có hộp kiểm tra phía trên: có blocker thì khóa nút xác nhận; lỗi tải kiểm tra thì không chặn. */
+function CheckedConfirm({ month, step, triggerLabel, title, description, onConfirm }: CheckedConfirmProps) {
+  const t = useTranslations("Payroll");
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const checks = useChecks(month, step, open);
+  const blocked = hasBlockers(checks.data);
+
+  async function confirm() {
+    setPending(true);
+    try {
+      await onConfirm();
+      setOpen(false);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>{triggerLabel}</Button>
+      <Dialog open={open} onOpenChange={(next) => !pending && setOpen(next)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </DialogHeader>
+          <ChecksBox month={month} checks={checks.data} loading={checks.isPending} />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={pending}>
+              {t("cancel")}
+            </Button>
+            <Button onClick={confirm} disabled={pending || blocked}>
+              {pending && <Spinner />} {triggerLabel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

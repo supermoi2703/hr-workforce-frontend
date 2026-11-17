@@ -3608,7 +3608,8 @@
       "inputs": "Khoản nhập",
       "complaints": "Thắc mắc",
       "mail": "Gửi phiếu qua mail",
-      "mailLocked": "Chỉ gửi được sau khi phát hành"
+      "mailLocked": "Chỉ gửi được sau khi phát hành",
+      "review": "Xem để duyệt"
     },
     "stepper": {
       "title": "Trạng thái kỳ lương",
@@ -3696,7 +3697,13 @@
       "view": "Chi tiết",
       "totals": "Tổng",
       "totalsFiltered": "Tổng (theo bộ lọc)",
-      "lines": "{count} phiếu"
+      "lines": "{count} phiếu",
+      "warningType": "Loại cảnh báo",
+      "allWarningTypes": "Mọi loại cảnh báo",
+      "export": "Xuất Excel",
+      "exportNotice": "File chứa dữ liệu lương, không chia sẻ.",
+      "exportLocked": "Kỳ chưa tính lương, chưa xuất được",
+      "warningLine": "{count} phiếu: {label}"
     },
     "drawer": {
       "office": "Văn phòng",
@@ -3758,7 +3765,8 @@
       "complaintAlreadyResolved": "Thắc mắc này đã được xử lý. Hãy tải lại trang.",
       "targetLocked": "Kỳ nhận điều chỉnh đã duyệt hoặc đang chờ duyệt. Chọn kỳ khác hoặc mở kỳ sau.",
       "targetNotFound": "Kỳ nhận chưa mở. Hãy mở kỳ đó trước.",
-      "periodNotPublished": "Chỉ gửi được sau khi phát hành."
+      "periodNotPublished": "Chỉ gửi được sau khi phát hành.",
+      "sheetEmpty": "Kỳ chưa tính lương, chưa xuất được"
     },
     "inputs": {
       "metaTitle": "Nhập khoản lương",
@@ -3987,6 +3995,69 @@
       "error": {
         "NO_EMAIL": "Không có email"
       }
+    },
+    "warnings": {
+      "W_GT_N": "Công W ({w}) lớn hơn công chuẩn N ({n})",
+      "KPI_MISSING": "Chưa có hệ số KPI, lương hiệu suất tính 0",
+      "OT_MONTH_CAP": "OT {hours} giờ vượt {cap} giờ/tháng",
+      "NET_NEGATIVE": "Thực lĩnh âm",
+      "NET_BELOW_MIN_WAGE": "Thực lĩnh nhỏ hơn lương tối thiểu vùng",
+      "NO_CONTRACT": "Có công nhưng không có hợp đồng",
+      "REGION_FALLBACK": "Văn phòng vùng {region} chưa có mức lương tối thiểu riêng, đang dùng mức chung",
+      "TIMESHEET_PENDING": "Còn {days} ngày công chờ HR quyết",
+      "PAID_OUTSIDE_CONTRACT": "Có công ngoài thời hạn hợp đồng",
+      "LEGACY": "Cảnh báo cũ"
+    },
+    "checks": {
+      "loading": "Đang kiểm tra...",
+      "none": "Không có vấn đề",
+      "TIMESHEET_NOT_LOCKED": "Bảng công chưa chốt kỳ.",
+      "goTimesheets": "Đi chốt kỳ công",
+      "OFFICE_REGION_MISSING": "{count} văn phòng chưa khai vùng lương",
+      "NO_CONTRACT_WITH_WORK": "{count} nhân viên có công nhưng không có hợp đồng",
+      "PENDING_APPROVAL": "Kỳ đang chờ duyệt.",
+      "SINGLE_APPROVER": "Cần ít nhất 2 người có quyền duyệt; bạn không tự duyệt được",
+      "RECIPIENTS": "Phiếu sẽ hiện cho {count} nhân viên",
+      "sheetWarning": "{count} phiếu: {label}",
+      "INVALID_STATUS": "Kỳ đang ở trạng thái {status}, chưa làm được bước này",
+      "NO_APPROVER": "Không còn ai khác có quyền duyệt; cần thêm tài khoản HR toàn công ty"
+    },
+    "review": {
+      "metaTitle": "Duyệt bảng lương",
+      "back": "Về kỳ lương",
+      "notFound": "Không tìm thấy kỳ lương.",
+      "title": "Duyệt bảng lương {month}",
+      "submitted": "Gửi bởi {name} lúc {at}",
+      "note": "Ghi chú của người gửi",
+      "approve": "Duyệt",
+      "reject": "Trả lại",
+      "cancel": "Hủy",
+      "blocked": {
+        "submitter": "Bạn là người gửi, không tự duyệt được.",
+        "notPending": "Bảng không còn chờ duyệt, hoặc bạn không có lượt duyệt."
+      },
+      "employees": "Số nhân viên",
+      "vsPrev": "{pct}% so với tháng trước",
+      "byOffice": "Theo văn phòng",
+      "noOffice": "Chưa có dữ liệu theo văn phòng.",
+      "prevNet": "Net tháng trước",
+      "warnings": "Cảnh báo",
+      "noWarnings": "Không có cảnh báo.",
+      "inputs": "Khoản nhập trong kỳ",
+      "noInputs": "Không có khoản nhập.",
+      "inputLine": "{code}: {lines} dòng, {amount}",
+      "approveTitle": "Duyệt bảng lương {month}?",
+      "approveDescription": "Sau khi duyệt, bảng lương có thể phát hành.",
+      "rejectTitle": "Trả lại bảng lương {month}?",
+      "rejectDescription": "Bảng lương quay về để chỉnh sửa và tính lại.",
+      "comment": "Ghi chú (không bắt buộc)",
+      "reason": "Lý do",
+      "reasonHint": "Tối thiểu {min} ký tự.",
+      "done": {
+        "approved": "Đã duyệt bảng lương",
+        "rejected": "Đã trả lại bảng lương"
+      },
+      "conflict": "Bảng đã được người khác xử lý"
     }
   },
   "MissingOut": {
