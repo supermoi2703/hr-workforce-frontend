@@ -5,6 +5,7 @@
   },
   "Common": {
     "retry": "Try again",
+    "toggleSidebar": "Toggle sidebar",
     "backToHome": "Back to home",
     "confirm": "Confirm",
     "cancel": "Cancel"
@@ -3572,6 +3573,9 @@
       },
       "attendanceAsOf": "{expected} expected to work, as of {time}",
       "attendanceOff": "Nobody is expected to work today",
+      "missingOut": "Missing check-outs to decide",
+      "missingOutDetail": "This month {thisMonth} · last month {previousMonth}",
+      "missingOutNone": "Nothing waiting",
       "attendanceGroups": {
         "present": "In the office",
         "remote": "WFH",

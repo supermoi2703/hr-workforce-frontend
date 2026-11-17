@@ -133,6 +133,8 @@ export type AttendanceToday = {
 /** Một phần của cơ cấu: `key` là mã nhóm (dịch ở FE) hoặc id văn phòng (kèm `label`). */
 export type Slice = { key: string; label: string | null; count: number };
 
+export type MissingOutPending = { thisMonth: number; previousMonth: number };
+
 export type HrDashboard = {
   headcount: number;
   onboarding: number;
@@ -145,6 +147,8 @@ export type HrDashboard = {
   contracts: ContractsExpiring | null;
   /** null = hôm nay không ai phải làm. */
   attendanceToday: AttendanceToday | null;
+  /** Ngày thiếu giờ ra chờ HR quyết (từ đầu tháng trước); null = không có quyền quyết. */
+  missingOut: MissingOutPending | null;
   payroll: { month: string; amount: number }[] | null;
   byEmploymentType: Slice[];
   byTenure: Slice[];
