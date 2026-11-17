@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { IconTile, type DomainTone } from "@/components/shared/icon-tile";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ export type Metric = {
  * Mỗi ô bấm được, dẫn tới trang chi tiết của chỉ số đó.
  */
 export function MetricStrip({ metrics, className }: { metrics: Metric[]; className?: string }) {
+  const t = useTranslations("Home");
   return (
     <ul
       className={cn("grid grid-cols-2 overflow-hidden rounded-xl border bg-card lg:grid-cols-4", className)}
@@ -40,11 +42,11 @@ export function MetricStrip({ metrics, className }: { metrics: Metric[]; classNa
               {metric.value !== undefined ? (
                 <span className="block text-xl leading-7 font-semibold tabular-nums">{metric.value}</span>
               ) : (
-                <span className="block text-xl leading-7 font-semibold text-muted-foreground/60" aria-label="Chưa có dữ liệu">
+                <span className="block text-xl leading-7 font-semibold text-muted-foreground/60" aria-label={t("noData")}>
                   —
                 </span>
               )}
-              <span className="block text-xs text-muted-foreground">{metric.detail ?? "Chưa có dữ liệu"}</span>
+              <span className="block text-xs text-muted-foreground">{metric.detail ?? t("noData")}</span>
             </span>
           </Link>
         </li>

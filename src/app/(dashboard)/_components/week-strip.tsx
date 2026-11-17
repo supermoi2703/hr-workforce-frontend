@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const WEEKDAY_LABELS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
 /** 7 ngày (yyyy-MM-dd) của tuần chứa `isoDate`, bắt đầu từ thứ Hai. */
 export function weekOf(isoDate: string): string[] {
@@ -27,10 +28,11 @@ type WeekStripProps = {
 
 /** Dải 7 ngày của tuần hiện tại, ô hôm nay tô màu thương hiệu. */
 export function WeekStrip({ today, dayContent = {}, className }: WeekStripProps) {
+  const t = useTranslations("Home.week");
   const days = weekOf(today);
 
   return (
-    <ol aria-label="Tuần này" className={cn("grid grid-cols-7 gap-1.5 sm:gap-2", className)}>
+    <ol aria-label={t("title")} className={cn("grid grid-cols-7 gap-1.5 sm:gap-2", className)}>
       {days.map((day, index) => {
         const isToday = day === today;
         const isWeekend = index >= 5;
@@ -45,7 +47,7 @@ export function WeekStrip({ today, dayContent = {}, className }: WeekStripProps)
               isWeekend && !isToday && "border-transparent bg-muted text-muted-foreground",
             )}
           >
-            <span className={cn("text-xs", !isToday && "text-muted-foreground")}>{WEEKDAY_LABELS[index]}</span>
+            <span className={cn("text-xs", !isToday && "text-muted-foreground")}>{t(`days.${WEEKDAYS[index]}`)}</span>
             <time dateTime={day} className="text-lg leading-7 font-semibold">
               {Number(day.slice(8, 10))}
             </time>

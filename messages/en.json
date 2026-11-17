@@ -3326,6 +3326,44 @@
       "versionConflict": "Someone else just changed this announcement. The list was reloaded, open it again to see the latest version."
     }
   },
+  "Home": {
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "noon": "Good afternoon, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "metrics": {
+      "checkIn": "Today's check-in",
+      "leaveLeft": "Leave remaining",
+      "leaveValue": "{count, plural, one {# day} other {# days}}",
+      "leaveUsed": "Used {used}/{total} days",
+      "pending": "My pending requests",
+      "pendingDetail": "Waiting for approval",
+      "projects": "Active projects",
+      "projectsDetail": "{percent}% of time"
+    },
+    "noData": "No data yet",
+    "week": {
+      "title": "This week",
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "quickLinks": {
+      "title": "Quick access",
+      "leave": "Request leave",
+      "payslips": "View payslips",
+      "officeCalendar": "Office calendar",
+      "employees": "Find employees"
+    }
+  },
   "Dashboard": {
     "title": "Dashboard",
     "Filters": {
@@ -3366,7 +3404,7 @@
         "IN_PROGRESS": "Working",
         "REMOTE": "Working from home",
         "ABSENT": "Absent",
-        "UPCOMING": "Not started",
+        "UPCOMING": "Not checked in",
         "HOLIDAY": "Holiday",
         "OFF": "Day off",
         "LEAVE_PAID": "Paid leave",
