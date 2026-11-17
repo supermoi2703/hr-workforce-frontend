@@ -20,6 +20,7 @@ export type StatusLogEntry = {
   from: PayrollPeriodStatus | null;
   to: PayrollPeriodStatus;
   actorUserId: string | null;
+  actorName?: string | null;
   reason: string | null;
   at: string;
 };
@@ -31,18 +32,25 @@ export type PeriodDetail = {
   endDate: string;
   lockedAt: string | null;
   lockedBy: string | null;
+  // Tên người thao tác: backend mới có thể trả thêm; thiếu thì hiện id rút gọn.
+  lockedByName?: string | null;
   calculatedAt: string | null;
   calculatedBy: string | null;
+  calculatedByName?: string | null;
   submittedAt: string | null;
   submittedBy: string | null;
+  submittedByName?: string | null;
   approvalRequestId: string | null;
   approvedAt: string | null;
   approvedBy: string | null;
+  approvedByName?: string | null;
   publishedAt: string | null;
   publishedBy: string | null;
+  publishedByName?: string | null;
   complaintDeadline: string | null;
   closedAt: string | null;
   closedBy: string | null;
+  closedByName?: string | null;
   pendingApproval: boolean;
   employees: number;
   statusLog: StatusLogEntry[];
@@ -65,6 +73,7 @@ export type PayslipRow = {
   employeeCode: string;
   fullName: string;
   officeId: string | null;
+  officeName?: string | null;
   contractType: string | null;
   /** Công thực tế (paidDays). */
   w: number;
@@ -110,6 +119,7 @@ export type PayslipDetail = {
   employeeCode: string;
   fullName: string;
   officeId: string | null;
+  officeName?: string | null;
   contractType: string | null;
   standardDays: number;
   paidDays: number;
@@ -159,6 +169,8 @@ export type PayrollInput = {
   id: string;
   month: string;
   employeeId: string;
+  employeeCode?: string | null;
+  fullName?: string | null;
   code: PayrollInputCode;
   amount: number | null;
   quantity: number | null;
@@ -168,6 +180,7 @@ export type PayrollInput = {
   supersededBy: string | null;
   createdAt: string;
   createdBy: string | null;
+  createdByName?: string | null;
   deletedAt: string | null;
   deletedBy: string | null;
   deleteReason: string | null;
@@ -175,6 +188,8 @@ export type PayrollInput = {
 
 export type InputCreateBody = {
   employeeId: string;
+  employeeCode?: string | null;
+  fullName?: string | null;
   code: PayrollInputCode;
   amount?: number;
   quantity?: number;

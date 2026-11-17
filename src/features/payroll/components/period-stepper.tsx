@@ -4,11 +4,9 @@ import { CheckIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { displayName } from "../names";
 import { PAYROLL_STEPS, sortedLog, stepState, stepStamp } from "../status";
 import type { PeriodDetail } from "../types";
-
-/** Chỉ có id người thao tác (backend chưa trả tên), nên hiện 8 ký tự đầu. */
-const shortId = (id: string | null) => (id ? id.slice(0, 8) : null);
 
 export function PeriodStepper({ period }: { period: PeriodDetail }) {
   const t = useTranslations("Payroll");
@@ -44,7 +42,7 @@ export function PeriodStepper({ period }: { period: PeriodDetail }) {
             {stamp && (
               <p className="mt-2 text-xs text-muted-foreground">
                 <time>{formatDateTime(stamp.at)}</time>
-                {stamp.by && <span className="block">{t("stepper.by", { id: shortId(stamp.by) ?? "" })}</span>}
+                {stamp.by && <span className="block">{t("stepper.by", { id: displayName(stamp.byName, stamp.by) })}</span>}
               </p>
             )}
           </li>
@@ -67,7 +65,7 @@ export function StatusLog({ period }: { period: PeriodDetail }) {
           <span className="font-medium">
             {entry.from ? t("transition", { from: tStatus(entry.from), to: tStatus(entry.to) }) : t("created", { to: tStatus(entry.to) })}
           </span>
-          {entry.actorUserId && <span className="text-xs text-muted-foreground">{t("by", { id: shortId(entry.actorUserId) ?? "" })}</span>}
+          {entry.actorUserId && <span className="text-xs text-muted-foreground">{t("by", { id: displayName(entry.actorName, entry.actorUserId) })}</span>}
           {entry.reason && <span className="text-muted-foreground">{entry.reason}</span>}
         </li>
       ))}

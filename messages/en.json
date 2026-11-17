@@ -3699,6 +3699,7 @@
       "lines": "{count} payslips"
     },
     "drawer": {
+      "office": "Office",
       "title": "Payslip",
       "snapshot": "Inputs used",
       "lines": "Payslip lines",

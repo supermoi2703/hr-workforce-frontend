@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { usePayslip } from "../hooks";
+import { displayName } from "../names";
 import type { PayslipDetail } from "../types";
 
 type PayslipDrawerProps = { month: string; employeeId: string | null; onClose: () => void };
@@ -44,6 +45,7 @@ function Body({ p }: { p: PayslipDetail }) {
   const tGroup = useTranslations("Payroll.drawer.groups");
 
   const facts: [string, string][] = [
+    [t("office"), displayName(p.officeName, p.officeId)],
     [t("standardDays"), formatNumber(p.standardDays)],
     [t("paidDays"), formatNumber(p.paidDays)],
     [t("otNormal"), formatNumber(p.otHoursNormal)],
