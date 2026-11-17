@@ -1904,6 +1904,44 @@
       }
     }
   },
+  "PolicyQa": {
+    "metaTitle": "Hỏi đáp chính sách",
+    "title": "Hỏi đáp chính sách",
+    "description": "Hỏi về quy định của công ty. Câu trả lời chỉ dựa trên tài liệu chính sách và có ghi nguồn.",
+    "labBadge": "Thử nghiệm",
+    "privacy": "Câu hỏi được gửi tới Google Gemini để xử lý. Đừng nhập thông tin cá nhân hay bí mật của công ty.",
+    "placeholder": "Ví dụ: Một tuần được WFH tối đa mấy ngày?",
+    "inputLabel": "Câu hỏi về chính sách",
+    "hint": "Nhấn Enter để gửi, Shift + Enter để xuống dòng.",
+    "ask": "Hỏi",
+    "newConversation": "Hỏi lại từ đầu",
+    "searching": "Đang tìm trong tài liệu chính sách…",
+    "suggestionsTitle": "Thử hỏi",
+    "suggestions": {
+      "leave": "Nhân viên được bao nhiêu ngày phép năm?",
+      "remote": "Một tuần được WFH tối đa mấy ngày?",
+      "lunch": "Giờ nghỉ trưa là mấy giờ?",
+      "approval": "Đơn nghỉ từ mấy ngày thì cần HR duyệt thêm?"
+    },
+    "noAnswer": "Chính sách hiện chưa quy định nội dung này, hoặc không tìm thấy trong tài liệu. Bạn có thể hỏi HR nếu cần.",
+    "sourcesTitle": "Căn cứ ({count})",
+    "sourceFile": "Tài liệu: {file}",
+    "parameters": {
+      "title": "Giá trị đang áp dụng",
+      "upcoming": "Từ {date}: {value}",
+      "yes": "Có",
+      "no": "Không"
+    },
+    "status": {
+      "disabled": "Trợ lý đang tắt hoặc chưa được cấu hình khóa. Liên hệ quản trị viên để bật.",
+      "keywordOnly": "Trợ lý đang tìm theo từ khóa vì dịch vụ ngôn ngữ chưa sẵn sàng. Câu trả lời vẫn có nguồn nhưng có thể kém chính xác hơn."
+    },
+    "responseTime": "{seconds} giây",
+    "errors": {
+      "disabled": "Trợ lý hỏi đáp đang tắt hoặc chưa được cấu hình.",
+      "unavailable": "Trợ lý tạm thời không phản hồi (dịch vụ ngôn ngữ lỗi hoặc hết hạn mức). Vui lòng thử lại sau ít phút."
+    }
+  },
   "Skills": {
     "metaTitle": "Kỹ năng",
     "title": "Kỹ năng",

@@ -1904,6 +1904,44 @@
       }
     }
   },
+  "PolicyQa": {
+    "metaTitle": "Policy Q&A",
+    "title": "Policy Q&A",
+    "description": "Ask about company rules. Answers are based only on the policy documents and cite their sources.",
+    "labBadge": "Experimental",
+    "privacy": "Your question is sent to Google Gemini for processing. Do not enter personal information or company secrets.",
+    "placeholder": "Example: How many days a week can I work from home?",
+    "inputLabel": "Question about policy",
+    "hint": "Press Enter to send, Shift + Enter for a new line.",
+    "ask": "Ask",
+    "newConversation": "Start over",
+    "searching": "Searching the policy documents…",
+    "suggestionsTitle": "Try asking",
+    "suggestions": {
+      "leave": "How many days of annual leave does an employee get?",
+      "remote": "How many days a week can I work from home?",
+      "lunch": "What time is the lunch break?",
+      "approval": "How long must a leave request be to need an extra HR approval?"
+    },
+    "noAnswer": "The policy does not cover this yet, or it was not found in the documents. Ask HR if you need an answer.",
+    "sourcesTitle": "Sources ({count})",
+    "sourceFile": "Document: {file}",
+    "parameters": {
+      "title": "Values currently in force",
+      "upcoming": "From {date}: {value}",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "status": {
+      "disabled": "The assistant is off or has no API key configured. Ask an administrator to turn it on.",
+      "keywordOnly": "The assistant is searching by keywords because the language service is not ready. Answers still cite sources but may be less accurate."
+    },
+    "responseTime": "{seconds} s",
+    "errors": {
+      "disabled": "The policy assistant is off or not configured.",
+      "unavailable": "The assistant is not responding right now (language service error or quota reached). Please try again in a few minutes."
+    }
+  },
   "Skills": {
     "metaTitle": "Skills",
     "title": "Skills",

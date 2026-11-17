@@ -126,7 +126,7 @@ export const NAV_GROUPS: NavGroup[] = [
     owner: "cuongvv",
     collapsible: true,
     items: [
-      { id: "policyQa", href: "/lab/policy-qa", icon: MessageSquareTextIcon, access: HR_ONLY, task: "AI-2", badge: "Lab" },
+      { id: "policyQa", href: "/lab/policy-qa", icon: MessageSquareTextIcon, access: { permissions: ["ai:policy-qa"] }, task: "AI-2", badge: "Lab" },
       { id: "allocationSuggest", href: "/lab/allocation-suggest", icon: SparklesIcon, access: HR_ONLY, task: "AI-3", badge: "Lab", owner: "quangnn" },
       { id: "dataQa", href: "/lab/data-qa", icon: BrainCircuitIcon, access: HR_ONLY, task: "AI-4", badge: "Lab" },
     ],
