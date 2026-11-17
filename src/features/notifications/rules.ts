@@ -32,6 +32,7 @@ const PARAM_KEYS: Record<NotificationType, readonly string[]> = {
   CONTRACT_EXPIRING: ["contractNumber", "employeeName", "endDate"],
   MISSING_CHECKOUT: ["workDate"],
   PAYSLIP_PUBLISHED: ["period", "complaintDeadline"],
+  ANNOUNCEMENT_PUBLISHED: ["title"],
 };
 
 /** Tham số là ngày (yyyy-MM-dd) cần định dạng theo kiểu Việt Nam trước khi ghép câu. */

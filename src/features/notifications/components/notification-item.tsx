@@ -12,6 +12,7 @@ import {
   FileClockIcon,
   FolderMinusIcon,
   GraduationCapIcon,
+  MegaphoneIcon,
   ReceiptTextIcon,
   RepeatIcon,
   Undo2Icon,
@@ -45,6 +46,8 @@ function iconOf(notification: AppNotification): ReactNode {
       return <FileClockIcon />;
     case "MISSING_CHECKOUT":
       return <ClockAlertIcon />;
+    case "ANNOUNCEMENT_PUBLISHED":
+      return <MegaphoneIcon />;
     case "PAYSLIP_PUBLISHED":
       return <ReceiptTextIcon />;
     default:
