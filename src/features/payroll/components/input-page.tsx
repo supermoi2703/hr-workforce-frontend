@@ -28,9 +28,9 @@ import {
   inputValue,
   isMoneyCode,
   isValidReason,
-  shortId,
   type InputGroup,
 } from "../inputs";
+import { displayName, employeeLabel } from "../names";
 import { isValidMonth } from "../status";
 import type { PayrollInput } from "../types";
 import { InputFormDialog } from "./input-form-dialog";
@@ -44,7 +44,7 @@ export function InputPage({ month }: { month: string }) {
   const inputs = useInputs(month, undefined, false, valid);
   const [group, setGroup] = useState<InputGroup>("bonus");
   const [form, setForm] = useState<{ input?: PayrollInput } | null>(null);
-  const [history, setHistory] = useState<string | null>(null);
+  const [history, setHistory] = useState<{ id: string; label: string } | null>(null);
   const [saved, setSaved] = useState(false);
 
   const back = (
@@ -152,7 +152,7 @@ export function InputPage({ month }: { month: string }) {
           onSaved={() => setSaved(true)}
         />
       )}
-      {history && <HistoryDialog month={month} employeeId={history} onClose={() => setHistory(null)} />}
+      {history && <HistoryDialog month={month} employeeId={history.id} label={history.label} onClose={() => setHistory(null)} />}
     </div>
   );
 }
@@ -162,7 +162,7 @@ type InputTableProps = {
   showSource: boolean;
   canEdit: boolean;
   onEdit: (input: PayrollInput) => void;
-  onHistory: (employeeId: string) => void;
+  onHistory: (employee: { id: string; label: string }) => void;
 };
 
 function ValueCell({ input }: { input: PayrollInput }) {
@@ -202,8 +202,8 @@ function InputTable({ rows, showSource, canEdit, onEdit, onHistory }: InputTable
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell className="font-mono text-xs" title={row.employeeId}>
-                  {shortId(row.employeeId)}
+                <TableCell className="whitespace-normal" title={row.employeeId}>
+                  {employeeLabel(row.employeeCode, row.fullName, row.employeeId)}
                 </TableCell>
                 <TableCell>{t(`codes.${row.code}`)}</TableCell>
                 <TableCell className="text-right">
@@ -212,12 +212,12 @@ function InputTable({ rows, showSource, canEdit, onEdit, onHistory }: InputTable
                 {showSource && <TableCell>{row.adjustSourceMonth ?? "—"}</TableCell>}
                 <TableCell className="max-w-64 whitespace-normal">{row.reason}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">
-                  <span className="block font-mono">{shortId(row.createdBy)}</span>
+                  <span className="block">{displayName(row.createdByName, row.createdBy)}</span>
                   <time>{formatDateTime(row.createdAt)}</time>
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon-sm" aria-label={t("history")} title={t("history")} onClick={() => onHistory(row.employeeId)}>
+                    <Button variant="ghost" size="icon-sm" aria-label={t("history")} title={t("history")} onClick={() => onHistory({ id: row.employeeId, label: employeeLabel(row.employeeCode, row.fullName, row.employeeId) })}>
                       <HistoryIcon />
                     </Button>
                     {canEdit && (
@@ -327,7 +327,7 @@ function ReasonDialogShell({
 }
 
 /** Mọi dòng của một nhân viên trong kỳ, kể cả dòng đã bị thay hoặc xóa. */
-function HistoryDialog({ month, employeeId, onClose }: { month: string; employeeId: string; onClose: () => void }) {
+function HistoryDialog({ month, employeeId, label, onClose }: { month: string; employeeId: string; label: string; onClose: () => void }) {
   const t = useTranslations("Payroll.inputs");
   const query = useInputs(month, employeeId, true);
   return (
@@ -335,7 +335,7 @@ function HistoryDialog({ month, employeeId, onClose }: { month: string; employee
       <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("historyTitle")}</DialogTitle>
-          <DialogDescription className="font-mono text-xs">{employeeId}</DialogDescription>
+          <DialogDescription>{label}</DialogDescription>
         </DialogHeader>
         {query.isPending ? (
           <LoadingState />
@@ -363,7 +363,7 @@ function HistoryDialog({ month, employeeId, onClose }: { month: string; employee
                   </div>
                   <p>{row.reason}</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDateTime(row.createdAt)} · {shortId(row.createdBy)}
+                    {formatDateTime(row.createdAt)} · {displayName(row.createdByName, row.createdBy)}
                     {row.deletedAt && ` · ${t("deletedAt", { at: formatDateTime(row.deletedAt) })}${row.deleteReason ? `: ${row.deleteReason}` : ""}`}
                   </p>
                 </li>

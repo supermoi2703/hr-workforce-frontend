@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { useSheet } from "../hooks";
+import { displayName } from "../names";
 import type { PayrollPeriodStatus, PayslipRow } from "../types";
 import { PayslipDrawer } from "./payslip-drawer";
 
@@ -73,7 +74,7 @@ export function PayslipSheet({ month, status }: PayslipSheetProps) {
       }),
       col.accessor("officeId", {
         header: t("office"),
-        cell: (c) => <span className="font-mono text-xs text-muted-foreground">{c.getValue()?.slice(0, 8) ?? "—"}</span>,
+        cell: (c) => <span className="text-muted-foreground">{displayName(c.row.original.officeName, c.getValue())}</span>,
       }),
       col.display({
         id: "days",

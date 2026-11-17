@@ -3699,6 +3699,7 @@
       "lines": "{count} phiếu"
     },
     "drawer": {
+      "office": "Văn phòng",
       "title": "Phiếu lương",
       "snapshot": "Dữ liệu đã dùng để tính",
       "lines": "Các dòng phiếu",

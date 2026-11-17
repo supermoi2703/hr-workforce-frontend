@@ -146,6 +146,3 @@ export function buildInputBody(values: InputFormValues): {
   if (values.code === "ADJUST") body.adjustSourceMonth = values.sourceMonth.trim();
   return body;
 }
-
-/** Id rút gọn khi backend chưa trả tên. */
-export const shortId = (id: string | null | undefined) => (id ? id.slice(0, 8) : "—");

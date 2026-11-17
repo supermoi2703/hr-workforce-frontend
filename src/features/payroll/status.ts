@@ -22,17 +22,17 @@ export function knownActions(nextActions: string[] | undefined): PayrollAction[]
 }
 
 /** Ai/lúc nào đã đưa kỳ vào từng bước (null nếu chưa tới hoặc backend không ghi). */
-export function stepStamp(period: PeriodDetail, step: PayrollPeriodStatus): { at: string; by: string | null } | null {
-  const pairs: Record<PayrollPeriodStatus, [string | null, string | null]> = {
-    OPEN: [null, null],
-    LOCKED: [period.lockedAt, period.lockedBy],
-    CALCULATED: [period.calculatedAt, period.calculatedBy],
-    APPROVED: [period.approvedAt, period.approvedBy],
-    PUBLISHED: [period.publishedAt, period.publishedBy],
-    CLOSED: [period.closedAt, period.closedBy],
+export function stepStamp(period: PeriodDetail, step: PayrollPeriodStatus): { at: string; by: string | null; byName: string | null } | null {
+  const pairs: Record<PayrollPeriodStatus, [string | null, string | null, string | null | undefined]> = {
+    OPEN: [null, null, null],
+    LOCKED: [period.lockedAt, period.lockedBy, period.lockedByName],
+    CALCULATED: [period.calculatedAt, period.calculatedBy, period.calculatedByName],
+    APPROVED: [period.approvedAt, period.approvedBy, period.approvedByName],
+    PUBLISHED: [period.publishedAt, period.publishedBy, period.publishedByName],
+    CLOSED: [period.closedAt, period.closedBy, period.closedByName],
   };
-  const [at, by] = pairs[step];
-  return at ? { at, by } : null;
+  const [at, by, byName] = pairs[step];
+  return at ? { at, by, byName: byName ?? null } : null;
 }
 
 export const MIN_REVOKE_REASON = 10;
