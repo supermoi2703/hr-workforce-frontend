@@ -1,38 +1,40 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { EyeIcon } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/shared/user-avatar";
+import { cn } from "@/lib/utils";
+
+/** Link chữ trong bảng: màu chữ thường, gạch chân khi rê chuột hoặc focus (như bảng thành viên trang Tổ chức). */
+export const TEXT_LINK =
+  "rounded-sm text-left underline-offset-4 hover:underline focus-visible:underline focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none";
 
 type PersonCellProps = {
   fullName: string;
   employeeCode: string;
-  /** Dòng phụ dưới mã nhân viên (vd cấp bậc). */
+  /** Dòng phụ cạnh mã nhân viên (vd cấp bậc). */
   extra?: ReactNode;
+  /** Dòng trên cũng là người này (hàng chờ): ẩn ảnh và tên để không lặp, vẫn đọc được tên bằng trình đọc màn hình. */
+  repeated?: boolean;
   onOpen: () => void;
 };
 
 /**
- * Ô "nhân viên" trong bảng: tên hiện như link (màu chủ đạo, gạch chân mờ) để người dùng biết bấm được, mở khung kỹ năng
- * của người đó. Đi cùng nút {@link ViewSkillsButton} ở cột thao tác cho ai không để ý tới link.
+ * Ô "nhân viên" trong bảng. Cả dòng bấm được (DataTable `onRowClick`) để mở khung kỹ năng; tên là nút thật làm cùng việc cho
+ * người dùng bàn phím.
  */
-export function PersonCell({ fullName, employeeCode, extra, onOpen }: PersonCellProps) {
+export function PersonCell({ fullName, employeeCode, extra, repeated, onOpen }: PersonCellProps) {
   const t = useTranslations("Skills.Person");
+  if (repeated) return <span className="sr-only">{fullName}</span>;
   return (
     <span className="flex items-center gap-3">
       <UserAvatar name={fullName} seed={employeeCode} />
-      <span className="flex min-w-0 flex-col">
-        <button
-          type="button"
-          onClick={onOpen}
-          title={t("viewSkillsOf", { name: fullName })}
-          className="w-fit text-left font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary focus-visible:decoration-primary focus-visible:outline-none"
-        >
+      <span className="flex min-w-0 flex-col gap-0.5">
+        <button type="button" onClick={onOpen} title={t("viewSkillsOf", { name: fullName })} className={cn(TEXT_LINK, "w-fit font-medium")}>
           {fullName}
         </button>
-        <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground tabular-nums">
+        <span className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground tabular-nums">
           {employeeCode}
           {extra}
         </span>
@@ -41,12 +43,14 @@ export function PersonCell({ fullName, employeeCode, extra, onOpen }: PersonCell
   );
 }
 
-/** Nút "Xem kỹ năng" ở cột thao tác. */
-export function ViewSkillsButton({ fullName, onOpen }: { fullName: string; onOpen: () => void }) {
-  const t = useTranslations("Skills.Person");
-  return (
-    <Button size="sm" variant="ghost" onClick={onOpen} aria-label={t("viewSkillsOf", { name: fullName })}>
-      <EyeIcon /> <span className="hidden sm:inline">{t("viewSkills")}</span>
-    </Button>
-  );
+/**
+ * Nút phụ đi cùng nút chính màu đặc (vd "Chốt mức khác" cạnh "Xác nhận"): viền và chữ màu chủ đạo, để nhìn rõ là nút mà
+ * vẫn nhẹ hơn nút chính. Dùng với `<Button variant="outline">`.
+ */
+export const SECONDARY_ACTION =
+  "border-primary/50 font-semibold text-primary hover:border-primary hover:bg-primary/10 hover:text-primary dark:border-primary/60 dark:text-primary";
+
+/** Dấu › cuối dòng: báo cả dòng bấm được, đậm lên khi rê chuột qua dòng. */
+export function RowChevron() {
+  return <ChevronRightIcon className="size-4 text-muted-foreground/60 transition-colors group-hover/row:text-foreground" aria-hidden />;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckIcon, PlusIcon, SlidersHorizontalIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,8 @@ import { useEmployeeSkills, useSkillErrorMessage, useSkillMutation, useVerifierS
 import { groupByCategory, skillStatus } from "../rules";
 import type { EmployeeSkill } from "../types";
 import { ConfirmationInfo } from "./confirmation-info";
-import { LevelLabel, SkillStatusBadge } from "./skill-level";
+import { SECONDARY_ACTION } from "./person-cell";
+import { LevelLabel, SkillStatusChip } from "./skill-level";
 import { VerifyLevelDialog, type VerifyTarget } from "./verify-level-dialog";
 
 export type SheetPerson = { employeeId: string; fullName: string; employeeCode: string; subtitle?: string };
@@ -100,7 +101,7 @@ function SheetBody({ person }: { person: SheetPerson }) {
                   <li key={skill.skillId} className="flex flex-col gap-1.5 px-3 py-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{skill.skillName}</span>
-                      <SkillStatusBadge skill={skill} />
+                      <SkillStatusChip skill={skill} />
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                       <LevelLabel level={skill.level} />
@@ -115,6 +116,7 @@ function SheetBody({ person }: { person: SheetPerson }) {
                         {status === "pending" && skill.selfLevel !== null && (
                           <Button
                             size="xs"
+                            className="font-semibold"
                             disabled={confirm.isPending}
                             onClick={() =>
                               confirm.mutate(skill, {
@@ -123,15 +125,16 @@ function SheetBody({ person }: { person: SheetPerson }) {
                               })
                             }
                           >
-                            <CheckIcon /> {busy ? t("confirming") : t("confirm")}
+                            {busy ? t("confirming") : t("confirm")}
                           </Button>
                         )}
                         <Button
                           size="xs"
                           variant="outline"
+                          className={SECONDARY_ACTION}
                           onClick={() => setVerify({ employeeId: person.employeeId, fullName: person.fullName, skill })}
                         >
-                          <SlidersHorizontalIcon /> {t("adjust")}
+                          {t("adjust")}
                         </Button>
                         {!skill.skillActive && <Badge variant="outline">{t("inactive")}</Badge>}
                       </div>

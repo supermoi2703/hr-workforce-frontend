@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import {
   createColumnHelper,
+  metaHelper,
   rowPaginationFeature,
   rowSortingFeature,
   tableFeatures,
@@ -22,8 +23,18 @@ import { cn } from "@/lib/utils";
 import { EmptyState, ErrorState } from "../states";
 import { DataTablePagination } from "./data-table-pagination";
 
+/**
+ * Tùy chọn riêng của một cột (`meta` khi khai báo cột):
+ * - `className`: gắn vào ô tiêu đề và mọi ô của cột, vd `"hidden sm:table-cell"` để ẩn cột phụ trên điện thoại.
+ */
+export type DataTableColumnMeta = { className?: string };
+
 /** Bảng chỉ dùng phân trang + sắp xếp phía server (backend trả PageResponse). */
-export const dataTableFeatures = tableFeatures({ rowPaginationFeature, rowSortingFeature });
+export const dataTableFeatures = tableFeatures({
+  rowPaginationFeature,
+  rowSortingFeature,
+  columnMeta: metaHelper<DataTableColumnMeta>(),
+});
 
 type Features = typeof dataTableFeatures;
 
@@ -174,7 +185,10 @@ export function DataTable<TData extends RowData>({
                 {group.headers.map((header) => {
                   const sorted = header.column.getIsSorted();
                   return (
-                    <TableHead key={header.id} aria-sort={sorted ? (sorted === "asc" ? "ascending" : "descending") : undefined}>
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.meta?.className}
+                      aria-sort={sorted ? (sorted === "asc" ? "ascending" : "descending") : undefined}>
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <button
                           type="button"
@@ -228,7 +242,7 @@ export function DataTable<TData extends RowData>({
                   }
                 >
                   {row.getAllCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className={cell.column.columnDef.meta?.className}>
                       <table.FlexRender cell={cell} />
                     </TableCell>
                   ))}

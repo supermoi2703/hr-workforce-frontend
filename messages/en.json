@@ -2004,7 +2004,16 @@
       "remove": "Remove",
       "removeTitle": "Remove {name}?",
       "removeDescription": "The skill will no longer be on your profile. Its change history is kept.",
-      "removed": "Removed {name}."
+      "removed": "Removed {name}.",
+      "bannerTitle": "My skills",
+      "bannerUnit": "{count, plural, one {skill} other {skills}}",
+      "toConfirm": "{count, plural, one {# skill waits} other {# skills wait}} for your confirmation",
+      "colSkill": "Skill",
+      "colLevel": "Level",
+      "colYears": "Experience",
+      "colStatus": "Status",
+      "yearsShort": "{years} yrs",
+      "declaredOn": "Declared · {date}"
     },
     "Verify": {
       "adjustTitle": "Set level for {name}",
@@ -2093,7 +2102,10 @@
         "LEAD": "Lead",
         "PRINCIPAL": "Principal"
       },
-      "actions": "Actions"
+      "actions": "Actions",
+      "clearAll": "Clear all",
+      "fromLevel": "level",
+      "unconfirmedHint": "unconfirmed"
     },
     "Catalog": {
       "search": "Search by name or code",
@@ -2163,7 +2175,6 @@
       "noteRequired": "Add a reason when setting a level different from the one the employee declared."
     },
     "Person": {
-      "viewSkills": "View skills",
       "viewSkillsOf": "View {name}'s skills"
     },
     "Confirmation": {
@@ -2172,7 +2183,10 @@
       "adjustedSelf": "You declared level {self}; {name} set level {confirmed} · {date}",
       "adjustedOther": "Self-declared level {self}; {name} set level {confirmed} · {date}",
       "addedBy": "Added by {name} · {date}",
-      "noteLabel": "Note from {name}"
+      "declaredSelf": "You declared level {level}",
+      "declaredOther": "Self-declared level {level}",
+      "noteTitleAdjusted": "{name} set level {self} → {confirmed}",
+      "noteTitle": "{name}"
     }
   },
   "Employees": {

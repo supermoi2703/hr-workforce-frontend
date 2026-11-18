@@ -2004,7 +2004,16 @@
       "remove": "Xóa",
       "removeTitle": "Xóa kỹ năng {name}?",
       "removeDescription": "Kỹ năng sẽ không còn trong hồ sơ của bạn. Lịch sử thay đổi vẫn được lưu.",
-      "removed": "Đã xóa kỹ năng {name}."
+      "removed": "Đã xóa kỹ năng {name}.",
+      "bannerTitle": "Kỹ năng của tôi",
+      "bannerUnit": "{count, plural, other {kỹ năng}}",
+      "toConfirm": "{count} kỹ năng chờ bạn xác nhận",
+      "colSkill": "Kỹ năng",
+      "colLevel": "Mức",
+      "colYears": "Kinh nghiệm",
+      "colStatus": "Trạng thái",
+      "yearsShort": "{years} năm",
+      "declaredOn": "Bạn khai · {date}"
     },
     "Verify": {
       "adjustTitle": "Chốt mức {name}",
@@ -2093,7 +2102,10 @@
         "LEAD": "Lead",
         "PRINCIPAL": "Principal"
       },
-      "actions": "Thao tác"
+      "actions": "Thao tác",
+      "clearAll": "Bỏ tất cả",
+      "fromLevel": "từ mức",
+      "unconfirmedHint": "chưa xác nhận"
     },
     "Catalog": {
       "search": "Tìm theo tên hoặc mã",
@@ -2163,7 +2175,6 @@
       "noteRequired": "Hãy ghi lý do khi chốt mức khác mức nhân viên tự khai."
     },
     "Person": {
-      "viewSkills": "Xem kỹ năng",
       "viewSkillsOf": "Xem kỹ năng của {name}"
     },
     "Confirmation": {
@@ -2172,7 +2183,10 @@
       "adjustedSelf": "Bạn khai mức {self}, {name} chốt mức {confirmed} · {date}",
       "adjustedOther": "Tự khai mức {self}, {name} chốt mức {confirmed} · {date}",
       "addedBy": "{name} thêm kỹ năng này · {date}",
-      "noteLabel": "Ghi chú của {name}"
+      "declaredSelf": "Bạn khai mức {level}",
+      "declaredOther": "Tự khai mức {level}",
+      "noteTitleAdjusted": "{name} chốt mức {self} → {confirmed}",
+      "noteTitle": "{name}"
     }
   },
   "Employees": {

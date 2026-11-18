@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -17,8 +17,35 @@ import {
   searchBySkills,
 } from "./api";
 import { getSkillError, isStaleSkillError } from "./error-messages";
-import { availableTabs, stateFromSearchParams, stateToSearchParams, type SkillPageState } from "./rules";
-import type { SkillSearchCriteria } from "./types";
+import {
+  availableTabs,
+  criteriaFromStorage,
+  criteriaToStorage,
+  hasCriteria,
+  stateFromSearchParams,
+  stateToSearchParams,
+  type SkillPageState,
+} from "./rules";
+import type { SkillSearchCriteria, SkillTab } from "./types";
+
+const SEARCH_STORAGE_KEY = "skills.search.criteria";
+
+/** sessionStorage có thể bị chặn (chế độ riêng tư, chính sách trình duyệt): lỗi thì coi như không có gì. */
+function readSavedCriteria(): string | null {
+  try {
+    return window.sessionStorage.getItem(SEARCH_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function saveCriteria(value: string) {
+  try {
+    window.sessionStorage.setItem(SEARCH_STORAGE_KEY, value);
+  } catch {
+    // không lưu được thì thôi: lần sau chỉ mất điều kiện cũ
+  }
+}
 
 // Danh mục và cây tổ chức ít đổi: giữ 5 phút. Kỹ năng của người: luôn tải lại khi mở (quản lý có thể vừa xác nhận).
 const SLOW_STALE_TIME = 5 * 60_000;
@@ -118,7 +145,7 @@ export function useSkillPageState() {
   const canVerify = !!verifier.data?.canVerify;
   // Theo `user` (ổn định giữa các lần render), không theo hasPermission (hàm mới mỗi lần render).
   const tabs = useMemo(
-    () => availableTabs((permission) => !!user?.permissions.includes(permission), canVerify),
+    () => availableTabs((permission) => !!user?.permissions.includes(permission), canVerify, !!user?.employeeId),
     [user, canVerify],
   );
   // Chưa biết quyền (đang tải người dùng / trạng thái xác nhận): giữ tab trên URL, đừng ép về "mine".
@@ -135,6 +162,24 @@ export function useSkillPageState() {
     },
     [router, pathname],
   );
+
+  // Nhớ điều kiện tìm: mỗi khi đổi điều kiện ở tab Tìm người thì lưu lại; mở lại tab (đổi tab, rời trang rồi quay lại) mà
+  // URL chưa có điều kiện thì lấy lại điều kiện đã lưu và ghi lên URL (link gửi đi vẫn đủ).
+  const previousTab = useRef<SkillTab | null>(null);
+  useEffect(() => {
+    if (loading) return;
+    const entered = previousTab.current !== "search" && state.tab === "search";
+    previousTab.current = state.tab;
+    if (state.tab !== "search") return;
+    if (entered && !hasCriteria(state.criteria)) {
+      const saved = criteriaFromStorage(readSavedCriteria());
+      if (saved) {
+        setState({ tab: "search", criteria: saved });
+        return;
+      }
+    }
+    saveCriteria(criteriaToStorage(state.criteria));
+  }, [loading, state, setState]);
 
   return { state, setState, tabs, loading };
 }
