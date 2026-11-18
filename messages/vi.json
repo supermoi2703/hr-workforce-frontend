@@ -25,7 +25,7 @@
       "people": "Nhân sự",
       "timePay": "Công & Lương",
       "organization": "Tổ chức & Workforce",
-      "aiLab": "Thử nghiệm AI",
+      "aiLab": "Trợ lý AI",
       "admin": "Quản trị",
       "dev": "Phát triển"
     },
@@ -1908,8 +1908,6 @@
     "metaTitle": "Hỏi đáp chính sách",
     "title": "Hỏi đáp chính sách",
     "description": "Hỏi về quy định của công ty. Câu trả lời chỉ dựa trên tài liệu chính sách và có ghi nguồn.",
-    "labBadge": "Thử nghiệm",
-    "privacy": "Câu hỏi được gửi tới Google Gemini để xử lý. Đừng nhập thông tin cá nhân hay bí mật của công ty.",
     "placeholder": "Ví dụ: Một tuần được WFH tối đa mấy ngày?",
     "inputLabel": "Câu hỏi về chính sách",
     "hint": "Nhấn Enter để gửi, Shift + Enter để xuống dòng.",

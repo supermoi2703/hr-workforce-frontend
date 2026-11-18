@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircleIcon, InfoIcon, RotateCcwIcon, SendIcon, SparklesIcon } from "lucide-react";
+import { AlertCircleIcon, InfoIcon, RotateCcwIcon, SendIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/shared/page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -17,7 +16,7 @@ import { AnswerCard, QuestionBubble } from "./answer-card";
 const SUGGESTIONS = ["leave", "remote", "lunch", "approval"] as const;
 
 /**
- * Trang Lab hỏi đáp chính sách (AI-2). Hội thoại chỉ nằm trong bộ nhớ trang: tải lại là hỏi lại từ đầu. Mỗi câu hỏi gửi kèm
+ * Trang hỏi đáp chính sách (AI-2), mở cho mọi vai trò từ 18/11. Hội thoại chỉ nằm trong bộ nhớ trang: tải lại là hỏi lại từ đầu. Mỗi câu hỏi gửi kèm
  * vài lượt đã được trả lời gần nhất để hiểu câu hỏi nối tiếp.
  */
 export function PolicyQaPage() {
@@ -67,18 +66,12 @@ export function PolicyQaPage() {
         title={t("title")}
         description={t("description")}
         actions={
-          <>
-            <Badge variant="info">
-              <SparklesIcon />
-              {t("labBadge")}
-            </Badge>
-            {entries.length > 0 && (
-              <Button variant="outline" size="sm" onClick={() => setEntries([])} disabled={busy}>
-                <RotateCcwIcon />
-                {t("newConversation")}
-              </Button>
-            )}
-          </>
+          entries.length > 0 && (
+            <Button variant="outline" size="sm" onClick={() => setEntries([])} disabled={busy}>
+              <RotateCcwIcon />
+              {t("newConversation")}
+            </Button>
+          )
         }
       />
 
@@ -161,7 +154,6 @@ export function PolicyQaPage() {
             {text.length}/{MAX_QUESTION_LENGTH}
           </span>
         </p>
-        <p className="text-xs text-muted-foreground">{t("privacy")}</p>
       </form>
     </div>
   );

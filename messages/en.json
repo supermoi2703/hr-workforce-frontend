@@ -25,7 +25,7 @@
       "people": "People",
       "timePay": "Time & pay",
       "organization": "Organization & workforce",
-      "aiLab": "AI lab",
+      "aiLab": "AI assistant",
       "admin": "Administration",
       "dev": "Development"
     },
@@ -1908,8 +1908,6 @@
     "metaTitle": "Policy Q&A",
     "title": "Policy Q&A",
     "description": "Ask about company rules. Answers are based only on the policy documents and cite their sources.",
-    "labBadge": "Experimental",
-    "privacy": "Your question is sent to Google Gemini for processing. Do not enter personal information or company secrets.",
     "placeholder": "Example: How many days a week can I work from home?",
     "inputLabel": "Question about policy",
     "hint": "Press Enter to send, Shift + Enter for a new line.",
