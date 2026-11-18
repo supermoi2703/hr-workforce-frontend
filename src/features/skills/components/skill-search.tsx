@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { PlusIcon, SearchIcon, UsersRoundIcon, XIcon } from "lucide-react";
+import { useMemo, useState, type KeyboardEvent } from "react";
+import { ClockIcon, PlusIcon, SearchIcon, UsersRoundIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,14 @@ import { EmptyState } from "@/components/shared/states";
 import { cn } from "@/lib/utils";
 import { useOrgUnits, useSkillCatalog, useSkillSearch } from "../hooks";
 import { MAX_REQUIREMENTS } from "../rules";
-import { SKILL_LEVELS, type Skill, type SkillSearchCriteria, type SkillSearchResult } from "../types";
+import { SKILL_LEVELS, type EmployeeSkill, type Skill, type SkillSearchCriteria, type SkillSearchResult } from "../types";
 import { EmployeeSkillsSheet, type SheetPerson } from "./employee-skills-sheet";
-import { PersonCell, ViewSkillsButton } from "./person-cell";
+import { PersonCell, RowChevron } from "./person-cell";
 import { LevelMeter } from "./skill-level";
 import { SkillPicker } from "./skill-picker";
+
+/** Số kỹ năng tối đa còn hiện mỗi kỹ năng một cột trong bảng kết quả. */
+const PER_SKILL_COLUMNS = 4;
 
 /** Giá trị "không lọc" của Select (Select không nhận chuỗi rỗng làm một lựa chọn). */
 const ALL = "all";
@@ -33,7 +36,6 @@ type SkillSearchProps = {
  */
 export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
   const t = useTranslations("Skills.Search");
-  const tLevels = useTranslations("Skills.Levels");
   const catalog = useSkillCatalog();
   const units = useOrgUnits();
   const tableState = useDataTableState({ pageSize: 20 });
@@ -67,6 +69,10 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
     onChange({ ...criteria, requirements: criteria.requirements.filter((r) => r.code !== code) });
   }
 
+  const perSkill = criteria.requirements.length <= PER_SKILL_COLUMNS;
+  const requirementKey = criteria.requirements.map((r) => r.code).join(",");
+  const requirementCodes = useMemo(() => (requirementKey ? requirementKey.split(",") : []), [requirementKey]);
+
   const columns = useMemo(() => {
     const personOf = (row: SkillSearchResult): SheetPerson => ({
       employeeId: row.employeeId,
@@ -81,40 +87,50 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
         cell: (c) => {
           const row = c.row.original;
           return (
-            <PersonCell
-              fullName={row.fullName}
-              employeeCode={row.employeeCode}
-              extra={row.level && <Badge variant="outline">{t(`employeeLevel.${row.level}`)}</Badge>}
-              onOpen={() => setPerson(personOf(row))}
-            />
+            <span className="flex flex-col gap-2">
+              <PersonCell
+                fullName={row.fullName}
+                employeeCode={row.employeeCode}
+                extra={row.level && <span>· {t(`employeeLevel.${row.level}`)}</span>}
+                onOpen={() => setPerson(personOf(row))}
+              />
+              <MatchedList skills={row.matchedSkills} className="md:hidden" />
+            </span>
           );
         },
       }),
-      col.display({
-        id: "matched",
-        header: t("matched"),
-        cell: (c) => (
-          <span className="flex flex-col gap-1">
-            {c.row.original.matchedSkills.map((skill) => (
-              <span key={skill.skillId} className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="min-w-24">{skill.skillName}</span>
-                <LevelMeter level={skill.level} />
-                <span className="tabular-nums">{skill.level}</span>
-                {!skill.confirmed && <Badge variant="warning">{t("unconfirmed")}</Badge>}
-              </span>
-            ))}
-          </span>
-        ),
-      }),
+      // Tối đa PER_SKILL_COLUMNS kỹ năng: mỗi kỹ năng một cột, mỗi người đúng một dòng, so sánh theo cột. Nhiều hơn thì một
+      // cột gộp. Màn hình hẹp luôn dùng dạng gộp, đặt dưới tên.
+      ...(perSkill
+        ? requirementCodes.map((code) =>
+            col.display({
+              id: `skill-${code}`,
+              header: byCode.get(code)?.name ?? code,
+              meta: { className: "hidden md:table-cell" },
+              cell: (c) => {
+                const skill = c.row.original.matchedSkills.find((s) => s.skillCode === code);
+                return skill ? <MatchedLevel skill={skill} /> : <span className="text-muted-foreground">—</span>;
+              },
+            }),
+          )
+        : [
+            col.display({
+              id: "matched",
+              header: t("matched"),
+              meta: { className: "hidden md:table-cell" },
+              cell: (c) => <MatchedList skills={c.row.original.matchedSkills} />,
+            }),
+          ]),
       col.display({
         id: "unit",
         header: t("unit"),
+        meta: { className: "hidden md:table-cell" },
         cell: (c) => {
           const row = c.row.original;
           const dept = units.nameOf(row.departmentId);
           const team = units.nameOf(row.teamId);
           return dept ? (
-            <span className="flex flex-col">
+            <span className="flex min-w-36 flex-col gap-0.5 whitespace-normal">
               <span>{dept}</span>
               {team && <span className="text-xs text-muted-foreground">{team}</span>}
             </span>
@@ -126,21 +142,16 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
       col.display({
         id: "office",
         header: t("office"),
-        cell: (c) => units.nameOf(c.row.original.officeId) ?? <span className="text-muted-foreground">—</span>,
+        meta: { className: "hidden lg:table-cell" },
+        cell: (c) => {
+          const office = units.nameOf(c.row.original.officeId);
+          return office ?? <span className="text-muted-foreground">—</span>;
+        },
       }),
-      col.display({
-        id: "actions",
-        header: () => <span className="sr-only">{t("actions")}</span>,
-        cell: (c) => (
-          <span className="flex justify-end">
-            <ViewSkillsButton fullName={c.row.original.fullName} onOpen={() => setPerson(personOf(c.row.original))} />
-          </span>
-        ),
-      }),
+      col.display({ id: "open", header: "", meta: { className: "w-8" }, cell: () => <RowChevron /> }),
     ]);
-  }, [t, units]);
+  }, [t, units, perSkill, requirementCodes, byCode]);
 
-  const levelItems = Object.fromEntries(SKILL_LEVELS.map((level) => [String(level), t("atLeast", { level, name: tLevels(`${level}.name`) })]));
   const officeItems: Record<string, string> = {
     [ALL]: t("allOffices"),
     ...Object.fromEntries(units.offices.map((o) => [o.id, o.name])),
@@ -162,53 +173,28 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
           <p className="text-sm text-muted-foreground">{t("requirementsHint")}</p>
         </div>
 
-        {criteria.requirements.length > 0 && (
-          <ul className="flex flex-col gap-2">
-            {criteria.requirements.map((requirement) => {
-              const skill = byCode.get(requirement.code);
-              return (
-                <li key={requirement.code} className="flex flex-col gap-2 rounded-lg border bg-background p-2 sm:flex-row sm:items-center">
-                  <span className="flex min-w-0 flex-1 items-center gap-2 px-1">
-                    <span className="truncate font-medium">{skill?.name ?? requirement.code}</span>
-                    {skill && !skill.active && <Badge variant="outline">{t("inactive")}</Badge>}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <Select
-                      value={String(requirement.minLevel)}
-                      onValueChange={(value) => value && setMinLevel(requirement.code, Number(value))}
-                      items={levelItems}
-                    >
-                      <SelectTrigger className="w-full sm:w-72" aria-label={t("minLevel", { name: skill?.name ?? requirement.code })}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SKILL_LEVELS.map((level) => (
-                          <SelectItem key={level} value={String(level)}>
-                            {levelItems[String(level)]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => removeRequirement(requirement.code)}
-                      aria-label={t("remove", { name: skill?.name ?? requirement.code })}
-                    >
-                      <XIcon />
-                    </Button>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        {criteria.requirements.length < MAX_REQUIREMENTS ? (
-          <AddRequirement skills={skills} disabled={chosen} onAdd={addRequirement} />
-        ) : (
-          <p className="text-sm text-muted-foreground">{t("maxReached", { max: MAX_REQUIREMENTS })}</p>
-        )}
+        {/* Điều kiện là chip gọn trên một hàng; ô thêm kỹ năng nằm cuối hàng */}
+        <div className="flex flex-wrap items-center gap-2">
+          {criteria.requirements.map((requirement) => (
+            <RequirementChip
+              key={requirement.code}
+              skill={byCode.get(requirement.code)}
+              requirement={requirement}
+              onLevelChange={(level) => setMinLevel(requirement.code, level)}
+              onRemove={() => removeRequirement(requirement.code)}
+            />
+          ))}
+          {criteria.requirements.length < MAX_REQUIREMENTS ? (
+            <AddRequirement skills={skills} disabled={chosen} onAdd={addRequirement} />
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("maxReached", { max: MAX_REQUIREMENTS })}</p>
+          )}
+          {criteria.requirements.length >= 2 && (
+            <Button variant="ghost" size="sm" onClick={() => onChange({ ...criteria, requirements: [] })}>
+              {t("clearAll")}
+            </Button>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap sm:items-center">
           <FilterSelect
@@ -238,8 +224,13 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
       ) : (
         <>
           {query.data && (
-            <p className="text-sm text-muted-foreground" aria-live="polite">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground" aria-live="polite">
               {t("resultCount", { count: query.data.totalElements })}
+              {query.data.totalElements > 0 && !criteria.confirmedOnly && (
+                <span className="inline-flex items-center gap-1 text-xs">
+                  <ClockIcon className="size-3.5 text-warning" aria-hidden /> {t("unconfirmedHint")}
+                </span>
+              )}
             </p>
           )}
           <DataTable
@@ -248,6 +239,9 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
             getRowId={(row) => row.employeeId}
             pageSizeOptions={[20, 50, 100]}
             empty={<EmptyState icon={<UsersRoundIcon />} title={t("emptyTitle")} description={t("empty")} />}
+            onRowClick={(row) =>
+              setPerson({ employeeId: row.employeeId, fullName: row.fullName, employeeCode: row.employeeCode, subtitle: units.nameOf(row.departmentId) })
+            }
             {...tableState.bind}
             onSortingChange={undefined}
           />
@@ -262,7 +256,7 @@ export function SkillSearch({ criteria, onChange }: SkillSearchProps) {
 function AddRequirement({ skills, disabled, onAdd }: { skills: Skill[]; disabled: Map<string, string>; onAdd: (skill: Skill) => void }) {
   const t = useTranslations("Skills.Search");
   return (
-    <div className="flex items-center gap-2 sm:max-w-sm">
+    <div className="flex w-full items-center gap-2 sm:w-72">
       <PlusIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
       <SkillPicker
         skills={skills}
@@ -300,5 +294,112 @@ function FilterSelect({
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+
+/** Một điều kiện: chip "Java  từ mức [1][2][3][4][5]  ×". Mức chọn bằng 5 ô bấm thẳng, nhìn là biết bấm được. */
+function RequirementChip({
+  skill,
+  requirement,
+  onLevelChange,
+  onRemove,
+}: {
+  skill: Skill | undefined;
+  requirement: SkillSearchCriteria["requirements"][number];
+  onLevelChange: (level: number) => void;
+  onRemove: () => void;
+}) {
+  const t = useTranslations("Skills.Search");
+  const name = skill?.name ?? requirement.code;
+  return (
+    <span className="inline-flex max-w-full items-center gap-2 rounded-full border bg-background py-1 pr-1 pl-3 text-sm">
+      <span className="truncate font-medium">{name}</span>
+      {skill && !skill.active && <Badge variant="outline">{t("inactive")}</Badge>}
+      <span className="text-xs whitespace-nowrap text-muted-foreground">{t("fromLevel")}</span>
+      <MinLevelStepper value={requirement.minLevel} onChange={onLevelChange} label={t("minLevel", { name })} />
+      <Button variant="ghost" size="icon-xs" className="rounded-full" onClick={onRemove} aria-label={t("remove", { name })}>
+        <XIcon />
+      </Button>
+    </span>
+  );
+}
+
+/**
+ * Mức tối thiểu 1–5 như thanh mức: các ô từ 1 đến mức đang chọn tô màu. Là một nhóm radio: Tab vào ô đang chọn, mũi tên
+ * trái / phải đổi mức. Rê chuột (hoặc trình đọc màn hình) đọc được tên mức.
+ */
+function MinLevelStepper({ value, onChange, label }: { value: number; onChange: (level: number) => void; label: string }) {
+  const t = useTranslations("Skills.Search");
+  const tLevels = useTranslations("Skills.Levels");
+
+  function onKeyDown(event: KeyboardEvent<HTMLButtonElement>, level: number) {
+    const delta = event.key === "ArrowRight" || event.key === "ArrowUp" ? 1 : event.key === "ArrowLeft" || event.key === "ArrowDown" ? -1 : 0;
+    if (!delta) return;
+    event.preventDefault();
+    const next = Math.min(Math.max(level + delta, 1), 5);
+    onChange(next);
+    event.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`[data-level="${next}"]`)?.focus();
+  }
+
+  return (
+    <span role="radiogroup" aria-label={label} className="inline-flex items-center gap-0.5">
+      {SKILL_LEVELS.map((level) => {
+        const text = t("atLeast", { level, name: tLevels(`${level}.name`) });
+        return (
+          <button
+            key={level}
+            type="button"
+            role="radio"
+            aria-checked={level === value}
+            aria-label={text}
+            title={text}
+            data-level={level}
+            tabIndex={level === value ? 0 : -1}
+            onClick={() => onChange(level)}
+            onKeyDown={(event) => onKeyDown(event, level)}
+            className={cn(
+              "flex size-6 items-center justify-center rounded-md text-xs font-medium tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+              level <= value
+                ? "bg-primary text-primary-foreground hover:bg-primary/85"
+                : "bg-muted text-muted-foreground hover:bg-muted-foreground/20 hover:text-foreground",
+            )}
+          >
+            {level}
+          </button>
+        );
+      })}
+    </span>
+  );
+}
+
+/** Mức của một kỹ năng khớp: thanh, số, và icon đồng hồ cam nếu chưa xác nhận (có chú thích phía trên bảng). */
+function MatchedLevel({ skill }: { skill: EmployeeSkill }) {
+  const t = useTranslations("Skills.Search");
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      <LevelMeter level={skill.level} />
+      <span className="tabular-nums">{skill.level}</span>
+      {!skill.confirmed && (
+        <span title={t("unconfirmed")} className="inline-flex">
+          <ClockIcon className="size-3.5 text-warning" aria-hidden />
+          <span className="sr-only">{t("unconfirmed")}</span>
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** Dạng gộp: "Java ■■■■□ 4 ◷   Spring Boot ■■■□□ 3" xếp cạnh nhau, xuống dòng khi hết chỗ. */
+function MatchedList({ skills, className }: { skills: EmployeeSkill[]; className?: string }) {
+  return (
+    <span className={cn("flex flex-wrap gap-x-4 gap-y-1 text-sm", className)}>
+      {skills.map((skill) => (
+        <span key={skill.skillId} className="inline-flex items-center gap-2 whitespace-nowrap">
+          {skill.skillName}
+          <MatchedLevel skill={skill} />
+        </span>
+      ))}
+    </span>
   );
 }

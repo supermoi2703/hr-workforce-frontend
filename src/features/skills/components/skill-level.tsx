@@ -1,11 +1,14 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
+import { BadgeCheckIcon, ClockIcon, SlidersHorizontalIcon, UserRoundCheckIcon, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
+import type { DomainTone } from "@/components/shared/icon-tile";
+import { TintChip } from "@/components/shared/tint-chip";
 import { cn } from "@/lib/utils";
 import { skillStatus } from "../rules";
-import { SKILL_LEVELS, type EmployeeSkill, type SkillLevel } from "../types";
+import { SKILL_LEVELS, type EmployeeSkill, type SkillLevel, type SkillStatus } from "../types";
 
 /** Năm vạch, tô đến mức hiện có. `title` đọc được tên mức khi rê chuột. */
 export function LevelMeter({ level, className }: { level: number; className?: string }) {
@@ -39,17 +42,30 @@ export function LevelLabel({ level, className }: { level: number; className?: st
   );
 }
 
-const STATUS_VARIANT = {
-  pending: "warning",
-  confirmed: "success",
-  adjusted: "info",
-  addedByManager: "success",
-} as const;
+/** Cùng một kiểu chip: đang chờ = cam (việc còn dở), đã xong (xác nhận / chốt mức / quản lý thêm) = xanh lá, khác icon. */
+const STATUS_CHIP: Record<SkillStatus, { icon: LucideIcon; tone: DomainTone; iconClassName?: string; className?: string }> = {
+  pending: { icon: ClockIcon, tone: "approval", className: "text-warning" },
+  confirmed: { icon: BadgeCheckIcon, tone: "leave", className: "text-success" },
+  adjusted: { icon: SlidersHorizontalIcon, tone: "leave", className: "text-success" },
+  addedByManager: { icon: UserRoundCheckIcon, tone: "leave", className: "text-success" },
+};
 
-export function SkillStatusBadge({ skill }: { skill: Pick<EmployeeSkill, "confirmed" | "selfLevel" | "confirmedLevel"> }) {
+/** Chip trạng thái của một kỹ năng đã khai. */
+export function SkillStatusChip({
+  skill,
+  className,
+}: {
+  skill: Pick<EmployeeSkill, "confirmed" | "selfLevel" | "confirmedLevel">;
+  className?: string;
+}) {
   const t = useTranslations("Skills.Status");
   const status = skillStatus(skill);
-  return <Badge variant={STATUS_VARIANT[status]}>{t(status)}</Badge>;
+  const chip = STATUS_CHIP[status];
+  return (
+    <TintChip icon={chip.icon} tone={chip.tone} iconClassName={chip.iconClassName} className={cn(chip.className, className)}>
+      {t(status)}
+    </TintChip>
+  );
 }
 
 type LevelPickerProps = {

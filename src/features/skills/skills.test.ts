@@ -16,6 +16,9 @@ import {
   SKILL_CODE_PATTERN,
   stateFromSearchParams,
   stateToSearchParams,
+  criteriaFromStorage,
+  criteriaToStorage,
+  hasCriteria,
 } from "./rules";
 import type { EmployeeSkill, Skill, SkillTab } from "./types";
 
@@ -66,6 +69,12 @@ describe("availableTabs", () => {
   it("HR with people in scope gets every tab", () => {
     const hr = new Set(["skill:verify", "skill:read", "skill:manage"]);
     expect(availableTabs((p) => hr.has(p), true)).toEqual(ALL_TABS);
+  });
+
+  it("an account without an employee profile skips 'mine' unless nothing else is left", () => {
+    const admin = new Set(["skill:verify", "skill:read", "skill:manage"]);
+    expect(availableTabs((p) => admin.has(p), true, false)).toEqual(["pending", "search", "catalog"]);
+    expect(availableTabs(() => false, false, false)).toEqual(["mine"]);
   });
 });
 
@@ -121,6 +130,8 @@ describe("URL state", () => {
   it("falls back to 'mine' for unknown or forbidden tabs", () => {
     expect(stateFromSearchParams(new URLSearchParams("tab=catalog"), ["mine"]).tab).toBe("mine");
     expect(stateFromSearchParams(new URLSearchParams("tab=nope"), ALL_TABS).tab).toBe("mine");
+    // Không có tab "Của tôi" (tài khoản không hồ sơ): mở tab đầu tiên được thấy
+    expect(stateFromSearchParams(new URLSearchParams(""), ["pending", "search"]).tab).toBe("pending");
   });
 
   it("reads and writes the search criteria", () => {
@@ -148,6 +159,32 @@ describe("URL state", () => {
     const state = stateFromSearchParams(new URLSearchParams("tab=search&require=JAVA"), ALL_TABS);
     expect(stateToSearchParams({ ...state, tab: "pending" }).toString()).toBe("tab=pending");
     expect(stateToSearchParams({ ...state, tab: "mine" }).toString()).toBe("");
+  });
+});
+
+describe("saved search criteria", () => {
+  const criteria = {
+    requirements: [
+      { code: "JAVA", minLevel: 3 },
+      { code: "SPRING_BOOT", minLevel: 1 },
+    ],
+    officeId: "o1",
+    confirmedOnly: true,
+  };
+
+  it("round-trips through the stored string", () => {
+    expect(criteriaFromStorage(criteriaToStorage(criteria))).toEqual({ ...criteria, departmentId: undefined, teamId: undefined });
+  });
+
+  it("ignores empty, missing or broken values", () => {
+    expect(criteriaFromStorage(null)).toBeNull();
+    expect(criteriaFromStorage(criteriaToStorage({ requirements: [], confirmedOnly: false }))).toBeNull();
+    expect(criteriaFromStorage("require=bad code&require=JAVA:9")).toBeNull();
+  });
+
+  it("knows when there is something to search for", () => {
+    expect(hasCriteria({ requirements: [], confirmedOnly: false })).toBe(false);
+    expect(hasCriteria({ requirements: [], confirmedOnly: false, officeId: "o1" })).toBe(true);
   });
 });
 

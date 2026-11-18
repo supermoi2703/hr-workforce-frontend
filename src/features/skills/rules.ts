@@ -25,16 +25,19 @@ export const MAX_REQUIREMENTS = 10;
 // ===== Tab theo quyền
 
 /**
- * Tab người dùng được thấy: "Của tôi" luôn có. "Chờ xác nhận" theo `canVerify` của backend (cấp dưới trên sơ đồ hoặc phạm
- * vi skill:verify), không theo role: trưởng team role Employee vẫn có. Tìm người, danh mục theo permission.
+ * Tab người dùng được thấy. "Chờ xác nhận" theo `canVerify` của backend (cấp dưới trên sơ đồ hoặc phạm vi skill:verify),
+ * không theo role: trưởng team role Employee vẫn có. Tìm người, danh mục theo permission. "Của tôi" cần hồ sơ nhân viên:
+ * tài khoản không gắn hồ sơ (vd Admin) không có tab này, trừ khi không còn tab nào khác (khi đó tab hiện lời giải thích).
  */
-export function availableTabs(hasPermission: (permission: string) => boolean, canVerify: boolean): SkillTab[] {
-  return SKILL_TABS.filter((tab) => {
+export function availableTabs(hasPermission: (permission: string) => boolean, canVerify: boolean, hasProfile = true): SkillTab[] {
+  const tabs = SKILL_TABS.filter((tab) => {
     if (tab === "pending") return canVerify;
     if (tab === "search") return hasPermission(SKILL_READ_PERMISSION);
     if (tab === "catalog") return hasPermission(SKILL_MANAGE_PERMISSION);
     return true;
   });
+  const others = tabs.filter((tab) => tab !== "mine");
+  return hasProfile || others.length === 0 ? tabs : others;
 }
 
 // ===== Trạng thái trang trên URL: ?tab=search&require=JAVA:3&require=SPRING_BOOT&office=...&confirmed=1
@@ -43,7 +46,7 @@ export type SkillPageState = { tab: SkillTab; criteria: SkillSearchCriteria };
 
 export function stateFromSearchParams(params: URLSearchParams, allowed: SkillTab[]): SkillPageState {
   const rawTab = params.get("tab") as SkillTab | null;
-  const tab = rawTab && allowed.includes(rawTab) ? rawTab : "mine";
+  const tab = rawTab && allowed.includes(rawTab) ? rawTab : (allowed[0] ?? "mine");
   const requirements = params
     .getAll("require")
     .map(parseRequirement)
@@ -72,6 +75,27 @@ export function stateToSearchParams(state: SkillPageState): URLSearchParams {
     if (criteria.confirmedOnly) params.set("confirmed", "1");
   }
   return params;
+}
+
+/** Có điều kiện nào chưa (kỹ năng hoặc bộ lọc). */
+export function hasCriteria(criteria: SkillSearchCriteria): boolean {
+  return (
+    criteria.requirements.length > 0 || !!criteria.officeId || !!criteria.departmentId || !!criteria.teamId || criteria.confirmedOnly
+  );
+}
+
+/**
+ * Điều kiện tìm lần trước, lưu trong sessionStorage để đổi tab / rời trang rồi quay lại vẫn còn (URL chỉ giữ điều kiện khi
+ * đang ở tab Tìm người). Cùng định dạng với URL, đọc lại qua cùng bộ kiểm tra nên chuỗi hỏng / cũ không làm vỡ trang.
+ */
+export function criteriaToStorage(criteria: SkillSearchCriteria): string {
+  return stateToSearchParams({ tab: "search", criteria }).toString();
+}
+
+export function criteriaFromStorage(raw: string | null): SkillSearchCriteria | null {
+  if (!raw) return null;
+  const { criteria } = stateFromSearchParams(new URLSearchParams(raw), ["search"]);
+  return hasCriteria(criteria) ? criteria : null;
 }
 
 /** `JAVA:3` → { JAVA, 3 }; thiếu mức = 1 (như backend). Sai định dạng → null. */

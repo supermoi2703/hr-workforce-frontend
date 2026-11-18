@@ -2,7 +2,7 @@
 
 import { Building2Icon, LandmarkIcon, UsersRoundIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+import { TintChip } from "@/components/shared/tint-chip";
 import type { LeaderRole } from "../rules";
 
 const ROLE_ICONS = {
@@ -17,16 +17,9 @@ const ROLE_ICONS = {
  */
 export function RoleChip({ role, className }: { role: LeaderRole; className?: string }) {
   const t = useTranslations("Organization.Members");
-  const Icon = ROLE_ICONS[role];
   return (
-    <span
-      className={cn(
-        "inline-flex h-5 w-fit shrink-0 items-center gap-1 rounded-full bg-chart-5/10 px-2 text-xs font-medium whitespace-nowrap text-foreground",
-        className,
-      )}
-    >
-      <Icon className="size-3 text-chart-5" aria-hidden />
+    <TintChip icon={ROLE_ICONS[role]} tone="people" className={className}>
       {t(role)}
-    </span>
+    </TintChip>
   );
 }

@@ -100,6 +100,10 @@ Bấm cả dòng để mở chi tiết: truyền `onRowClick={(row) => ...}`.
 - Trên trang có màu nhấn riêng, tên đó dùng màu chữ thường, chỉ gạch chân khi rê chuột. Ví dụ:
   `features/organization/components/member-table.tsx`.
 
+Ẩn cột phụ trên màn hình hẹp: khai báo `meta: { className: "hidden md:table-cell" }` ở cột, class được gắn vào ô tiêu đề
+và mọi ô của cột. Nội dung cần thiết của cột ẩn thì đưa vào ô chính với `md:hidden`, để điện thoại không phải cuộn ngang.
+Ví dụ: `features/skills/components/pending-queue.tsx`.
+
 ## 5. Form
 
 react-hook-form + zod + component `Field`. Lỗi validation từ backend gắn vào đúng ô bằng
@@ -133,6 +137,13 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   một màu thương hiệu xanh dương (`primary`) chỉ dùng cho hành động chính, link và mục đang chọn.
 - Trạng thái: `<Badge variant="success | warning | info | destructive">` cho đúng giờ/đã duyệt, đi muộn/chờ duyệt,
   WFH/nghỉ có phép, vắng/từ chối.
+- Trên trang đã có màu nhấn riêng (băng màu, sơ đồ), vai trò / trạng thái dùng `<TintChip icon tone>`
+  (`components/shared/tint-chip.tsx`: nền nhạt, icon màu nhấn) thay badge màu đặc. Vai trò: chữ màu thường
+  (`RoleChip` trang Tổ chức). Trạng thái: chữ cùng màu với icon, đang chờ = cam, đã xong = xanh lá
+  (`SkillStatusChip` trang Kỹ năng).
+- Hai nút thao tác trong mỗi dòng (vd "Xác nhận" / "Chốt mức khác" trong hàng chờ): nút chính là nút đặc mặc định, chữ
+  đậm; nút phụ `variant="outline"` có viền và chữ màu chủ đạo (`SECONDARY_ACTION` trong `features/skills`), để cả hai
+  nhìn rõ là nút. Không cần icon.
 - Mảng màu "đang chờ" (thanh, khối trên biểu đồ / dòng thời gian): token `pending` (vàng cam, `bg-pending`,
   `text-pending-foreground`). `warning` là sắc 700 dành cho chữ nhỏ, tô thành mảng lớn sẽ ra màu nâu. Ví dụ: trang
   `/allocations` (`features/projects/components/allocation-timeline.tsx`).
