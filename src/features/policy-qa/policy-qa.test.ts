@@ -5,7 +5,18 @@ import vi from "../../../messages/vi.json";
 import { ApiError } from "@/lib/api/errors";
 import { booleanOf, HISTORY_TURNS, isValidQuestion, MAX_QUESTION_LENGTH, toHistory } from "./conversation";
 import { getPolicyQaError } from "./error-messages";
+import {
+  formatParameterValue,
+  humanizeExcerpt,
+  PARAMETER_KEYS,
+  parameterLabel,
+  sourceTitle,
+  type ParameterTranslate,
+} from "./parameter-labels";
 import type { PolicyQaAnswer, PolicyQaEntry } from "./types";
+
+const parameterTranslator = (messages: typeof vi | typeof en, locale: "vi" | "en") =>
+  createTranslator({ locale, messages, namespace: "PolicyQa.parameters" }) as unknown as ParameterTranslate;
 
 const answer = (overrides: Partial<PolicyQaAnswer> = {}): PolicyQaAnswer => ({
   answered: true,
@@ -94,6 +105,91 @@ describe("getPolicyQaError", () => {
     const limited = new ApiError({ status: 429, code: "TOO_MANY_REQUESTS", message: "x" });
 
     expect(getPolicyQaError(limited, t, tErrors)).toBe(en.Errors.tooManyRequests);
+  });
+});
+
+describe("nhãn và giá trị tham số", () => {
+  const tVi = parameterTranslator(vi, "vi");
+  const tEn = parameterTranslator(en, "en");
+
+  it("mọi khóa đều có nhãn ở cả tiếng Việt và tiếng Anh", () => {
+    for (const key of PARAMETER_KEYS) {
+      expect(parameterLabel(key, tVi), `vi ${key}`).toBeTruthy();
+      expect(parameterLabel(key, tEn), `en ${key}`).toBeTruthy();
+    }
+  });
+
+  it("không có nhãn thừa so với danh sách khóa", () => {
+    const labelled = Object.keys(vi.PolicyQa.parameters.labels).sort();
+    expect(labelled).toEqual(PARAMETER_KEYS.map((key) => key.replaceAll(".", "_")).sort());
+    expect(Object.keys(en.PolicyQa.parameters.labels).sort()).toEqual(labelled);
+  });
+
+  it("khóa lạ hoặc kỹ thuật không có nhãn nên không được hiển thị", () => {
+    expect(parameterLabel("face.match_threshold", tVi)).toBeNull();
+    expect(parameterLabel("attendance.duplicate_punch_window", tVi)).toBeNull();
+    expect(parameterLabel("leave.carry_over_max_days", tVi)).toBeNull();
+  });
+
+  it("giá trị có đơn vị theo ngôn ngữ", () => {
+    expect(formatParameterValue("leave.annual_days", "11", tVi)).toBe("11 ngày");
+    expect(formatParameterValue("leave.annual_days", "1", tEn)).toBe("1 day");
+    expect(formatParameterValue("leave.annual_days", "11", tEn)).toBe("11 days");
+    expect(formatParameterValue("payroll.rate_health", "0.015", tVi)).toBe("1,5%");
+    expect(formatParameterValue("attendance.min_span_percent", "50", tVi)).toBe("50%");
+    expect(formatParameterValue("payroll.ot_rate_normal", "1.5", tVi)).toBe("×1.5");
+    expect(formatParameterValue("payroll.insurance_cap_multiple", "20", tVi)).toBe("20 lần");
+    expect(formatParameterValue("schedule.start_step_minutes", "30", tVi)).toBe("30 phút");
+    expect(formatParameterValue("remote.allow_intern", "false", tVi)).toBe("Không");
+    expect(formatParameterValue("calendar.work_start", "08:30", tVi)).toBe("08:30");
+    expect(formatParameterValue("payroll.base_salary", "2530000", tVi)).toContain("2.530.000");
+  });
+
+  it("giá trị không đọc được thì giữ nguyên", () => {
+    expect(formatParameterValue("leave.annual_days", "abc", tVi)).toBe("abc");
+    expect(formatParameterValue("leave.annual_days", "", tVi)).toBe("");
+  });
+});
+
+describe("humanizeExcerpt", () => {
+  const t = parameterTranslator(vi, "vi");
+
+  it("bỏ câu 'Tham số ...' đứng đầu câu", () => {
+    const text = "- Nhân viên làm đủ 12 tháng được **12 ngày phép năm**. Tham số `leave.annual_days`.\n- Dòng khác.";
+
+    expect(humanizeExcerpt(text, t)).toBe("- Nhân viên làm đủ 12 tháng được **12 ngày phép năm**.\n- Dòng khác.");
+  });
+
+  it("bỏ cả cụm nhiều khóa chưa có nhãn", () => {
+    const text = "Quá hạn thì hết hiệu lực. Tham số `leave.carry_over_max_days`, `leave.carry_over_expiry`.";
+
+    expect(humanizeExcerpt(text, t)).not.toContain("`");
+    expect(humanizeExcerpt(text, t)).not.toContain("carry_over");
+  });
+
+  it("thay khóa còn lại giữa câu bằng nhãn, khóa lạ thì bỏ", () => {
+    expect(humanizeExcerpt("Khi tắt `attendance.remote_requires_punch`: tính 1 công.", t)).toBe(
+      "Khi tắt Ngày WFH bắt buộc chấm công: tính 1 công.",
+    );
+    expect(humanizeExcerpt("Giá trị `face.match_threshold` xem thêm.", t)).not.toContain("face.");
+  });
+
+  it("giữ nguyên tên file tài liệu và thụt lề danh sách", () => {
+    expect(humanizeExcerpt("Xem `approval.md` mục 6.", t)).toBe("Xem `approval.md` mục 6.");
+    expect(humanizeExcerpt("  - dòng thụt lề", t)).toBe("  - dòng thụt lề");
+  });
+
+  it("không còn tên khóa kỹ thuật nào sau khi xử lý", () => {
+    const text = PARAMETER_KEYS.map((key) => `Giá trị \`${key}\` ở đây.`).join("\n");
+
+    expect(humanizeExcerpt(text, t)).not.toMatch(/`|[a-z]+\.[a-z_]+/);
+  });
+});
+
+describe("sourceTitle", () => {
+  it("lấy tiêu đề tài liệu, không lấy tên file", () => {
+    expect(sourceTitle("Quy định nghỉ phép › 2. Quỹ phép năm", "leave.md")).toBe("Quy định nghỉ phép");
+    expect(sourceTitle("", "leave.md")).toBe("leave.md");
   });
 });
 

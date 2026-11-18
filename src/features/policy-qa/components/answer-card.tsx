@@ -9,8 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { MarkdownContent } from "@/features/announcements/components/markdown-content";
 import { formatDate } from "@/lib/format";
-import { booleanOf } from "../conversation";
 import { getPolicyQaError } from "../error-messages";
+import {
+  formatParameterValue,
+  humanizeExcerpt,
+  parameterLabel,
+  sourceTitle,
+  type ParameterTranslate,
+} from "../parameter-labels";
 import type { PolicyQaAnswer, PolicyQaEntry, PolicyQaParameter } from "../types";
 
 /** Câu hỏi của người dùng, canh phải. */
@@ -66,6 +72,7 @@ export function AnswerCard({ entry, onRetry }: { entry: PolicyQaEntry; onRetry: 
 
 function Answered({ answer }: { answer: PolicyQaAnswer }) {
   const t = useTranslations("PolicyQa");
+  const tParameters = useTranslations("PolicyQa.parameters") as unknown as ParameterTranslate;
   const [open, setOpen] = useState(false);
 
   return (
@@ -84,7 +91,7 @@ function Answered({ answer }: { answer: PolicyQaAnswer }) {
             {answer.sources.map((source) => (
               <Badge key={source.id} variant="outline" className="font-normal">
                 <FileTextIcon />
-                {source.file}
+                {sourceTitle(source.section, source.file)}
               </Badge>
             ))}
           </span>
@@ -94,12 +101,11 @@ function Answered({ answer }: { answer: PolicyQaAnswer }) {
           <ul className="space-y-3">
             {answer.sources.map((source) => (
               <li key={source.id} className="rounded-lg bg-muted/40 p-3">
-                <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  {source.file} · {source.section}
-                </p>
-                <MarkdownContent className="text-xs">{source.excerpt}</MarkdownContent>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">{source.section}</p>
+                <MarkdownContent className="text-xs">{humanizeExcerpt(source.excerpt, tParameters)}</MarkdownContent>
               </li>
             ))}
+            {answer.parameters.length > 0 && <li className="text-xs text-muted-foreground">{t("defaultNote")}</li>}
           </ul>
         )}
       </div>
@@ -113,21 +119,27 @@ function Answered({ answer }: { answer: PolicyQaAnswer }) {
 /** Giá trị đang áp dụng của các tham số được nhắc trong câu trả lời, và thay đổi đã lên lịch. */
 function Parameters({ parameters }: { parameters: PolicyQaParameter[] }) {
   const t = useTranslations("PolicyQa.parameters");
-  const show = (value: string) => {
-    const boolean = booleanOf(value);
-    return boolean === null ? value : boolean ? t("yes") : t("no");
-  };
+  const translate = t as unknown as ParameterTranslate;
+  // Chỉ hiện tham số có nhãn: không để lộ tên khóa kỹ thuật
+  const labelled = parameters.flatMap((parameter) => {
+    const label = parameterLabel(parameter.key, translate);
+    return label ? [{ parameter, label }] : [];
+  });
+  if (labelled.length === 0) return null;
   return (
     <div className="rounded-lg bg-muted/50 p-3 text-xs">
       <p className="mb-1 font-medium">{t("title")}</p>
       <ul className="space-y-1">
-        {parameters.map((parameter) => (
+        {labelled.map(({ parameter, label }) => (
           <li key={parameter.key} className="flex flex-wrap items-baseline gap-x-2">
-            <code className="rounded bg-background px-1 py-0.5">{parameter.key}</code>
-            <span className="font-semibold">{show(parameter.value)}</span>
+            <span>{label}:</span>
+            <span className="font-semibold">{formatParameterValue(parameter.key, parameter.value, translate)}</span>
             {parameter.nextFrom && parameter.nextValue !== null && (
               <span className="text-muted-foreground">
-                {t("upcoming", { date: formatDate(parameter.nextFrom), value: show(parameter.nextValue) })}
+                {t("upcoming", {
+                  date: formatDate(parameter.nextFrom),
+                  value: formatParameterValue(parameter.key, parameter.nextValue, translate),
+                })}
               </span>
             )}
           </li>
