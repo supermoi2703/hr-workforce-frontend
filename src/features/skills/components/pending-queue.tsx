@@ -32,7 +32,8 @@ const WIDE_ONLY = "hidden md:table-cell";
  * Tab "Chờ xác nhận" (ai có cấp dưới trên sơ đồ, hoặc HR / Admin theo skill:verify): kỹ năng cấp dưới vừa khai, cũ
  * nhất trước. Xác nhận = chốt đúng mức tự khai; "Chốt mức khác" khi thấy chưa đúng. Không gồm kỹ năng của chính mình
  * (không ai tự xác nhận). Bấm cả dòng (hoặc tên) mở khung kỹ năng của người đó, nơi xử lý được hết kỹ năng của họ.
- * Không gom theo người (server chia trang theo thứ tự cũ nhất trước); dòng liền sau cùng người thì không lặp tên.
+ * Không gom theo người (server chia trang theo thứ tự cũ nhất trước), và dòng nào cũng hiện tên: cùng một người có thể
+ * xuất hiện lại ở chỗ khác trong danh sách, ẩn tên ở dòng liền sau sẽ trông như đã gom.
  */
 export function PendingQueue() {
   const t = useTranslations("Skills.Pending");
@@ -50,12 +51,6 @@ export function PendingQueue() {
   if (page && page.content.length === 0 && page.page > 0 && !query.isFetching) {
     tableState.bind.onPaginationChange({ ...tableState.pagination, pageIndex: page.page - 1 });
   }
-
-  // Dòng có cùng người với dòng ngay trên (trong trang đang xem)
-  const repeated = useMemo(() => {
-    const rows = page?.content ?? [];
-    return new Set(rows.filter((row, i) => i > 0 && rows[i - 1].employeeId === row.employeeId).map(rowKey));
-  }, [page]);
 
   const columns = useMemo(() => {
     const actions = (row: PendingSkill) => {
@@ -93,7 +88,6 @@ export function PendingQueue() {
               <PersonCell
                 fullName={row.fullName}
                 employeeCode={row.employeeCode}
-                repeated={repeated.has(rowKey(row))}
                 onOpen={() => setPerson(personOf(row))}
               />
               <span className="flex flex-col gap-2 md:hidden">
@@ -161,7 +155,7 @@ export function PendingQueue() {
       // Màn hình vừa (md–xl) chật: hai nút xếp chồng, bỏ dấu › để bảng không phải cuộn ngang
       col.display({ id: "open", header: "", meta: { className: "w-8 md:hidden xl:table-cell" }, cell: () => <RowChevron /> }),
     ]);
-  }, [t, tCategory, confirm, confirmingKey, errorMessage, repeated]);
+  }, [t, tCategory, confirm, confirmingKey, errorMessage]);
 
   return (
     <div className="flex flex-col gap-4">

@@ -15,8 +15,6 @@ type PersonCellProps = {
   employeeCode: string;
   /** Dòng phụ cạnh mã nhân viên (vd cấp bậc). */
   extra?: ReactNode;
-  /** Dòng trên cũng là người này (hàng chờ): ẩn ảnh và tên để không lặp, vẫn đọc được tên bằng trình đọc màn hình. */
-  repeated?: boolean;
   onOpen: () => void;
 };
 
@@ -24,9 +22,8 @@ type PersonCellProps = {
  * Ô "nhân viên" trong bảng. Cả dòng bấm được (DataTable `onRowClick`) để mở khung kỹ năng; tên là nút thật làm cùng việc cho
  * người dùng bàn phím.
  */
-export function PersonCell({ fullName, employeeCode, extra, repeated, onOpen }: PersonCellProps) {
+export function PersonCell({ fullName, employeeCode, extra, onOpen }: PersonCellProps) {
   const t = useTranslations("Skills.Person");
-  if (repeated) return <span className="sr-only">{fullName}</span>;
   return (
     <span className="flex items-center gap-3">
       <UserAvatar name={fullName} seed={employeeCode} />
