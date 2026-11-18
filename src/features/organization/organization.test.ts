@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
+  chartSummary,
   decodeNode,
+  departmentSummary,
   directorOf,
   encodeNode,
   filterDepartments,
   foldText,
+  leaderRoles,
   managerOf,
   memberFilters,
   resolveNode,
+  splitTeams,
   stateFromSearchParams,
   stateToSearchParams,
   unitLedBy,
@@ -112,6 +116,35 @@ describe("resolveNode", () => {
   });
 });
 
+describe("banner summaries", () => {
+  it("counts departments without the executive board, every team and the units without a head", () => {
+    // Team "Đảm bảo chất lượng" chưa có trưởng
+    expect(chartSummary(chart)).toEqual({ departments: 1, teams: 2, vacant: 1 });
+    expect(chartSummary({ employeeCount: 0, departments: [] })).toEqual({ departments: 0, teams: 0, vacant: 0 });
+  });
+
+  it("counts a missing department head but not a team lead hidden by the viewer's scope", () => {
+    expect(departmentSummary({ ...ptpm, head: null })).toEqual({ teams: 2, vacant: 2 });
+    const hidden = { ...ptpm, teams: [{ ...ptpm.teams[1], restricted: true, employeeCount: null }] };
+    expect(departmentSummary(hidden)).toEqual({ teams: 1, vacant: 0 });
+    expect(departmentSummary({ ...bgd, head: null })).toEqual({ teams: 0, vacant: 1 });
+  });
+});
+
+describe("splitTeams", () => {
+  const teams = Array.from({ length: 8 }, (_, index) => ({ ...ptpm.teams[0], id: `t${index}` }));
+
+  it("keeps every team up to the limit", () => {
+    expect(splitTeams(teams.slice(0, 6), 6)).toEqual({ shown: teams.slice(0, 6), more: 0 });
+  });
+
+  it("folds the rest into one row so a column has at most `max` rows", () => {
+    const { shown, more } = splitTeams(teams, 6);
+    expect(shown.map((team) => team.id)).toEqual(["t0", "t1", "t2", "t3", "t4"]);
+    expect(more).toBe(3);
+  });
+});
+
 describe("filterDepartments", () => {
   it("matches without Vietnamese accents and by code", () => {
     expect(foldText("  Đảm Bảo  ")).toBe("dam bao");
@@ -170,6 +203,22 @@ describe("managerOf (same chain as the backend ManagerResolver)", () => {
     expect(unitLedBy(member("chi", "ptpm", null, { departmentHead: true }))).toEqual({ kind: "department", id: "ptpm" });
     expect(unitLedBy(member("binh", "ptpm", "be", { teamLead: true }))).toEqual({ kind: "team", id: "be" });
     expect(unitLedBy(member("an", "ptpm", "be"))).toBeUndefined();
+  });
+});
+
+describe("leaderRoles", () => {
+  it("names the director instead of the head of the executive board", () => {
+    expect(leaderRoles(member("gd", "bgd", null, { departmentHead: true }), "gd")).toEqual(["director"]);
+    expect(leaderRoles(member("chi", "ptpm", null, { departmentHead: true }), "gd")).toEqual(["departmentHead"]);
+  });
+
+  it("keeps both roles of a head who also leads a team, and none for other people", () => {
+    expect(leaderRoles(member("chi", "ptpm", "be", { departmentHead: true, teamLead: true }), "gd")).toEqual([
+      "departmentHead",
+      "teamLead",
+    ]);
+    expect(leaderRoles(member("binh", "ptpm", "be", { teamLead: true }), undefined)).toEqual(["teamLead"]);
+    expect(leaderRoles(member("an", "ptpm", "be"), "gd")).toEqual([]);
   });
 });
 

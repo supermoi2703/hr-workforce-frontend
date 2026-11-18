@@ -219,7 +219,7 @@ function TreeRow({ level, departmentId, icon, label, hint, count, active, onClic
           <span
             className={cn(
               "shrink-0 rounded-full px-1.5 text-xs tabular-nums",
-              active ? "bg-primary/15 text-primary" : "text-muted-foreground",
+              active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground group-hover/row:bg-background",
             )}
           >
             {count}

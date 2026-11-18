@@ -115,9 +115,18 @@ type DataTableProps<TData extends RowData> = {
   empty?: ReactNode;
   pageSizeOptions?: number[];
   className?: string;
+  /**
+   * Bấm vào dòng (trừ link, nút, ô nhập trong dòng, và trừ khi đang bôi đen chữ) thì gọi hàm này, vd mở khung chi tiết.
+   * Dòng có con trỏ tay và class `group/row` để ô trong dòng đổi kiểu khi rê chuột (vd dấu › đậm lên). Dòng không nhận
+   * focus: vẫn phải có một nút thật trong dòng làm cùng việc cho người dùng bàn phím.
+   */
+  onRowClick?: (row: TData) => void;
 };
 
 const EMPTY_ROWS: never[] = [];
+
+/** Bấm vào các phần tử này trong dòng thì để chúng tự xử lý, không coi là bấm dòng. */
+const INTERACTIVE_IN_ROW = "a, button, input, select, textarea, label, [role='button'], [role='link'], [role='checkbox']";
 
 export function DataTable<TData extends RowData>({
   columns,
@@ -130,6 +139,7 @@ export function DataTable<TData extends RowData>({
   empty,
   pageSizeOptions,
   className,
+  onRowClick,
 }: DataTableProps<TData>) {
   const t = useTranslations("States");
   const page = query.data;
@@ -204,7 +214,19 @@ export function DataTable<TData extends RowData>({
               </TableRow>
             ) : (
               rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className={onRowClick ? "group/row cursor-pointer" : undefined}
+                  onClick={
+                    onRowClick
+                      ? (event) => {
+                          if ((event.target as HTMLElement).closest(INTERACTIVE_IN_ROW)) return;
+                          if (window.getSelection()?.type === "Range") return;
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                >
                   {row.getAllCells().map((cell) => (
                     <TableCell key={cell.id}>
                       <table.FlexRender cell={cell} />

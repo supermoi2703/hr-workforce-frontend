@@ -92,6 +92,14 @@ return <DataTable columns={columns} query={query} {...tableState.bind} />;
 
 Bảng dùng TanStack Table **v9** (API khác v8). Xem `node_modules/@tanstack/react-table/skills/`.
 
+Bấm cả dòng để mở chi tiết: truyền `onRowClick={(row) => ...}`.
+- Dòng có con trỏ tay và class `group/row`, nên có thể thêm một cột cuối là dấu ›, đậm lên khi rê chuột
+  (`group-hover/row:text-foreground`).
+- Bấm vào link, nút trong dòng hoặc đang bôi đen chữ thì không tính là bấm dòng.
+- Trong dòng vẫn phải có một nút thật làm cùng việc (vd tên người) cho người dùng bàn phím.
+- Trên trang có màu nhấn riêng, tên đó dùng màu chữ thường, chỉ gạch chân khi rê chuột. Ví dụ:
+  `features/organization/components/member-table.tsx`.
+
 ## 5. Form
 
 react-hook-form + zod + component `Field`. Lỗi validation từ backend gắn vào đúng ô bằng
@@ -141,6 +149,16 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   thì dùng màu trạng thái kèm chữ. Ví dụ đầy đủ: `features/dashboard` (donut, biểu đồ vùng, heatmap).
 - Thẻ số nổi bật nền màu đặc (hàng đầu trang phân tích): utility `bg-hero-project | people | time | approval | leave`
   (gradient theo nhóm, chữ trắng đạt tương phản ≥ 5:1). Không dùng cho nội dung thường.
+- Mỗi trang có **tối đa một khối màu đặc**: hàng thẻ số ở trang phân tích, hoặc băng tiêu đề `<HeroBanner tone=...>`
+  (`components/shared/hero-banner.tsx`: đường dẫn, tiêu đề, số lớn, vài số phụ) ở đầu khung chi tiết, như trang
+  `/organization`. Phần còn lại giữ nền trắng. Màu nhấn lấy theo nhóm chức năng (tone), không tô mỗi mục một màu. Mục
+  đang chọn luôn là `primary`. Nút đặt trên băng màu dùng `variant="outline"`.
+- Sơ đồ (cây tổ chức...):
+  - Vùng vẽ: `bg-muted/30 bg-dot-grid`.
+  - Đường nối: `border-diagram-line` / `bg-diagram-line`, là màu tím nhạt pha sẵn thành màu đặc, nên chỗ hai nét chồng
+    nhau không bị đậm lên.
+  - Chỗ còn trống: viền nét đứt `border-warning/50`.
+  - Ví dụ: `features/organization/components/org-diagram.tsx`.
 - Trang chủ (`src/app/(dashboard)/page.tsx`) là chỗ làm việc trong ngày; phân tích theo phạm vi nằm ở `/dashboard`.
   - Hàng chỉ số lấy từ `/api/dashboard/me` (`useMyDashboard` trong `features/dashboard`): giờ vào, phép còn, đơn chờ, dự
     án.

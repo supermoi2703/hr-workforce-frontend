@@ -1,17 +1,43 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Building2Icon, ChevronRightIcon, EyeOffIcon, LandmarkIcon, NetworkIcon, UserRoundIcon, UsersRoundIcon, type LucideIcon } from "lucide-react";
+import {
+  Building2Icon,
+  EyeOffIcon,
+  LandmarkIcon,
+  MapPinIcon,
+  NetworkIcon,
+  UserRoundIcon,
+  UserRoundXIcon,
+  UsersRoundIcon,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Badge } from "@/components/ui/badge";
+import {
+  HeroBanner,
+  HeroBannerBadge,
+  type HeroBannerStat,
+  type HeroBannerStep,
+} from "@/components/shared/hero-banner";
 import { IconTile } from "@/components/shared/icon-tile";
-import { useOrgMembers } from "../hooks";
-import { memberFilters, nodeCount, type OrgPageState, type ResolvedNode } from "../rules";
+import { formatNumber } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { useOrgChartOffices, useOrgMembers } from "../hooks";
+import {
+  chartSummary,
+  departmentSummary,
+  encodeNode,
+  memberFilters,
+  nodeCount,
+  type OrgPageState,
+  type ResolvedNode,
+} from "../rules";
 import type { MemberFilters, OrgChart, OrgChartDepartment, OrgChartPerson, OrgChartTeam, OrgNode } from "../types";
+import { CompanyDiagram } from "./company-diagram";
 import { MemberTable } from "./member-table";
-import { MemberCard, MemberTier, OrgDiagram, ReportingChain, UnitCard } from "./org-diagram";
+import { DIAGRAM_INTERACTIVE, MemberCard, MemberTier, OrgDiagram, ReportingChain, UnitCard, UnitTile } from "./org-diagram";
 import { useOpenPerson } from "./person-sheet";
-import { AddDepartmentButton, UnitActions } from "./unit-actions";
+import { AddDepartmentButton, UnitActions, useCanManageOrg } from "./unit-actions";
 
 /** Bộ dịch theo nhóm con: cả nhóm "Organization" quá lớn để TypeScript suy ra kiểu khóa (TS2590). */
 function useOrgTranslations() {
@@ -33,49 +59,55 @@ type DetailProps = {
   onSelect: (node: OrgNode | undefined) => void;
 };
 
-/** Khi chưa chọn nút: sơ đồ cấp công ty (giám đốc → các phòng) và danh sách mọi người trong phạm vi đang xem. */
+/**
+ * Khi chưa chọn nút: băng tiêu đề của cả công ty (hoặc văn phòng), sơ đồ ba tầng giám đốc → phòng → team, và danh sách
+ * mọi người trong phạm vi đang xem.
+ */
 export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }: DetailProps) {
   const tt = useOrgTranslations();
+  const canManage = useCanManageOrg();
+  const offices = useOrgChartOffices();
+  const officeView = state.view === "office";
   const departments = chart.departments.filter((d) => !d.executive);
   const executive = chart.departments.find((d) => d.executive);
+  const summary = chartSummary(chart);
+
+  const stats: HeroBannerStat[] = [
+    { key: "departments", icon: Building2Icon, label: tt.detail("stats.departments", { count: summary.departments }) },
+    { key: "teams", icon: UsersRoundIcon, label: tt.detail("stats.teams", { count: summary.teams }) },
+  ];
+  if (!officeView && offices.data) {
+    stats.push({ key: "offices", icon: MapPinIcon, label: tt.detail("stats.offices", { count: offices.data.length }) });
+  }
+  // Chỉ người dựng tổ chức cần (và sửa được) chỗ trống; người bị giới hạn phạm vi có thể đếm thiếu
+  if (canManage && summary.vacant > 0) {
+    stats.push({ key: "vacant", icon: UserRoundXIcon, label: tt.detail("stats.vacant", { count: summary.vacant }) });
+  }
 
   return (
     <DetailLayout
-      icon={NetworkIcon}
-      title={scopeLabel}
-      subtitle={tt.detail("overviewSubtitle", { departments: departments.length })}
-      count={chart.employeeCount}
-      notice={chart.employeeCount == null ? tt.detail("restrictedOverview") : undefined}
-      actions={state.view === "department" ? <AddDepartmentButton /> : undefined}
+      header={
+        <UnitBanner
+          icon={officeView ? MapPinIcon : NetworkIcon}
+          title={scopeLabel}
+          count={chart.employeeCount}
+          stats={stats}
+          actions={canManage && !officeView ? <AddDepartmentButton /> : undefined}
+        />
+      }
+      diagramKey="overview"
       diagram={
         chart.departments.length > 0 && (
-          <OrgDiagram
+          <CompanyDiagram
             label={tt.diagram("companyLabel")}
-            root={
-              <UnitCard
-                emphasis
-                person={director}
-                role={tt.roles("director")}
-                unit={executive?.name}
-                count={executive?.employeeCount}
-                onClick={executive ? () => onSelect({ kind: "department", id: executive.id }) : undefined}
-              />
-            }
-            items={departments.map((department) => ({
-              key: department.id,
-              node: (
-                <UnitCard
-                  person={department.head}
-                  role={tt.roles("departmentHead")}
-                  unit={department.name}
-                  count={department.employeeCount}
-                  onClick={() => onSelect({ kind: "department", id: department.id })}
-                />
-              ),
-            }))}
+            director={director}
+            executive={executive}
+            departments={departments}
+            onSelect={onSelect}
           />
         )
       }
+      notice={chart.employeeCount == null ? tt.detail("restrictedOverview") : undefined}
       membersTitle={tt.detail("allMembers")}
     >
       <MemberTable
@@ -83,7 +115,7 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
         directorId={director?.id}
         unitColumn="full"
         onSelectUnit={onSelect}
-        showOffice={state.view !== "office"}
+        showOffice={!officeView}
         emptyTitle={tt.detail("emptyScope")}
       />
     </DetailLayout>
@@ -93,6 +125,7 @@ export function OverviewDetail({ chart, director, state, scopeLabel, onSelect }:
 /** Chi tiết một phòng ban, một team hoặc nhóm "trực thuộc phòng". */
 export function NodeDetail({ chart, director, state, scopeLabel, onSelect, resolved }: DetailProps & { resolved: ResolvedNode }) {
   const tt = useOrgTranslations();
+  const canManage = useCanManageOrg();
   const { department } = resolved;
   const executive = chart.departments.find((d) => d.executive);
   // Giám đốc đứng trên mọi phòng (trừ chính Ban Giám đốc, nơi trưởng phòng là giám đốc): nút phòng, team hay "trực thuộc
@@ -103,7 +136,7 @@ export function NodeDetail({ chart, director, state, scopeLabel, onSelect, resol
           key: "director",
           node: (
             <UnitCard
-              wide
+              apex
               person={director}
               role={tt.roles("director")}
               unit={executive?.name}
@@ -117,16 +150,26 @@ export function NodeDetail({ chart, director, state, scopeLabel, onSelect, resol
   const headRole = department.executive ? tt.roles("director") : tt.roles("departmentHead");
   const filters = memberFilters({ ...state, keyword: undefined });
 
-  const path: { label: string; node?: OrgNode }[] = [{ label: scopeLabel }];
-  if (resolved.kind !== "department") path.push({ label: department.name, node: { kind: "department", id: department.id } });
+  const path: HeroBannerStep[] = [{ key: "scope", label: scopeLabel, onClick: () => onSelect(undefined) }];
+  if (resolved.kind !== "department") {
+    path.push({ key: "department", label: department.name, onClick: () => onSelect({ kind: "department", id: department.id }) });
+  }
 
   let title: string;
   let icon: LucideIcon;
   let diagram: ReactNode;
+  const stats: HeroBannerStat[] = [];
 
   if (resolved.kind === "department") {
     title = department.name;
     icon = department.executive ? LandmarkIcon : Building2Icon;
+    const summary = departmentSummary(department);
+    if (summary.teams > 0) {
+      stats.push({ key: "teams", icon: UsersRoundIcon, label: tt.detail("stats.teams", { count: summary.teams }) });
+    }
+    if (canManage && summary.vacant > 0) {
+      stats.push({ key: "vacant", icon: UserRoundXIcon, label: tt.detail("stats.vacant", { count: summary.vacant }) });
+    }
     diagram = underDirector(
       "department",
       <DepartmentDiagram
@@ -191,20 +234,31 @@ export function NodeDetail({ chart, director, state, scopeLabel, onSelect, resol
       : department.restricted
         ? tt.detail("restrictedDepartment")
         : undefined;
+  const nodeKey =
+    resolved.kind === "team"
+      ? encodeNode({ kind: "team", id: resolved.team.id })
+      : resolved.kind === "department"
+        ? encodeNode({ kind: "department", id: department.id })
+        : encodeNode({ kind: "noTeam", departmentId: department.id });
 
   return (
     <DetailLayout
-      icon={icon}
-      title={title}
-      code={code}
-      path={path}
-      onSelect={onSelect}
-      subtitle={resolved.kind === "noTeam" ? tt.detail("withoutTeamSubtitle", { name: department.name }) : undefined}
-      badge={department.executive && resolved.kind === "department" ? tt.detail("executiveBadge") : undefined}
-      count={nodeCount(resolved)}
-      notice={notice}
-      actions={<UnitActions resolved={resolved} onSelect={onSelect} />}
+      header={
+        <UnitBanner
+          icon={icon}
+          title={title}
+          code={code}
+          executive={department.executive && resolved.kind === "department"}
+          path={path}
+          description={resolved.kind === "noTeam" ? tt.detail("withoutTeamSubtitle", { name: department.name }) : undefined}
+          count={nodeCount(resolved)}
+          stats={stats}
+          actions={canManage && resolved.kind !== "noTeam" ? <UnitActions resolved={resolved} onSelect={onSelect} /> : undefined}
+        />
+      }
+      diagramKey={nodeKey}
       diagram={diagram}
+      notice={notice}
       membersTitle={tt.detail("members")}
     >
       <MemberTable
@@ -282,7 +336,10 @@ function LeaderWithMembers({
       <a
         key="more"
         href={`#${MEMBERS_SECTION_ID}`}
-        className="flex w-44 items-center justify-center rounded-lg border border-dashed px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+        className={cn(
+          "flex min-h-10 w-48 items-center justify-center rounded-full border border-dashed px-3 py-1 text-sm text-muted-foreground hover:text-foreground",
+          DIAGRAM_INTERACTIVE,
+        )}
       >
         {tt.diagram("moreMembers", { count: hidden })}
       </a>,
@@ -291,14 +348,18 @@ function LeaderWithMembers({
   return <MemberTier label={label} root={leader} members={cards} />;
 }
 
-/** Kết quả tìm người theo tên / mã trong phạm vi đang xem. */
+/** Kết quả tìm người theo tên / mã trong phạm vi đang xem. Không phải một đơn vị nên dùng tiêu đề trắng, không có băng màu. */
 export function SearchDetail({ director, state, scopeLabel, onSelect }: Omit<DetailProps, "chart">) {
   const tt = useOrgTranslations();
   return (
     <DetailLayout
-      icon={UsersRoundIcon}
-      title={tt.detail("searchTitle", { keyword: state.keyword ?? "" })}
-      subtitle={tt.detail("searchSubtitle", { scope: scopeLabel })}
+      header={
+        <PlainHeader
+          icon={UsersRoundIcon}
+          title={tt.detail("searchTitle", { keyword: state.keyword ?? "" })}
+          subtitle={tt.detail("searchSubtitle", { scope: scopeLabel })}
+        />
+      }
       membersTitle={tt.detail("searchResults")}
     >
       <MemberTable
@@ -314,6 +375,7 @@ export function SearchDetail({ director, state, scopeLabel, onSelect }: Omit<Det
   );
 }
 
+/** Sơ đồ của một phòng: trưởng phòng ở trên, các team (và nhóm trực thuộc phòng) ở dưới. */
 function DepartmentDiagram({
   department,
   headRole,
@@ -345,129 +407,123 @@ function DepartmentDiagram({
   const items = department.teams.map((team) => ({
     key: team.id,
     node: (
-      <UnitCard
+      <UnitTile
+        icon={UsersRoundIcon}
+        name={team.name}
+        count={team.employeeCount}
         person={team.lead}
         hidden={team.restricted}
         role={tt.roles("teamLead")}
-        unit={team.name}
-        count={team.employeeCount}
         onClick={() => onSelect({ kind: "team", id: team.id })}
       />
     ),
   }));
   // Trưởng phòng đã ở ô trên nên ô này đếm directStaffCount (không tính trưởng phòng); không còn ai thì không vẽ
-  if ((department.directStaffCount ?? 0) > 0 && department.teams.length > 0) {
+  if ((department.directStaffCount ?? 0) > 0) {
     items.push({
       key: "no-team",
       node: (
-        <button
-          type="button"
+        <UnitTile
+          dashed
+          icon={UserRoundIcon}
+          name={tt.tree("withoutTeam")}
+          count={department.directStaffCount}
           onClick={() => onSelect({ kind: "noTeam", departmentId: department.id })}
-          className="flex w-48 flex-col justify-center rounded-lg border border-dashed p-2.5 text-left text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
-        >
-          <span className="font-medium text-foreground">{tt.tree("withoutTeam")}</span>
-          <span className="text-xs tabular-nums">{tt.detail("people", { count: department.directStaffCount ?? 0 })}</span>
-        </button>
+        />
       ),
     });
   }
-  return (
-    <OrgDiagram
-      label={label}
-      root={head}
-      items={items}
-    />
-  );
+  return <OrgDiagram label={label} root={head} items={items} />;
 }
 
 /** Neo của bảng danh sách, để ô "+N người khác" trên sơ đồ cuộn xuống. */
 const MEMBERS_SECTION_ID = "org-members";
 
-type DetailLayoutProps = {
+/** Băng tiêu đề tím (nhóm Tổ chức) của một đơn vị: khối màu đặc duy nhất của trang. */
+function UnitBanner({
+  icon,
+  title,
+  code,
+  executive,
+  path,
+  description,
+  count,
+  stats,
+  actions,
+}: {
   icon: LucideIcon;
-  /** Nút quản trị bên phải tiêu đề (chỉ hiện với người có org:manage). */
-  actions?: ReactNode;
   title: string;
   code?: string;
-  subtitle?: string;
-  badge?: string;
-  /** null / không truyền = không hiện số người. */
-  count?: number | null;
+  executive?: boolean;
+  path?: HeroBannerStep[];
+  description?: string;
+  /** null = không hiện số lớn (người xem không thấy hết người của đơn vị). */
+  count: number | null;
+  stats: HeroBannerStat[];
+  /** Chỉ truyền khi người xem có quyền: component trả null vẫn để lại một khối trống. */
+  actions?: ReactNode;
+}) {
+  const t = useTranslations("Organization.Detail");
+  return (
+    <HeroBanner
+      tone="people"
+      icon={icon}
+      title={title}
+      path={path}
+      badges={
+        (code || executive) && (
+          <>
+            {code && <HeroBannerBadge>{code}</HeroBannerBadge>}
+            {executive && <HeroBannerBadge>{t("executiveBadge")}</HeroBannerBadge>}
+          </>
+        )
+      }
+      description={description}
+      value={count != null ? formatNumber(count) : undefined}
+      valueLabel={count != null ? t("peopleLabel", { count }) : undefined}
+      stats={stats}
+      actions={actions}
+    />
+  );
+}
+
+/** Tiêu đề trắng cho phần không phải một đơn vị (kết quả tìm kiếm). */
+function PlainHeader({ icon, title, subtitle }: { icon: LucideIcon; title: string; subtitle: string }) {
+  return (
+    <header className="flex items-center gap-3 border-b p-4">
+      <IconTile icon={icon} tone="people" className="size-10" />
+      <div className="min-w-0">
+        <h2 className="truncate text-lg font-semibold tracking-tight">{title}</h2>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+    </header>
+  );
+}
+
+type DetailLayoutProps = {
+  header: ReactNode;
+  diagram?: ReactNode;
+  /** Đổi giá trị (đổi đơn vị đang xem) thì sơ đồ hiện dần lại. */
+  diagramKey?: string;
   /** Dòng giải thích phạm vi xem, hiện trên danh sách thành viên. */
   notice?: string;
-  path?: { label: string; node?: OrgNode }[];
-  onSelect?: (node: OrgNode | undefined) => void;
-  diagram?: ReactNode;
   membersTitle: string;
   children: ReactNode;
 };
 
-function DetailLayout({
-  icon,
-  actions,
-  title,
-  code,
-  subtitle,
-  badge,
-  count,
-  notice,
-  path,
-  onSelect,
-  diagram,
-  membersTitle,
-  children,
-}: DetailLayoutProps) {
-  const t = useTranslations("Organization.Detail");
+function DetailLayout({ header, diagram, diagramKey, notice, membersTitle, children }: DetailLayoutProps) {
   return (
     <div className="flex flex-col">
-      <header className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
-          <IconTile icon={icon} tone="people" className="size-10" />
-          <div className="min-w-0">
-            {path && path.length > 0 && (
-              <ol className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                {path.map((step, index) => (
-                  <li key={`${step.label}-${index}`} className="flex items-center gap-1">
-                    {index > 0 && <ChevronRightIcon className="size-3" aria-hidden />}
-                    <button
-                      type="button"
-                      onClick={() => onSelect?.(step.node)}
-                      className="hover:text-foreground hover:underline"
-                    >
-                      {step.label}
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
-            <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold tracking-tight">
-              <span className="truncate">{title}</span>
-              {code && (
-                <Badge variant="outline" className="font-normal tabular-nums">
-                  {code}
-                </Badge>
-              )}
-              {badge && <Badge variant="info">{badge}</Badge>}
-            </h2>
-            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+      {header}
+
+      {diagram && (
+        <div className="border-b bg-muted/30 bg-dot-grid px-4 py-8">
+          {/* Hiệu ứng duy nhất của trang: đổi đơn vị thì sơ đồ hiện dần (tắt khi bật "giảm chuyển động") */}
+          <div key={diagramKey} className="animate-in duration-200 fade-in-0 slide-in-from-bottom-1">
+            {diagram}
           </div>
         </div>
-        {(count != null || actions) && (
-          <div className="flex shrink-0 items-center gap-4">
-            {count != null && (
-              <p className="text-sm text-muted-foreground">
-                {t.rich("headcount", {
-                  count,
-                  num: (chunks) => <span className="text-2xl font-semibold text-foreground tabular-nums">{chunks}</span>,
-                })}
-              </p>
-            )}
-            {actions}
-          </div>
-        )}
-      </header>
-
-      {diagram && <div className="border-b bg-muted/40 px-4 py-6">{diagram}</div>}
+      )}
 
       <section id={MEMBERS_SECTION_ID} className="flex scroll-mt-4 flex-col gap-3 p-4" aria-label={membersTitle}>
         <h3 className="text-sm font-medium">{membersTitle}</h3>

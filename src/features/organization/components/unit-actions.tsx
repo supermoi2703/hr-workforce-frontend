@@ -29,14 +29,14 @@ export function useCanManageOrg() {
   return useCurrentUser().hasPermission(ORG_MANAGE_PERMISSION);
 }
 
-/** Nút "Thêm phòng ban" ở trang toàn công ty. */
+/** Nút "Thêm phòng ban" ở trang toàn công ty (nằm trên băng tiêu đề màu nên dùng kiểu outline). */
 export function AddDepartmentButton() {
   const t = useTranslations("Organization.Admin");
   const [target, setTarget] = useState<UnitFormTarget | null>(null);
   if (!useCanManageOrg()) return null;
   return (
     <>
-      <Button size="sm" onClick={() => setTarget({ kind: "department", mode: "create" })}>
+      <Button variant="outline" size="sm" onClick={() => setTarget({ kind: "department", mode: "create" })}>
         <PlusIcon /> {t("createDepartment")}
       </Button>
       <UnitFormDialog target={target} onClose={() => setTarget(null)} />
@@ -45,8 +45,8 @@ export function AddDepartmentButton() {
 }
 
 /**
- * Menu "Quản lý" trên đầu trang một phòng ban / team: gán trưởng, thêm team, sửa, ngừng dùng. Ngừng dùng xong thì quay
- * về đơn vị cha (đơn vị đã ngừng dùng không còn trên cây).
+ * Menu "Quản lý" trên băng tiêu đề của một phòng ban / team: gán trưởng, thêm team, sửa, ngừng dùng. Ngừng dùng xong thì
+ * quay về đơn vị cha (đơn vị đã ngừng dùng không còn trên cây).
  */
 export function UnitActions({ resolved, onSelect }: { resolved: ResolvedNode; onSelect: (node: OrgNode | undefined) => void }) {
   const t = useTranslations("Organization.Admin");

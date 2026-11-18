@@ -24,6 +24,9 @@
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --color-hero-foreground: var(--hero-foreground);
+  /* Đường nối trên sơ đồ tổ chức: tím nhạt của nhóm Tổ chức, pha với nền thẻ thành màu đặc (chỗ hai nét chồng nhau không
+     bị đậm lên như khi dùng màu trong suốt). */
+  --color-diagram-line: color-mix(in oklch, var(--chart-5) 35%, var(--card));
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -216,4 +219,10 @@
 }
 @utility bg-hero-leave {
   background-image: linear-gradient(135deg, var(--hero-leave-from), var(--hero-leave-to));
+}
+
+/* Nền vùng vẽ sơ đồ: lưới chấm mờ theo màu chữ, tự đổi theo theme. Ghép với một màu nền (vd. bg-muted/30). */
+@utility bg-dot-grid {
+  background-image: radial-gradient(circle, color-mix(in oklch, var(--foreground) 14%, transparent) 1px, transparent 1.5px);
+  background-size: 1rem 1rem;
 }

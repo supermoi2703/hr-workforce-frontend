@@ -122,6 +122,54 @@ export function filterDepartments(departments: OrgChartDepartment[], text: strin
   });
 }
 
+/** Phòng chưa có trưởng (kể cả Ban Giám đốc chưa có giám đốc). Trưởng phòng luôn hiện với mọi người xem. */
+export function isVacantDepartment(department: OrgChartDepartment): boolean {
+  return !department.head;
+}
+
+/** Team chưa có trưởng. Team ngoài phạm vi xem (`restricted`) không có trưởng là do bị ẩn, không tính là trống. */
+export function isVacantTeam(team: OrgChartTeam): boolean {
+  return !team.lead && !team.restricted;
+}
+
+export type UnitSummary = {
+  teams: number;
+  /** Số đơn vị (phòng, team) chưa có trưởng. */
+  vacant: number;
+};
+
+/** Số phụ trên băng tiêu đề của một phòng. */
+export function departmentSummary(department: OrgChartDepartment): UnitSummary {
+  return {
+    teams: department.teams.length,
+    vacant: Number(isVacantDepartment(department)) + department.teams.filter(isVacantTeam).length,
+  };
+}
+
+/** Số phụ trên băng tiêu đề của cả cây (công ty hoặc một văn phòng). Số phòng không tính Ban Giám đốc. */
+export function chartSummary(chart: OrgChart): UnitSummary & { departments: number } {
+  return chart.departments.reduce(
+    (sum, department) => {
+      const own = departmentSummary(department);
+      return {
+        departments: sum.departments + (department.executive ? 0 : 1),
+        teams: sum.teams + own.teams,
+        vacant: sum.vacant + own.vacant,
+      };
+    },
+    { departments: 0, teams: 0, vacant: 0 },
+  );
+}
+
+/**
+ * Cột phòng trên sơ đồ công ty vẽ tối đa `max` dòng team; nhiều hơn thì vẽ `max - 1` team và một dòng "+N team khác", để
+ * các cột không dài quá.
+ */
+export function splitTeams(teams: OrgChartTeam[], max: number): { shown: OrgChartTeam[]; more: number } {
+  if (teams.length <= max) return { shown: teams, more: 0 };
+  return { shown: teams.slice(0, max - 1), more: teams.length - (max - 1) };
+}
+
 /** Số người ở nút đang chọn, để hiện ngay trên tiêu đề trước khi danh sách tải xong. */
 export function nodeCount(resolved: ResolvedNode): number | null {
   switch (resolved.kind) {
@@ -150,6 +198,22 @@ export function managerOf(
   if (member.departmentHead) return notSelf(director);
   const team = department?.teams.find((t) => t.id === member.team?.id);
   return notSelf(team?.lead) ?? notSelf(department?.head) ?? notSelf(director);
+}
+
+export type LeaderRole = "director" | "departmentHead" | "teamLead";
+
+/**
+ * Vai trò trưởng của một người, để hiện chip trong danh sách và khung thông tin: trưởng Ban Giám đốc là "director" thay cho
+ * "departmentHead"; người vừa là trưởng phòng vừa là trưởng team có cả hai.
+ */
+export function leaderRoles(
+  member: Pick<OrgChartMember, "id" | "departmentHead" | "teamLead">,
+  directorId: string | undefined,
+): LeaderRole[] {
+  const roles: LeaderRole[] = [];
+  if (member.departmentHead) roles.push(member.id === directorId ? "director" : "departmentHead");
+  if (member.teamLead) roles.push("teamLead");
+  return roles;
 }
 
 /** Đơn vị người này đứng đầu (để hiện "Phụ trách"): phòng nếu là trưởng phòng, team nếu là trưởng team. */
