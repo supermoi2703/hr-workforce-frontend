@@ -63,7 +63,10 @@ export type UnitCardProps = {
   count?: number | null;
   active?: boolean;
   onClick?: () => void;
-  /** Ô giám đốc ở đầu sơ đồ và đầu mọi chuỗi báo cáo: to hơn, có quầng tím nhạt. */
+  /**
+   * Ô giám đốc ở đầu sơ đồ và đầu mọi chuỗi báo cáo: to hơn một chút. Khung và ảnh giữ như các ô khác (không quầng, không
+   * đổ bóng, không vòng tím quanh ảnh): đứng trên cùng đã đủ nói là cấp cao nhất.
+   */
   apex?: boolean;
   /** Ô gốc to hơn một chút. */
   emphasis?: boolean;
@@ -80,12 +83,7 @@ export function UnitCard({ person, hidden, role, unit, count, active, onClick, a
     <>
       <span className="flex items-center gap-2.5">
         {person ? (
-          <UserAvatar
-            name={person.fullName}
-            seed={person.employeeCode}
-            size={large ? "lg" : "default"}
-            className={apex ? "ring-2 ring-chart-5/30" : undefined}
-          />
+          <UserAvatar name={person.fullName} seed={person.employeeCode} size={large ? "lg" : "default"} />
         ) : (
           <PlaceholderAvatar hidden={hidden} size={large ? "lg" : "default"} />
         )}
@@ -118,7 +116,6 @@ export function UnitCard({ person, hidden, role, unit, count, active, onClick, a
   const className = cn(
     "flex flex-col rounded-xl border bg-card p-3 text-left text-sm shadow-xs",
     large || wide ? "w-60" : "w-48",
-    apex && "border-chart-5/40 shadow-sm ring-4 ring-chart-5/10",
     vacant && "border-dashed border-warning/50",
     !person && hidden && "border-dashed",
     active && "border-primary ring-2 ring-primary/20",
