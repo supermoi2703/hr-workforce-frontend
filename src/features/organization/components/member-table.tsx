@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
-import { Building2Icon, ChevronRightIcon, MapPinIcon, UserRoundIcon, UsersRoundIcon, type LucideIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createDataTableColumns, DataTable, useDataTableState } from "@/components/shared/data-table/data-table";
 import { EmptyState } from "@/components/shared/states";
@@ -68,7 +68,7 @@ export function MemberTable({
     return col.columns([
       col.accessor("fullName", {
         header: t("employee"),
-        cell: (c) => <PersonCell member={c.row.original} directorId={directorId} onOpen={openPerson} />,
+        cell: (c) => <PersonCell member={c.row.original} onOpen={openPerson} />,
       }),
       col.accessor((row) => row.position?.name ?? "", {
         id: "position",
@@ -98,7 +98,7 @@ export function MemberTable({
             col.accessor((row) => row.office?.name ?? "", {
               id: "office",
               header: t("office"),
-              cell: (c) => (c.getValue() ? <IconText icon={MapPinIcon}>{c.getValue()}</IconText> : <Dash />),
+              cell: (c) => c.getValue() || <Dash />,
             }),
           ]
         : []),
@@ -131,22 +131,13 @@ export function MemberTable({
 }
 
 /**
- * Ô nhân viên: ảnh (trưởng có viền tím nhạt như ô giám đốc trên sơ đồ), tên, dòng dưới là mã và email. Tên là nút thật để
- * người dùng bàn phím mở được khung thông tin. Vai trò trưởng nằm ở cột chức vụ.
+ * Ô nhân viên: ảnh, tên, dòng dưới là mã và email. Tên là nút thật để người dùng bàn phím mở được khung thông tin. Vai
+ * trò trưởng nằm ở cột chức vụ (chip), ảnh không tô riêng.
  */
-function PersonCell({
-  member,
-  directorId,
-  onOpen,
-}: {
-  member: OrgChartMember;
-  directorId?: string;
-  onOpen: (member: OrgChartMember) => void;
-}) {
-  const leader = leaderRoles(member, directorId).length > 0;
+function PersonCell({ member, onOpen }: { member: OrgChartMember; onOpen: (member: OrgChartMember) => void }) {
   return (
     <span className="flex items-center gap-3">
-      <UserAvatar name={member.fullName} seed={member.employeeCode} className={leader ? "ring-2 ring-chart-5/30" : undefined} />
+      <UserAvatar name={member.fullName} seed={member.employeeCode} />
       <span className="flex min-w-0 flex-col gap-0.5">
         <button type="button" onClick={() => onOpen(member)} className={cn(TEXT_LINK, "w-fit font-medium text-foreground")}>
           {member.fullName}
@@ -195,8 +186,9 @@ function UnitLink({ label, node, onSelectUnit }: { label: string; node: OrgNode;
 }
 
 /**
- * Phòng ban, dưới là team. Người không thuộc team là "Trực thuộc phòng"; trưởng phòng và giám đốc không ghi dòng này vì
- * chip cạnh tên đã nói vai trò.
+ * Phòng ban, dưới là team (chữ nhỏ, xám). Người không thuộc team là "Trực thuộc phòng"; trưởng phòng và giám đốc không ghi
+ * dòng này vì chip ở cột chức vụ đã nói vai trò. Không icon: tiêu đề cột và cỡ chữ đã phân biệt phòng với team (như bảng
+ * kết quả tìm người ở trang Kỹ năng).
  */
 function UnitCell({ member, onSelectUnit }: CellProps) {
   const t = useTranslations("Organization.Members");
@@ -205,62 +197,37 @@ function UnitCell({ member, onSelectUnit }: CellProps) {
   return (
     // Tên phòng dài được xuống dòng, để bảng vừa khung thay vì cuộn ngang
     <span className="flex min-w-36 flex-col gap-0.5 whitespace-normal">
-      <IconText icon={Building2Icon}>
+      <span>
         <UnitLink label={department.name} node={{ kind: "department", id: department.id }} onSelectUnit={onSelectUnit} />
-      </IconText>
+      </span>
       {team ? (
-        <IconText icon={UsersRoundIcon} small>
+        <span className={SUB_LINE}>
           <UnitLink label={team.name} node={{ kind: "team", id: team.id }} onSelectUnit={onSelectUnit} />
-        </IconText>
+        </span>
       ) : (
-        !member.departmentHead && (
-          <IconText icon={UserRoundIcon} small>
-            {t("noTeam")}
-          </IconText>
-        )
+        !member.departmentHead && <span className={SUB_LINE}>{t("noTeam")}</span>
       )}
     </span>
   );
 }
 
-/** Cột team khi đang xem một phòng: trưởng phòng không thuộc team thì để "—" (chip cạnh tên đã nói vai trò). */
+/** Cột team khi đang xem một phòng: trưởng phòng không thuộc team thì để "—" (chip ở cột chức vụ đã nói vai trò). */
 function TeamCell({ member, onSelectUnit }: CellProps) {
   const t = useTranslations("Organization.Members");
   const { team } = member;
   if (team) {
     return (
-      <IconText icon={UsersRoundIcon} className="whitespace-normal">
+      <span className="whitespace-normal">
         <UnitLink label={team.name} node={{ kind: "team", id: team.id }} onSelectUnit={onSelectUnit} />
-      </IconText>
+      </span>
     );
   }
   if (member.departmentHead) return <Dash />;
-  return (
-    <IconText icon={UserRoundIcon} className="text-muted-foreground">
-      {t("noTeam")}
-    </IconText>
-  );
+  return <span className="text-muted-foreground">{t("noTeam")}</span>;
 }
 
-/** Chữ kèm icon nhỏ xám đứng trước. `small` = dòng phụ chữ nhỏ, xám. */
-function IconText({
-  icon: Icon,
-  small,
-  className,
-  children,
-}: {
-  icon: LucideIcon;
-  small?: boolean;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <span className={cn("flex items-start gap-1.5", small && "text-xs text-muted-foreground", className)}>
-      <Icon className={cn("mt-0.5 shrink-0 text-muted-foreground", small ? "size-3" : "size-3.5")} aria-hidden />
-      <span className="min-w-0">{children}</span>
-    </span>
-  );
-}
+/** Dòng phụ dưới tên phòng: team hoặc "Trực thuộc phòng". */
+const SUB_LINE = "text-xs text-muted-foreground";
 
 function Dash() {
   return <span className="text-muted-foreground">—</span>;
