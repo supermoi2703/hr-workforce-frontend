@@ -1572,13 +1572,13 @@
     "Diagram": {
       "vacant": "Chưa có trưởng",
       "hidden": "Không hiển thị",
-      "companyLabel": "Sơ đồ công ty: giám đốc và các phòng ban",
+      "companyLabel": "Sơ đồ công ty: giám đốc, các phòng ban và team",
       "unitLabel": "Sơ đồ {name}",
       "chainLabel": "Tuyến báo cáo của {name}",
-      "moreMembers": "+{count} người khác"
+      "moreMembers": "+{count} người khác",
+      "moreTeams": "+{count} team khác"
     },
     "Detail": {
-      "overviewSubtitle": "{departments, plural, =0 {Chưa có phòng ban} other {# phòng ban}}",
       "allMembers": "Tất cả nhân sự",
       "emptyScope": "Chưa có ai",
       "members": "Thành viên",
@@ -1594,11 +1594,13 @@
       "emptySearch": "Không tìm thấy ai",
       "emptySearchHint": "Kiểm tra chính tả (kể cả dấu tiếng Việt) hoặc tìm theo mã nhân viên.",
       "people": "{count} người",
-      "headcount": "<num>{count}</num> người",
-      "statPeople": "Nhân sự",
-      "statDepartments": "Phòng ban",
-      "statTeams": "Team",
-      "statOffices": "Văn phòng"
+      "peopleLabel": "người",
+      "stats": {
+        "departments": "{count} phòng ban",
+        "teams": "{count} team",
+        "offices": "{count} văn phòng",
+        "vacant": "{count} đơn vị chưa có trưởng"
+      }
     },
     "Members": {
       "employee": "Nhân viên",

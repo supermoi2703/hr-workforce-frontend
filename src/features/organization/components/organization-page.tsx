@@ -231,23 +231,27 @@ function TreeSkeleton() {
   );
 }
 
+/** Khung chờ theo bố cục thật: băng tiêu đề, ô giám đốc, các cột phòng kèm team, bảng. */
 function DetailSkeleton() {
   return (
-    <div className="space-y-4 p-4" aria-hidden>
-      <div className="flex items-center gap-3">
-        <Skeleton className="size-10 rounded-lg" />
-        <div className="space-y-1.5">
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-5 w-48" />
+    <div aria-hidden>
+      <Skeleton className="h-36 rounded-none" />
+      <div className="flex flex-col items-center gap-6 border-b px-4 py-8">
+        <Skeleton className="h-20 w-60 rounded-xl" />
+        <div className="flex flex-wrap justify-center gap-3">
+          {[3, 2, 0, 4].map((teams, index) => (
+            <div key={index} className="flex w-44 flex-col gap-2">
+              <Skeleton className="h-24 rounded-xl" />
+              {Array.from({ length: teams }, (_, row) => (
+                <Skeleton key={row} className="ml-6 h-6" />
+              ))}
+            </div>
+          ))}
         </div>
       </div>
-      <Skeleton className="mx-auto h-16 w-60" />
-      <div className="flex justify-center gap-3">
-        <Skeleton className="h-16 w-48" />
-        <Skeleton className="h-16 w-48" />
-        <Skeleton className="h-16 w-48" />
+      <div className="p-4">
+        <Skeleton className="h-40 w-full" />
       </div>
-      <Skeleton className="h-40 w-full" />
     </div>
   );
 }

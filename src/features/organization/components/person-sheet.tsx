@@ -3,11 +3,11 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { Building2Icon, MailIcon, MapPinIcon, UsersRoundIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { UserAvatar } from "@/components/shared/user-avatar";
-import { managerOf, resolveNode, unitLedBy } from "../rules";
+import { leaderRoles, managerOf, resolveNode, unitLedBy } from "../rules";
 import type { OrgChart, OrgChartMember, OrgChartPerson, OrgNode } from "../types";
+import { RoleChip } from "./role-chip";
 
 const PersonSheetContext = createContext<(member: OrgChartMember) => void>(() => {});
 
@@ -66,6 +66,7 @@ function PersonDetail({
   const tMembers = useTranslations("Organization.Members");
   const manager = managerOf(member, chart, director);
   const isDirector = member.id === director?.id;
+  const roles = leaderRoles(member, director?.id);
   const led = unitLedBy(member);
   const ledResolved = resolveNode(chart, led);
   const ledName = ledResolved?.kind === "team" ? ledResolved.team.name : ledResolved?.department.name;
@@ -74,17 +75,26 @@ function PersonDetail({
 
   return (
     <>
-      <SheetHeader className="items-center gap-3 border-b pb-5 pt-8 text-center">
-        <UserAvatar name={member.fullName} seed={member.employeeCode} size="lg" className="data-[size=lg]:size-16 text-lg" />
+      {/* Dải tím nhạt của nhóm Tổ chức sau ảnh đại diện; không dùng gradient (băng màu đặc chỉ có một, ở trang chính) */}
+      <SheetHeader className="items-center gap-3 border-b bg-chart-5/8 pb-5 pt-8 text-center">
+        <UserAvatar
+          name={member.fullName}
+          seed={member.employeeCode}
+          size="lg"
+          className="text-lg ring-4 ring-card data-[size=lg]:size-16"
+        />
         <div className="flex flex-col items-center gap-1">
           <SheetTitle className="text-lg">{member.fullName}</SheetTitle>
           <SheetDescription>
             {member.position?.name ?? t("noPosition")} <span className="tabular-nums">({member.employeeCode})</span>
           </SheetDescription>
-          {(member.departmentHead || member.teamLead) && (
-            <Badge variant={member.departmentHead ? "info" : "secondary"}>
-              {isDirector ? tMembers("director") : member.departmentHead ? tMembers("departmentHead") : tMembers("teamLead")}
-            </Badge>
+          {roles.length > 0 && (
+            // Chip nền trắng: nổi trên dải tím nhạt của đầu khung
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {roles.map((role) => (
+                <RoleChip key={role} role={role} className="bg-card" />
+              ))}
+            </div>
           )}
         </div>
       </SheetHeader>

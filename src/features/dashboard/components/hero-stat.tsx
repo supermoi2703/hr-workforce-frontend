@@ -3,10 +3,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowDownRightIcon, ArrowRightIcon, ArrowUpRightIcon, type LucideIcon } from "lucide-react";
+import { HERO_TONE_BG, type HeroTone } from "@/components/shared/hero-banner";
 import { cn } from "@/lib/utils";
 import type { Change } from "../rules";
-
-export type HeroTone = "project" | "people" | "time" | "approval" | "leave";
 
 /** Chữ của nhãn so sánh nền trắng: màu đậm cùng tông của thẻ (đọc được ở cả hai theme). */
 const TONE_INK: Record<HeroTone, string> = {
@@ -15,14 +14,6 @@ const TONE_INK: Record<HeroTone, string> = {
   time: "text-[var(--hero-time-to)]",
   approval: "text-[var(--hero-approval-to)]",
   leave: "text-[var(--hero-leave-to)]",
-};
-
-const TONE_CLASS: Record<HeroTone, string> = {
-  project: "bg-hero-project",
-  people: "bg-hero-people",
-  time: "bg-hero-time",
-  approval: "bg-hero-approval",
-  leave: "bg-hero-leave",
 };
 
 type HeroStatProps = {
@@ -87,7 +78,7 @@ export function HeroStat({
 
   const classes = cn(
     "relative grid min-h-32 content-between gap-1 overflow-hidden rounded-xl p-4 text-hero-foreground shadow-sm",
-    TONE_CLASS[tone],
+    HERO_TONE_BG[tone],
     className,
   );
   return href ? (

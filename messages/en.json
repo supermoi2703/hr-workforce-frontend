@@ -1572,13 +1572,13 @@
     "Diagram": {
       "vacant": "No head assigned",
       "hidden": "Not shown",
-      "companyLabel": "Company chart: director and departments",
+      "companyLabel": "Company chart: director, departments and teams",
       "unitLabel": "Chart of {name}",
       "chainLabel": "Reporting line of {name}",
-      "moreMembers": "+{count} more"
+      "moreMembers": "+{count} more",
+      "moreTeams": "{count, plural, one {+# more team} other {+# more teams}}"
     },
     "Detail": {
-      "overviewSubtitle": "{departments, plural, =0 {No departments yet} one {# department} other {# departments}}",
       "allMembers": "Everyone",
       "emptyScope": "Nobody here yet",
       "members": "Members",
@@ -1594,11 +1594,13 @@
       "emptySearch": "No one matches",
       "emptySearchHint": "Check the spelling, including Vietnamese accents, or search by employee code.",
       "people": "{count, plural, one {# person} other {# people}}",
-      "headcount": "<num>{count}</num> {count, plural, one {person} other {people}}",
-      "statPeople": "People",
-      "statDepartments": "Departments",
-      "statTeams": "Teams",
-      "statOffices": "Offices"
+      "peopleLabel": "{count, plural, one {person} other {people}}",
+      "stats": {
+        "departments": "{count, plural, one {# department} other {# departments}}",
+        "teams": "{count, plural, one {# team} other {# teams}}",
+        "offices": "{count, plural, one {# office} other {# offices}}",
+        "vacant": "{count, plural, one {# unit without a head} other {# units without a head}}"
+      }
     },
     "Members": {
       "employee": "Employee",
