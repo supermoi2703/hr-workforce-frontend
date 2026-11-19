@@ -26,7 +26,7 @@
       "people": "People",
       "timePay": "Time & pay",
       "organization": "Organization & workforce",
-      "aiLab": "AI lab",
+      "aiLab": "AI assistant",
       "admin": "Administration",
       "dev": "Development"
     },
@@ -1906,6 +1906,98 @@
         "name": "Contract expiry warning",
         "description": "Show contracts ending within this many days."
       }
+    }
+  },
+  "PolicyQa": {
+    "metaTitle": "Policy Q&A",
+    "title": "Policy Q&A",
+    "description": "Ask about company rules. Answers are based only on the policy documents and cite their sources.",
+    "placeholder": "Example: How many days a week can I work from home?",
+    "inputLabel": "Question about policy",
+    "hint": "Press Enter to send, Shift + Enter for a new line.",
+    "ask": "Ask",
+    "newConversation": "Start over",
+    "searching": "Searching the policy documents…",
+    "suggestionsTitle": "Try asking",
+    "suggestions": {
+      "leave": "How many days of annual leave does an employee get?",
+      "remote": "How many days a week can I work from home?",
+      "lunch": "What time is the lunch break?",
+      "approval": "How long must a leave request be to need an extra HR approval?"
+    },
+    "noAnswer": "The policy does not cover this yet, or it was not found in the documents. Ask HR if you need an answer.",
+    "sourcesTitle": "Sources ({count})",
+    "sourceFile": "Document: {file}",
+    "defaultNote": "A number in the excerpt may be the document's default. The value in force is the one shown under \"Values currently in force\" above.",
+    "parameters": {
+      "title": "Values currently in force",
+      "upcoming": "From {date}: {value}",
+      "yes": "Yes",
+      "no": "No",
+      "units": {
+        "days": "{value, plural, one {# day} other {# days}}",
+        "hours": "{value, plural, one {# hour} other {# hours}}",
+        "minutes": "{value, plural, one {# minute} other {# minutes}}",
+        "times": "{value, plural, one {# time} other {# times}}",
+        "percent": "{value}%",
+        "multiple": "{value}×",
+        "multiplier": "×{value}"
+      },
+      "labels": {
+        "leave_annual_days": "Annual leave days",
+        "leave_min_notice_days": "Days of notice required for leave",
+        "leave_backdate_max_days": "How far back a leave request can be sent",
+        "leave_max_request_days": "Longest single leave request",
+        "remote_max_personal_days_per_week": "Most WFH days per week",
+        "remote_max_personal_days_per_month": "Most WFH days per month",
+        "remote_min_notice_days": "Days of notice required for WFH",
+        "remote_allow_probation": "Probation employees can work from home",
+        "remote_allow_intern": "Interns can work from home",
+        "attendance_remote_requires_punch": "WFH days require a punch",
+        "attendance_remote_min_span_percent": "Minimum gap between the two punches on a WFH day (of required hours)",
+        "attendance_min_span_percent": "Minimum gap between the two punches (of required hours)",
+        "calendar_work_start": "Default start of the working day",
+        "schedule_start_earliest": "Earliest start time you can register",
+        "schedule_start_latest": "Latest start time you can register",
+        "schedule_start_step_minutes": "Step when registering a start time",
+        "schedule_effective_delay_days": "Days after approval before a new schedule applies",
+        "schedule_max_changes_per_month": "Most schedule changes per month",
+        "approval_leave_hr_step_min_days": "Leave of this many days or more needs extra HR approval",
+        "payroll_rate_social": "Employee social insurance rate",
+        "payroll_rate_health": "Employee health insurance rate",
+        "payroll_rate_unemployment": "Employee unemployment insurance rate",
+        "payroll_base_salary": "Statutory base salary",
+        "payroll_region_min_wage": "Regional minimum wage (region I)",
+        "payroll_insurance_cap_multiple": "Insurable salary cap",
+        "payroll_personal_deduction": "Personal tax deduction",
+        "payroll_dependent_deduction": "Tax deduction per dependent",
+        "payroll_tax_bracket_1_upto": "Taxable income up to, bracket 1",
+        "payroll_tax_bracket_2_upto": "Taxable income up to, bracket 2",
+        "payroll_tax_bracket_3_upto": "Taxable income up to, bracket 3",
+        "payroll_tax_bracket_4_upto": "Taxable income up to, bracket 4",
+        "payroll_tax_bracket_1_rate": "Tax rate, bracket 1",
+        "payroll_tax_bracket_2_rate": "Tax rate, bracket 2",
+        "payroll_tax_bracket_3_rate": "Tax rate, bracket 3",
+        "payroll_tax_bracket_4_rate": "Tax rate, bracket 4",
+        "payroll_tax_bracket_5_rate": "Tax rate, bracket 5",
+        "payroll_lunch_exempt_cap": "Tax-exempt lunch allowance per month",
+        "payroll_hours_per_day": "Standard working hours per day",
+        "payroll_ot_rate_normal": "Overtime multiplier on a normal day",
+        "payroll_ot_rate_weekly_off": "Overtime multiplier on a weekly day off",
+        "payroll_ot_rate_holiday": "Overtime multiplier on a public holiday",
+        "payroll_ot_monthly_hour_cap": "Monthly overtime warning threshold",
+        "payroll_ot_yearly_hour_cap": "Yearly overtime warning threshold",
+        "payroll_complaint_days": "Working days to raise a payslip complaint"
+      }
+    },
+    "status": {
+      "disabled": "The assistant is off or has no API key configured. Ask an administrator to turn it on.",
+      "keywordOnly": "The assistant is searching by keywords because the language service is not ready. Answers still cite sources but may be less accurate."
+    },
+    "responseTime": "{seconds} s",
+    "errors": {
+      "disabled": "The policy assistant is off or not configured.",
+      "unavailable": "The assistant is not responding right now (language service error or quota reached). Please try again in a few minutes."
     }
   },
   "Skills": {
