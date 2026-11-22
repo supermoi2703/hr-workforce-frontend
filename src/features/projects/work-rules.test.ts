@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  assignWarning,
+  hoursText,
+  needsConfirm,
   applyCategory,
   applySuggestion,
   dateRangeValid,
@@ -16,7 +19,7 @@ import {
   workGroup,
   type CategoryDraft,
 } from "./work-rules";
-import { BOARD_STATUSES, type MyWork, type TaskCard, type WorkCategory } from "./work-types";
+import { BOARD_STATUSES, type AssignPreview, type LoadSummary, type MyWork, type TaskCard, type WorkCategory } from "./work-types";
 
 describe("formatMinutes", () => {
   it("hiện giờ và phút", () => {
@@ -63,12 +66,14 @@ describe("gom việc theo hạn", () => {
 
 describe("loadTone", () => {
   it("theo tỉ lệ tải", () => {
-    expect(loadTone({ capacityMinutes: 1920, loadMinutes: 2160 })).toBe("over");
-    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 2000 })).toBe("high");
-    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 1000 })).toBe("normal");
-    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 100 })).toBe("low");
-    expect(loadTone({ capacityMinutes: 0, loadMinutes: 0 })).toBe("off");
-    expect(loadTone({ capacityMinutes: 0, loadMinutes: 60 })).toBe("over");
+    expect(loadTone({ capacityMinutes: 1920, loadMinutes: 2600, zone: "RED", flags: ["OVERLOADED"] })).toBe("over");
+    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 2880, zone: "YELLOW", flags: ["OVERLOADED"] })).toBe("high");
+    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 1000, zone: "GREEN", flags: [] })).toBe("normal");
+    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 100, zone: "GREEN", flags: ["IDLE"] })).toBe("low");
+    // Sau hạn xa nhất của các việc đã lên lịch: chưa lên lịch, không phải rảnh
+    expect(loadTone({ capacityMinutes: 2400, loadMinutes: 0, zone: "GREEN", flags: ["NOT_PLANNED"] })).toBe("notPlanned");
+    expect(loadTone({ capacityMinutes: 0, loadMinutes: 0, zone: "GREEN", flags: ["ON_LEAVE"] })).toBe("off");
+    expect(loadTone({ capacityMinutes: 0, loadMinutes: 60, zone: "RED", flags: ["OVERLOADED"] })).toBe("over");
   });
 });
 
@@ -163,5 +168,34 @@ describe("task dates", () => {
       startFromSprint: false,
       endFromSprint: false,
     });
+  });
+});
+
+describe("cảnh báo tải khi giao việc", () => {
+  const load = (zone: LoadSummary["zone"]): LoadSummary => ({
+    zone,
+    reasons: zone === "GREEN" ? [] : ["WEEK_OVER_CAPACITY"],
+    peakWeek: { weekStart: "2026-11-23", capacityMinutes: 2400, loadMinutes: zone === "GREEN" ? 1920 : 2880, percent: zone === "GREEN" ? 80 : 120, zone },
+    unscheduledMinutes: 0,
+    weeks: [],
+  });
+  const preview = (zone: LoadSummary["zone"]): AssignPreview => ({ scheduled: true, load: load(zone) });
+
+  it("xanh, chưa có kết quả hoặc việc chưa lên lịch thì không cảnh báo", () => {
+    expect(assignWarning(preview("GREEN"))).toBeNull();
+    expect(assignWarning(undefined)).toBeNull();
+    expect(assignWarning({ scheduled: false, load: null })).toBeNull();
+  });
+
+  it("vàng chỉ cảnh báo, đỏ phải xác nhận; server không chặn", () => {
+    expect(assignWarning(preview("YELLOW"))).toMatchObject({ zone: "YELLOW", peak: { percent: 120 } });
+    expect(needsConfirm(preview("YELLOW"))).toBe(false);
+    expect(needsConfirm(preview("RED"))).toBe(true);
+    expect(needsConfirm(null)).toBe(false);
+  });
+
+  it("giờ hiển thị dùng dấu phẩy thập phân", () => {
+    expect(hoursText(2880)).toBe("48");
+    expect(hoursText(90)).toBe("1,5");
   });
 });

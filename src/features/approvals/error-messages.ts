@@ -13,6 +13,8 @@ const ERROR_KEYS: Record<string, ApprovalErrorKey> = {
   APPROVAL_NOT_PENDING: "notPending",
   // Rút đơn của người khác
   FORBIDDEN: "notRequester",
+  // Duyệt đề xuất phân bổ khi dự án đã đóng / ngày không còn hợp lệ / người đã nghỉ (module project, README mục 8.4)
+  ALLOCATION_NO_LONGER_VALID: "allocationNoLongerValid",
 };
 
 /**

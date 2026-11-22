@@ -16,7 +16,7 @@ import { isApiError } from "@/lib/api/errors";
 import { formatDate, todayIsoDate } from "@/lib/format";
 import { closeProject } from "../api";
 import { useProject, useProjectErrorMessage, useProjectMembers, useProjectMutation } from "../hooks";
-import { allocatedEmployeeIds, currentManager } from "../rules";
+import { allocatedEmployeeIds } from "../rules";
 import type { Project } from "../types";
 import { ProjectRoleBadge, ProjectStatusBadge } from "./project-badges";
 import { ChangeManagerDialog, EditProjectDialog, ProjectSettingsDialog } from "./project-edit-dialogs";
@@ -72,7 +72,6 @@ function ProjectDetail({ project }: { project: Project }) {
   const members = useProjectMembers(project.id, project.closedOn ?? undefined);
   const close = useProjectMutation(() => closeProject(project.id));
   const { can } = project;
-  const manager = currentManager(members.data ?? []);
   const hasMenu = can.manageSettings || can.close;
 
   const openDialog = (name: DialogName) => (open: boolean) => setDialog(open ? name : null);
@@ -175,7 +174,6 @@ function ProjectDetail({ project }: { project: Project }) {
         open={dialog === "pm"}
         onOpenChange={openDialog("pm")}
         current={project.pm}
-        currentPercent={manager?.allocationPercent ?? null}
         allocatedIds={allocatedEmployeeIds(members.data ?? [])}
       />
       <ConfirmDialog

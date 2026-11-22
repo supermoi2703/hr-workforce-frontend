@@ -8,6 +8,7 @@ import type { PageParams } from "@/lib/api/types";
 import { getProjects } from "./api";
 import {
   getAllocationPeople,
+  getAssignPreview,
   getAllocationRequests,
   getAvailability,
   getBoard,
@@ -32,7 +33,8 @@ import {
   type CandidateQuery,
 } from "./work-api";
 import { useProjectErrorMessage } from "./hooks";
-import type { TaskStatus } from "./work-types";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import type { AssignPreviewInput, TaskStatus } from "./work-types";
 
 // Board và cảnh báo tự tải lại để nhiều người cùng xem thấy thay đổi gần như ngay (đặc tả mục 10).
 const BOARD_POLL_MS = 3_000;
@@ -161,4 +163,18 @@ export function useWorkErrorMessage() {
     (error: unknown) => (isApiError(error) && ERROR_KEYS.includes(error.code) ? t(error.code as ErrorKey) : fallback(error)),
     [t, fallback],
   );
+}
+
+/**
+ * Tải của người được chọn nếu nhận việc với giá trị đang có trên form (workload bước 3). Chỉ hỏi khi đã chọn người và đợi
+ * người dùng ngừng sửa 400 ms. Không chặn lưu: kết quả chỉ để cảnh báo hoặc hỏi xác nhận.
+ */
+export function useAssignPreview(projectId: string, input: AssignPreviewInput | null) {
+  const asked = useDebouncedValue(input, 400);
+  return useQuery({
+    queryKey: ["projects", "assign-preview", projectId, asked],
+    queryFn: () => getAssignPreview(projectId, asked as AssignPreviewInput),
+    enabled: asked !== null,
+    staleTime: 30_000,
+  });
 }

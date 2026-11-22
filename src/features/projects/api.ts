@@ -36,8 +36,8 @@ export const updateProject = (id: string, body: UpdateProjectInput) => http.put<
 export const updateProjectSettings = (id: string, body: ProjectSettingsInput) =>
   http.put<Project>(`/api/projects/${enc(id)}/settings`, body);
 /** Đổi PM, hoặc đổi % của PM hiện tại nếu vẫn là người cũ. */
-export const changeProjectManager = (id: string, employeeId: string, allocationPercent: number) =>
-  http.put<Project>(`/api/projects/${enc(id)}/pm`, { employeeId, allocationPercent });
+export const changeProjectManager = (id: string, employeeId: string) =>
+  http.put<Project>(`/api/projects/${enc(id)}/pm`, { employeeId });
 export const closeProject = (id: string) => http.post<Project>(`/api/projects/${enc(id)}/close`);
 
 /** Không có `date`: người chưa rời dự án. Có `date`: người có hiệu lực đúng ngày đó. */

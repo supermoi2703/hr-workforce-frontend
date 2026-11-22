@@ -16,9 +16,11 @@ import { formatDate, todayIsoDate } from "@/lib/format";
 import { isRunningMember } from "../allocation-rules";
 import { removeProjectObserver } from "../api";
 import { useProjectErrorMessage, useProjectMutation } from "../hooks";
-import { hasHiddenPercent } from "../rules";
+import { hasHiddenLoad } from "../rules";
+import { hoursText } from "../work-rules";
 import type { Project, ProjectMember } from "../types";
 import { EndAllocationDialog, ProposeAllocationDialog } from "./allocation-dialogs";
+import { ZoneDot } from "./load-summary";
 import { ProjectRoleBadge } from "./project-badges";
 import { AddObserverDialog } from "./project-edit-dialogs";
 
@@ -83,7 +85,9 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
                 <TableRow>
                   <TableHead>{t("person")}</TableHead>
                   <TableHead>{t("role")}</TableHead>
-                  <TableHead className="text-right">{t("percent")}</TableHead>
+                  <TableHead className="text-right" title={t("loadHint")}>
+                    {t("load")}
+                  </TableHead>
                   <TableHead>{t("period")}</TableHead>
                   {canManage && (
                     <TableHead className="w-24">
@@ -114,7 +118,14 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
                       <ProjectRoleBadge role={member.role} />
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
-                      {member.allocationPercent === null ? "—" : `${member.allocationPercent}%`}
+                      {member.projectMinutesPerWeek === null || member.zone === null ? (
+                        "—"
+                      ) : (
+                        <span className="inline-flex items-center justify-end gap-1.5">
+                          <ZoneDot zone={member.zone} />
+                          {t("perWeek", { hours: hoursText(member.projectMinutesPerWeek) })}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {formatDate(member.fromDate)} – {member.toDate ? formatDate(member.toDate) : t("noEnd")}
@@ -162,7 +173,7 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
               </TableBody>
             </Table>
           </div>
-          {hasHiddenPercent(members) && <p className="text-sm text-muted-foreground">{t("percentHidden")}</p>}
+          {hasHiddenLoad(members) && <p className="text-sm text-muted-foreground">{t("loadHidden")}</p>}
         </>
       )}
 
@@ -193,7 +204,6 @@ export function ProjectMembers({ project, members, isPending, error, onRetry }: 
         open={!!changing}
         onOpenChange={(open) => !open && setChanging(null)}
         person={changing?.employee}
-        percent={changing?.allocationPercent}
       />
       <EndAllocationDialog project={project} member={ending} onClose={() => setEnding(null)} />
     </section>

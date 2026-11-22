@@ -21,7 +21,10 @@ export type ResourceSummary = {
   actualPercent: number | null;
   billablePercent: number;
   benchCount: number;
+  /** Người vùng đỏ (README module project mục 7.2) */
   overloadedCount: number;
+  /** Người vùng vàng: 100–125% năng lực, cần thỏa thuận (làm nhanh hơn hoặc OT); không tính vào quá tải */
+  needsAgreementCount: number;
 };
 
 export type WeekPoint = { weekStart: string; plannedPercent: number; benchCount: number };
@@ -39,16 +42,24 @@ export type UtilizationBucket = "0" | "1-50" | "51-80" | "81-100" | "over-100";
 
 export type Bucket = { key: UtilizationBucket; count: number };
 
-export type BenchPerson = { person: PersonRef; skills: string[] };
+/** unscheduledMinutes: giờ việc chưa lên lịch (không có hạn, không trong sprint): chưa hẳn là rảnh. */
+export type BenchPerson = { person: PersonRef; skills: string[]; unscheduledMinutes: number };
 
-export type WeekLoad = { weekStart: string; capacityMinutes: number; loadMinutes: number };
+/** Vùng tải tính từ task (workload bước 3): xanh ≤ 100%, vàng ≤ 125%, đỏ trên nữa / ngày > 12 giờ / tháng vượt > 40 giờ. */
+export type WorkloadZone = "GREEN" | "YELLOW" | "RED";
+export type ZoneReason = "WEEK_OVER_CAPACITY" | "NO_CAPACITY" | "DAY_OVER_MAX" | "MONTH_OVERTIME";
 
+export type LoadWeek = { weekStart: string; capacityMinutes: number; loadMinutes: number; percent: number | null; zone: WorkloadZone };
+
+/** Người vùng đỏ. */
 export type OverloadedPerson = {
   person: PersonRef;
+  /** % của tuần nặng nhất */
   maxDailyPercent: number;
-  /** Ngày đầu tiên tổng % vượt trần; null = chỉ quá tải việc. */
+  /** Ngày đầu tiên quá 12 giờ, không có thì thứ Hai của tuần đầu tiên không xanh. */
   firstOverDay: string | null;
-  overCapacityWeeks: WeekLoad[];
+  reasons: ZoneReason[];
+  overWeeks: LoadWeek[];
 };
 
 /** Một dự án trong khoảng xem; `fte` = tổng thời gian quy ra người làm toàn thời gian. */
@@ -73,10 +84,10 @@ export type PersonUtilization = {
   plannedPercent: number;
   actualPercent: number | null;
   billablePercent: number;
+  /** % của tuần nặng nhất */
   maxDailyPercent: number;
   bench: boolean;
-  overAllocated: boolean;
-  overCapacity: boolean;
+  zone: WorkloadZone;
 };
 
 // ===== Đội =====

@@ -2,6 +2,8 @@ import { http, toPageQuery } from "@/lib/api/http-client";
 import type { PageParams, PageResponse } from "@/lib/api/types";
 import type {
   AllocationInput,
+  AssignPreview,
+  AssignPreviewInput,
   AllocationPeople,
   AllocationRequest,
   AllocationRequestStatus,
@@ -37,7 +39,7 @@ const enc = encodeURIComponent;
 export type CandidateQuery = {
   sourceTeamId: string | null;
   sourceProjectId: string | null;
-  /** Có from thì mỗi người kèm % còn trống trong [from, to]. */
+  /** Có from thì mỗi người kèm tải tính từ task trong [from, to]. */
   from: string | null;
   to: string | null;
 };
@@ -51,6 +53,9 @@ export const getCandidates = (projectId: string, query: CandidateQuery) =>
       to: query.to ?? undefined,
     },
   });
+/** Tải của một người nếu nhận việc với giá trị đang có trên form; không chặn (workload bước 3). */
+export const getAssignPreview = (projectId: string, body: AssignPreviewInput) =>
+  http.post<AssignPreview>(`/api/projects/${enc(projectId)}/tasks/assign-preview`, body);
 export const proposeAllocation = (projectId: string, body: AllocationInput) =>
   http.post<AllocationRequest[]>(`/api/projects/${enc(projectId)}/allocation-requests`, body);
 export const getAllocationRequests = (projectId: string, status?: AllocationRequestStatus) =>

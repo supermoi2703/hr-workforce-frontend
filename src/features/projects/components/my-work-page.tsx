@@ -17,6 +17,7 @@ const GROUPS: WorkGroup[] = ["overdue", "thisWeek", "later", "noDue"];
 /** S11: việc được giao trên mọi dự án, kèm năng lực và tải tuần này. */
 export function MyWorkPage() {
   const t = useTranslations("ProjectWork");
+  const tLoad = useTranslations("Workload");
   const work = useMyWork();
 
   return (
@@ -25,7 +26,13 @@ export function MyWorkPage() {
         title={t("myWorkTitle")}
         description={
           work.data
-            ? t("myWorkLoad", { load: formatMinutes(work.data.weekLoadMinutes), capacity: formatMinutes(work.data.weekCapacityMinutes) })
+            ? [
+                t("myWorkLoad", { load: formatMinutes(work.data.weekLoadMinutes), capacity: formatMinutes(work.data.weekCapacityMinutes) }),
+                // Vàng / đỏ thì nói rõ (workload bước 3); xanh không cần thêm chữ
+                work.data.weekZone !== "GREEN" ? tLoad(`zone.${work.data.weekZone}`) : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")
             : t("myWorkDescription")
         }
       />

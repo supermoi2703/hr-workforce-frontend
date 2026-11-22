@@ -163,8 +163,8 @@ function MembersPanel({ members }: { members: PersonUtilization[] }) {
               <div className="flex items-center justify-between gap-2 text-sm">
                 <span className="truncate font-medium">{member.person.fullName}</span>
                 <span className="flex shrink-0 items-center gap-1.5">
-                  {member.overAllocated && <Badge variant="destructive">{t("badges.overAllocated")}</Badge>}
-                  {member.overCapacity && <Badge variant="warning">{t("badges.overCapacity")}</Badge>}
+                  {member.zone === "RED" && <Badge variant="destructive">{t("badges.overloaded")}</Badge>}
+                  {member.zone === "YELLOW" && <Badge variant="warning">{t("badges.needsAgreement")}</Badge>}
                   {member.bench && <Badge variant="secondary">{t("badges.bench")}</Badge>}
                   <span className="w-10 text-right tabular-nums">{member.plannedPercent}%</span>
                 </span>

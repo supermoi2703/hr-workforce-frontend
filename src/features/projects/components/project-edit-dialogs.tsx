@@ -20,7 +20,7 @@ import { isApiError } from "@/lib/api/errors";
 import { applyServerFieldErrors } from "@/lib/forms";
 import { addProjectObserver, changeProjectManager, updateProject, updateProjectSettings } from "../api";
 import { useOrgDepartments, useOrgOffices, useProjectErrorMessage, useProjectMutation } from "../hooks";
-import { DESCRIPTION_MAX_LENGTH, isValidPercent, NAME_MAX_LENGTH } from "../rules";
+import { DESCRIPTION_MAX_LENGTH, NAME_MAX_LENGTH } from "../rules";
 import { PROJECT_TYPES, type Project, type ProjectPerson } from "../types";
 import { EmployeePicker } from "./employee-picker";
 
@@ -246,12 +246,11 @@ function SettingsForm({ project, onDone }: { project: Project; onDone: () => voi
 
 type ChangePmProps = DialogProps & {
   current: ProjectPerson | null;
-  currentPercent: number | null;
   /** Người đang có phân bổ, phải kết thúc phân bổ trước khi làm PM. */
   allocatedIds: string[];
 };
 
-export function ChangeManagerDialog({ project, open, onOpenChange, current, currentPercent, allocatedIds }: ChangePmProps) {
+export function ChangeManagerDialog({ project, open, onOpenChange, current, allocatedIds }: ChangePmProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -259,7 +258,6 @@ export function ChangeManagerDialog({ project, open, onOpenChange, current, curr
           <ChangeManagerForm
             project={project}
             current={current}
-            currentPercent={currentPercent}
             allocatedIds={allocatedIds}
             onDone={() => onOpenChange(false)}
           />
@@ -272,28 +270,22 @@ export function ChangeManagerDialog({ project, open, onOpenChange, current, curr
 function ChangeManagerForm({
   project,
   current,
-  currentPercent,
   allocatedIds,
   onDone,
 }: Omit<ChangePmProps, "open" | "onOpenChange"> & { onDone: () => void }) {
   const t = useTranslations("Projects.Form");
   const errorMessage = useProjectErrorMessage();
   const [person, setPerson] = useState<ProjectPerson | null>(current);
-  const [percent, setPercent] = useState(currentPercent === null ? "" : String(currentPercent));
-  const [touched, setTouched] = useState(false);
-  const percentValid = isValidPercent(percent);
   const disabled = useMemo(() => new Map(allocatedIds.map((id) => [id, t("hasAllocation")])), [allocatedIds, t]);
 
-  const mutation = useProjectMutation(({ employeeId, value }: { employeeId: string; value: number }) =>
-    changeProjectManager(project.id, employeeId, value),
-  );
+  // PM không kèm % (workload bước 3): tải của PM cũng tính từ task
+  const mutation = useProjectMutation((employeeId: string) => changeProjectManager(project.id, employeeId));
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    setTouched(true);
-    if (!person || !percentValid) return;
+    if (!person) return;
     mutation.mutate(
-      { employeeId: person.id, value: Number(percent) },
+      person.id,
       {
         onSuccess: () => {
           toast.success(t("pmSaved"));
@@ -315,22 +307,6 @@ function ChangeManagerForm({
           <Field>
             <FieldLabel htmlFor="project-pm">{t("pm")}</FieldLabel>
             <EmployeePicker id="project-pm" value={person} onChange={setPerson} disabled={disabled} />
-          </Field>
-          <Field data-invalid={touched && !percentValid}>
-            <FieldLabel htmlFor="project-pm-percent">{t("pmPercent")}</FieldLabel>
-            <Input
-              id="project-pm-percent"
-              type="number"
-              inputMode="numeric"
-              min={5}
-              max={100}
-              step={5}
-              className="w-32"
-              value={percent}
-              aria-invalid={touched && !percentValid}
-              onChange={(event) => setPercent(event.target.value)}
-            />
-            {touched && !percentValid && <FieldError>{t("percentInvalid")}</FieldError>}
           </Field>
         </FieldGroup>
       </form>
