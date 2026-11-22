@@ -1533,7 +1533,8 @@
       "notCurrentApprover": "Bạn không phải người duyệt của bước hiện tại. Trang đã được tải lại.",
       "alreadyDecided": "Bạn đã quyết định đơn này rồi. Trang đã được tải lại.",
       "notPending": "Đơn này không còn chờ duyệt nữa. Trang đã được tải lại.",
-      "notRequester": "Chỉ người gửi đơn mới rút được đơn."
+      "notRequester": "Chỉ người gửi đơn mới rút được đơn.",
+      "allocationNoLongerValid": "Đề xuất phân bổ không còn hợp lệ: dự án đã đóng, khoảng ngày không còn nằm trong dự án, hoặc người được đề xuất đã nghỉ việc. Hãy từ chối đề xuất này."
     },
     "Validation": {
       "reasonRequired": "Nhập lý do từ chối",
@@ -2581,7 +2582,7 @@
       "onClosedDate": "Những người còn trong dự án vào ngày đóng.",
       "addObserver": "Thêm người quan sát",
       "addObserverTitle": "Thêm người quan sát",
-      "addObserverDescription": "Người quan sát theo dõi dự án, không có % phân bổ và không tính vào giới hạn 100%.",
+      "addObserverDescription": "Người quan sát theo dõi dự án, không được giao việc nên không có tải.",
       "employee": "Nhân viên",
       "add": "Thêm",
       "alreadyIn": "Đã có trong dự án",
@@ -2589,7 +2590,6 @@
       "empty": "Chưa có người tham gia",
       "person": "Nhân viên",
       "role": "Vai trò",
-      "percent": "Phân bổ",
       "period": "Thời gian",
       "noEnd": "chưa có ngày kết thúc",
       "actions": "Thao tác",
@@ -2597,7 +2597,10 @@
       "removeObserverTitle": "Bỏ người quan sát?",
       "removeObserverDescription": "{name} sẽ không còn theo dõi dự án này.",
       "removeObserver": "Bỏ quan sát",
-      "percentHidden": "Bạn chỉ thấy % phân bổ của chính mình và người mình phụ trách."
+      "load": "Tải ở dự án",
+      "loadHint": "Giờ mỗi tuần ở dự án này, trung bình 4 tuần tới; chấm màu là vùng tải chung của người đó trên mọi dự án",
+      "perWeek": "{hours} giờ/tuần",
+      "loadHidden": "Bạn chỉ thấy tải của chính mình và người mình phụ trách."
     },
     "Form": {
       "createTitle": "Tạo dự án",
@@ -2743,9 +2746,9 @@
     "startSprint": "Bắt đầu",
     "closeSprint": "Đóng sprint",
     "sprintDone": "xong {done}/{total}",
-    "sprintCapacity": "Năng lực trong sprint (đã trừ ngày nghỉ)",
+    "sprintCapacity": "Năng lực trong sprint (đã trừ ngày nghỉ và giờ task ở dự án khác)",
     "leaveDays": "Nghỉ {days} ngày",
-    "capacityHint": "Mỗi ô là giờ việc có hạn trong tuần trên mọi dự án / giờ làm được theo lịch sau khi trừ ngày nghỉ đã duyệt.",
+    "capacityHint": "Mỗi ô là giờ task rải vào tuần trên mọi dự án / giờ làm được sau khi trừ ngày nghỉ đã duyệt. Màu theo vùng: vàng là cần thỏa thuận (100–125%), đỏ là quá tải.",
     "person": "Người",
     "peopleCount": "{count} người",
     "members": "Thành viên",
@@ -2922,7 +2925,8 @@
     },
     "suggestionHoursOnly": "Gợi ý của nhóm: {hours}, không gắn kỹ năng cố định",
     "dateHintSprintStart": "Ngày bắt đầu để trống: lấy ngày bắt đầu sprint ({date}).",
-    "dateHintSprintEnd": "Hạn để trống: lấy ngày kết thúc sprint ({date})."
+    "dateHintSprintEnd": "Hạn để trống: lấy ngày kết thúc sprint ({date}).",
+    "notPlanned": "Chưa lên lịch"
   },
   "Contracts": {
     "metaTitle": "Hợp đồng",
@@ -3155,13 +3159,13 @@
   },
   "Allocations": {
     "propose": "Đề xuất phân bổ",
-    "proposeShortHint": "Trưởng phòng của từng người và PM cùng duyệt. Tổng phân bổ của một người không vượt 100%.",
+    "proposeShortHint": "Trưởng phòng của từng người và PM cùng duyệt. Không còn nhập %: tải tính từ giờ của task.",
     "pendingTitle": "Đề xuất đang chờ duyệt ({count})",
     "openApproval": "Xem đơn",
     "proposeTitle": "Đề xuất phân bổ",
-    "proposeHint": "Trưởng phòng của từng người và PM cùng duyệt ở trang Phê duyệt; bên tạo đề xuất coi như đã đồng ý. Tổng phân bổ của một người không vượt 100%, tính cả đề xuất đang chờ.",
-    "changeTitle": "Đổi % hoặc gia hạn: {name}",
-    "changeHint": "Đề xuất đặt lại % trong đúng khoảng ngày đã chọn; ngoài khoảng giữ nguyên. Trưởng phòng của người này và PM cùng duyệt.",
+    "proposeHint": "Đưa người vào dự án trong một khoảng ngày. Trưởng phòng của từng người và PM cùng duyệt ở trang Phê duyệt; bên tạo đề xuất coi như đã đồng ý. Chấm màu cạnh mỗi người là tải tính từ task trong khoảng này: chỉ để cân nhắc, không chặn.",
+    "changeTitle": "Gia hạn hoặc đổi thời gian: {name}",
+    "changeHint": "Đề xuất đặt lại thời gian tham gia trong đúng khoảng ngày đã chọn; ngoài khoảng giữ nguyên. Trưởng phòng của người này và PM cùng duyệt.",
     "source": "Lấy từ",
     "sourceTeam": "Team tổ chức",
     "sourceProject": "Dự án khác",
@@ -3169,7 +3173,7 @@
     "pickTeam": "Chọn team",
     "pickProject": "Chọn dự án",
     "selectedCount": "Đã chọn {count}/{total} người",
-    "selectAll": "Chọn tất cả còn đủ chỗ ({count})",
+    "selectAll": "Chọn tất cả chưa ở dự án ({count})",
     "clearAll": "Bỏ chọn tất cả",
     "ProjectPicker": {
       "placeholder": "Chọn dự án",
@@ -3184,7 +3188,6 @@
     "person": "Người",
     "fromDate": "Từ ngày",
     "toDate": "Đến ngày",
-    "percent": "% thời gian",
     "noEndHint": "Để trống đến ngày: không có ngày kết thúc.",
     "Period": {
       "fromBeforeToday": "Không đề xuất lùi ngày: từ ngày phải từ hôm nay trở đi.",
@@ -3195,16 +3198,13 @@
     },
     "noCandidates": "Không có ai để chọn.",
     "inProject": "Đang ở dự án",
-    "free": "Còn {percent}%",
-    "freeInPeriod": "Còn trống {percent}% trong khoảng này.",
-    "notEnough": "Chỉ còn trống {percent}% trong khoảng này, chọn mức thấp hơn.",
     "note": "Ghi chú",
     "notePlaceholder": "Vai trò, lý do (không bắt buộc)",
     "submit": "{count, plural, =0 {Gửi đề xuất} other {Gửi # đề xuất}}",
     "sent": "Đã gửi {count} đề xuất, chờ duyệt",
     "applied": "Đã thêm {count} người vào dự án",
-    "change": "Đổi % hoặc gia hạn",
-    "changeOf": "Đổi % hoặc gia hạn của {name}",
+    "change": "Gia hạn hoặc đổi thời gian",
+    "changeOf": "Gia hạn hoặc đổi thời gian của {name}",
     "end": "Kết thúc phân bổ",
     "endOf": "Kết thúc phân bổ của {name}",
     "endTitle": "Kết thúc phân bổ của {name}?",
@@ -3218,7 +3218,7 @@
     "ended": "Đã kết thúc phân bổ",
     "Schedule": {
       "title": "Phân bổ nhân sự",
-      "description": "Lịch phân bổ của một người trên mọi dự án: đang ở dự án nào, bao nhiêu %, đến khi nào, còn trống bao nhiêu. Chỉ để xem; đề xuất phân bổ làm ở tab Nhân sự của dự án.",
+      "description": "Lịch của một người trên mọi dự án: đang ở dự án nào, đến khi nào, và tải từng tuần tính từ giờ task (xanh / vàng / đỏ). Chỉ để xem; đề xuất phân bổ làm ở tab Nhân sự của dự án.",
       "person": "Người",
       "from": "Từ ngày",
       "to": "Đến ngày",
@@ -3231,31 +3231,28 @@
       "myScheduleTitle": "Lịch phân bổ của tôi",
       "scheduleOf": "Lịch phân bổ của {name}",
       "period": "{from} – {to}",
-      "freeToday": "Hôm nay còn trống {percent}%",
-      "legendApproved": "Đã duyệt",
-      "legendHeld": "Chờ duyệt (đang giữ chỗ)",
-      "legendFree": "Còn trống",
-      "segmentShort": "Đã duyệt {approved}% · Đang giữ {held}% ·",
-      "segmentApprovedOnly": "Đã duyệt {approved}% ·",
-      "free": "Trống {percent}%",
-      "empty": "Không có phân bổ nào trong khoảng này",
+      "legendApproved": "Đang tham gia",
+      "legendHeld": "Chờ duyệt",
+      "empty": "Không tham gia dự án nào trong khoảng này",
       "closed": "Đã đóng",
       "noEnd": "không thời hạn",
       "statusApproved": "Đã duyệt",
       "statusPending": "Chờ duyệt",
       "openApproval": "Xem đơn",
-      "total": "Tổng",
-      "totalHint": "Còn trống theo từng đoạn ngày",
+      "total": "Tải theo tuần",
+      "totalHint": "Giờ task ÷ giờ làm được, trên mọi dự án",
       "today": "Hôm nay",
-      "full": "Kín 100%",
-      "freeShort": "Trống {percent}%",
-      "usedApproved": "Đã duyệt {approved}%",
-      "usedWithPending": "Duyệt {approved}% · chờ {pending}%",
-      "totalBlockLabel": "{from} – {to}: còn trống {free}%, đã duyệt {approved}%, đang chờ {pending}%",
-      "barPending": "{percent}% · chờ duyệt",
-      "barLabel": "{project}: {percent}%, {period}, {status}",
+      "barLabel": "{project}: {period}, {status}",
       "monthTick": "T{month}{withYear, select, true {/{year}} other {}}",
-      "segmentsTitle": "Theo đoạn ngày"
+      "legendZone": {
+        "GREEN": "Trong sức (≤ 100%)",
+        "YELLOW": "Cần thỏa thuận (100–125%)",
+        "RED": "Quá tải"
+      },
+      "weekLabel": "Tuần {week}: {load}/{capacity} giờ ({percent}), {zone}",
+      "weekHours": "{load}/{capacity} giờ",
+      "weeksTitle": "Theo tuần",
+      "weekOf": "Tuần {week}"
     }
   },
   "Notifications": {
@@ -3573,15 +3570,15 @@
       "exporting": "Đang xuất…",
       "exportFailed": "Không xuất được file",
       "planned": "Utilization theo kế hoạch",
-      "plannedHint": "Trung bình % phân bổ mỗi ngày làm việc",
-      "limit": "Trần {limit}%",
-      "overLimit": "Vượt trần",
+      "plannedHint": "Trung bình % tải theo kế hoạch mỗi ngày làm việc (giờ task ÷ giờ làm được)",
+      "limit": "Đủ việc {limit}%",
+      "overLimit": "Trên 100%",
       "actual": "Utilization thực tế",
       "actualHint": "Giờ log ÷ giờ làm được",
-      "bench": "Chưa có dự án",
-      "benchDetail": "Không có phân bổ trong khoảng này",
+      "bench": "Chưa có việc",
+      "benchDetail": "Không có giờ task đã lên lịch trong khoảng này",
       "overloaded": "Quá tải",
-      "overloadedDetail": "Vượt trần hoặc việc nhiều hơn năng lực",
+      "overloadedDetail": "Vùng đỏ · {yellow} người cần thỏa thuận (vàng)",
       "billable": "Tính phí",
       "billableDetail": "Phần thời gian ở dự án tính phí",
       "split": {
@@ -3591,7 +3588,7 @@
       },
       "trendTitle": "Utilization theo kế hoạch từng tuần",
       "heatmapTitle": "Utilization theo phòng và tuần",
-      "heatmapDescription": "Ô càng đậm càng nhiều phân bổ. Ô đỏ là vượt trần.",
+      "heatmapDescription": "Ô càng đậm càng nhiều việc theo kế hoạch. Ô đỏ là trên 100%.",
       "heatLegendLow": "0%",
       "heatLegendHigh": "{limit}%",
       "heatLegendOver": "Trên {limit}%",
@@ -3613,15 +3610,15 @@
         "81-100": "81–100%",
         "over-100": "Trên 100%"
       },
-      "overloadTitle": "Cảnh báo quá tải",
+      "overloadTitle": "Quá tải (vùng đỏ)",
       "overloadEmpty": "Không ai quá tải trong khoảng này.",
-      "benchTitle": "Chưa có dự án",
-      "benchEmpty": "Ai cũng có dự án trong khoảng này.",
+      "benchTitle": "Chưa có việc",
+      "benchEmpty": "Ai cũng có việc trong khoảng này.",
       "columns": {
         "person": "Nhân viên",
-        "maxDaily": "Ngày cao nhất",
-        "firstOver": "Vượt trần từ",
-        "weeksOver": "Tuần quá tải việc",
+        "maxDaily": "Tuần cao nhất",
+        "firstOver": "Từ ngày",
+        "weeksOver": "Lý do",
         "skills": "Kỹ năng nổi bật",
         "count": "Số người"
       },
@@ -3630,10 +3627,17 @@
       "plannedNow": "Kế hoạch tuần này",
       "projectsTitle": "Top dự án theo FTE",
       "projectsDescription": "FTE = thời gian quy ra số người làm toàn thời gian",
-      "projectsEmpty": "Không dự án nào có phân bổ trong khoảng này.",
+      "projectsEmpty": "Không dự án nào có việc trong khoảng này.",
       "fte": "FTE",
       "timeTitle": "Thời gian theo kế hoạch dành cho đâu",
-      "timeCenter": "kế hoạch"
+      "timeCenter": "kế hoạch",
+      "unscheduled": "Còn {hours} giờ việc chưa lên lịch",
+      "reasons": {
+        "WEEK_OVER_CAPACITY": "tuần trên 125%",
+        "NO_CAPACITY": "còn việc khi nghỉ",
+        "DAY_OVER_MAX": "ngày quá 12 giờ",
+        "MONTH_OVERTIME": "tháng vượt quá 40 giờ"
+      }
     },
     "Team": {
       "title": "Đội của tôi",
@@ -3655,9 +3659,9 @@
       "membersTitle": "Utilization theo kế hoạch từng người",
       "membersEmpty": "Hiện không có ai trong đội đang làm việc.",
       "badges": {
-        "overAllocated": "Vượt trần",
-        "overCapacity": "Quá nhiều việc",
-        "bench": "Chưa có dự án"
+        "bench": "Chưa có việc",
+        "overloaded": "Quá tải",
+        "needsAgreement": "Cần thỏa thuận"
       },
       "distributionTitle": "Đội theo mức utilization",
       "distributionCenter": "người",
@@ -4345,5 +4349,29 @@
       "INCIDENT": "Sự cố chấm công",
       "HR_REQUEST": "HR ghi tay"
     }
+  },
+  "Workload": {
+    "zone": {
+      "GREEN": "Xanh: trong sức",
+      "YELLOW": "Vàng: cần thỏa thuận",
+      "RED": "Đỏ: quá tải"
+    },
+    "reason": {
+      "WEEK_OVER_CAPACITY": "có tuần vượt năng lực",
+      "NO_CAPACITY": "còn việc khi không còn giờ làm (nghỉ)",
+      "DAY_OVER_MAX": "có ngày phải làm quá 12 giờ",
+      "MONTH_OVERTIME": "giờ vượt trong tháng quá 40"
+    },
+    "peak": "Tuần nặng nhất {week}: {load}/{capacity} giờ",
+    "peakShort": "{load}/{capacity} giờ",
+    "noLoad": "Chưa có việc trong khoảng này",
+    "unscheduled": "còn {hours} giờ việc chưa lên lịch",
+    "assignYellow": "Tuần {week}: {name} có {load}/{capacity} giờ ({percent}). Cần thỏa thuận: làm nhanh hơn hoặc OT.",
+    "assignRed": "{name} sẽ quá tải: {reasons}. Tuần nặng nhất {week}: {load}/{capacity} giờ.",
+    "assignChecking": "Đang tính tải…",
+    "assignUnscheduled": "Việc chưa có hạn (không trong sprint): chưa tính vào tải.",
+    "confirmTitle": "Vẫn giao cho {name}?",
+    "confirmDescription": "{name} sẽ quá tải nếu nhận việc này. Hệ thống không chặn; hãy chắc đã trao đổi với {name} hoặc lùi hạn, chia việc.",
+    "confirmAction": "Vẫn giao"
   }
 }

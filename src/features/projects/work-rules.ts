@@ -1,4 +1,4 @@
-import type { BOARD_STATUSES, MyWork, TaskCard, TaskSkillInput, WeekCell, WorkCategory } from "./work-types";
+import type { AssignPreview, BOARD_STATUSES, LoadWeek, MyWork, TaskCard, TaskSkillInput, WeekCell, WorkCategory, ZoneReason } from "./work-types";
 
 const MINUTES_PER_HOUR = 60;
 
@@ -53,15 +53,19 @@ export function groupMyWork(tasks: MyWork["tasks"], today: string) {
   return groups;
 }
 
-export type LoadTone = "over" | "high" | "normal" | "low" | "off";
+export type LoadTone = "over" | "high" | "normal" | "low" | "notPlanned" | "off";
 
 /** Màu ô năng lực: quá tải, gần đầy (từ 80%), bình thường, ít việc (dưới 20%), không có giờ làm. */
-export function loadTone(cell: Pick<WeekCell, "capacityMinutes" | "loadMinutes">): LoadTone {
-  if (cell.capacityMinutes === 0) return cell.loadMinutes > 0 ? "over" : "off";
-  const ratio = cell.loadMinutes / cell.capacityMinutes;
-  if (ratio > 1) return "over";
-  if (ratio >= 0.8) return "high";
-  return ratio < 0.2 ? "low" : "normal";
+/**
+ * Màu ô tuần của lưới năng lực theo vùng tải (workload bước 3): đỏ, vàng theo vùng; tuần xanh chưa có việc được xếp là
+ * "chưa lên lịch" (không nói là rảnh); tải dưới 20% là "nhàn"; không có giờ làm (nghỉ, lễ) là "off".
+ */
+export function loadTone(cell: Pick<WeekCell, "capacityMinutes" | "loadMinutes" | "zone" | "flags">): LoadTone {
+  if (cell.zone === "RED") return "over";
+  if (cell.zone === "YELLOW") return "high";
+  if (cell.capacityMinutes === 0) return "off";
+  if (cell.flags.includes("NOT_PLANNED")) return "notPlanned";
+  return cell.flags.includes("IDLE") ? "low" : "normal";
 }
 
 export function percent(part: number, whole: number): number {
@@ -136,4 +140,25 @@ export function scheduleInfo(card: Pick<TaskCard, "startDate" | "dueDate" | "sch
     startFromSprint: !card.startDate && !!card.scheduledStart,
     endFromSprint: !card.dueDate && !!card.scheduledEnd,
   };
+}
+
+// ===== Tải khi giao việc (workload bước 3, backend README module project mục 7.2, 8.3)
+
+/** Cảnh báo khi giao việc: null khi xanh, chưa có kết quả hoặc việc chưa lên lịch. Server không chặn. */
+export type AssignWarning = { zone: "YELLOW" | "RED"; peak: LoadWeek | null; reasons: ZoneReason[] };
+
+export function assignWarning(preview: AssignPreview | null | undefined): AssignWarning | null {
+  const load = preview?.scheduled ? preview.load : null;
+  if (!load || load.zone === "GREEN") return null;
+  return { zone: load.zone, peak: load.peakWeek, reasons: load.reasons };
+}
+
+/** Đỏ: PM phải bấm xác nhận "Vẫn giao" trước khi lưu. Vàng chỉ cảnh báo. */
+export function needsConfirm(preview: AssignPreview | null | undefined): boolean {
+  return assignWarning(preview)?.zone === "RED";
+}
+
+/** 2880 → "48", 90 → "1,5": giờ để hiển thị trong câu (dấu phẩy thập phân). */
+export function hoursText(minutes: number): string {
+  return minutesToHoursText(minutes).replace(".", ",");
 }

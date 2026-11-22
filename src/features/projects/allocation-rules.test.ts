@@ -1,31 +1,30 @@
 import { describe, expect, it } from "vitest";
 import {
-  ALLOCATION_PERCENTS,
   allApplied,
   dayOffsetPercent,
   defaultPeriod,
-  freePercentOn,
   isRunningMember,
   monthTicks,
   pendingRequests,
   periodProblem,
   scheduleRange,
-  segmentBars,
+  weekBars,
+  weekOn,
   selectableIds,
   pickedIds,
   timelineSpan,
 } from "./allocation-rules";
 import type { ProjectMember } from "./types";
-import type { AllocationRequest, AllocationRequestStatus, AllocationSegment, Candidate } from "./work-types";
+import type { AllocationRequest, AllocationRequestStatus, Candidate, LoadWeek } from "./work-types";
 
 const TODAY = "2026-11-08";
 const open = { startDate: "2026-06-01", endDate: null };
 const ending = { startDate: "2026-06-01", endDate: "2026-12-31" };
 
-const candidate = (id: string, freePercent: number | null, alreadyInProject = false): Candidate => ({
+const candidate = (id: string, alreadyInProject = false): Candidate => ({
   person: { id, employeeCode: id, fullName: id },
   alreadyInProject,
-  freePercent,
+  load: null,
 });
 
 const request = (id: string, status: AllocationRequestStatus, createdAt: string): AllocationRequest => ({
@@ -34,7 +33,7 @@ const request = (id: string, status: AllocationRequestStatus, createdAt: string)
   projectCode: "HRM",
   projectName: "HRM",
   employee: { id: "an", employeeCode: "NV1", fullName: "An" },
-  percent: 50,
+  percent: null,
   fromDate: TODAY,
   toDate: null,
   note: null,
@@ -43,15 +42,6 @@ const request = (id: string, status: AllocationRequestStatus, createdAt: string)
   approvalRequestId: null,
   createdAt,
   decidedAt: null,
-});
-
-describe("ALLOCATION_PERCENTS", () => {
-  it("là bội của 5 từ 100 xuống 5", () => {
-    expect(ALLOCATION_PERCENTS).toHaveLength(20);
-    expect(ALLOCATION_PERCENTS[0]).toBe(100);
-    expect(ALLOCATION_PERCENTS.at(-1)).toBe(5);
-    expect(ALLOCATION_PERCENTS.every((p) => p % 5 === 0)).toBe(true);
-  });
 });
 
 describe("defaultPeriod", () => {
@@ -87,16 +77,15 @@ describe("periodProblem", () => {
 });
 
 describe("chọn người", () => {
-  it("\"Chọn tất cả\" lấy người chưa ở dự án và còn đủ chỗ", () => {
-    const list = [candidate("an", 60), candidate("binh", 40), candidate("chi", 100, true), candidate("dung", null)];
-    expect(selectableIds(list, 50)).toEqual(["an", "dung"]);
+  it("\"Chọn tất cả\" lấy người chưa ở dự án, kể cả người đang bận (không còn trần %)", () => {
+    const list = [candidate("an"), candidate("binh"), candidate("chi", true)];
+    expect(selectableIds(list)).toEqual(["an", "binh"]);
   });
 
-  it("mặc định không chọn ai; theo lựa chọn của người dùng, nhưng luôn bỏ người không đủ chỗ", () => {
-    const list = [candidate("an", 100), candidate("binh", 100, true), candidate("chi", 20)];
-    expect(pickedIds(list, 50, new Map())).toEqual([]);
-    expect(pickedIds(list, 50, new Map([["an", false], ["binh", true], ["chi", true]]))).toEqual(["binh"]);
-    expect(pickedIds(list, 20, new Map([["chi", true]]))).toEqual(["chi"]);
+  it("mặc định không chọn ai; theo lựa chọn của người dùng", () => {
+    const list = [candidate("an"), candidate("binh", true), candidate("chi")];
+    expect(pickedIds(list, new Map())).toEqual([]);
+    expect(pickedIds(list, new Map([["an", false], ["binh", true], ["chi", true]]))).toEqual(["binh", "chi"]);
   });
 });
 
@@ -118,7 +107,8 @@ describe("isRunningMember", () => {
   const member = (role: ProjectMember["role"], toDate: string | null): ProjectMember => ({
     employee: { id: "an", employeeCode: "NV1", fullName: "An" },
     role,
-    allocationPercent: 50,
+    projectMinutesPerWeek: 0,
+    zone: "GREEN",
     fromDate: "2026-10-01",
     toDate,
   });
@@ -132,13 +122,6 @@ describe("isRunningMember", () => {
 });
 
 /** pendingPercent: phần đang chờ; backend trả heldPercent = đã duyệt + đang chờ. */
-const segment = (from: string, to: string | null, approvedPercent: number, pendingPercent = 0): AllocationSegment => ({
-  from,
-  to,
-  approvedPercent,
-  heldPercent: approvedPercent + pendingPercent,
-  freePercent: 100 - approvedPercent - pendingPercent,
-});
 
 describe("scheduleRange", () => {
   it("keeps valid dates and leaves missing ones to the backend", () => {
@@ -156,52 +139,27 @@ describe("scheduleRange", () => {
   });
 });
 
-describe("segmentBars", () => {
-  it("sizes each segment by its days, both ends included", () => {
-    const bars = segmentBars(
-      [segment("2026-11-01", "2026-11-10", 60), segment("2026-11-11", "2026-11-30", 60, 20)],
-      "2026-11-01",
-      "2026-11-30",
-    );
-    expect(bars.map((bar) => Math.round(bar.widthPercent * 10) / 10)).toEqual([33.3, 66.7]);
-    expect(bars[1]).toMatchObject({ start: "2026-11-11", end: "2026-11-30", heldPercent: 80, freePercent: 20 });
+describe("weekBars", () => {
+  const week = (weekStart: string, loadMinutes: number): LoadWeek => ({
+    weekStart, capacityMinutes: 2400, loadMinutes, percent: Math.round((loadMinutes * 100) / 2400), zone: loadMinutes > 2400 ? "YELLOW" : "GREEN",
   });
 
-  it("splits out the pending part, since heldPercent already includes the approved part", () => {
-    const [onlyApproved, withPending] = segmentBars(
-      [segment("2026-11-01", "2026-11-10", 60), segment("2026-11-11", null, 40, 30)],
-      "2026-11-01",
-      "2026-11-30",
-    );
-    expect(onlyApproved).toMatchObject({ approvedPercent: 60, heldPercent: 60, pendingPercent: 0, freePercent: 40 });
-    expect(withPending).toMatchObject({ approvedPercent: 40, heldPercent: 70, pendingPercent: 30, freePercent: 30 });
-  });
-
-  it("clips to the range and stretches an open end to the range end", () => {
-    const bars = segmentBars([segment("2026-10-01", "2026-11-05", 50), segment("2026-11-06", null, 0)], "2026-11-01", "2026-11-10");
+  it("places each week by its days and clips to the range", () => {
+    // 01/11/2026 là Chủ nhật: tuần 26/10 chỉ còn 1 ngày trong trục
+    const bars = weekBars([week("2026-10-26", 600), week("2026-11-02", 2880), week("2026-12-07", 0)], "2026-11-01", "2026-11-30");
     expect(bars.map((bar) => [bar.start, bar.end])).toEqual([
-      ["2026-11-01", "2026-11-05"],
-      ["2026-11-06", "2026-11-10"],
+      ["2026-11-01", "2026-11-01"],
+      ["2026-11-02", "2026-11-08"],
     ]);
-    expect(bars.reduce((sum, bar) => sum + bar.widthPercent, 0)).toBeCloseTo(100);
+    expect(bars[1]).toMatchObject({ loadMinutes: 2880, zone: "YELLOW" });
+    expect(Math.round(bars[1].widthPercent * 10) / 10).toBe(23.3);
   });
 
-  it("drops segments outside the range and handles an empty range", () => {
-    expect(segmentBars([segment("2026-12-01", null, 10)], "2026-11-01", "2026-11-30")).toEqual([]);
-    expect(segmentBars([segment("2026-11-01", null, 10)], "2026-11-30", "2026-11-01")).toEqual([]);
-  });
-});
-
-describe("freePercentOn", () => {
-  const segments = [segment("2026-11-01", "2026-11-10", 60), segment("2026-11-11", null, 100)];
-
-  it("reads the segment holding the day", () => {
-    expect(freePercentOn(segments, "2026-11-10")).toBe(40);
-    expect(freePercentOn(segments, "2027-05-01")).toBe(0);
-  });
-
-  it("is null outside the schedule", () => {
-    expect(freePercentOn(segments, "2026-10-31")).toBeNull();
+  it("finds the week holding a day", () => {
+    const weeks = [week("2026-11-02", 600), week("2026-11-09", 1200)];
+    expect(weekOn(weeks, "2026-11-08")?.loadMinutes).toBe(600);
+    expect(weekOn(weeks, "2026-11-15")?.loadMinutes).toBe(1200);
+    expect(weekOn(weeks, "2026-11-16")).toBeNull();
   });
 });
 

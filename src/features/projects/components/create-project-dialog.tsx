@@ -23,7 +23,7 @@ import { isApiError } from "@/lib/api/errors";
 import { createProject } from "../api";
 import { isProjectErrorCode } from "../error-messages";
 import { useOrgDepartments, useOrgOffices, useProjectCreateScope, useProjectErrorMessage, useProjectMutation } from "../hooks";
-import { creatableDepartments, DESCRIPTION_MAX_LENGTH, isValidPercent, NAME_MAX_LENGTH, PROJECT_CODE_PATTERN } from "../rules";
+import { creatableDepartments, DESCRIPTION_MAX_LENGTH, NAME_MAX_LENGTH, PROJECT_CODE_PATTERN } from "../rules";
 import { PROJECT_TYPES, type ProjectPerson, type ProjectType } from "../types";
 import { EmployeePicker } from "./employee-picker";
 
@@ -64,7 +64,6 @@ function CreateForm({ onDone }: { onDone: () => void }) {
           ownerDepartmentId: z.string().min(1, t("departmentRequired")),
           officeId: z.string().min(1, t("officeRequired")),
           pm: z.custom<ProjectPerson>((value) => !!value, t("pmRequired")),
-          pmAllocationPercent: z.string().refine(isValidPercent, t("percentInvalid")),
           startDate: z.string().min(1, t("startDateRequired")),
           endDate: z.string(),
         })
@@ -89,7 +88,6 @@ function CreateForm({ onDone }: { onDone: () => void }) {
       ownerDepartmentId: departmentChoices.length === 1 ? departmentChoices[0].id : "",
       officeId: "",
       pm: undefined,
-      pmAllocationPercent: "",
       startDate: todayIsoDate(),
       endDate: "",
     },
@@ -105,7 +103,6 @@ function CreateForm({ onDone }: { onDone: () => void }) {
       ownerDepartmentId: values.ownerDepartmentId,
       officeId: values.officeId,
       pmEmployeeId: values.pm.id,
-      pmAllocationPercent: Number(values.pmAllocationPercent),
       startDate: values.startDate,
       endDate: values.endDate || null,
       sprintEnabled: values.sprintEnabled,
@@ -240,7 +237,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
+          <div className="grid gap-4">
             <Controller
               control={form.control}
               name="pm"
@@ -252,20 +249,6 @@ function CreateForm({ onDone }: { onDone: () => void }) {
                 </Field>
               )}
             />
-            <Field data-invalid={!!errors.pmAllocationPercent}>
-              <FieldLabel htmlFor="project-pm-percent">{t("pmPercent")}</FieldLabel>
-              <Input
-                id="project-pm-percent"
-                type="number"
-                inputMode="numeric"
-                min={5}
-                max={100}
-                step={5}
-                aria-invalid={!!errors.pmAllocationPercent}
-                {...form.register("pmAllocationPercent")}
-              />
-              <FieldError errors={[errors.pmAllocationPercent]} />
-            </Field>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

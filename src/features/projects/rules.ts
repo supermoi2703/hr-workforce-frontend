@@ -13,18 +13,8 @@ import {
 export const PROJECT_CODE_PATTERN = /^[A-Za-z][A-Za-z0-9]{1,9}$/;
 export const NAME_MAX_LENGTH = 200;
 export const DESCRIPTION_MAX_LENGTH = 2000;
-const MIN_PERCENT = 5;
-const MAX_PERCENT = 100;
-const PERCENT_STEP = 5;
 /** Còn từng này ngày trở xuống thì báo sắp hết hạn. */
 export const ENDING_SOON_DAYS = 14;
-
-/** Bội số của 5, từ 5 đến 100 (ProjectConstants.isValidAllocationPercent). */
-export function isValidPercent(value: string): boolean {
-  if (!/^\d+$/.test(value.trim())) return false;
-  const percent = Number(value);
-  return percent >= MIN_PERCENT && percent <= MAX_PERCENT && percent % PERCENT_STEP === 0;
-}
 
 // ===== Bộ lọc trên URL
 
@@ -106,7 +96,7 @@ export function currentManager(members: ProjectMember[]): ProjectMember | undefi
   return members.find((member) => member.role === "PM" && member.toDate === null);
 }
 
-/** Có dòng nào người xem không được xem % không (không tính người quan sát, vốn không có %). */
-export function hasHiddenPercent(members: ProjectMember[]): boolean {
-  return members.some((member) => member.role !== "OBSERVER" && member.allocationPercent === null);
+/** Có dòng nào người xem không được xem tải không (không tính người quan sát, vốn không có tải). */
+export function hasHiddenLoad(members: ProjectMember[]): boolean {
+  return members.some((member) => member.role !== "OBSERVER" && member.projectMinutesPerWeek === null);
 }

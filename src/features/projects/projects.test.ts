@@ -9,28 +9,20 @@ import {
   deadlineState,
   filtersFromSearchParams,
   filtersToSearchParams,
-  hasHiddenPercent,
-  isValidPercent,
+  hasHiddenLoad,
   PROJECT_CODE_PATTERN,
 } from "./rules";
 import type { ProjectMember, ProjectRole } from "./types";
 
 const ID = "01a139a9-0000-7000-8000-000000000001";
-const member = (role: ProjectRole, id: string, percent: number | null, toDate: string | null = null): ProjectMember => ({
+/** minutes: giờ mỗi tuần ở dự án (phút); null = không được xem. */
+const member = (role: ProjectRole, id: string, minutes: number | null, toDate: string | null = null): ProjectMember => ({
   employee: { id, employeeCode: id, fullName: id },
   role,
-  allocationPercent: percent,
+  projectMinutesPerWeek: minutes,
+  zone: minutes === null ? null : "GREEN",
   fromDate: "2026-01-01",
   toDate,
-});
-
-describe("isValidPercent", () => {
-  it("nhận bội số của 5 từ 5 đến 100", () => {
-    expect(["5", "50", "100"].every(isValidPercent)).toBe(true);
-  });
-  it("từ chối số ngoài khoảng, lẻ, không phải số", () => {
-    expect(["", "0", "3", "105", "12", "1e1", "-5", "5.5"].some(isValidPercent)).toBe(false);
-  });
 });
 
 describe("PROJECT_CODE_PATTERN", () => {
@@ -104,9 +96,9 @@ describe("người tham gia", () => {
   it("chỉ thành viên có phân bổ bị chặn làm PM, người quan sát thì không", () => {
     expect(allocatedEmployeeIds([member("MEMBER", "m", 50), member("OBSERVER", "o", null), member("PM", "p", 50)])).toEqual(["m"]);
   });
-  it("người quan sát không có % không tính là bị ẩn", () => {
-    expect(hasHiddenPercent([member("OBSERVER", "o", null), member("PM", "p", 50)])).toBe(false);
-    expect(hasHiddenPercent([member("MEMBER", "m", null)])).toBe(true);
+  it("người quan sát không có tải nên không tính là bị ẩn", () => {
+    expect(hasHiddenLoad([member("OBSERVER", "o", null), member("PM", "p", 50)])).toBe(false);
+    expect(hasHiddenLoad([member("MEMBER", "m", null)])).toBe(true);
   });
 });
 

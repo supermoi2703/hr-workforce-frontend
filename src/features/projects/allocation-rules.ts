@@ -1,11 +1,8 @@
 import type { Project, ProjectMember } from "./types";
-import type { AllocationRequest, AllocationSegment, Candidate } from "./work-types";
+import type { AllocationRequest, Candidate, LoadWeek } from "./work-types";
 
 // Luật thuần của màn phân bổ (3.4). Khớp backend: README module project mục 8. Ngày dạng "yyyy-MM-dd" so sánh được
-// bằng chuỗi.
-
-/** % đề xuất được: bội của 5, từ 5 đến 100. */
-export const ALLOCATION_PERCENTS: readonly number[] = Array.from({ length: 20 }, (_, i) => 100 - i * 5);
+// bằng chuỗi. Từ workload bước 3 đề xuất không còn %: tải tính từ task (mục 7.2).
 
 export type Period = { from: string; to: string | null };
 
@@ -29,30 +26,17 @@ export function periodProblem(project: ProjectDates, today: string, period: Peri
   return null;
 }
 
-/** Còn đủ chỗ cho mức đã chọn; chưa biết (chưa hỏi khoảng ngày) thì coi như đủ, backend vẫn chặn. */
-export function hasRoomFor(candidate: Candidate, percent: number): boolean {
-  return candidate.freePercent === null || candidate.freePercent >= percent;
+/**
+ * Người mà nút "Chọn tất cả" tick: chưa ở dự án. Người đang ở dự án vẫn chọn tay được (đề xuất mới đặt lại khoảng tham
+ * gia), nhưng không nằm trong "tất cả" để không đổi nhầm. Tải không chặn: người đỏ vẫn chọn được, màn hiện màu để cân nhắc.
+ */
+export function selectableIds(candidates: Candidate[]): string[] {
+  return candidates.filter((candidate) => !candidate.alreadyInProject).map((candidate) => candidate.person.id);
 }
 
-/**
- * Người mà nút "Chọn tất cả" tick: chưa ở dự án và còn đủ chỗ. Người đang ở dự án vẫn chọn tay được (đề xuất mới đặt lại
- * % của họ trong khoảng đó), nhưng không nằm trong "tất cả" để không đổi nhầm.
- */
-export function selectableIds(candidates: Candidate[], percent: number): string[] {
-  return candidates
-    .filter((candidate) => !candidate.alreadyInProject && hasRoomFor(candidate, percent))
-    .map((candidate) => candidate.person.id);
-}
-
-/**
- * Danh sách được gửi: chỉ người đã được tick (mặc định không tick ai, vì một team có thể rất đông); người không đủ chỗ
- * luôn bị bỏ.
- */
-export function pickedIds(candidates: Candidate[], percent: number, choices: ReadonlyMap<string, boolean>): string[] {
-  return candidates
-    .filter((candidate) => hasRoomFor(candidate, percent))
-    .filter((candidate) => choices.get(candidate.person.id) === true)
-    .map((candidate) => candidate.person.id);
+/** Danh sách được gửi: chỉ người đã được tick (mặc định không tick ai, vì một team có thể rất đông). */
+export function pickedIds(candidates: Candidate[], choices: ReadonlyMap<string, boolean>): string[] {
+  return candidates.filter((candidate) => choices.get(candidate.person.id) === true).map((candidate) => candidate.person.id);
 }
 
 /** Đề xuất đang chờ, mới nhất trước. */
@@ -67,7 +51,7 @@ export function allApplied(requests: AllocationRequest[]): boolean {
   return requests.length > 0 && requests.every((request) => request.status === "APPROVED");
 }
 
-/** Dòng thành viên chưa kết thúc: hiện nút đổi % và kết thúc sớm. */
+/** Dòng thành viên chưa kết thúc: hiện nút kết thúc sớm. */
 export function isRunningMember(member: ProjectMember, today: string): boolean {
   return member.role === "MEMBER" && (member.toDate === null || member.toDate >= today);
 }
@@ -160,23 +144,24 @@ export function monthTicks(rangeFrom: string, rangeTo: string): MonthTick[] {
   }
 }
 
-/** `pendingPercent`: riêng phần đang giữ cho đề xuất chờ duyệt (backend trả `heldPercent` là tổng, đã gồm phần đã duyệt). */
-export type SegmentBar = AllocationSegment & TimelineSpan & { pendingPercent: number };
+export type WeekBar = LoadWeek & TimelineSpan;
 
-/**
- * Đoạn của thanh tổng, rộng theo số ngày trong [from, to]. Đoạn không có ngày kết thúc kéo tới `to`; phần nằm ngoài khoảng
- * bị cắt, đoạn không còn ngày nào bị bỏ.
- */
-export function segmentBars(segments: AllocationSegment[], from: string, to: string): SegmentBar[] {
-  return segments.flatMap((segment) => {
-    const span = timelineSpan(segment.from, segment.to, from, to);
-    if (span === null) return [];
-    return [{ ...segment, ...span, pendingPercent: Math.max(0, segment.heldPercent - segment.approvedPercent) }];
+/** Mỗi tuần tải một ô trên trục [from, to], rộng theo số ngày của tuần nằm trong trục; tuần ngoài trục bị bỏ. */
+export function weekBars(weeks: LoadWeek[], from: string, to: string): WeekBar[] {
+  return weeks.flatMap((week) => {
+    const end = addDays(week.weekStart, 6);
+    const span = end === null ? null : timelineSpan(week.weekStart, end, from, to);
+    return span === null ? [] : [{ ...week, ...span }];
   });
 }
 
-/** % còn trống của đoạn chứa ngày `day`; null nếu ngày đó nằm ngoài lịch. */
-export function freePercentOn(segments: AllocationSegment[], day: string): number | null {
-  const segment = segments.find((s) => s.from <= day && (s.to === null || day <= s.to));
-  return segment ? segment.freePercent : null;
+/** Ngày cách `iso` một số ngày; null nếu không phải ngày hợp lệ. */
+function addDays(iso: string, days: number): string | null {
+  const day = dayNumber(iso);
+  return day === null ? null : new Date((day + days) * DAY_MS).toISOString().slice(0, 10);
+}
+
+/** Tuần chứa ngày `day`; null nếu ngoài các tuần đã có. */
+export function weekOn(weeks: LoadWeek[], day: string): LoadWeek | null {
+  return weeks.find((week) => week.weekStart <= day && day <= (addDays(week.weekStart, 6) ?? week.weekStart)) ?? null;
 }

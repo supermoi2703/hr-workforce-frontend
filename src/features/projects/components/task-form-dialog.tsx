@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { SparklesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,9 +12,9 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/format";
-import { createTask, updateTask } from "../work-api";
+import { createTask, getAssignPreview, updateTask } from "../work-api";
 import { useProjectMembers } from "../hooks";
-import { useSkillOptions, useWorkCategories, useWorkErrorMessage, useWorkMutation } from "../work-hooks";
+import { useAssignPreview, useSkillOptions, useWorkCategories, useWorkErrorMessage, useWorkMutation } from "../work-hooks";
 import {
   applyCategory,
   applySuggestion,
@@ -21,12 +22,14 @@ import {
   dateRangeValid,
   differsFromSuggestion,
   formatMinutes,
+  needsConfirm,
   parseHours,
   scheduleInfo,
   type CategoryDraft,
 } from "../work-rules";
 import type { Project } from "../types";
-import { TASK_PRIORITIES, TASK_TYPES, type Task, type TaskPriority, type TaskType, type WorkCategory } from "../work-types";
+import { TASK_PRIORITIES, TASK_TYPES, type AssignPreviewInput, type Task, type TaskPriority, type TaskType, type WorkCategory } from "../work-types";
+import { AssignLoadNotice } from "./load-summary";
 import { SimpleSelect } from "./simple-select";
 import { TaskSkillsField } from "./task-skills-field";
 import { WorkCategorySelect } from "./work-category-select";
@@ -40,6 +43,7 @@ const NOBODY = "NOBODY";
 export function TaskFormDialog({ project, task, onClose }: { project: Project; task?: Task; onClose: () => void }) {
   const t = useTranslations("ProjectWork");
   const tCommon = useTranslations("Common");
+  const tLoad = useTranslations("Workload");
   const errorMessage = useWorkErrorMessage();
   const members = useProjectMembers(project.id);
   const skillOptions = useSkillOptions();
@@ -67,6 +71,7 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   const validEstimate = !draft.estimate.trim() || estimateMinutes != null;
   const validDates = dateRangeValid(startDate, dueDate);
   const showSuggestion = !!category && differsFromSuggestion(draft, category);
+  const [confirming, setConfirming] = useState(false);
 
   const mutation = useWorkMutation(() => {
     const body = {
@@ -92,6 +97,41 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   }
 
   const people = (members.data ?? []).filter((member) => member.role !== "OBSERVER");
+  const assigneeName = people.find((member) => member.employee.id === assignee)?.employee.fullName ?? "";
+  // Xem trước tải của người được chọn (workload bước 3): chỉ khi đã chọn người và form hợp lệ. Không chặn lưu.
+  const previewInput: AssignPreviewInput | null =
+    !common && assignee !== NOBODY && validDates && validEstimate
+      ? {
+          taskId: task?.card.id ?? null,
+          employeeId: assignee,
+          estimateMinutes,
+          startDate: startDate || null,
+          dueDate: dueDate || null,
+          sprintId: task?.card.sprintId ?? null,
+        }
+      : null;
+  const preview = useAssignPreview(project.id, previewInput);
+  // Chỉ hỏi xác nhận khi đổi người (hoặc việc mới): sửa việc của người đã đỏ không hỏi lại mỗi lần lưu.
+  const assigneeChanged = !task || (task.card.assignee?.id ?? NOBODY) !== assignee;
+
+  function save() {
+    mutation.mutate(undefined, { onSuccess: onClose, onError: (error) => toast.error(errorMessage(error)) });
+  }
+
+  async function submit() {
+    if (previewInput && assigneeChanged) {
+      try {
+        // Tính lại với đúng giá trị lúc bấm Lưu (ô cảnh báo có thể còn chờ 400 ms)
+        if (needsConfirm(await getAssignPreview(project.id, previewInput))) {
+          setConfirming(true);
+          return;
+        }
+      } catch {
+        // Không xem trước được thì vẫn lưu: tải chỉ để cảnh báo
+      }
+    }
+    save();
+  }
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-2xl">
@@ -187,6 +227,9 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
                 </Field>
               )}
             </div>
+            {previewInput && (
+              <AssignLoadNotice preview={preview.data} name={assigneeName} pending={preview.isFetching && !preview.data} />
+            )}
           </Section>
 
           <Section title={t("sectionDates")}>
@@ -231,11 +274,28 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
           </Button>
           <Button
             disabled={!title.trim() || !validEstimate || !validDates || mutation.isPending}
-            onClick={() => mutation.mutate(undefined, { onSuccess: onClose, onError: (error) => toast.error(errorMessage(error)) })}
+            onClick={() => void submit()}
           >
             {t("save")}
           </Button>
         </DialogFooter>
+        <ConfirmDialog
+          open={confirming}
+          onOpenChange={setConfirming}
+          title={tLoad("confirmTitle", { name: assigneeName })}
+          description={tLoad("confirmDescription", { name: assigneeName })}
+          confirmLabel={tLoad("confirmAction")}
+          destructive
+          onConfirm={() =>
+            mutation
+              .mutateAsync(undefined)
+              .then(onClose)
+              .catch((failure) => {
+                toast.error(errorMessage(failure));
+                throw failure;
+              })
+          }
+        />
       </DialogContent>
     </Dialog>
   );

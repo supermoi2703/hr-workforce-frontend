@@ -14,14 +14,15 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { isApiError } from "@/lib/api/errors";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
 import { formatDate, todayIsoDate } from "@/lib/format";
-import { cn } from "@/lib/utils";
-import { freePercentOn, scheduleRange, segmentBars, type SegmentBar } from "../allocation-rules";
+import { scheduleRange, weekBars, type WeekBar } from "../allocation-rules";
 import { EMPLOYEE_SEARCH_MIN_LENGTH } from "../hooks";
 import type { ProjectPerson } from "../types";
 import { useAllocationPeople, usePersonAllocations } from "../work-hooks";
+import { hoursText } from "../work-rules";
 import type { AllocationViewerReach, PersonAllocations } from "../work-types";
 import { PersonPicker } from "./employee-picker";
 import { AllocationTimeline } from "./allocation-timeline";
+import { LoadLine, ZoneDot } from "./load-summary";
 
 type UrlPatch = { employeeId?: string | null; from?: string | null; to?: string | null };
 
@@ -165,8 +166,7 @@ function AllocationPersonPicker({ id, reach, value, onChange }: AllocationPerson
 function ScheduleView({ schedule, isMine }: { schedule: PersonAllocations; isMine: boolean }) {
   const t = useTranslations("Allocations.Schedule");
   const today = todayIsoDate();
-  const bars = segmentBars(schedule.segments, schedule.from, schedule.to);
-  const freeToday = freePercentOn(schedule.segments, today);
+  const weeks = weekBars(schedule.load.weeks, schedule.from, schedule.to);
   const { fullName, employeeCode } = schedule.employee;
 
   return (
@@ -177,39 +177,34 @@ function ScheduleView({ schedule, isMine }: { schedule: PersonAllocations; isMin
           {[employeeCode, t("period", { from: formatDate(schedule.from), to: formatDate(schedule.to) })]
             .filter(Boolean)
             .join(" · ")}
-          {freeToday !== null && <> · {t("freeToday", { percent: freeToday })}</>}
         </CardDescription>
+        <LoadLine load={schedule.load} />
       </CardHeader>
       <CardContent className="grid gap-6">
-        <AllocationTimeline from={schedule.from} to={schedule.to} today={today} bars={bars} items={schedule.items} />
-        <SegmentList bars={bars} />
+        <AllocationTimeline from={schedule.from} to={schedule.to} today={today} weeks={weeks} items={schedule.items} />
+        <WeekList weeks={weeks} />
       </CardContent>
     </Card>
   );
 }
 
-/** Cùng số liệu với thanh tổng, dạng chữ: đọc được bằng trình đọc màn hình và trên màn hình hẹp. */
-function SegmentList({ bars }: { bars: SegmentBar[] }) {
+/** Cùng số liệu với dòng tải, dạng chữ: đọc được bằng trình đọc màn hình và trên màn hình hẹp. */
+function WeekList({ weeks }: { weeks: WeekBar[] }) {
   const t = useTranslations("Allocations.Schedule");
   return (
     <section className="grid gap-1.5">
-      <h3 className="text-sm font-medium">{t("segmentsTitle")}</h3>
+      <h3 className="text-sm font-medium">{t("weeksTitle")}</h3>
       <ul className="grid gap-1 text-sm">
-      {bars.map((bar) => (
-        <li key={bar.start} className="flex flex-wrap items-baseline justify-between gap-x-3 border-b border-dashed py-1 last:border-b-0">
-          <span className="tabular-nums">
-            {bar.start === bar.end ? formatDate(bar.start) : `${formatDate(bar.start)} – ${formatDate(bar.end)}`}
-          </span>
-          <span className="text-muted-foreground tabular-nums">
-            {bar.pendingPercent > 0
-              ? t("segmentShort", { approved: bar.approvedPercent, held: bar.pendingPercent })
-              : t("segmentApprovedOnly", { approved: bar.approvedPercent })}{" "}
-            <span className={cn("font-medium", bar.freePercent === 0 ? "text-destructive" : "text-foreground")}>
-              {t("free", { percent: bar.freePercent })}
+        {weeks.map((week) => (
+          <li key={week.weekStart} className="flex flex-wrap items-baseline justify-between gap-x-3 border-b border-dashed py-1 last:border-b-0">
+            <span className="tabular-nums">{t("weekOf", { week: formatDate(week.weekStart) })}</span>
+            <span className="flex items-center gap-1.5 text-muted-foreground tabular-nums">
+              <ZoneDot zone={week.zone} />
+              {t("weekHours", { load: hoursText(week.loadMinutes), capacity: hoursText(week.capacityMinutes) })}
+              {week.percent !== null && <span className="font-medium text-foreground">{week.percent}%</span>}
             </span>
-          </span>
-        </li>
-      ))}
+          </li>
+        ))}
       </ul>
     </section>
   );

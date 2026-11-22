@@ -1,3 +1,5 @@
+import type { WorkloadZone } from "./work-types";
+
 // Kiểu dữ liệu khớp DTO của API dự án (backend: modules/project/README.md mục 5).
 
 export const PROJECT_TYPES = ["TIME_AND_MATERIAL", "FIXED_PRICE", "ODC", "PRODUCT", "TRAINING", "INTERNAL"] as const;
@@ -57,8 +59,10 @@ export type Project = ProjectListItem & {
 export type ProjectMember = {
   employee: ProjectPerson;
   role: ProjectRole;
-  /** null với người quan sát, hoặc khi người xem không được xem % của người này. */
-  allocationPercent: number | null;
+  /** Phút mỗi tuần ở dự án này, trung bình 4 tuần tới (tính từ task); null với người quan sát hoặc khi không được xem. */
+  projectMinutesPerWeek: number | null;
+  /** Vùng tải chung của người đó 4 tuần tới; null cùng điều kiện trên. */
+  zone: WorkloadZone | null;
   fromDate: string;
   toDate: string | null;
 };
@@ -84,7 +88,6 @@ export type CreateProjectInput = {
   ownerDepartmentId: string;
   officeId: string;
   pmEmployeeId: string;
-  pmAllocationPercent: number;
   startDate: string;
   endDate: string | null;
   sprintEnabled: boolean;

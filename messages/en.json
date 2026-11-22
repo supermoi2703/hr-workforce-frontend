@@ -1533,7 +1533,8 @@
       "notCurrentApprover": "You aren't an approver of the current step. The page has been refreshed.",
       "alreadyDecided": "You have already decided on this request. The page has been refreshed.",
       "notPending": "This request is no longer waiting for approval. The page has been refreshed.",
-      "notRequester": "Only the person who sent the request can withdraw it."
+      "notRequester": "Only the person who sent the request can withdraw it.",
+      "allocationNoLongerValid": "This allocation request is no longer valid: the project is closed, the dates are no longer within the project, or the person has left. Please reject it."
     },
     "Validation": {
       "reasonRequired": "Enter a reason for rejecting",
@@ -2581,7 +2582,7 @@
       "onClosedDate": "People who were in the project on the day it closed.",
       "addObserver": "Add observer",
       "addObserverTitle": "Add observer",
-      "addObserverDescription": "Observers follow the project. They have no allocation and do not count towards the 100% limit.",
+      "addObserverDescription": "Observers follow the project; they get no tasks, so they have no load.",
       "employee": "Employee",
       "add": "Add",
       "alreadyIn": "Already in the project",
@@ -2589,7 +2590,6 @@
       "empty": "No participants yet",
       "person": "Employee",
       "role": "Role",
-      "percent": "Allocation",
       "period": "Dates",
       "noEnd": "no end date",
       "actions": "Actions",
@@ -2597,7 +2597,10 @@
       "removeObserverTitle": "Remove observer?",
       "removeObserverDescription": "{name} will stop following this project.",
       "removeObserver": "Remove",
-      "percentHidden": "You only see the allocation of yourself and the people you manage."
+      "load": "Load here",
+      "loadHint": "Hours a week in this project, average of the next 4 weeks; the dot is the person's overall zone across projects",
+      "perWeek": "{hours} h/week",
+      "loadHidden": "You only see the load of yourself and the people you look after."
     },
     "Form": {
       "createTitle": "New project",
@@ -2743,9 +2746,9 @@
     "startSprint": "Start",
     "closeSprint": "Close sprint",
     "sprintDone": "{done}/{total} done",
-    "sprintCapacity": "Sprint capacity (leave removed)",
+    "sprintCapacity": "Sprint capacity (leave and task hours in other projects removed)",
     "leaveDays": "{days, plural, one {# day off} other {# days off}}",
-    "capacityHint": "Each cell shows work due that week on every project / hours available after approved leave.",
+    "capacityHint": "Each cell shows task hours spread into the week on every project / hours available after approved leave. Colour by zone: yellow needs agreement (100–125%), red is overloaded.",
     "person": "Person",
     "peopleCount": "{count} people",
     "members": "Members",
@@ -2922,7 +2925,8 @@
     },
     "suggestionHoursOnly": "Category suggests: {hours}, no fixed skills",
     "dateHintSprintStart": "Empty start date: uses the sprint start ({date}).",
-    "dateHintSprintEnd": "Empty due date: uses the sprint end ({date})."
+    "dateHintSprintEnd": "Empty due date: uses the sprint end ({date}).",
+    "notPlanned": "Not scheduled yet"
   },
   "Contracts": {
     "metaTitle": "Contracts",
@@ -3155,13 +3159,13 @@
   },
   "Allocations": {
     "propose": "Propose allocation",
-    "proposeShortHint": "Each person's department head and the PM approve together. Nobody goes over 100% in total.",
+    "proposeShortHint": "Each person's department head and the PM approve. No percent any more: load comes from task hours.",
     "pendingTitle": "Requests waiting for approval ({count})",
     "openApproval": "Open request",
     "proposeTitle": "Propose allocation",
-    "proposeHint": "Each person's department head and the PM approve on the Approvals page; whoever proposes counts as agreeing. Nobody goes over 100% in total, pending requests included.",
-    "changeTitle": "Change percent or extend: {name}",
-    "changeHint": "The request sets the percent for exactly the chosen period; other days stay as they are. This person's department head and the PM approve.",
+    "proposeHint": "Bring people into the project for a period. Each person's department head and the PM approve on the Approvals page; the requester counts as agreed. The dot next to each person is their load from tasks in this period: for judgement only, nothing is blocked.",
+    "changeTitle": "Extend or change dates: {name}",
+    "changeHint": "Resets the participation period for exactly the dates chosen; outside them nothing changes. This person's department head and the PM approve.",
     "source": "Pick from",
     "sourceTeam": "Organization team",
     "sourceProject": "Another project",
@@ -3169,7 +3173,7 @@
     "pickTeam": "Choose a team",
     "pickProject": "Choose a project",
     "selectedCount": "{count} of {total} selected",
-    "selectAll": "Select all with room ({count})",
+    "selectAll": "Select everyone not in the project ({count})",
     "clearAll": "Clear selection",
     "ProjectPicker": {
       "placeholder": "Select a project",
@@ -3184,7 +3188,6 @@
     "person": "Person",
     "fromDate": "From",
     "toDate": "To",
-    "percent": "% of time",
     "noEndHint": "Leave the end date empty for no end date.",
     "Period": {
       "fromBeforeToday": "Allocations cannot start in the past: start today or later.",
@@ -3195,16 +3198,13 @@
     },
     "noCandidates": "Nobody to choose.",
     "inProject": "In the project",
-    "free": "{percent}% free",
-    "freeInPeriod": "{percent}% free in this period.",
-    "notEnough": "Only {percent}% free in this period; choose a lower percent.",
     "note": "Note",
     "notePlaceholder": "Role, reason (optional)",
     "submit": "{count, plural, =0 {Send request} one {Send # request} other {Send # requests}}",
     "sent": "Sent {count} requests for approval",
     "applied": "Added {count} people to the project",
-    "change": "Change percent or extend",
-    "changeOf": "Change percent or extend for {name}",
+    "change": "Extend or change dates",
+    "changeOf": "Extend or change dates of {name}",
     "end": "End allocation",
     "endOf": "End allocation of {name}",
     "endTitle": "End the allocation of {name}?",
@@ -3218,7 +3218,7 @@
     "ended": "Allocation ended",
     "Schedule": {
       "title": "Allocations",
-      "description": "One person's allocation schedule across all projects: which projects, what percent, until when, and how much is free. View only; propose allocations from a project's Staffing tab.",
+      "description": "One person's schedule across projects: which projects, until when, and the load of each week from task hours (green / yellow / red). View only; propose allocations from a project's Staffing tab.",
       "person": "Person",
       "from": "From",
       "to": "To",
@@ -3231,31 +3231,28 @@
       "myScheduleTitle": "My allocation schedule",
       "scheduleOf": "Allocation schedule of {name}",
       "period": "{from} – {to}",
-      "freeToday": "{percent}% free today",
-      "legendApproved": "Approved",
-      "legendHeld": "Pending (capacity held)",
-      "legendFree": "Free",
-      "segmentShort": "Approved {approved}% · Held {held}% ·",
-      "segmentApprovedOnly": "Approved {approved}% ·",
-      "free": "Free {percent}%",
-      "empty": "No allocations in this period",
+      "legendApproved": "Taking part",
+      "legendHeld": "Pending approval",
+      "empty": "Not in any project in this period",
       "closed": "Closed",
       "noEnd": "open-ended",
       "statusApproved": "Approved",
       "statusPending": "Pending",
       "openApproval": "View request",
-      "total": "Total",
-      "totalHint": "Free capacity per period",
+      "total": "Weekly load",
+      "totalHint": "Task hours ÷ available hours, all projects",
       "today": "Today",
-      "full": "Full",
-      "freeShort": "{percent}% free",
-      "usedApproved": "Approved {approved}%",
-      "usedWithPending": "Approved {approved}% · pending {pending}%",
-      "totalBlockLabel": "{from} – {to}: {free}% free, {approved}% approved, {pending}% pending",
-      "barPending": "{percent}% · pending",
-      "barLabel": "{project}: {percent}%, {period}, {status}",
+      "barLabel": "{project}: {period}, {status}",
       "monthTick": "{month, select, 1 {Jan} 2 {Feb} 3 {Mar} 4 {Apr} 5 {May} 6 {Jun} 7 {Jul} 8 {Aug} 9 {Sep} 10 {Oct} 11 {Nov} other {Dec}}{withYear, select, true { {year}} other {}}",
-      "segmentsTitle": "By period"
+      "legendZone": {
+        "GREEN": "Within capacity (≤ 100%)",
+        "YELLOW": "Needs agreement (100–125%)",
+        "RED": "Overloaded"
+      },
+      "weekLabel": "Week {week}: {load}/{capacity} h ({percent}), {zone}",
+      "weekHours": "{load}/{capacity} h",
+      "weeksTitle": "By week",
+      "weekOf": "Week {week}"
     }
   },
   "Notifications": {
@@ -3573,15 +3570,15 @@
       "exporting": "Exporting…",
       "exportFailed": "Could not export the file",
       "planned": "Planned utilization",
-      "plannedHint": "Average allocation per working day",
-      "limit": "Limit {limit}%",
-      "overLimit": "Over the limit",
+      "plannedHint": "Average planned load per working day (task hours ÷ available hours)",
+      "limit": "Full at {limit}%",
+      "overLimit": "Over 100%",
       "actual": "Actual utilization",
       "actualHint": "Logged hours ÷ available hours",
-      "bench": "On bench",
-      "benchDetail": "No project in this period",
+      "bench": "No work",
+      "benchDetail": "No scheduled task hours in this period",
       "overloaded": "Overloaded",
-      "overloadedDetail": "Over the limit or more work than capacity",
+      "overloadedDetail": "Red zone · {yellow} need agreement (yellow)",
       "billable": "Billable",
       "billableDetail": "Share of time on billable projects",
       "split": {
@@ -3591,7 +3588,7 @@
       },
       "trendTitle": "Planned utilization by week",
       "heatmapTitle": "Planned utilization by department and week",
-      "heatmapDescription": "Darker means more allocated. Red cells are over the limit.",
+      "heatmapDescription": "Darker cells mean more planned work. Red cells are over 100%.",
       "heatLegendLow": "0%",
       "heatLegendHigh": "{limit}%",
       "heatLegendOver": "Over {limit}%",
@@ -3613,15 +3610,15 @@
         "81-100": "81–100%",
         "over-100": "Over 100%"
       },
-      "overloadTitle": "Overload warnings",
+      "overloadTitle": "Overloaded (red zone)",
       "overloadEmpty": "Nobody is overloaded in this period.",
-      "benchTitle": "On bench",
-      "benchEmpty": "Everyone has a project in this period.",
+      "benchTitle": "No work",
+      "benchEmpty": "Everyone has work in this period.",
       "columns": {
         "person": "Person",
-        "maxDaily": "Highest day",
-        "firstOver": "Over limit from",
-        "weeksOver": "Weeks over capacity",
+        "maxDaily": "Busiest week",
+        "firstOver": "From",
+        "weeksOver": "Why",
         "skills": "Top skills",
         "count": "People"
       },
@@ -3630,10 +3627,17 @@
       "plannedNow": "Planned this week",
       "projectsTitle": "Top projects by FTE",
       "projectsDescription": "FTE = time converted to full-time people",
-      "projectsEmpty": "No project has allocations in this period.",
+      "projectsEmpty": "No project has work in this period.",
       "fte": "FTE",
       "timeTitle": "Where planned time goes",
-      "timeCenter": "planned"
+      "timeCenter": "planned",
+      "unscheduled": "{hours} h of work not scheduled yet",
+      "reasons": {
+        "WEEK_OVER_CAPACITY": "a week over 125%",
+        "NO_CAPACITY": "work left while on leave",
+        "DAY_OVER_MAX": "a day over 12 h",
+        "MONTH_OVERTIME": "over 40 extra hours in a month"
+      }
     },
     "Team": {
       "title": "My team",
@@ -3655,9 +3659,9 @@
       "membersTitle": "Planned utilization by person",
       "membersEmpty": "Nobody in your team is working right now.",
       "badges": {
-        "overAllocated": "Over limit",
-        "overCapacity": "Too much work",
-        "bench": "No project"
+        "bench": "No work",
+        "overloaded": "Overloaded",
+        "needsAgreement": "Needs agreement"
       },
       "distributionTitle": "Team by planned utilization",
       "distributionCenter": "people",
@@ -4345,5 +4349,29 @@
       "INCIDENT": "Punch incident",
       "HR_REQUEST": "Entered by HR"
     }
+  },
+  "Workload": {
+    "zone": {
+      "GREEN": "Green: within capacity",
+      "YELLOW": "Yellow: needs agreement",
+      "RED": "Red: overloaded"
+    },
+    "reason": {
+      "WEEK_OVER_CAPACITY": "a week over capacity",
+      "NO_CAPACITY": "work left with no hours available (leave)",
+      "DAY_OVER_MAX": "a day with more than 12 hours",
+      "MONTH_OVERTIME": "more than 40 extra hours in a month"
+    },
+    "peak": "Busiest week {week}: {load}/{capacity} h",
+    "peakShort": "{load}/{capacity} h",
+    "noLoad": "No work in this period",
+    "unscheduled": "{hours} h of work not scheduled yet",
+    "assignYellow": "Week {week}: {name} has {load}/{capacity} h ({percent}). Needs agreement: work faster or overtime.",
+    "assignRed": "{name} would be overloaded: {reasons}. Busiest week {week}: {load}/{capacity} h.",
+    "assignChecking": "Checking load…",
+    "assignUnscheduled": "No due date (not in a sprint): not counted in the load yet.",
+    "confirmTitle": "Assign to {name} anyway?",
+    "confirmDescription": "{name} would be overloaded with this task. Nothing is blocked; make sure you have talked to {name}, or move the due date or split the task.",
+    "confirmAction": "Assign anyway"
   }
 }

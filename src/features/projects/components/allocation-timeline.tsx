@@ -7,14 +7,22 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { dayOffsetPercent, monthTicks, timelineSpan, type MonthTick, type SegmentBar, type TimelineSpan } from "../allocation-rules";
-import type { PersonAllocationItem } from "../work-types";
+import { dayOffsetPercent, monthTicks, timelineSpan, type MonthTick, type TimelineSpan, type WeekBar } from "../allocation-rules";
+import { hoursText } from "../work-rules";
+import type { PersonAllocationItem, WorkloadZone } from "../work-types";
 import { ProjectRoleBadge } from "./project-badges";
 
-/** Dưới mức này (phần trăm bề rộng trục) nhãn % nằm ngoài thanh; khối Tổng bỏ chữ, chỉ còn thanh nhỏ. */
+/** Dưới mức này (phần trăm bề rộng trục) nhãn nằm ngoài thanh; ô tuần chỉ còn %, rồi chỉ còn màu. */
 const LABEL_INSIDE_MIN = 12;
-const TOTAL_TEXT_MIN = 9;
-const TOTAL_DATE_MIN = 16;
+const WEEK_HOURS_MIN = 7;
+const WEEK_PERCENT_MIN = 3.5;
+
+/** Màu ô tuần theo vùng tải (xanh / vàng / đỏ). */
+const ZONE_BLOCK: Record<WorkloadZone, string> = {
+  GREEN: "border-success/30 bg-success/10 text-success",
+  YELLOW: "border-warning/40 bg-warning/15 text-warning",
+  RED: "border-destructive/30 bg-destructive/10 text-destructive",
+};
 /** Số nhãn tháng tối đa trên trục: màn rộng / màn hẹp. Đường kẻ tháng vẫn vẽ đủ. */
 const MAX_TICK_LABELS = 9;
 const MAX_TICK_LABELS_NARROW = 4;
@@ -31,15 +39,15 @@ type AllocationTimelineProps = {
   from: string;
   to: string;
   today: string;
-  bars: SegmentBar[];
+  weeks: WeekBar[];
   items: PersonAllocationItem[];
 };
 
 /**
- * Lịch phân bổ dạng dòng thời gian: trục tháng, dòng Tổng (còn trống theo đoạn) và mỗi dự án một dòng. Mọi con số (%,
- * ngày) hiện sẵn trên màn hình, không phải di chuột.
+ * Lịch phân bổ dạng dòng thời gian: trục tháng, dòng tải theo tuần (giờ task ÷ năng lực, tô theo vùng; workload bước 3) và
+ * mỗi dự án một dòng (khoảng tham gia, không còn %). Mọi con số hiện sẵn trên màn hình, không phải di chuột.
  */
-export function AllocationTimeline({ from, to, today, bars, items }: AllocationTimelineProps) {
+export function AllocationTimeline({ from, to, today, weeks, items }: AllocationTimelineProps) {
   const t = useTranslations("Allocations.Schedule");
   const ticks = monthTicks(from, to);
   const todayAt = dayOffsetPercent(today, from, to);
@@ -58,9 +66,9 @@ export function AllocationTimeline({ from, to, today, bars, items }: AllocationT
           </>
         }
       >
-        <Track ticks={ticks} todayAt={todayAt} className="h-20">
-          {bars.map((bar) => (
-            <TotalBlock key={bar.start} bar={bar} />
+        <Track ticks={ticks} todayAt={todayAt} className="h-14">
+          {weeks.map((week) => (
+            <WeekBlock key={week.weekStart} week={week} />
           ))}
         </Track>
       </TimelineRow>
@@ -82,7 +90,9 @@ export function AllocationTimeline({ from, to, today, bars, items }: AllocationT
       <ul className="flex flex-wrap gap-x-5 gap-y-1.5 pt-1 text-xs text-muted-foreground">
         <LegendItem swatch={<span className="size-3 rounded-sm bg-primary" />} label={t("legendApproved")} />
         <LegendItem swatch={<span className="size-3 rounded-sm border border-pending" style={PENDING_STRIPES} />} label={t("legendHeld")} />
-        <LegendItem swatch={<span className="size-3 rounded-sm border border-success/40 bg-success/15" />} label={t("legendFree")} />
+        {(["GREEN", "YELLOW", "RED"] as const).map((zone) => (
+          <LegendItem key={zone} swatch={<span className={cn("size-3 rounded-sm border", ZONE_BLOCK[zone])} />} label={t(`legendZone.${zone}`)} />
+        ))}
         {todayAt !== null && <LegendItem swatch={<span className="h-3 w-0.5 bg-destructive/70" />} label={t("today")} />}
       </ul>
     </div>
@@ -146,51 +156,33 @@ function Track({ ticks, todayAt, className, children }: { ticks: MonthTick[]; to
   );
 }
 
-/** Một đoạn của dòng Tổng: chữ to là còn trống, chữ nhỏ là đã duyệt / đang chờ, thanh mảnh dưới đáy cho thấy độ đầy. */
-function TotalBlock({ bar }: { bar: SegmentBar }) {
+/** Một tuần của dòng tải: giờ task / năng lực, tô theo vùng; hẹp thì chỉ còn %, rồi chỉ còn màu. */
+function WeekBlock({ week }: { week: WeekBar }) {
   const t = useTranslations("Allocations.Schedule");
-  const full = bar.freePercent === 0;
-  const used =
-    bar.pendingPercent > 0
-      ? t("usedWithPending", { approved: bar.approvedPercent, pending: bar.pendingPercent })
-      : t("usedApproved", { approved: bar.approvedPercent });
-  const label = t("totalBlockLabel", {
-    from: formatDate(bar.start),
-    to: formatDate(bar.end),
-    free: bar.freePercent,
-    approved: bar.approvedPercent,
-    pending: bar.pendingPercent,
+  const percent = week.percent === null ? "—" : `${week.percent}%`;
+  const label = t("weekLabel", {
+    week: formatDate(week.weekStart),
+    load: hoursText(week.loadMinutes),
+    capacity: hoursText(week.capacityMinutes),
+    percent,
+    zone: t(`legendZone.${week.zone}`),
   });
   return (
     <div
       role="img"
       aria-label={label}
       title={label}
-      className={cn(
-        "absolute inset-y-1 flex flex-col overflow-hidden rounded-md border px-2 pt-1 pb-2.5",
-        full ? "border-destructive/30 bg-destructive/10" : "border-success/30 bg-success/10",
-      )}
-      style={{ left: `calc(${bar.leftPercent}% + 1px)`, width: `calc(${bar.widthPercent}% - 2px)` }}
+      className={cn("absolute inset-y-1 flex flex-col justify-center overflow-hidden rounded-md border px-1.5", ZONE_BLOCK[week.zone])}
+      style={{ left: `calc(${week.leftPercent}% + 1px)`, width: `calc(${week.widthPercent}% - 2px)` }}
     >
-      {bar.widthPercent >= TOTAL_DATE_MIN && (
-        <span className="hidden text-[10px] leading-3 text-muted-foreground tabular-nums sm:block">{formatDate(bar.start)}</span>
+      {week.widthPercent >= WEEK_PERCENT_MIN && (
+        <span className="truncate text-xs leading-4 font-semibold tabular-nums">{percent}</span>
       )}
-      {/* Màn hẹp chỉ còn con số trống; chi tiết ở danh sách "Theo đoạn ngày" bên dưới. */}
-      <span className={cn("truncate text-sm leading-5 font-semibold tabular-nums sm:hidden", full ? "text-destructive" : "text-success")}>
-        {bar.freePercent}%
-      </span>
-      {bar.widthPercent >= TOTAL_TEXT_MIN && (
-        <>
-          <span className={cn("hidden truncate text-sm leading-5 font-semibold sm:block", full ? "text-destructive" : "text-success")}>
-            {full ? t("full") : t("freeShort", { percent: bar.freePercent })}
-          </span>
-          <span className="hidden truncate text-[11px] leading-4 text-muted-foreground sm:block">{used}</span>
-        </>
+      {week.widthPercent >= WEEK_HOURS_MIN && (
+        <span className="truncate text-[10px] leading-3 text-muted-foreground tabular-nums">
+          {t("weekHours", { load: hoursText(week.loadMinutes), capacity: hoursText(week.capacityMinutes) })}
+        </span>
       )}
-      <span className="absolute inset-x-2 bottom-1 flex h-1 overflow-hidden rounded-full bg-success/25" aria-hidden>
-        <span className="bg-primary" style={{ width: `${bar.approvedPercent}%` }} />
-        <span className="bg-pending" style={{ width: `${bar.pendingPercent}%` }} />
-      </span>
     </div>
   );
 }
@@ -201,7 +193,7 @@ function ProjectRow({ item, span, ticks, todayAt }: ProjectRowProps) {
   const t = useTranslations("Allocations.Schedule");
   const pending = item.status === "PENDING";
   const period = `${formatDate(item.fromDate)} → ${item.toDate ? formatDate(item.toDate) : t("noEnd")}`;
-  const barText = pending ? t("barPending", { percent: item.percent }) : `${item.percent}%`;
+  const barText = pending ? t("statusPending") : null;
   const inside = span !== null && span.widthPercent >= LABEL_INSIDE_MIN;
 
   return (
@@ -238,7 +230,7 @@ function ProjectRow({ item, span, ticks, todayAt }: ProjectRowProps) {
           <>
             <div
               role="img"
-              aria-label={t("barLabel", { project: item.projectCode, percent: item.percent, period, status: pending ? t("statusPending") : t("statusApproved") })}
+              aria-label={t("barLabel", { project: item.projectCode, period, status: pending ? t("statusPending") : t("statusApproved") })}
               className={cn(
                 "absolute inset-y-1 flex items-center justify-between gap-1 overflow-hidden rounded-md px-1.5 text-xs font-semibold tabular-nums",
                 pending ? "border border-pending text-pending-foreground" : "bg-primary text-primary-foreground",
@@ -248,10 +240,10 @@ function ProjectRow({ item, span, ticks, todayAt }: ProjectRowProps) {
               style={{ left: `${span.leftPercent}%`, width: `${span.widthPercent}%`, ...(pending ? PENDING_STRIPES : undefined) }}
             >
               {span.startsBefore ? <ChevronLeftIcon className="size-3.5 shrink-0 opacity-80" aria-hidden /> : <span />}
-              {inside && <span className={cn("truncate", pending && "rounded bg-pending px-1.5")}>{barText}</span>}
+              {inside && barText && <span className="truncate rounded bg-pending px-1.5">{barText}</span>}
               {span.endsAfter ? <ChevronRightIcon className="size-3.5 shrink-0 opacity-80" aria-hidden /> : <span />}
             </div>
-            {!inside && (
+            {!inside && barText && (
               <span
                 className="absolute top-1/2 -translate-y-1/2 pl-1.5 text-xs font-semibold whitespace-nowrap tabular-nums"
                 style={span.leftPercent + span.widthPercent > 80 ? { right: `${100 - span.leftPercent}%`, paddingRight: 6 } : { left: `${span.leftPercent + span.widthPercent}%` }}

@@ -45,7 +45,7 @@ export function ProjectStaffing({ project }: { project: Project }) {
                 <span className="min-w-0 flex-1">
                   <PersonChip person={request.employee} />
                 </span>
-                <span className="tabular-nums">{request.percent}%</span>
+                {request.percent !== null && <span className="tabular-nums text-muted-foreground">{request.percent}%</span>}
                 <span className="whitespace-nowrap text-muted-foreground">
                   {formatDate(request.fromDate)} – {request.toDate ? formatDate(request.toDate) : tMembers("noEnd")}
                 </span>

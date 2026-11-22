@@ -88,7 +88,7 @@ export function ResourceHeroes({ data, compact = false }: { data: ResourceDashbo
         value={data.summary.overloadedCount}
         icon={AlertTriangleIcon}
         tone="approval"
-        detail={t("overloadedDetail")}
+        detail={t("overloadedDetail", { yellow: data.summary.needsAgreementCount })}
         href={compact ? "/dashboard?tab=resources" : undefined}
       />
       {!compact && (
@@ -223,7 +223,7 @@ function OverloadPanel({ people, noDepartment }: { people: OverloadedPerson[]; n
                 <TableHead>{t("columns.person")}</TableHead>
                 <TableHead className="text-right">{t("columns.maxDaily")}</TableHead>
                 <TableHead className="hidden md:table-cell">{t("columns.firstOver")}</TableHead>
-                <TableHead className="hidden text-right sm:table-cell">{t("columns.weeksOver")}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t("columns.weeksOver")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,16 +233,15 @@ function OverloadPanel({ people, noDepartment }: { people: OverloadedPerson[]; n
                     <PersonCell person={row.person} noDepartment={noDepartment} />
                   </TableCell>
                   <TableCell className="text-right">
-                    {row.firstOverDay ? (
-                      <Badge variant="destructive" className="tabular-nums">
-                        {row.maxDailyPercent}%
-                      </Badge>
-                    ) : (
-                      <span className="tabular-nums">{row.maxDailyPercent}%</span>
-                    )}
+                    <Badge variant="destructive" className="tabular-nums">
+                      {row.maxDailyPercent}%
+                    </Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{row.firstOverDay ? formatDate(row.firstOverDay) : "—"}</TableCell>
-                  <TableCell className="hidden text-right sm:table-cell">{t("weeksOverValue", { count: row.overCapacityWeeks.length })}</TableCell>
+                  <TableCell className="hidden text-xs whitespace-normal text-muted-foreground sm:table-cell">
+                    {row.reasons.map((reason) => t(`reasons.${reason}`)).join(", ")}
+                    {row.overWeeks.length > 0 && <> · {t("weeksOverValue", { count: row.overWeeks.length })}</>}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -286,6 +285,11 @@ function BenchPanel({ people, noDepartment }: { people: BenchPerson[]; noDepartm
                       </div>
                     ) : (
                       <span className="text-xs text-muted-foreground">{t("noSkills")}</span>
+                    )}
+                    {row.unscheduledMinutes > 0 && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t("unscheduled", { hours: Math.round(row.unscheduledMinutes / 6) / 10 })}
+                      </p>
                     )}
                   </TableCell>
                 </TableRow>

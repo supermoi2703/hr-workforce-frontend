@@ -1,26 +1,76 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ErrorState, LoadingState } from "@/components/shared/states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/format";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { assignTask, getTask } from "../work-api";
+import { assignTask, getAssignPreview, getTask } from "../work-api";
 import { useWorkErrorMessage, useWorkMutation, useSuggestions } from "../work-hooks";
-import { formatMinutes } from "../work-rules";
-import type { Suggestion } from "../work-types";
+import { assignWarning, formatMinutes, hoursText, needsConfirm } from "../work-rules";
+import type { AssignPreview, Suggestion, Task } from "../work-types";
 import { PersonChip } from "./badges";
 
-/** Gợi ý người thay thế bằng luật. Hệ thống không tự giao: PM luôn là người quyết định. */
+/**
+ * Gợi ý người thay thế bằng luật. Hệ thống không tự giao: PM luôn là người quyết định. Trước khi giao xem trước tải của người
+ * đó (workload bước 3): đỏ thì hỏi xác nhận, vàng thì giao kèm cảnh báo "cần thỏa thuận". Không chặn.
+ */
 export function ReassignDialog({ taskId, taskKey, onClose }: { taskId: string; taskKey: string; onClose: () => void }) {
   const t = useTranslations("ProjectWork");
+  const tLoad = useTranslations("Workload");
   const errorMessage = useWorkErrorMessage();
   const suggestions = useSuggestions(taskId);
-  const assign = useWorkMutation(async (person: Suggestion) => {
-    const task = await getTask(taskKey);
-    return assignTask(taskId, person.person.id, task.card.version);
-  });
+  const [confirming, setConfirming] = useState<{ person: Suggestion; task: Task } | null>(null);
+  const assign = useWorkMutation(({ person, task }: { person: Suggestion; task: Task }) =>
+    assignTask(taskId, person.person.id, task.card.version),
+  );
+
+  function done(person: Suggestion, preview: AssignPreview | null) {
+    const warning = assignWarning(preview);
+    toast.success(t("assignedTo", { name: person.person.fullName }));
+    if (warning?.zone === "YELLOW" && warning.peak) {
+      toast.warning(
+        tLoad("assignYellow", {
+          name: person.person.fullName,
+          week: formatDate(warning.peak.weekStart),
+          load: hoursText(warning.peak.loadMinutes),
+          capacity: hoursText(warning.peak.capacityMinutes),
+          percent: warning.peak.percent == null ? "—" : `${warning.peak.percent}%`,
+        }),
+      );
+    }
+    onClose();
+  }
+
+  async function choose(person: Suggestion) {
+    try {
+      const task = await getTask(taskKey);
+      let preview: AssignPreview | null = null;
+      try {
+        preview = await getAssignPreview(task.projectId, {
+          taskId,
+          employeeId: person.person.id,
+          estimateMinutes: task.card.estimateMinutes,
+          startDate: task.card.startDate,
+          dueDate: task.card.dueDate,
+          sprintId: task.card.sprintId,
+        });
+      } catch {
+        // Không xem trước được thì vẫn giao: tải chỉ để cảnh báo
+      }
+      if (needsConfirm(preview)) {
+        setConfirming({ person, task });
+        return;
+      }
+      assign.mutate({ person, task }, { onSuccess: () => done(person, preview), onError: (error) => toast.error(errorMessage(error)) });
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  }
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -53,15 +103,7 @@ export function ReassignDialog({ taskId, taskKey, onClose }: { taskId: string; t
                 <Button
                   size="sm"
                   disabled={assign.isPending}
-                  onClick={() =>
-                    assign.mutate(item, {
-                      onSuccess: () => {
-                        toast.success(t("assignedTo", { name: item.person.fullName }));
-                        onClose();
-                      },
-                      onError: (error) => toast.error(errorMessage(error)),
-                    })
-                  }
+                  onClick={() => void choose(item)}
                 >
                   {t("assign")}
                 </Button>
@@ -69,6 +111,25 @@ export function ReassignDialog({ taskId, taskKey, onClose }: { taskId: string; t
             ))}
           </ul>
         )}
+        <ConfirmDialog
+          open={!!confirming}
+          onOpenChange={(open) => !open && setConfirming(null)}
+          title={tLoad("confirmTitle", { name: confirming?.person.person.fullName ?? "" })}
+          description={tLoad("confirmDescription", { name: confirming?.person.person.fullName ?? "" })}
+          confirmLabel={tLoad("confirmAction")}
+          destructive
+          onConfirm={() =>
+            confirming
+              ? assign
+                  .mutateAsync(confirming)
+                  .then(() => done(confirming.person, null))
+                  .catch((failure) => {
+                    toast.error(errorMessage(failure));
+                    throw failure;
+                  })
+              : undefined
+          }
+        />
       </DialogContent>
     </Dialog>
   );

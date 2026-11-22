@@ -12,22 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { todayIsoDate } from "@/lib/format";
-import { cn } from "@/lib/utils";
-import {
-  ALLOCATION_PERCENTS,
-  allApplied,
-  defaultPeriod,
-  hasRoomFor,
-  periodProblem,
-  selectableIds,
-  pickedIds,
-} from "../allocation-rules";
+import { allApplied, defaultPeriod, periodProblem, selectableIds, pickedIds } from "../allocation-rules";
 import { useProjectErrorMessage } from "../hooks";
 import type { Project, ProjectMember, ProjectPerson } from "../types";
 import { endAllocation, proposeAllocation } from "../work-api";
 import { useAvailability, useCandidates, useOrgTeams, useWorkMutation } from "../work-hooks";
 import { PersonChip } from "./badges";
 import { EmployeePicker } from "./employee-picker";
+import { LoadLine } from "./load-summary";
 import { ProjectSourcePicker, type SourceProject } from "./project-source-picker";
 import { SimpleSelect } from "./simple-select";
 
@@ -38,27 +30,21 @@ type ProposeAllocationDialogProps = {
   project: Project;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Có người: đổi % hoặc gia hạn cho người đó; không có: chọn người từ team, dự án khác hoặc từng người. */
+  /** Có người: gia hạn hoặc đặt lại khoảng tham gia của người đó; không có: chọn người từ team, dự án khác hoặc từng người. */
   person?: ProjectPerson | null;
-  /** % đang có của người đó, làm mức chọn sẵn; không có thì 100%. */
-  percent?: number | null;
 };
 
 /**
- * Đề xuất phân bổ (3.4): "từ ngày A đến ngày B, X%". Trưởng phòng của từng người và PM cùng duyệt ở trang Phê duyệt; bên
- * tạo coi như đã đồng ý. Tổng của một người không vượt 100%, tính cả đề xuất đang chờ: danh sách hiện % còn trống.
+ * Đề xuất phân bổ (3.4): "đưa người vào dự án từ ngày A đến ngày B". Trưởng phòng của từng người và PM cùng duyệt ở trang
+ * Phê duyệt; bên tạo coi như đã đồng ý. Không còn % và trần 100% (workload bước 3): danh sách hiện tải tính từ task để cân
+ * nhắc, không chặn.
  */
-export function ProposeAllocationDialog({ project, open, onOpenChange, person, percent }: ProposeAllocationDialogProps) {
+export function ProposeAllocationDialog({ project, open, onOpenChange, person }: ProposeAllocationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         {open && (
-          <ProposeForm
-            project={project}
-            initialPerson={person ?? null}
-            initialPercent={percent ?? null}
-            onDone={() => onOpenChange(false)}
-          />
+          <ProposeForm project={project} initialPerson={person ?? null} onDone={() => onOpenChange(false)} />
         )}
       </DialogContent>
     </Dialog>
@@ -68,11 +54,10 @@ export function ProposeAllocationDialog({ project, open, onOpenChange, person, p
 type ProposeFormProps = {
   project: Project;
   initialPerson: ProjectPerson | null;
-  initialPercent: number | null;
   onDone: () => void;
 };
 
-function ProposeForm({ project, initialPerson, initialPercent, onDone }: ProposeFormProps) {
+function ProposeForm({ project, initialPerson, onDone }: ProposeFormProps) {
   const t = useTranslations("Allocations");
   const tCommon = useTranslations("Common");
   const errorMessage = useProjectErrorMessage();
@@ -84,15 +69,13 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   const [person, setPerson] = useState<ProjectPerson | null>(initialPerson);
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to ?? "");
-  const [percent, setPercent] = useState(String(initialPercent ?? 100));
   const [note, setNote] = useState("");
   const [choices, setChoices] = useState<ReadonlyMap<string, boolean>>(new Map());
 
   const period = { from, to: to || null };
   const problem = from ? periodProblem(project, today, period) : "fromBeforeToday";
-  // Chỉ hỏi % còn trống khi khoảng ngày hợp lệ, để không gọi API với khoảng backend sẽ từ chối.
+  // Chỉ hỏi tải khi khoảng ngày hợp lệ, để không gọi API với khoảng backend sẽ từ chối.
   const asked = problem === null ? period : { from: null, to: null };
-  const level = Number(percent);
   const teams = useOrgTeams(source === "team");
   const candidates = useCandidates(project.id, {
     sourceTeamId: source === "team" ? sourceId : null,
@@ -108,10 +91,9 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   );
 
   const list = candidates.data ?? [];
-  const personFree = availability.data?.freePercent;
-  const personShort = source === "person" && personFree !== undefined && personFree < level;
-  const picked = source === "person" ? (person && !personShort ? [person.id] : []) : pickedIds(list, level, choices);
-  const selectable = selectableIds(list, level);
+  const personLoad = availability.data?.load;
+  const picked = source === "person" ? (person ? [person.id] : []) : pickedIds(list, choices);
+  const selectable = selectableIds(list);
   const allSelected = selectable.length > 0 && selectable.every((id) => choices.get(id) === true);
 
   function selectAll(select: boolean) {
@@ -124,7 +106,6 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
   const propose = useWorkMutation(() =>
     proposeAllocation(project.id, {
       employeeIds: picked,
-      percent: level,
       fromDate: from,
       toDate: period.to,
       note: note.trim() || null,
@@ -175,7 +156,7 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
             />
           </Field>
         )}
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field data-invalid={problem === "fromBeforeToday" || problem === "beforeProjectStart"}>
             <FieldLabel htmlFor="alloc-from">{t("fromDate")}</FieldLabel>
             <Input id="alloc-from" type="date" min={initial.from} value={from} onChange={(event) => setFrom(event.target.value)} />
@@ -189,16 +170,6 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
               max={project.endDate ?? undefined}
               value={to}
               onChange={(event) => setTo(event.target.value)}
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="alloc-percent">{t("percent")}</FieldLabel>
-            <SimpleSelect
-              id="alloc-percent"
-              className="w-full"
-              value={percent}
-              onChange={setPercent}
-              options={ALLOCATION_PERCENTS.map((value) => ({ value: String(value), label: `${value}%` }))}
             />
           </Field>
         </div>
@@ -216,9 +187,9 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
             ) : (
               <EmployeePicker id="alloc-person" value={person} onChange={setPerson} />
             )}
-            {person && personFree !== undefined && (
-              <FieldDescription className={cn(personShort && "text-destructive")}>
-                {personShort ? t("notEnough", { percent: personFree }) : t("freeInPeriod", { percent: personFree })}
+            {person && personLoad && (
+              <FieldDescription>
+                <LoadLine load={personLoad} />
               </FieldDescription>
             )}
           </Field>
@@ -269,13 +240,11 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
                 </div>
                 <ul className="grid max-h-64 gap-1 overflow-y-auto">
                   {list.map((candidate) => {
-                    const room = hasRoomFor(candidate, level);
-                    const checked = room && choices.get(candidate.person.id) === true;
+                    const checked = choices.get(candidate.person.id) === true;
                     return (
                       <li key={candidate.person.id} className="flex items-center gap-2 text-sm">
                         <Checkbox
                           checked={checked}
-                          disabled={!room}
                           onCheckedChange={() => toggle(candidate.person.id, checked)}
                           aria-label={candidate.person.fullName}
                         />
@@ -283,11 +252,7 @@ function ProposeForm({ project, initialPerson, initialPercent, onDone }: Propose
                           <PersonChip person={candidate.person} />
                         </span>
                         {candidate.alreadyInProject && <Badge variant="secondary">{t("inProject")}</Badge>}
-                        {candidate.freePercent !== null && (
-                          <span className={cn("text-xs tabular-nums", room ? "text-muted-foreground" : "text-destructive")}>
-                            {t("free", { percent: candidate.freePercent })}
-                          </span>
-                        )}
+                        {candidate.load && <LoadLine load={candidate.load} compact className="shrink-0" />}
                       </li>
                     );
                   })}

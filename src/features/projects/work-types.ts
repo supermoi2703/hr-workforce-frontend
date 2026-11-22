@@ -9,7 +9,38 @@ export const TASK_STATUSES = [...BOARD_STATUSES, "CANCELLED"] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 export type SprintStatus = "PLANNED" | "ACTIVE" | "CLOSED";
 export type RiskCode = "DUE_ON_LEAVE" | "NOT_ENOUGH_TIME" | "OVERDUE" | "LEAVE_BEFORE_DUE" | "BLOCKED" | "ASSIGNEE_UNAVAILABLE";
-export type CapacityFlag = "OVERLOADED" | "ON_LEAVE" | "IDLE";
+export type CapacityFlag = "OVERLOADED" | "ON_LEAVE" | "IDLE" | "NOT_PLANNED";
+
+// ===== Tải tính từ task (workload bước 3, backend README module project mục 7.2)
+
+/** Xanh ≤ 100% năng lực tuần; vàng ≤ 125% (cần thỏa thuận); đỏ trên nữa, ngày > 12 giờ, tháng vượt > 40 giờ. */
+export const WORKLOAD_ZONES = ["GREEN", "YELLOW", "RED"] as const;
+export type WorkloadZone = (typeof WORKLOAD_ZONES)[number];
+export type ZoneReason = "WEEK_OVER_CAPACITY" | "NO_CAPACITY" | "DAY_OVER_MAX" | "MONTH_OVERTIME";
+
+/** percent: tải ÷ năng lực; null khi không còn năng lực mà vẫn có việc. */
+export type LoadWeek = { weekStart: string; capacityMinutes: number; loadMinutes: number; percent: number | null; zone: WorkloadZone };
+
+/** Tải trong một khoảng; `weeks` rỗng ở chỗ chỉ cần tóm tắt (danh sách ứng viên). */
+export type LoadSummary = {
+  zone: WorkloadZone;
+  reasons: ZoneReason[];
+  peakWeek: LoadWeek | null;
+  unscheduledMinutes: number;
+  weeks: LoadWeek[];
+};
+
+export type AssignPreviewInput = {
+  taskId: string | null;
+  employeeId: string;
+  estimateMinutes: number | null;
+  startDate: string | null;
+  dueDate: string | null;
+  sprintId: string | null;
+};
+
+/** scheduled = false: việc chưa có hạn (không trong sprint), không xét vùng. */
+export type AssignPreview = { scheduled: boolean; load: LoadSummary | null };
 export type TaskEventKind =
   | "CREATED"
   | "STATUS_CHANGED"
@@ -147,6 +178,7 @@ export type MyWork = {
   tasks: { card: TaskCard; projectId: string; projectCode: string; projectName: string }[];
   weekCapacityMinutes: number;
   weekLoadMinutes: number;
+  weekZone: WorkloadZone;
 };
 
 export type Sprint = {
@@ -177,10 +209,12 @@ export type WeekCell = {
   loadMinutes: number;
   leaveDays: number;
   flags: CapacityFlag[];
+  zone: WorkloadZone;
 };
 export type Capacity = {
   weeks: string[];
-  people: { person: Person; allocationPercent: number; weeks: WeekCell[] }[];
+  /** unscheduledMinutes: giờ việc chưa lên lịch trên mọi dự án */
+  people: { person: Person; weeks: WeekCell[]; unscheduledMinutes: number }[];
 };
 
 export type Risk = {
@@ -232,8 +266,8 @@ export type Metrics = {
   sprints: { name: string; committedMinutes: number | null; doneMinutes: number }[];
 };
 
-/** freePercent: % còn trống ít nhất trong khoảng đã hỏi (đã trừ đề xuất đang chờ, không tính dự án này); null khi chưa hỏi. */
-export type Candidate = { person: Person; alreadyInProject: boolean; freePercent: number | null };
+/** load: tải trong khoảng đã hỏi, tính từ task (không kèm từng tuần); null khi chưa hỏi khoảng ngày. */
+export type Candidate = { person: Person; alreadyInProject: boolean; load: LoadSummary | null };
 
 // ===== Phân bổ có duyệt (3.4), backend README module project mục 8
 
@@ -245,7 +279,8 @@ export type AllocationRequest = {
   projectCode: string;
   projectName: string;
   employee: Person;
-  percent: number;
+  /** % của đề xuất gửi trước workload bước 3; null với đề xuất mới */
+  percent: number | null;
   fromDate: string;
   /** null = không có ngày kết thúc */
   toDate: string | null;
@@ -258,31 +293,20 @@ export type AllocationRequest = {
   decidedAt: string | null;
 };
 
+/** Đưa người vào dự án: không còn % (tải tính từ task). */
 export type AllocationInput = {
   employeeIds: string[];
-  percent: number;
   fromDate: string;
   toDate: string | null;
   note: string | null;
 };
 
-export type AllocationSegment = {
-  from: string;
-  to: string | null;
-  approvedPercent: number;
-  /** Tổng đã duyệt cộng phần tạm giữ cho đề xuất đang chờ (luôn ≥ approvedPercent), không phải riêng phần đang chờ */
-  heldPercent: number;
-  /** 100 trừ heldPercent, không âm */
-  freePercent: number;
-};
-
+/** Tải của người định đề xuất trong khoảng; to: ngày cuối đã tính (không có ngày kết thúc thì 4 tuần). */
 export type Availability = {
   employee: Person;
   from: string;
-  to: string | null;
-  /** Mức tối đa đề xuất được trong cả khoảng */
-  freePercent: number;
-  segments: AllocationSegment[];
+  to: string;
+  load: LoadSummary;
 };
 // ===== Lịch phân bổ của một người: trang /allocations (backend README module project mục 8.6)
 
@@ -293,7 +317,6 @@ export type PersonAllocationItem = {
   projectName: string;
   projectClosed: boolean;
   role: ProjectRole;
-  percent: number;
   fromDate: string;
   /** null = không có ngày kết thúc */
   toDate: string | null;
@@ -307,8 +330,8 @@ export type PersonAllocations = {
   from: string;
   to: string;
   items: PersonAllocationItem[];
-  /** Chia [from, to] thành các đoạn liền nhau; mỗi đoạn tổng đã duyệt + đang giữ + còn trống = 100 */
-  segments: AllocationSegment[];
+  /** Tải theo tuần tính từ task trên mọi dự án */
+  load: LoadSummary;
 };
 
 /** SELF: chỉ chính mình; SCOPED: danh sách có hạn (cấp dưới, văn phòng của HR); ALL: tìm cả công ty. */
