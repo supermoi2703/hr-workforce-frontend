@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { BanIcon, PencilIcon, Trash2Icon, UserRoundCogIcon } from "lucide-react";
+import { BanIcon, PencilIcon, ShapesIcon, Trash2Icon, UserRoundCogIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ErrorState, LoadingState } from "@/components/shared/states";
+import { TintChip } from "@/components/shared/tint-chip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +15,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate, formatDateTime, todayIsoDate } from "@/lib/format";
 import { addComment, addLink, addWorklog, deleteTask, deleteWorklog, removeLink, transitionTask } from "../work-api";
-import { useComments, useEvents, useWorkErrorMessage, useWorkMutation, useTask, useWorklogs } from "../work-hooks";
-import { formatMinutes, parseHours, percent } from "../work-rules";
+import { useComments, useEvents, useSkillOptions, useWorkErrorMessage, useWorkMutation, useTask, useWorklogs } from "../work-hooks";
+import { formatMinutes, parseHours, percent, scheduleInfo } from "../work-rules";
 import type { Project } from "../types";
 import { BOARD_STATUSES, TASK_STATUSES, type LinkedTask, type Task, type TaskStatus } from "../work-types";
 import { PersonChip, PriorityIcon, TaskStatusBadge, TypeIcon } from "./badges";
@@ -64,6 +65,8 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
   const remove = useWorkMutation(() => deleteTask(card.id));
   const statuses = can.cancel ? TASK_STATUSES : BOARD_STATUSES;
   const spent = card.loggedMinutes + (card.remainingMinutes ?? 0);
+  const schedule = scheduleInfo(card);
+  const skillNames = new Map((useSkillOptions().data ?? []).map((skill) => [skill.id, skill.name]));
 
   return (
     <div className="grid gap-4 p-4">
@@ -118,8 +121,26 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
         <dd>
           <PersonChip person={task.reporter} />
         </dd>
+        <dt className="text-muted-foreground">{t("workCategory")}</dt>
+        <dd>
+          {task.workCategory ? (
+            <TintChip icon={ShapesIcon} tone="project">
+              {task.workCategory.name}
+            </TintChip>
+          ) : (
+            "—"
+          )}
+        </dd>
+        <dt className="text-muted-foreground">{t("startDate")}</dt>
+        <dd>
+          {formatDate(schedule.start)}
+          {schedule.startFromSprint && <span className="text-muted-foreground"> {t("fromSprint")}</span>}
+        </dd>
         <dt className="text-muted-foreground">{t("dueDate")}</dt>
-        <dd className={card.overdue ? "text-destructive" : undefined}>{formatDate(card.dueDate)}</dd>
+        <dd className={card.overdue ? "text-destructive" : undefined}>
+          {formatDate(schedule.end)}
+          {schedule.endFromSprint && <span className="text-muted-foreground"> {t("fromSprint")}</span>}
+        </dd>
         <dt className="text-muted-foreground">{t("estimate")}</dt>
         <dd className="tabular-nums">
           {t("timeRow", {
@@ -128,6 +149,19 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
             remaining: formatMinutes(card.remainingMinutes),
           })}
         </dd>
+        {task.skills.length > 0 && (
+          <>
+            <dt className="text-muted-foreground">{t("requiredSkills")}</dt>
+            <dd className="flex flex-wrap gap-1.5">
+              {task.skills.map((skill) => (
+                <Badge key={skill.id} variant="outline">
+                  {skillNames.get(skill.id) ?? t("unknownSkill")}
+                  {skill.minLevel != null && <span className="text-muted-foreground tabular-nums">≥ {skill.minLevel}</span>}
+                </Badge>
+              ))}
+            </dd>
+          </>
+        )}
       </dl>
       {spent > 0 && (
         <div className="bg-muted h-1.5 overflow-hidden rounded-full">

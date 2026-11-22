@@ -25,6 +25,7 @@ import type {
   TaskEvent,
   TaskInput,
   TaskStatus,
+  WorkCategory,
   Worklog,
   WorklogInput,
 } from "./work-types";
@@ -102,6 +103,7 @@ export const getEvents = (id: string) => http.get<TaskEvent[]>(`/api/tasks/${enc
 export const getSuggestions = (id: string) => http.get<Suggestion[]>(`/api/tasks/${enc(id)}/assignee-suggestions`);
 export const getMyWork = () => http.get<MyWork>("/api/my-work");
 export const getSkillOptions = () => http.get<SkillOption[]>("/api/skills");
+export const getWorkCategories = () => http.get<WorkCategory[]>("/api/work-categories");
 
 // ===== Giờ
 

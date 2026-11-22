@@ -1,4 +1,4 @@
-import type { BOARD_STATUSES, MyWork, TaskCard, WeekCell } from "./work-types";
+import type { BOARD_STATUSES, MyWork, TaskCard, TaskSkillInput, WeekCell, WorkCategory } from "./work-types";
 
 const MINUTES_PER_HOUR = 60;
 
@@ -66,4 +66,74 @@ export function loadTone(cell: Pick<WeekCell, "capacityMinutes" | "loadMinutes">
 
 export function percent(part: number, whole: number): number {
   return whole <= 0 ? 0 : Math.min(100, Math.round((part / whole) * 100));
+}
+
+// ===== Nhóm công việc và ngày của việc (workload bước 1)
+
+/** Phần form chịu ảnh hưởng khi chọn nhóm công việc. Cờ *Touched: PM đã tự sửa ô đó. */
+export type CategoryDraft = {
+  estimate: string;
+  skills: TaskSkillInput[];
+  estimateTouched: boolean;
+  skillsTouched: boolean;
+};
+
+/** 480 → "8", 90 → "1.5": giờ để điền vào ô ước lượng. */
+export function minutesToHoursText(minutes: number): string {
+  return String(Math.round((minutes / MINUTES_PER_HOUR) * 100) / 100);
+}
+
+/** Giờ và kỹ năng gợi ý của nhóm, cùng dạng với form. */
+export function categorySuggestion(category: WorkCategory): { estimate: string; skills: TaskSkillInput[] } {
+  return {
+    estimate: minutesToHoursText(category.defaultMinutes),
+    skills: category.skills.map((skill) => ({ skillId: skill.skillId, minLevel: skill.minLevel })),
+  };
+}
+
+/** Cùng tập kỹ năng và cùng mức, không tính thứ tự. */
+export function sameSkills(a: TaskSkillInput[], b: TaskSkillInput[]): boolean {
+  if (a.length !== b.length) return false;
+  const levels = new Map(a.map((skill) => [skill.skillId, skill.minLevel]));
+  return b.every((skill) => levels.has(skill.skillId) && levels.get(skill.skillId) === skill.minLevel);
+}
+
+/** Giờ hoặc kỹ năng đang khác gợi ý của nhóm: hiện nút "Áp dụng gợi ý". */
+export function differsFromSuggestion(draft: Pick<CategoryDraft, "estimate" | "skills">, category: WorkCategory): boolean {
+  return parseHours(draft.estimate) !== category.defaultMinutes || !sameSkills(draft.skills, categorySuggestion(category).skills);
+}
+
+/**
+ * Đổi nhóm công việc. Việc mới: điền giờ, kỹ năng của nhóm vào ô PM chưa tự sửa. Sửa việc: không tự ghi đè (PM bấm
+ * "Áp dụng gợi ý" nếu muốn). Bỏ chọn nhóm: giữ nguyên.
+ */
+export function applyCategory(draft: CategoryDraft, category: WorkCategory | null, mode: "create" | "edit"): CategoryDraft {
+  if (!category || mode === "edit") return draft;
+  const suggestion = categorySuggestion(category);
+  return {
+    ...draft,
+    estimate: draft.estimateTouched ? draft.estimate : suggestion.estimate,
+    skills: draft.skillsTouched ? draft.skills : suggestion.skills,
+  };
+}
+
+/** Nút "Áp dụng gợi ý": thay cả giờ và kỹ năng, coi như chưa tự sửa. */
+export function applySuggestion(draft: CategoryDraft, category: WorkCategory): CategoryDraft {
+  const suggestion = categorySuggestion(category);
+  return { estimate: suggestion.estimate, skills: suggestion.skills, estimateTouched: false, skillsTouched: false };
+}
+
+/** Ngày bắt đầu không sau hạn (chuỗi yyyy-MM-dd so sánh được trực tiếp). Thiếu một bên thì hợp lệ. */
+export function dateRangeValid(start: string | null | undefined, due: string | null | undefined): boolean {
+  return !start || !due || start <= due;
+}
+
+/** Ngày hiển thị của việc và ngày nào lấy theo sprint (việc để trống, backend điền theo sprint). */
+export function scheduleInfo(card: Pick<TaskCard, "startDate" | "dueDate" | "scheduledStart" | "scheduledEnd">) {
+  return {
+    start: card.startDate ?? card.scheduledStart,
+    end: card.dueDate ?? card.scheduledEnd,
+    startFromSprint: !card.startDate && !!card.scheduledStart,
+    endFromSprint: !card.dueDate && !!card.scheduledEnd,
+  };
 }

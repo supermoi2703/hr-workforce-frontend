@@ -27,6 +27,7 @@ import {
   getSuggestions,
   getTask,
   getTasks,
+  getWorkCategories,
   getWorklogs,
   type CandidateQuery,
 } from "./work-api";
@@ -67,6 +68,8 @@ export const useSuggestions = (id: string | null) =>
   useQuery({ queryKey: key("suggestions", id), queryFn: () => getSuggestions(id!), enabled: !!id });
 export const useMyWork = () => useQuery({ queryKey: key("my-work"), queryFn: getMyWork, retry: false });
 export const useSkillOptions = () => useQuery({ queryKey: key("skills"), queryFn: getSkillOptions, staleTime: 300_000 });
+export const useWorkCategories = () =>
+  useQuery({ queryKey: key("work-categories"), queryFn: getWorkCategories, staleTime: 300_000 });
 export const useSprints = (projectId: string, enabled: boolean) =>
   useQuery({ queryKey: key("sprints", projectId), queryFn: () => getSprints(projectId), enabled });
 export const useSprintCapacity = (id: string | undefined) =>
@@ -134,6 +137,9 @@ const ERROR_KEYS: readonly string[] = [
   "PROJECT_HAS_OPEN_TASKS",
   "TASK_NOT_FOUND",
   "TASK_INVALID_PARENT",
+  "TASK_INVALID_DATES",
+  "WORK_CATEGORY_NOT_FOUND",
+  "WORK_CATEGORY_INACTIVE",
   "TASK_LINK_INVALID",
   "TASK_LINK_CYCLE",
   "TASK_HAS_WORKLOG",
