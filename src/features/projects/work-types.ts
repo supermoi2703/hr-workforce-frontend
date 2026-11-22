@@ -15,6 +15,7 @@ export type TaskEventKind =
   | "STATUS_CHANGED"
   | "ASSIGNEE_CHANGED"
   | "DUE_CHANGED"
+  | "START_CHANGED"
   | "ESTIMATE_CHANGED"
   | "PRIORITY_CHANGED"
   | "TITLE_CHANGED"
@@ -44,6 +45,12 @@ export type TaskCard = {
   overdue: boolean;
   common: boolean;
   version: number;
+  /** Ngày bắt đầu PM nhập; null = để trống. */
+  startDate: string | null;
+  workCategoryId: string | null;
+  /** Ngày hiệu lực: ngày của việc, thiếu thì lấy theo sprint; cả hai null = chưa lên lịch. */
+  scheduledStart: string | null;
+  scheduledEnd: string | null;
 };
 
 export type LinkedTask = { linkId: string | null; taskId: string; key: string; title: string; status: TaskStatus };
@@ -63,6 +70,9 @@ export type Task = {
   blocks: LinkedTask[];
   blockedBy: LinkedTask[];
   skillIds: string[];
+  /** Kỹ năng cần kèm mức tối thiểu 1–5; null = chỉ cần có kỹ năng. */
+  skills: TaskSkill[];
+  workCategory: { id: string; code: string; name: string } | null;
   can: {
     edit: boolean;
     transition: boolean;
@@ -84,9 +94,31 @@ export type TaskInput = {
   common?: boolean;
   sprintId?: string | null;
   dueDate: string | null;
+  startDate: string | null;
+  workCategoryId: string | null;
   estimateMinutes: number | null;
-  skillIds: string[];
+  skills: TaskSkillInput[];
   version?: number;
+};
+
+export type TaskSkill = { id: string; minLevel: number | null };
+export type TaskSkillInput = { skillId: string; minLevel: number | null };
+
+// ===== Nhóm công việc (workload bước 1), backend README module project mục 7.1
+
+export const WORK_PHASES = ["ANALYSIS_DESIGN", "DEVELOPMENT", "TESTING_OPERATIONS"] as const;
+export type WorkPhase = (typeof WORK_PHASES)[number];
+
+export type WorkCategory = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  phase: WorkPhase;
+  defaultMinutes: number;
+  sortOrder: number;
+  active: boolean;
+  skills: { skillId: string; minLevel: number }[];
 };
 
 export type Comment = { id: string; author: Person | null; body: string; createdAt: string };

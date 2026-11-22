@@ -1,43 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { SparklesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/format";
 import { createTask, updateTask } from "../work-api";
 import { useProjectMembers } from "../hooks";
-import { useWorkErrorMessage, useWorkMutation, useSkillOptions } from "../work-hooks";
-import { formatMinutes, parseHours } from "../work-rules";
+import { useSkillOptions, useWorkCategories, useWorkErrorMessage, useWorkMutation } from "../work-hooks";
+import {
+  applyCategory,
+  applySuggestion,
+  categorySuggestion,
+  dateRangeValid,
+  differsFromSuggestion,
+  formatMinutes,
+  parseHours,
+  scheduleInfo,
+  type CategoryDraft,
+} from "../work-rules";
 import type { Project } from "../types";
-import { TASK_PRIORITIES, TASK_TYPES, type Task, type TaskPriority, type TaskType } from "../work-types";
+import { TASK_PRIORITIES, TASK_TYPES, type Task, type TaskPriority, type TaskType, type WorkCategory } from "../work-types";
 import { SimpleSelect } from "./simple-select";
+import { TaskSkillsField } from "./task-skills-field";
+import { WorkCategorySelect } from "./work-category-select";
 
 const NOBODY = "NOBODY";
 
-/** Tạo hoặc sửa việc. Kỹ năng cần có là đầu vào của gợi ý giao lại. */
+/**
+ * Tạo hoặc sửa việc. Nhóm công việc điền sẵn giờ và kỹ năng (PM sửa được); ngày bắt đầu, hạn để trống thì lấy theo
+ * sprint; kỹ năng kèm mức tối thiểu là đầu vào của gợi ý người (workload, backend README module project mục 7.1).
+ */
 export function TaskFormDialog({ project, task, onClose }: { project: Project; task?: Task; onClose: () => void }) {
   const t = useTranslations("ProjectWork");
   const tCommon = useTranslations("Common");
   const errorMessage = useWorkErrorMessage();
   const members = useProjectMembers(project.id);
-  const skills = useSkillOptions();
+  const skillOptions = useSkillOptions();
+  const categories = useWorkCategories();
+  const mode = task ? "edit" : "create";
+
   const [title, setTitle] = useState(task?.card.title ?? "");
   const [description, setDescription] = useState(task?.description ?? "");
   const [type, setType] = useState<TaskType>(task?.card.type ?? "TASK");
   const [priority, setPriority] = useState<TaskPriority>(task?.card.priority ?? "MEDIUM");
   const [assignee, setAssignee] = useState(task?.card.assignee?.id ?? NOBODY);
+  const [startDate, setStartDate] = useState(task?.card.startDate ?? "");
   const [dueDate, setDueDate] = useState(task?.card.dueDate ?? "");
-  const [estimate, setEstimate] = useState(task?.card.estimateMinutes != null ? String(task.card.estimateMinutes / 60) : "");
-  const [skillIds, setSkillIds] = useState<string[]>(task?.skillIds ?? []);
+  const [categoryId, setCategoryId] = useState(task?.workCategory?.id ?? "");
+  const [draft, setDraft] = useState<CategoryDraft>({
+    estimate: task?.card.estimateMinutes != null ? String(task.card.estimateMinutes / 60) : "",
+    skills: task?.skills.map((skill) => ({ skillId: skill.id, minLevel: skill.minLevel })) ?? [],
+    estimateTouched: false,
+    skillsTouched: false,
+  });
   const [common, setCommon] = useState(false);
-  const estimateMinutes = parseHours(estimate);
-  const validEstimate = !estimate.trim() || estimateMinutes != null;
+
+  const category = (categories.data ?? []).find((item) => item.id === categoryId) ?? null;
+  const estimateMinutes = parseHours(draft.estimate);
+  const validEstimate = !draft.estimate.trim() || estimateMinutes != null;
+  const validDates = dateRangeValid(startDate, dueDate);
+  const showSuggestion = !!category && differsFromSuggestion(draft, category);
 
   const mutation = useWorkMutation(() => {
     const body = {
@@ -48,102 +77,160 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
       assigneeId: common || assignee === NOBODY ? null : assignee,
       common,
       parentId: task?.parent?.taskId ?? null,
+      startDate: startDate || null,
       dueDate: dueDate || null,
+      workCategoryId: common ? null : categoryId || null,
       estimateMinutes,
-      skillIds,
+      skills: common ? [] : draft.skills,
     };
     return task ? updateTask(task.card.id, { ...body, version: task.card.version }) : createTask(project.id, body);
   });
 
+  function chooseCategory(next: WorkCategory | null) {
+    setCategoryId(next?.id ?? "");
+    setDraft((current) => applyCategory(current, next, mode));
+  }
+
   const people = (members.data ?? []).filter((member) => member.role !== "OBSERVER");
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{task ? t("editTask", { key: task.card.key }) : t("newTask")}</DialogTitle>
+          <DialogDescription>{t("taskFormDescription")}</DialogDescription>
         </DialogHeader>
-        <FieldGroup className="gap-4">
-          {!task && (
-            <label className="flex items-center gap-2 text-sm" title={t("commonHint")}>
-              <Checkbox checked={common} onCheckedChange={(checked) => setCommon(checked === true)} />
-              {t("common")}
-            </label>
-          )}
-          <Field>
-            <FieldLabel htmlFor="task-title">{t("taskTitle")}</FieldLabel>
-            <Input id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
+        <FieldGroup className="gap-5">
+          <Section>
+            {!task && (
+              <label className="flex items-center gap-2 text-sm" title={t("commonHint")}>
+                <Checkbox checked={common} onCheckedChange={(checked) => setCommon(checked === true)} />
+                {t("common")}
+              </label>
+            )}
             <Field>
-              <FieldLabel htmlFor="task-type">{t("typeLabel")}</FieldLabel>
-              <SimpleSelect
-                id="task-type"
-                className="w-full"
-                value={type}
-                onChange={(value) => setType(value as TaskType)}
-                options={TASK_TYPES.map((value) => ({ value, label: t(`type.${value}`) }))}
-              />
+              <FieldLabel htmlFor="task-title">{t("taskTitle")}</FieldLabel>
+              <Input id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
             </Field>
-            <Field>
-              <FieldLabel htmlFor="task-priority">{t("priorityLabel")}</FieldLabel>
-              <SimpleSelect
-                id="task-priority"
-                className="w-full"
-                value={priority}
-                onChange={(value) => setPriority(value as TaskPriority)}
-                options={TASK_PRIORITIES.map((value) => ({ value, label: t(`priority.${value}`) }))}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="task-assignee">{t("assignee")}</FieldLabel>
-              <SimpleSelect
-                id="task-assignee"
-                className="w-full"
-                value={assignee}
-                onChange={setAssignee}
-                options={[{ value: NOBODY, label: t("unassigned") }, ...people.map((member) => ({ value: member.employee.id, label: member.employee.fullName }))]}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="task-due">{t("dueDate")}</FieldLabel>
-              <Input id="task-due" type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
-            </Field>
-            <Field data-invalid={!validEstimate}>
-              <FieldLabel htmlFor="task-estimate">{t("estimateHours")}</FieldLabel>
-              <Input id="task-estimate" inputMode="decimal" value={estimate} onChange={(event) => setEstimate(event.target.value)} />
-              <FieldDescription>{estimateMinutes != null ? formatMinutes(estimateMinutes) : t("estimateHint")}</FieldDescription>
-            </Field>
-          </div>
-          <Field>
-            <FieldLabel>{t("requiredSkills")}</FieldLabel>
-            <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
-              {(skills.data ?? []).map((skill) => {
-                const selected = skillIds.includes(skill.id);
-                return (
-                  <button
-                    key={skill.id}
-                    type="button"
-                    aria-pressed={selected}
-                    className={cn("rounded-full border px-2.5 py-0.5 text-xs", selected ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted")}
-                    onClick={() => setSkillIds(selected ? skillIds.filter((id) => id !== skill.id) : [...skillIds, skill.id])}
-                  >
-                    {skill.name}
-                  </button>
-                );
-              })}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field>
+                <FieldLabel htmlFor="task-type">{t("typeLabel")}</FieldLabel>
+                <SimpleSelect
+                  id="task-type"
+                  className="w-full"
+                  value={type}
+                  onChange={(value) => setType(value as TaskType)}
+                  options={TASK_TYPES.map((value) => ({ value, label: t(`type.${value}`) }))}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="task-priority">{t("priorityLabel")}</FieldLabel>
+                <SimpleSelect
+                  id="task-priority"
+                  className="w-full"
+                  value={priority}
+                  onChange={(value) => setPriority(value as TaskPriority)}
+                  options={TASK_PRIORITIES.map((value) => ({ value, label: t(`priority.${value}`) }))}
+                />
+              </Field>
             </div>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="task-description">{t("descriptionLabel")}</FieldLabel>
-            <Textarea id="task-description" rows={3} value={description} onChange={(event) => setDescription(event.target.value)} />
-          </Field>
+          </Section>
+
+          <Section title={common ? t("sectionWork") : t("sectionCategory")}>
+            {!common && (
+              <Field>
+                <FieldLabel htmlFor="task-category">{t("workCategory")}</FieldLabel>
+                <WorkCategorySelect id="task-category" value={categoryId} onChange={chooseCategory} categories={categories.data ?? []} />
+                {category && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-muted/40 px-3 py-2 text-sm">
+                    <SparklesIcon className="size-4 shrink-0 text-primary" aria-hidden />
+                    <span className="min-w-0 flex-1 text-muted-foreground">
+                      {category.skills.length > 0
+                        ? t("suggestion", { hours: formatMinutes(category.defaultMinutes), skills: suggestionSkills(category, skillOptions.data ?? []) })
+                        : t("suggestionHoursOnly", { hours: formatMinutes(category.defaultMinutes) })}
+                    </span>
+                    {showSuggestion && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-primary/40 text-primary"
+                        onClick={() => setDraft((current) => applySuggestion(current, category))}
+                      >
+                        {t("applySuggestion")}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </Field>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field data-invalid={!validEstimate}>
+                <FieldLabel htmlFor="task-estimate">{t("estimateHours")}</FieldLabel>
+                <Input
+                  id="task-estimate"
+                  inputMode="decimal"
+                  value={draft.estimate}
+                  onChange={(event) => setDraft((current) => ({ ...current, estimate: event.target.value, estimateTouched: true }))}
+                />
+                <FieldDescription>{estimateMinutes != null ? formatMinutes(estimateMinutes) : t("estimateHint")}</FieldDescription>
+              </Field>
+              {!common && (
+                <Field>
+                  <FieldLabel htmlFor="task-assignee">{t("assignee")}</FieldLabel>
+                  <SimpleSelect
+                    id="task-assignee"
+                    className="w-full"
+                    value={assignee}
+                    onChange={setAssignee}
+                    options={[{ value: NOBODY, label: t("unassigned") }, ...people.map((member) => ({ value: member.employee.id, label: member.employee.fullName }))]}
+                  />
+                </Field>
+              )}
+            </div>
+          </Section>
+
+          <Section title={t("sectionDates")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field data-invalid={!validDates}>
+                <FieldLabel htmlFor="task-start">{t("startDate")}</FieldLabel>
+                <Input id="task-start" type="date" value={startDate} max={dueDate || undefined} onChange={(event) => setStartDate(event.target.value)} />
+              </Field>
+              <Field data-invalid={!validDates}>
+                <FieldLabel htmlFor="task-due">{t("dueDate")}</FieldLabel>
+                <Input id="task-due" type="date" value={dueDate} min={startDate || undefined} onChange={(event) => setDueDate(event.target.value)} />
+              </Field>
+            </div>
+            {validDates ? (
+              <FieldDescription>{dateHint(t, task, startDate, dueDate)}</FieldDescription>
+            ) : (
+              <FieldError>{t("datesInvalid")}</FieldError>
+            )}
+          </Section>
+
+          {!common && (
+            <Section title={t("requiredSkills")} titleId="task-skills-label">
+              <TaskSkillsField
+                labelledBy="task-skills-label"
+                value={draft.skills}
+                options={skillOptions.data ?? []}
+                onChange={(skills) => setDraft((current) => ({ ...current, skills, skillsTouched: true }))}
+              />
+            </Section>
+          )}
+
+          <Section>
+            <Field>
+              <FieldLabel htmlFor="task-description">{t("descriptionLabel")}</FieldLabel>
+              <Textarea id="task-description" rows={3} value={description} onChange={(event) => setDescription(event.target.value)} />
+            </Field>
+          </Section>
         </FieldGroup>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             {tCommon("cancel")}
           </Button>
           <Button
-            disabled={!title.trim() || !validEstimate || mutation.isPending}
+            disabled={!title.trim() || !validEstimate || !validDates || mutation.isPending}
             onClick={() => mutation.mutate(undefined, { onSuccess: onClose, onError: (error) => toast.error(errorMessage(error)) })}
           >
             {t("save")}
@@ -152,4 +239,42 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
       </DialogContent>
     </Dialog>
   );
+}
+
+/** Một khối của form: tiêu đề nhỏ, ngăn với khối trên bằng đường kẻ. */
+function Section({ title, titleId, children }: { title?: string; titleId?: string; children: ReactNode }) {
+  return (
+    <div className="grid gap-4 border-t pt-4 first:border-t-0 first:pt-0">
+      {title && (
+        <h3 id={titleId} className="text-sm font-medium">
+          {title}
+        </h3>
+      )}
+      {children}
+    </div>
+  );
+}
+
+/** "Java ≥ 2 · SQL ≥ 2" từ kỹ năng gợi ý của nhóm. */
+function suggestionSkills(category: WorkCategory, options: { id: string; name: string }[]): string {
+  const names = new Map(options.map((option) => [option.id, option.name]));
+  return categorySuggestion(category)
+    .skills.map((skill) => `${names.get(skill.skillId) ?? "?"} ≥ ${skill.minLevel}`)
+    .join(" · ");
+}
+
+/**
+ * Dòng giải thích dưới hai ô ngày. Việc đang ở sprint: nêu đúng ngày nào sẽ lấy theo sprint (chỉ ô đang để trống); còn
+ * lại là câu chung.
+ */
+function dateHint(t: ReturnType<typeof useTranslations<"ProjectWork">>, task: Task | undefined, startDate: string, dueDate: string): string {
+  const card = task?.card;
+  if (!card?.sprintId) return t("dateHint");
+  const info = scheduleInfo(card);
+  const startFromSprint = !startDate && info.startFromSprint;
+  const endFromSprint = !dueDate && info.endFromSprint;
+  if (startFromSprint && endFromSprint) return t("dateHintSprint", { from: formatDate(info.start), to: formatDate(info.end) });
+  if (startFromSprint) return t("dateHintSprintStart", { date: formatDate(info.start) });
+  if (endFromSprint) return t("dateHintSprintEnd", { date: formatDate(info.end) });
+  return t("dateHint");
 }

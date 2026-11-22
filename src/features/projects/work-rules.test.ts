@@ -1,6 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { formatMinutes, groupMyWork, loadTone, parseHours, percent, sundayOf, toColumns, workGroup } from "./work-rules";
-import { BOARD_STATUSES, type MyWork, type TaskCard } from "./work-types";
+import {
+  applyCategory,
+  applySuggestion,
+  dateRangeValid,
+  differsFromSuggestion,
+  formatMinutes,
+  groupMyWork,
+  loadTone,
+  minutesToHoursText,
+  parseHours,
+  percent,
+  scheduleInfo,
+  sundayOf,
+  toColumns,
+  workGroup,
+  type CategoryDraft,
+} from "./work-rules";
+import { BOARD_STATUSES, type MyWork, type TaskCard, type WorkCategory } from "./work-types";
 
 describe("formatMinutes", () => {
   it("hiện giờ và phút", () => {
@@ -71,5 +87,81 @@ describe("percent", () => {
     expect(percent(50, 200)).toBe(25);
     expect(percent(300, 200)).toBe(100);
     expect(percent(1, 0)).toBe(0);
+  });
+});
+
+const API: WorkCategory = {
+  id: "c1",
+  code: "API",
+  name: "API nghiệp vụ",
+  description: null,
+  phase: "DEVELOPMENT",
+  defaultMinutes: 480,
+  sortOrder: 4,
+  active: true,
+  skills: [
+    { skillId: "java", minLevel: 2 },
+    { skillId: "sql", minLevel: 2 },
+  ],
+};
+const EMPTY: CategoryDraft = { estimate: "", skills: [], estimateTouched: false, skillsTouched: false };
+
+describe("work categories", () => {
+  it("fills hours and skills of a new task", () => {
+    const next = applyCategory(EMPTY, API, "create");
+    expect(next.estimate).toBe("8");
+    expect(next.skills).toEqual([
+      { skillId: "java", minLevel: 2 },
+      { skillId: "sql", minLevel: 2 },
+    ]);
+  });
+
+  it("keeps what the PM typed", () => {
+    const typed = { ...EMPTY, estimate: "40", estimateTouched: true };
+    const next = applyCategory(typed, API, "create");
+    expect(next.estimate).toBe("40");
+    expect(next.skills).toHaveLength(2);
+  });
+
+  it("never overwrites an existing task, only offers the suggestion", () => {
+    const existing = { ...EMPTY, estimate: "16", skills: [{ skillId: "java", minLevel: 3 }] };
+    expect(applyCategory(existing, API, "edit")).toEqual(existing);
+    expect(differsFromSuggestion(existing, API)).toBe(true);
+    const applied = applySuggestion(existing, API);
+    expect(differsFromSuggestion(applied, API)).toBe(false);
+  });
+
+  it("compares skills regardless of order", () => {
+    const draft = { estimate: "8", skills: [{ skillId: "sql", minLevel: 2 }, { skillId: "java", minLevel: 2 }] };
+    expect(differsFromSuggestion(draft, API)).toBe(false);
+    expect(differsFromSuggestion({ ...draft, skills: [{ skillId: "sql", minLevel: 2 }, { skillId: "java", minLevel: null }] }, API)).toBe(true);
+  });
+
+  it("writes hours for the estimate box", () => {
+    expect(minutesToHoursText(480)).toBe("8");
+    expect(minutesToHoursText(90)).toBe("1.5");
+  });
+});
+
+describe("task dates", () => {
+  it("rejects a start after the due date", () => {
+    expect(dateRangeValid("2026-04-10", "2026-04-08")).toBe(false);
+    expect(dateRangeValid("2026-04-08", "2026-04-08")).toBe(true);
+    expect(dateRangeValid(null, "2026-04-08")).toBe(true);
+  });
+
+  it("tells which dates come from the sprint", () => {
+    expect(scheduleInfo({ startDate: null, dueDate: "2026-04-09", scheduledStart: "2026-04-06", scheduledEnd: "2026-04-09" })).toEqual({
+      start: "2026-04-06",
+      end: "2026-04-09",
+      startFromSprint: true,
+      endFromSprint: false,
+    });
+    expect(scheduleInfo({ startDate: null, dueDate: null, scheduledStart: null, scheduledEnd: null })).toEqual({
+      start: null,
+      end: null,
+      startFromSprint: false,
+      endFromSprint: false,
+    });
   });
 });

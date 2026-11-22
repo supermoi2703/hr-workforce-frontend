@@ -213,11 +213,13 @@ export function EventLine({ event, showKey, onOpenTask }: { event: TaskEvent; sh
   const t = useTranslations("ProjectWork");
   const status = (value: string | null) => (value && value in STATUS_LABEL_KEYS ? t(`status.${value as keyof typeof STATUS_LABEL_KEYS}`) : value ?? "—");
   const useStatus = event.kind === "STATUS_CHANGED";
+  // Ngày đổi (hạn, ngày bắt đầu) lưu dạng yyyy-MM-dd: hiện theo kiểu ngày Việt Nam.
+  const value = (raw: string | null) => (useStatus ? status(raw) : raw && ISO_DATE.test(raw) ? formatDate(raw) : (raw ?? "—"));
   return (
     <li className="flex flex-wrap items-baseline gap-x-2">
       <span className="font-medium">{event.actor?.fullName ?? t("system")}</span>
       <span className="text-muted-foreground">
-        {t(`event.${event.kind}`, { from: useStatus ? status(event.from) : event.from ?? "—", to: useStatus ? status(event.to) : event.to ?? "—" })}
+        {t(`event.${event.kind}`, { from: value(event.from), to: value(event.to) })}
       </span>
       {showKey && (
         <button type="button" className="text-primary font-mono hover:underline" onClick={() => onOpenTask?.(event.taskKey)}>
@@ -229,4 +231,5 @@ export function EventLine({ event, showKey, onOpenTask }: { event: TaskEvent; sh
   );
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const STATUS_LABEL_KEYS = { TODO: 1, IN_PROGRESS: 1, IN_REVIEW: 1, DONE: 1, CANCELLED: 1 };
