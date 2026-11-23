@@ -60,7 +60,9 @@
       "policies": "Policy settings",
       "myWork": "My work",
       "missingOut": "Missing check-out",
-      "timesheetPeriods": "Timesheet periods"
+      "timesheetPeriods": "Timesheet periods",
+      "overtime": "My overtime",
+      "overtimeManage": "Overtime report"
     }
   },
   "Shell": {
@@ -487,6 +489,10 @@
     "announcement_manage": {
       "name": "Manage announcements",
       "description": "Create, edit, publish and remove announcements; HR only for their own office"
+    },
+    "overtime_read": {
+      "name": "View overtime",
+      "description": "See the overtime report of everyone in the data scope"
     }
   },
   "AuditActions": {
@@ -740,7 +746,8 @@
       "SELF": "Own data",
       "TEAM": "Team",
       "OFFICE": "Office",
-      "ALL": "Whole company"
+      "ALL": "Whole company",
+      "OVERTIME": "Overtime"
     },
     "unitKinds": {
       "OFFICE": "Office",
@@ -1169,7 +1176,8 @@
       "invalidPeriod": "Invalid period.",
       "reasonRequired": "A reason is required.",
       "selfDecideForbidden": "You cannot handle your own timesheet or one outside your scope.",
-      "decisionConflict": "The data was just changed by someone else, reload and try again."
+      "decisionConflict": "The data was just changed by someone else, reload and try again.",
+      "lockBlockedPendingOvertime": "Some overtime in this period still waits for the employee or the approver. Settle it, then lock again."
     },
     "remotePart": {
       "FULL_DAY": "WFH full day",
@@ -1299,7 +1307,8 @@
         "LEAVE_CANCEL": "Leave cancellation",
         "SHIFT_CHANGE": "Working hours",
         "WFH": "Remote work",
-        "WFH_CANCEL": "Remote work cancellation"
+        "WFH_CANCEL": "Remote work cancellation",
+        "OVERTIME": "Overtime"
       },
       "urgent": "Urgent",
       "meta": "Sent {at} · Step: {step}",
@@ -1374,6 +1383,186 @@
         "send": "Send cancellation",
         "sent": "Cancellation sent."
       }
+    }
+  },
+  "Overtime": {
+    "metaTitle": "My overtime",
+    "title": "My overtime",
+    "description": "Overtime your PM assigned to you and overtime you declared. Paid time comes from your punches.",
+    "month": "Month",
+    "pickMonth": "Pick a month",
+    "claim": "Declare overtime",
+    "assignAction": "Assign overtime",
+    "duration": {
+      "hm": "{h}h {m}",
+      "h": "{h}h",
+      "m": "{m} min"
+    },
+    "statuses": {
+      "WAIT_EMPLOYEE": "Waiting for employee",
+      "WAIT_APPROVAL": "Waiting for PM",
+      "ACTIVE": "Confirmed",
+      "REJECTED": "Declined",
+      "CANCELLED": "Cancelled",
+      "EXPIRED": "Expired",
+      "SETTLED": "Time counted"
+    },
+    "statusForMe": {
+      "WAIT_EMPLOYEE": "Waiting for you"
+    },
+    "kinds": {
+      "ASSIGNED": "Assigned by PM",
+      "CLAIMED": "Declared"
+    },
+    "dayTypes": {
+      "WORKING_DAY": "Working day",
+      "NORMAL": "Working day",
+      "WEEKLY_OFF": "Weekly day off",
+      "HOLIDAY": "Public holiday"
+    },
+    "usage": {
+      "month": "This month",
+      "year": "This year",
+      "usedOfCap": "{used} / {cap}",
+      "left": "{left} left",
+      "over": "Over the limit",
+      "notEnforced": "Going over the limit only shows a warning for now."
+    },
+    "list": {
+      "emptyTitle": "No overtime this month",
+      "emptyDescription": "Overtime your PM assigns to you and overtime you declare shows up here.",
+      "window": "{start}–{end}",
+      "nextDay": "ends next day",
+      "noTask": "No task",
+      "assignedBy": "Assigned by {name}",
+      "reason": "Reason: {reason}",
+      "paidNormal": "Counted {duration}",
+      "paidNight": "night {duration}",
+      "pendingHr": "Waiting for HR",
+      "pendingHrHint": "Your punches that day are uneven. Overtime counts as 0 until HR decides.",
+      "viewApproval": "View request",
+      "accept": "Accept",
+      "decline": "Decline",
+      "cancel": "Cancel",
+      "withdraw": "Withdraw",
+      "done": {
+        "accept": "Overtime accepted",
+        "decline": "Overtime declined",
+        "cancel": "Overtime cancelled",
+        "withdraw": "Declaration withdrawn"
+      }
+    },
+    "reasonDialog": {
+      "reason": "Reason (optional)",
+      "back": "Back",
+      "decline": {
+        "title": "Decline overtime",
+        "description": "Your PM will be told you declined:",
+        "confirm": "Decline"
+      },
+      "cancel": {
+        "title": "Cancel overtime",
+        "description": "The employee will be told this overtime is cancelled:",
+        "confirm": "Cancel overtime"
+      },
+      "withdraw": {
+        "title": "Withdraw declaration",
+        "description": "This declaration will no longer wait for approval:",
+        "confirm": "Withdraw"
+      }
+    },
+    "form": {
+      "assignTitle": "Assign overtime",
+      "assignDescription": "Only the person working on this task can be assigned. They accept or decline it in the app.",
+      "claimTitle": "Declare overtime",
+      "claimDescription": "Declare extra hours you work on one of your tasks. Your PM approves it.",
+      "employee": "Employee",
+      "task": "Task",
+      "taskPlaceholder": "Choose a task",
+      "noTasks": "You have no task you can declare on for this day.",
+      "date": "Date",
+      "start": "Start",
+      "end": "End",
+      "total": "Total {duration}",
+      "nextDay": "ends next day",
+      "reason": "Reason",
+      "reasonPlaceholder": "What needs the extra time (optional)",
+      "draftLoading": "Checking your punches...",
+      "retry": "Retry",
+      "deadline": "You can declare this day until the end of {date}.",
+      "outsideWindow": "Too late to declare this day (deadline was {date}).",
+      "suggested": "From your punches: {start}–{end}",
+      "noSuggestion": "No punches after working hours to suggest from.",
+      "usageLoading": "Checking hours used...",
+      "usageUnavailable": "Could not load hours used. The system still checks the limits when you send.",
+      "scheduledEnd": "Normal hours end at {time}",
+      "offDay": "Day off: any time of day is allowed",
+      "usedMonth": "Month: {used} / {cap}",
+      "usedYear": "year: {used} / {cap}",
+      "maxDay": "Up to {duration} on this day",
+      "remaining": "{duration} left before a limit",
+      "capWarning": "Warning: {text}",
+      "issues": {
+        "required": "Fill in the date, start and end.",
+        "invalidTime": "Time must look like 18:00.",
+        "startInPast": "Overtime must start later than now. For time already worked, the employee declares it.",
+        "beforeScheduleEnd": "Must start at {time} or later (end of normal hours).",
+        "dailyLimit": "Longer than the {duration} allowed on this day.",
+        "monthCap": "Goes over the {monthCap} allowed this month.",
+        "yearCap": "Goes over the {yearCap} allowed this year."
+      },
+      "cancel": "Cancel",
+      "submitAssign": "Assign",
+      "submitClaim": "Send",
+      "assigned": "Overtime assigned, waiting for the employee",
+      "claimed": "Declaration sent, waiting for your PM"
+    },
+    "project": {
+      "description": "Overtime in this project. You can cancel assigned overtime before it starts.",
+      "month": "Month",
+      "pickMonth": "Pick a month",
+      "emptyTitle": "No overtime this month",
+      "emptyDescription": "Assign overtime from a task's details. Declarations to approve are in Approvals."
+    },
+    "manage": {
+      "metaTitle": "Overtime report",
+      "title": "Overtime report",
+      "description": "Overtime of everyone in your scope by month.",
+      "month": "Month",
+      "pickMonth": "Pick a month",
+      "office": "Office",
+      "allOffices": "All offices",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "empty": "No overtime matches these filters",
+      "employee": "Employee",
+      "when": "Date and time",
+      "task": "Task",
+      "kind": "Type",
+      "planned": "Planned",
+      "paid": "Counted",
+      "night": "Night"
+    },
+    "errors": {
+      "taskNotAssigned": "This task is not assigned to this person.",
+      "notProjectMember": "This person is not a member of the project on that day.",
+      "taskClosed": "The task is done or cancelled.",
+      "taskNotLeaf": "The task has subtasks. Pick a subtask.",
+      "projectInactive": "The project is not running.",
+      "notProjectManager": "Only a PM of this project can assign overtime.",
+      "beforeScheduleEnd": "On a working day overtime starts after normal hours end.",
+      "dailyLimit": "Too many overtime hours for one day.",
+      "monthCap": "Goes over the overtime allowed this month.",
+      "yearCap": "Goes over the overtime allowed this year.",
+      "overlap": "This person already has overtime at that time.",
+      "onLeave": "This person is on full-day leave that day.",
+      "claimWindowClosed": "Too late to declare overtime for that day.",
+      "endTooLate": "The end time is later than allowed.",
+      "invalidState": "This overtime has already changed. The list has been refreshed.",
+      "expired": "This overtime has already started without an answer.",
+      "assignTooLate": "Assigned overtime must start in the future. The employee can declare it instead.",
+      "selfAssign": "A PM declares their own overtime instead of assigning it.",
+      "notFound": "This overtime no longer exists."
     }
   },
   "Approvals": {
@@ -1479,7 +1668,8 @@
       "ALLOCATION": "Project allocation",
       "TRANSFER": "Transfer",
       "SALARY_ADJUSTMENT": "Salary adjustment",
-      "PAYROLL_APPROVAL": "Payroll approval"
+      "PAYROLL_APPROVAL": "Payroll approval",
+      "OVERTIME": "Overtime"
     },
     "status": {
       "PENDING": "Pending",
@@ -2834,7 +3024,8 @@
       "sprint": "Sprint",
       "capacity": "Capacity",
       "members": "Members",
-      "info": "Details"
+      "info": "Details",
+      "overtime": "Overtime"
     },
     "risk": {
       "DUE_ON_LEAVE": "Due on leave",
@@ -3290,7 +3481,10 @@
       "CONTRACT_EXPIRING": "Contract {contractNumber} of {employeeName} expires on {endDate}",
       "MISSING_CHECKOUT": "You did not check out on {workDate}",
       "PAYSLIP_PUBLISHED": "Your payslip for {period} has been published. Send any questions by {complaintDeadline}",
-      "ANNOUNCEMENT_PUBLISHED": "New announcement: “{title}”"
+      "ANNOUNCEMENT_PUBLISHED": "New announcement: “{title}”",
+      "OVERTIME_ASSIGNED": "{assignerName} asked you to work overtime on {taskKey} on {workDate}, {startTime}–{endTime}. Please accept or decline",
+      "OVERTIME_RESPONDED": "{employeeName} {accepted, select, true {accepted} other {declined}} overtime on {taskKey} on {workDate}",
+      "OVERTIME_CANCELLED": "Overtime on {taskKey} on {workDate} was cancelled {cause, select, PM {by the PM} LEAVE {because of your full-day leave} EXPIRED {because nobody answered in time} other {}}"
     }
   },
   "Announcements": {
@@ -4197,7 +4391,8 @@
       "REGION_FALLBACK": "Region {region} has no minimum wage of its own, the general rate is used",
       "TIMESHEET_PENDING": "{days} days of work still awaiting HR decision",
       "PAID_OUTSIDE_CONTRACT": "Has worked days outside the contract term",
-      "LEGACY": "Legacy warning"
+      "LEGACY": "Legacy warning",
+      "OT_MANUAL_OVERRIDE": "OT hours entered by hand replace the hours from overtime requests"
     },
     "checks": {
       "loading": "Checking...",
@@ -4347,7 +4542,8 @@
       "LEAVE_APPROVED": "Leave approved after lock",
       "WFH_APPROVED": "Remote work approved after lock",
       "INCIDENT": "Punch incident",
-      "HR_REQUEST": "Entered by HR"
+      "HR_REQUEST": "Entered by HR",
+      "OVERTIME_APPROVED": "Overtime approved after lock"
     }
   },
   "Workload": {

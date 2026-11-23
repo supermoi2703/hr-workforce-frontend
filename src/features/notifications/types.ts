@@ -12,6 +12,9 @@ export const NOTIFICATION_TYPES = [
   "MISSING_CHECKOUT",
   "PAYSLIP_PUBLISHED",
   "ANNOUNCEMENT_PUBLISHED",
+  "OVERTIME_ASSIGNED",
+  "OVERTIME_RESPONDED",
+  "OVERTIME_CANCELLED",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

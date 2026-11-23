@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { BanIcon, PencilIcon, ShapesIcon, Trash2Icon, UserRoundCogIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -31,11 +31,14 @@ export function TaskSheet({
   project,
   onClose,
   onOpenTask,
+  renderActions,
 }: {
   taskKey: string | null;
   project: Project;
   onClose: () => void;
   onOpenTask: (key: string) => void;
+  /** Nút thêm do feature khác gắn vào (vd "Giao làm thêm giờ"), đặt cạnh các nút của task. */
+  renderActions?: (task: Task) => ReactNode;
 }) {
   const task = useTask(taskKey);
   return (
@@ -46,14 +49,26 @@ export function TaskSheet({
         ) : task.isError ? (
           <ErrorState error={task.error} onRetry={() => task.refetch()} />
         ) : (
-          <TaskDetail task={task.data} project={project} onClose={onClose} onOpenTask={onOpenTask} />
+          <TaskDetail task={task.data} project={project} onClose={onClose} onOpenTask={onOpenTask} renderActions={renderActions} />
         )}
       </SheetContent>
     </Sheet>
   );
 }
 
-function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; project: Project; onClose: () => void; onOpenTask: (key: string) => void }) {
+function TaskDetail({
+  task,
+  project,
+  onClose,
+  onOpenTask,
+  renderActions,
+}: {
+  task: Task;
+  project: Project;
+  onClose: () => void;
+  onOpenTask: (key: string) => void;
+  renderActions?: (task: Task) => ReactNode;
+}) {
   const t = useTranslations("ProjectWork");
   const errorMessage = useWorkErrorMessage();
   const { card, can } = task;
@@ -105,6 +120,7 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
             <UserRoundCogIcon /> {t("reassign")}
           </Button>
         )}
+        {renderActions?.(task)}
         {can.delete && (
           <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => setDeleting(true)}>
             <Trash2Icon />

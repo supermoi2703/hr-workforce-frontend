@@ -33,6 +33,11 @@ const PARAM_KEYS: Record<NotificationType, readonly string[]> = {
   MISSING_CHECKOUT: ["workDate"],
   PAYSLIP_PUBLISHED: ["period", "complaintDeadline"],
   ANNOUNCEMENT_PUBLISHED: ["title"],
+  OVERTIME_ASSIGNED: ["taskKey", "workDate", "startTime", "endTime", "assignerName"],
+  // accepted: true / false; câu dùng {accepted, select, true {...} other {...}}.
+  OVERTIME_RESPONDED: ["employeeName", "taskKey", "workDate", "accepted"],
+  // cause: PM / LEAVE / EXPIRED.
+  OVERTIME_CANCELLED: ["taskKey", "workDate", "cause"],
 };
 
 /** Tham số là ngày (yyyy-MM-dd) cần định dạng theo kiểu Việt Nam trước khi ghép câu. */
@@ -40,6 +45,9 @@ const DATE_KEYS = new Set(["lastDay", "effectiveFrom", "endDate", "workDate", "c
 
 /** Tham số là tháng (yyyy-MM, ví dụ kỳ lương) hiển thị dạng MM/yyyy. */
 const MONTH_KEYS = new Set(["period"]);
+
+/** Tham số là giờ "HH:mm" (backend có thể gửi "HH:mm:ss"): bỏ phần giây. */
+const TIME_KEYS = new Set(["startTime", "endTime"]);
 
 function formatMonth(value: string): string {
   const match = /^(\d{4})-(\d{2})$/.exec(value);
@@ -64,6 +72,8 @@ export function messageValues(
       values[key] = helpers.translateApprovalType(String(raw));
     } else if (MONTH_KEYS.has(key)) {
       values[key] = formatMonth(String(raw));
+    } else if (TIME_KEYS.has(key)) {
+      values[key] = String(raw).slice(0, 5);
     } else if (DATE_KEYS.has(key)) {
       values[key] = helpers.formatDate(String(raw));
     } else {

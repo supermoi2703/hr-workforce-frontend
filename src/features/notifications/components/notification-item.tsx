@@ -5,10 +5,13 @@ import {
   BadgeCheckIcon,
   BellIcon,
   BriefcaseBusinessIcon,
+  CalendarX2Icon,
   CircleCheckIcon,
   CircleXIcon,
   ClipboardCheckIcon,
   ClockAlertIcon,
+  ClockIcon,
+  ClockPlusIcon,
   FileClockIcon,
   FolderMinusIcon,
   GraduationCapIcon,
@@ -50,6 +53,13 @@ function iconOf(notification: AppNotification): ReactNode {
       return <MegaphoneIcon />;
     case "PAYSLIP_PUBLISHED":
       return <ReceiptTextIcon />;
+    case "OVERTIME_ASSIGNED":
+      return <ClockPlusIcon />;
+    case "OVERTIME_RESPONDED":
+      if (notification.params.accepted === true || notification.params.accepted === "true") return <ClockIcon className="text-success" />;
+      return <ClockIcon className="text-destructive" />;
+    case "OVERTIME_CANCELLED":
+      return <CalendarX2Icon />;
     default:
       return <BellIcon />;
   }
