@@ -229,16 +229,56 @@ export type Risk = {
   high: boolean;
 };
 
-export type Suggestion = {
+// ===== Gợi ý người cho một việc (workload bước 4, backend README module project mục 7.3)
+
+export const SUGGESTION_REASON_CODES = [
+  "SKILLS_MATCH",
+  "BELOW_MIN_LEVEL",
+  "SKILL_UNCONFIRMED",
+  "ENDS_BEFORE_START",
+  "LEAVE_ON_DUE",
+  "LEAVE_IN_RANGE",
+  "NOT_MEMBER",
+  "UNSCHEDULED_WORK",
+] as const;
+export type SuggestionReasonCode = (typeof SUGGESTION_REASON_CODES)[number];
+
+/** taskKey: việc cùng dự án (null = dự án khác, không nêu tên); amount: phút (UNSCHEDULED_WORK) hoặc số ngày (LEAVE_IN_RANGE). */
+export type SuggestionReason = { code: SuggestionReasonCode; taskKey: string | null; date: string | null; amount: number | null };
+
+/** level: mức hiệu lực (đã xác nhận nếu có, không thì tự khai). */
+export type SkillFit = { skillId: string; skillName: string; level: number; minLevel: number; confirmed: boolean };
+
+/** member = false: phải đề xuất vào dự án trước khi giao. load: tải trong khoảng đã xét, đã cộng việc này nếu đủ giờ và ngày. */
+export type SuggestionCandidate = {
   person: Person;
-  freeMinutes: number;
-  onLeaveOnDue: boolean;
+  officeId: string | null;
+  member: boolean;
+  load: LoadSummary;
+  skills: SkillFit[];
+  reasons: SuggestionReason[];
   leaveDays: number;
-  matchedSkills: number;
-  requiredSkills: number;
-  openTasks: number;
-  enoughTime: boolean;
+  leaveOnDue: boolean;
 };
+
+export type OverloadedCandidate = { person: Person; member: boolean; load: LoadSummary };
+
+export type AssigneeSuggestions = {
+  /** Việc có hạn hiệu lực; false = chỉ xét tải hiện tại. */
+  scheduled: boolean;
+  /** Việc chưa có giờ còn lại; true = chỉ xét tải hiện tại. */
+  missingEstimate: boolean;
+  /** Việc chưa khai kỹ năng nên không tìm người ngoài dự án. */
+  outsideNeedsSkills: boolean;
+  from: string;
+  to: string;
+  members: SuggestionCandidate[];
+  outside: SuggestionCandidate[];
+  outsideTotal: number;
+  excluded: { missingSkill: number; overloadedTotal: number; overloaded: OverloadedCandidate[] };
+};
+
+export type SuggestionParams = { scope?: "ALL" | "PROJECT"; officeId?: string | null; outsideLimit?: number };
 
 export type Overview = {
   unassigned: number;

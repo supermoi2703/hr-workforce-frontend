@@ -34,7 +34,7 @@ import {
 } from "./work-api";
 import { useProjectErrorMessage } from "./hooks";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import type { AssignPreviewInput, TaskStatus } from "./work-types";
+import type { AssignPreviewInput, SuggestionParams, TaskStatus } from "./work-types";
 
 // Board và cảnh báo tự tải lại để nhiều người cùng xem thấy thay đổi gần như ngay (đặc tả mục 10).
 const BOARD_POLL_MS = 3_000;
@@ -66,8 +66,13 @@ export const useComments = (id: string | undefined) =>
 export const useEvents = (id: string | undefined) => useQuery({ queryKey: key("events", id), queryFn: () => getEvents(id!), enabled: !!id });
 export const useWorklogs = (id: string | undefined) =>
   useQuery({ queryKey: key("worklogs", id), queryFn: () => getWorklogs(id!), enabled: !!id });
-export const useSuggestions = (id: string | null) =>
-  useQuery({ queryKey: key("suggestions", id), queryFn: () => getSuggestions(id!), enabled: !!id });
+export const useSuggestions = (id: string | null, params: SuggestionParams = {}) =>
+  useQuery({
+    queryKey: key("suggestions", id, params.scope ?? "ALL", params.officeId ?? "", params.outsideLimit ?? 0),
+    queryFn: () => getSuggestions(id!, params),
+    enabled: !!id,
+    placeholderData: keepPreviousData,
+  });
 export const useMyWork = () => useQuery({ queryKey: key("my-work"), queryFn: getMyWork, retry: false });
 export const useSkillOptions = () => useQuery({ queryKey: key("skills"), queryFn: getSkillOptions, staleTime: 300_000 });
 export const useWorkCategories = () =>

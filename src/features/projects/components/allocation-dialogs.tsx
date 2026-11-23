@@ -32,6 +32,10 @@ type ProposeAllocationDialogProps = {
   onOpenChange: (open: boolean) => void;
   /** Có người: gia hạn hoặc đặt lại khoảng tham gia của người đó; không có: chọn người từ team, dự án khác hoặc từng người. */
   person?: ProjectPerson | null;
+  /** "join": đưa người ngoài dự án vào (từ gợi ý người cho việc), tiêu đề khác "change". */
+  intent?: "change" | "join";
+  /** Khoảng điền sẵn (ví dụ khoảng ngày của việc); ngày đầu sớm hơn mức cho phép thì lấy mức cho phép. */
+  initialPeriod?: { from: string; to: string | null } | null;
 };
 
 /**
@@ -39,12 +43,18 @@ type ProposeAllocationDialogProps = {
  * Phê duyệt; bên tạo coi như đã đồng ý. Không còn % và trần 100% (workload bước 3): danh sách hiện tải tính từ task để cân
  * nhắc, không chặn.
  */
-export function ProposeAllocationDialog({ project, open, onOpenChange, person }: ProposeAllocationDialogProps) {
+export function ProposeAllocationDialog({ project, open, onOpenChange, person, intent = "change", initialPeriod }: ProposeAllocationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         {open && (
-          <ProposeForm project={project} initialPerson={person ?? null} onDone={() => onOpenChange(false)} />
+          <ProposeForm
+            project={project}
+            initialPerson={person ?? null}
+            intent={intent}
+            initialPeriod={initialPeriod ?? null}
+            onDone={() => onOpenChange(false)}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -54,10 +64,12 @@ export function ProposeAllocationDialog({ project, open, onOpenChange, person }:
 type ProposeFormProps = {
   project: Project;
   initialPerson: ProjectPerson | null;
+  intent: "change" | "join";
+  initialPeriod: { from: string; to: string | null } | null;
   onDone: () => void;
 };
 
-function ProposeForm({ project, initialPerson, onDone }: ProposeFormProps) {
+function ProposeForm({ project, initialPerson, intent, initialPeriod, onDone }: ProposeFormProps) {
   const t = useTranslations("Allocations");
   const tCommon = useTranslations("Common");
   const errorMessage = useProjectErrorMessage();
@@ -67,8 +79,8 @@ function ProposeForm({ project, initialPerson, onDone }: ProposeFormProps) {
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [sourceProject, setSourceProject] = useState<SourceProject | null>(null);
   const [person, setPerson] = useState<ProjectPerson | null>(initialPerson);
-  const [from, setFrom] = useState(initial.from);
-  const [to, setTo] = useState(initial.to ?? "");
+  const [from, setFrom] = useState(initialPeriod && initialPeriod.from > initial.from ? initialPeriod.from : initial.from);
+  const [to, setTo] = useState((initialPeriod ? initialPeriod.to : initial.to) ?? "");
   const [note, setNote] = useState("");
   const [choices, setChoices] = useState<ReadonlyMap<string, boolean>>(new Map());
 
@@ -136,8 +148,12 @@ function ProposeForm({ project, initialPerson, onDone }: ProposeFormProps) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle>{initialPerson ? t("changeTitle", { name: initialPerson.fullName }) : t("proposeTitle")}</DialogTitle>
-        <DialogDescription>{initialPerson ? t("changeHint") : t("proposeHint")}</DialogDescription>
+        <DialogTitle>
+          {initialPerson
+            ? t(intent === "join" ? "joinTitle" : "changeTitle", { name: initialPerson.fullName })
+            : t("proposeTitle")}
+        </DialogTitle>
+        <DialogDescription>{initialPerson ? t(intent === "join" ? "joinHint" : "changeHint") : t("proposeHint")}</DialogDescription>
       </DialogHeader>
       <FieldGroup className="gap-4">
         {!initialPerson && (

@@ -21,7 +21,8 @@ import type {
   Sprint,
   SprintCapacity,
   SprintInput,
-  Suggestion,
+  AssigneeSuggestions,
+  SuggestionParams,
   Task,
   TaskCard,
   TaskEvent,
@@ -105,7 +106,10 @@ export const addLink = (id: string, targetKey: string, direction: "BLOCKS" | "BL
   http.post<void>(`/api/tasks/${enc(id)}/links`, { targetKey, direction });
 export const removeLink = (id: string, linkId: string) => http.delete<void>(`/api/tasks/${enc(id)}/links/${enc(linkId)}`);
 export const getEvents = (id: string) => http.get<TaskEvent[]>(`/api/tasks/${enc(id)}/events`);
-export const getSuggestions = (id: string) => http.get<Suggestion[]>(`/api/tasks/${enc(id)}/assignee-suggestions`);
+export const getSuggestions = (id: string, params: SuggestionParams = {}) =>
+  http.get<AssigneeSuggestions>(`/api/tasks/${enc(id)}/assignee-suggestions`, {
+    query: { scope: params.scope, officeId: params.officeId ?? undefined, outsideLimit: params.outsideLimit },
+  });
 export const getMyWork = () => http.get<MyWork>("/api/my-work");
 export const getSkillOptions = () => http.get<SkillOption[]>("/api/skills");
 export const getWorkCategories = () => http.get<WorkCategory[]>("/api/work-categories");

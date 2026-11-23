@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BanIcon, PencilIcon, ShapesIcon, Trash2Icon, UserRoundCogIcon } from "lucide-react";
+import { BanIcon, PencilIcon, ShapesIcon, Trash2Icon, UserRoundSearchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -21,7 +21,7 @@ import type { Project } from "../types";
 import { BOARD_STATUSES, TASK_STATUSES, type LinkedTask, type Task, type TaskStatus } from "../work-types";
 import { PersonChip, PriorityIcon, TaskStatusBadge, TypeIcon } from "./badges";
 import { EventLine } from "./overview-tab";
-import { ReassignDialog } from "./reassign-dialog";
+import { SuggestAssigneeDialog } from "./suggest-assignee-dialog";
 import { SimpleSelect } from "./simple-select";
 import { TaskFormDialog } from "./task-form-dialog";
 
@@ -102,7 +102,7 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
         )}
         {project.can.editAnyTask && (
           <Button size="sm" variant="outline" onClick={() => setReassigning(true)}>
-            <UserRoundCogIcon /> {t("reassign")}
+            <UserRoundSearchIcon /> {t("suggestPeople")}
           </Button>
         )}
         {can.delete && (
@@ -180,7 +180,9 @@ function TaskDetail({ task, project, onClose, onOpenTask }: { task: Task; projec
       <History task={task} />
 
       {editing && <TaskFormDialog project={project} task={task} onClose={() => setEditing(false)} />}
-      {reassigning && <ReassignDialog taskId={card.id} taskKey={card.key} onClose={() => setReassigning(false)} />}
+      {reassigning && (
+        <SuggestAssigneeDialog project={project} taskId={card.id} taskKey={card.key} onClose={() => setReassigning(false)} />
+      )}
       <ConfirmDialog
         open={deleting}
         onOpenChange={setDeleting}

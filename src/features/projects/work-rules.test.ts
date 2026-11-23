@@ -14,12 +14,22 @@ import {
   parseHours,
   percent,
   scheduleInfo,
+  skillFitText,
+  suggestionLines,
   sundayOf,
   toColumns,
   workGroup,
   type CategoryDraft,
 } from "./work-rules";
-import { BOARD_STATUSES, type AssignPreview, type LoadSummary, type MyWork, type TaskCard, type WorkCategory } from "./work-types";
+import {
+  BOARD_STATUSES,
+  type AssignPreview,
+  type LoadSummary,
+  type MyWork,
+  type SuggestionCandidate,
+  type TaskCard,
+  type WorkCategory,
+} from "./work-types";
 
 describe("formatMinutes", () => {
   it("hiện giờ và phút", () => {
@@ -197,5 +207,67 @@ describe("cảnh báo tải khi giao việc", () => {
   it("giờ hiển thị dùng dấu phẩy thập phân", () => {
     expect(hoursText(2880)).toBe("48");
     expect(hoursText(90)).toBe("1,5");
+  });
+});
+
+describe("suggestionLines", () => {
+  const peak = { weekStart: "2026-04-06", capacityMinutes: 2400, loadMinutes: 840, percent: 35, zone: "GREEN" as const };
+  const candidate = (overrides: Partial<SuggestionCandidate> = {}): SuggestionCandidate => ({
+    person: { id: "an", employeeCode: "AN", fullName: "An" },
+    officeId: null,
+    member: false,
+    load: { zone: "GREEN", reasons: [], peakWeek: peak, unscheduledMinutes: 0, weeks: [] },
+    skills: [{ skillId: "java", skillName: "Java", level: 3, minLevel: 2, confirmed: true }],
+    reasons: [
+      { code: "SKILLS_MATCH", taskKey: null, date: null, amount: null },
+      { code: "ENDS_BEFORE_START", taskKey: null, date: "2026-04-03", amount: null },
+      { code: "NOT_MEMBER", taskKey: null, date: null, amount: null },
+    ],
+    leaveDays: 0,
+    leaveOnDue: false,
+    ...overrides,
+  });
+
+  it("kỹ năng, tuần nặng nhất rồi một lý do phụ; không lặp 'chưa ở dự án'", () => {
+    const lines = suggestionLines(candidate());
+    expect(lines.map((line) => line.kind)).toEqual(["skills", "peak", "reason"]);
+    expect(lines[2]).toMatchObject({ kind: "reason", reason: { code: "ENDS_BEFORE_START", date: "2026-04-03" } });
+  });
+
+  it("nghỉ đúng ngày hạn được ưu tiên hơn việc kết thúc trước", () => {
+    const lines = suggestionLines(
+      candidate({
+        reasons: [
+          { code: "SKILLS_MATCH", taskKey: null, date: null, amount: null },
+          { code: "ENDS_BEFORE_START", taskKey: "CRM-3", date: "2026-04-03", amount: null },
+          { code: "LEAVE_ON_DUE", taskKey: null, date: null, amount: null },
+        ],
+      }),
+    );
+    expect(lines[2]).toMatchObject({ reason: { code: "LEAVE_ON_DUE" } });
+  });
+
+  it("đánh dấu dưới mức và tự khai; việc không khai kỹ năng thì bỏ dòng kỹ năng", () => {
+    const below = suggestionLines(
+      candidate({
+        reasons: [
+          { code: "BELOW_MIN_LEVEL", taskKey: null, date: null, amount: null },
+          { code: "SKILL_UNCONFIRMED", taskKey: null, date: null, amount: null },
+        ],
+      }),
+    );
+    expect(below[0]).toMatchObject({ kind: "skills", belowMin: true, unconfirmed: true });
+    expect(suggestionLines(candidate({ skills: [], reasons: [] })).map((line) => line.kind)).toEqual(["peak"]);
+  });
+
+  it("ghi mức tối thiểu cạnh kỹ năng dưới mức", () => {
+    const text = skillFitText(
+      [
+        { skillId: "java", skillName: "Java", level: 3, minLevel: 2, confirmed: true },
+        { skillId: "sql", skillName: "SQL", level: 1, minLevel: 3, confirmed: false },
+      ],
+      (min) => `(cần ≥ ${min})`,
+    );
+    expect(text).toBe("Java 3, SQL 1 (cần ≥ 3)");
   });
 });

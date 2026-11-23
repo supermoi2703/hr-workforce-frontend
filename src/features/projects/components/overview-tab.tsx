@@ -14,7 +14,7 @@ import { formatMinutes, percent } from "../work-rules";
 import type { Project } from "../types";
 import { BOARD_STATUSES, type Risk, type TaskEvent } from "../work-types";
 import { PersonChip } from "./badges";
-import { ReassignDialog } from "./reassign-dialog";
+import { SuggestAssigneeDialog } from "./suggest-assignee-dialog";
 
 const STATUS_BAR = { TODO: "bg-muted-foreground/40", IN_PROGRESS: "bg-info", IN_REVIEW: "bg-warning", DONE: "bg-success" };
 
@@ -194,7 +194,9 @@ export function OverviewTab({ project, onOpenTask }: { project: Project; onOpenT
           </CardContent>
         </Card>
       )}
-      {reassigning && <ReassignDialog taskId={reassigning.taskId} taskKey={reassigning.key} onClose={() => setReassigning(null)} />}
+      {reassigning && (
+        <SuggestAssigneeDialog project={project} taskId={reassigning.taskId} taskKey={reassigning.key} onClose={() => setReassigning(null)} />
+      )}
     </div>
   );
 }
