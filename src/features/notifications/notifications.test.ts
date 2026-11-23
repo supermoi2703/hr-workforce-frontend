@@ -136,4 +136,18 @@ describe("câu dịch", () => {
     expect(text("REJECTED")).toContain("bị từ chối");
     expect(text("WITHDRAWN")).toContain("đã bị rút");
   });
+
+  it("làm thêm giờ: giờ bỏ giây, đồng ý / từ chối, lý do hủy", () => {
+    const t = createTranslator({ locale: "vi", messages: vi, namespace: "Notifications" });
+    const ot = { taskKey: "CRM-7", workDate: "2026-12-10", startTime: "18:00:00", endTime: "21:00", assignerName: "Lan", employeeName: "An" };
+    expect(t("types.OVERTIME_ASSIGNED", messageValues(notification("OVERTIME_ASSIGNED", ot), helpers))).toContain("18:00–21:00");
+    const responded = (accepted: unknown) =>
+      t("types.OVERTIME_RESPONDED", messageValues(notification("OVERTIME_RESPONDED", { ...ot, accepted }), helpers));
+    expect(responded(true)).toContain("đã đồng ý");
+    expect(responded(false)).toContain("đã từ chối");
+    const cancelled = (cause: string) =>
+      t("types.OVERTIME_CANCELLED", messageValues(notification("OVERTIME_CANCELLED", { ...ot, cause }), helpers));
+    expect(cancelled("LEAVE")).toContain("nghỉ cả ngày");
+    expect(cancelled("PM")).toContain("PM");
+  });
 });

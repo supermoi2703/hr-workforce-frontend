@@ -44,7 +44,7 @@ import {
 import type { ApprovalSummary, DecisionBody, ExplanationBody, LeaveDraft, RemoteWorkDraft, TimeApprovalType } from "./types";
 
 /** Loại yêu cầu duyệt của cụm công & phép, hiện ở tab "Cần tôi duyệt". */
-export const TIME_APPROVAL_TYPES: TimeApprovalType[] = ["LEAVE", "LEAVE_CANCEL", "WFH", "WFH_CANCEL", "SHIFT_CHANGE"];
+export const TIME_APPROVAL_TYPES: TimeApprovalType[] = ["LEAVE", "LEAVE_CANCEL", "WFH", "WFH_CANCEL", "SHIFT_CHANGE", "OVERTIME"];
 
 export type TimeApproval = ApprovalSummary & { type: TimeApprovalType };
 
@@ -326,6 +326,7 @@ const ERROR_KEYS: Record<string, TimesheetErrorKey> = {
   PERIOD_LOCK_SCOPE: "periodLockScope",
   PERIOD_LOCK_IN_PROGRESS: "periodLockInProgress",
   LOCK_BLOCKED_MISSING_OUT: "lockBlockedMissingOut",
+  LOCK_BLOCKED_PENDING_OVERTIME: "lockBlockedPendingOvertime",
   LOCK_RECOMPUTE_FAILED: "lockRecomputeFailed",
   INVALID_PERIOD: "invalidPeriod",
   REASON_REQUIRED: "reasonRequired",

@@ -40,6 +40,7 @@ const SOURCE_PAGES: Partial<Record<ApprovalType, string>> = {
   WFH_CANCEL: "/leave",
   SHIFT_CHANGE: "/timesheets",
   PAYROLL_APPROVAL: "/payroll",
+  OVERTIME: "/overtime",
 };
 
 export function sourceLink(type: string): string | null {
