@@ -11,11 +11,8 @@ import type {
   OvertimeUsage,
 } from "./types";
 
-/**
- * Tiền tố theo hợp đồng ot-kpi-api.md (`/api/v1/...`). Các module khác của backend dùng `/api/...` không có version:
- * nếu backend làm theo quy ước chung thì chỉ cần sửa dòng này.
- */
-export const OVERTIME_API = "/api/v1";
+// Tiền tố chung của backend, không có version (docs/01).
+export const OVERTIME_API = "/api";
 
 const enc = encodeURIComponent;
 const reasonOf = (reason?: string | null) => (reason && reason.trim() ? reason.trim() : null);
