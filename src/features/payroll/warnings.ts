@@ -7,6 +7,7 @@ export const WARNING_CODES = [
   "W_GT_N",
   "KPI_MISSING",
   "OT_MONTH_CAP",
+  "OT_MANUAL_OVERRIDE",
   "NET_NEGATIVE",
   "NET_BELOW_MIN_WAGE",
   "NO_CONTRACT",

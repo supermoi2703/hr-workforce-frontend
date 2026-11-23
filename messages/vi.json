@@ -60,7 +60,9 @@
       "policies": "Cài đặt chính sách",
       "myWork": "Việc của tôi",
       "missingOut": "Thiếu check-out",
-      "timesheetPeriods": "Kỳ công"
+      "timesheetPeriods": "Kỳ công",
+      "overtime": "Làm thêm giờ",
+      "overtimeManage": "Báo cáo làm thêm giờ"
     }
   },
   "Shell": {
@@ -487,6 +489,10 @@
     "announcement_manage": {
       "name": "Quản lý bảng tin",
       "description": "Tạo, sửa, đăng và gỡ thông báo; HR chỉ cho văn phòng của mình"
+    },
+    "overtime_read": {
+      "name": "Xem làm thêm giờ",
+      "description": "Xem báo cáo làm thêm giờ của mọi người trong phạm vi dữ liệu"
     }
   },
   "AuditActions": {
@@ -740,7 +746,8 @@
       "SELF": "Bản thân",
       "TEAM": "Cấp dưới",
       "OFFICE": "Văn phòng",
-      "ALL": "Toàn công ty"
+      "ALL": "Toàn công ty",
+      "OVERTIME": "Làm thêm giờ"
     },
     "unitKinds": {
       "OFFICE": "Văn phòng",
@@ -1169,7 +1176,8 @@
       "invalidPeriod": "Kỳ công không hợp lệ.",
       "reasonRequired": "Cần nhập lý do.",
       "selfDecideForbidden": "Bạn không xử lý được công của chính mình hoặc của người ngoài phạm vi của bạn.",
-      "decisionConflict": "Dữ liệu vừa được người khác thay đổi, hãy tải lại rồi thử lại."
+      "decisionConflict": "Dữ liệu vừa được người khác thay đổi, hãy tải lại rồi thử lại.",
+      "lockBlockedPendingOvertime": "Còn phiếu làm thêm chờ nhân viên hoặc người duyệt. Xử lý xong rồi chốt lại."
     },
     "remotePart": {
       "FULL_DAY": "WFH cả ngày",
@@ -1299,7 +1307,8 @@
         "LEAVE_CANCEL": "Hủy đơn nghỉ",
         "SHIFT_CHANGE": "Đăng ký giờ làm",
         "WFH": "Làm từ xa",
-        "WFH_CANCEL": "Hủy đơn làm từ xa"
+        "WFH_CANCEL": "Hủy đơn làm từ xa",
+        "OVERTIME": "Làm thêm giờ"
       },
       "urgent": "Gấp",
       "meta": "Gửi lúc {at} · Bước: {step}",
@@ -1374,6 +1383,186 @@
         "send": "Gửi yêu cầu hủy",
         "sent": "Đã gửi yêu cầu hủy."
       }
+    }
+  },
+  "Overtime": {
+    "metaTitle": "Làm thêm giờ của tôi",
+    "title": "Làm thêm giờ của tôi",
+    "description": "Giờ làm thêm PM giao cho bạn và giờ bạn tự khai. Giờ được tính lấy theo lần chấm công.",
+    "month": "Tháng",
+    "pickMonth": "Chọn tháng",
+    "claim": "Khai báo làm thêm",
+    "assignAction": "Giao làm thêm giờ",
+    "duration": {
+      "hm": "{h} giờ {m}",
+      "h": "{h} giờ",
+      "m": "{m} phút"
+    },
+    "statuses": {
+      "WAIT_EMPLOYEE": "Chờ nhân viên xác nhận",
+      "WAIT_APPROVAL": "Chờ PM duyệt",
+      "ACTIVE": "Có hiệu lực",
+      "REJECTED": "Từ chối",
+      "CANCELLED": "Đã hủy",
+      "EXPIRED": "Hết hạn",
+      "SETTLED": "Đã tính giờ"
+    },
+    "statusForMe": {
+      "WAIT_EMPLOYEE": "Chờ bạn xác nhận"
+    },
+    "kinds": {
+      "ASSIGNED": "PM giao",
+      "CLAIMED": "Tự khai"
+    },
+    "dayTypes": {
+      "WORKING_DAY": "Ngày thường",
+      "NORMAL": "Ngày thường",
+      "WEEKLY_OFF": "Ngày nghỉ tuần",
+      "HOLIDAY": "Ngày lễ"
+    },
+    "usage": {
+      "month": "Tháng này",
+      "year": "Năm nay",
+      "usedOfCap": "{used} / {cap}",
+      "left": "Còn {left}",
+      "over": "Đã vượt mức cho phép",
+      "notEnforced": "Hiện vượt mức chỉ cảnh báo, chưa chặn."
+    },
+    "list": {
+      "emptyTitle": "Tháng này chưa có làm thêm giờ",
+      "emptyDescription": "Giờ làm thêm PM giao và giờ bạn tự khai sẽ hiện ở đây.",
+      "window": "{start}–{end}",
+      "nextDay": "kết thúc hôm sau",
+      "noTask": "Không gắn task",
+      "assignedBy": "{name} giao",
+      "reason": "Lý do: {reason}",
+      "paidNormal": "Đã tính {duration}",
+      "paidNight": "đêm {duration}",
+      "pendingHr": "Chờ HR",
+      "pendingHrHint": "Lần chấm công ngày đó bị lẻ. Giờ làm thêm tạm tính 0 tới khi HR quyết.",
+      "viewApproval": "Xem yêu cầu duyệt",
+      "accept": "Đồng ý",
+      "decline": "Từ chối",
+      "cancel": "Hủy",
+      "withdraw": "Rút đơn",
+      "done": {
+        "accept": "Đã đồng ý làm thêm",
+        "decline": "Đã từ chối làm thêm",
+        "cancel": "Đã hủy làm thêm",
+        "withdraw": "Đã rút khai báo"
+      }
+    },
+    "reasonDialog": {
+      "reason": "Lý do (không bắt buộc)",
+      "back": "Quay lại",
+      "decline": {
+        "title": "Từ chối làm thêm",
+        "description": "PM sẽ nhận thông báo bạn từ chối:",
+        "confirm": "Từ chối"
+      },
+      "cancel": {
+        "title": "Hủy làm thêm",
+        "description": "Nhân viên sẽ nhận thông báo phiếu này bị hủy:",
+        "confirm": "Hủy làm thêm"
+      },
+      "withdraw": {
+        "title": "Rút khai báo",
+        "description": "Khai báo này sẽ không còn chờ duyệt:",
+        "confirm": "Rút đơn"
+      }
+    },
+    "form": {
+      "assignTitle": "Giao làm thêm giờ",
+      "assignDescription": "Chỉ giao được cho người đang làm task này. Người đó bấm Đồng ý hoặc Từ chối trên hệ thống.",
+      "claimTitle": "Khai báo làm thêm",
+      "claimDescription": "Khai giờ làm thêm trên một task của bạn. PM sẽ duyệt.",
+      "employee": "Nhân viên",
+      "task": "Task",
+      "taskPlaceholder": "Chọn task",
+      "noTasks": "Ngày này bạn không có task nào khai được.",
+      "date": "Ngày",
+      "start": "Bắt đầu",
+      "end": "Kết thúc",
+      "total": "Tổng {duration}",
+      "nextDay": "kết thúc hôm sau",
+      "reason": "Lý do",
+      "reasonPlaceholder": "Việc cần làm thêm (không bắt buộc)",
+      "draftLoading": "Đang xem lần chấm công...",
+      "retry": "Thử lại",
+      "deadline": "Khai cho ngày này được tới hết ngày {date}.",
+      "outsideWindow": "Đã quá hạn khai cho ngày này (hạn {date}).",
+      "suggested": "Theo lần chấm công: {start}–{end}",
+      "noSuggestion": "Không có lần chấm sau giờ làm để gợi ý.",
+      "usageLoading": "Đang xem số giờ đã làm thêm...",
+      "usageUnavailable": "Chưa lấy được số giờ đã làm thêm. Hệ thống vẫn kiểm mức cho phép khi gửi.",
+      "scheduledEnd": "Giờ làm thường kết thúc lúc {time}",
+      "offDay": "Ngày nghỉ: khung giờ nào cũng được",
+      "usedMonth": "Tháng: {used} / {cap}",
+      "usedYear": "năm: {used} / {cap}",
+      "maxDay": "Tối đa {duration} trong ngày này",
+      "remaining": "còn {duration} trước khi chạm mức",
+      "capWarning": "Lưu ý: {text}",
+      "issues": {
+        "required": "Nhập ngày, giờ bắt đầu và giờ kết thúc.",
+        "invalidTime": "Giờ phải có dạng 18:00.",
+        "startInPast": "Giờ bắt đầu phải sau bây giờ. Giờ đã làm rồi thì nhân viên tự khai.",
+        "beforeScheduleEnd": "Phải bắt đầu từ {time} trở đi (hết giờ làm thường).",
+        "dailyLimit": "Quá {duration} cho phép trong ngày này.",
+        "monthCap": "Vượt {monthCap} cho phép trong tháng.",
+        "yearCap": "Vượt {yearCap} cho phép trong năm."
+      },
+      "cancel": "Hủy",
+      "submitAssign": "Giao",
+      "submitClaim": "Gửi khai báo",
+      "assigned": "Đã giao, chờ nhân viên xác nhận",
+      "claimed": "Đã gửi, chờ PM duyệt"
+    },
+    "project": {
+      "description": "Làm thêm giờ trong dự án. Bạn hủy được phiếu đã giao trước giờ bắt đầu.",
+      "month": "Tháng",
+      "pickMonth": "Chọn tháng",
+      "emptyTitle": "Tháng này chưa có làm thêm giờ",
+      "emptyDescription": "Giao làm thêm giờ từ chi tiết task. Khai báo cần duyệt nằm ở Việc cần duyệt."
+    },
+    "manage": {
+      "metaTitle": "Báo cáo làm thêm giờ",
+      "title": "Báo cáo làm thêm giờ",
+      "description": "Làm thêm giờ của mọi người trong phạm vi bạn xem, theo tháng.",
+      "month": "Tháng",
+      "pickMonth": "Chọn tháng",
+      "office": "Văn phòng",
+      "allOffices": "Tất cả văn phòng",
+      "status": "Trạng thái",
+      "allStatuses": "Tất cả trạng thái",
+      "empty": "Không có phiếu nào khớp bộ lọc",
+      "employee": "Nhân viên",
+      "when": "Ngày giờ",
+      "task": "Task",
+      "kind": "Loại",
+      "planned": "Dự kiến",
+      "paid": "Đã tính",
+      "night": "Đêm"
+    },
+    "errors": {
+      "taskNotAssigned": "Task này không giao cho người này.",
+      "notProjectMember": "Người này không thuộc dự án vào ngày đó.",
+      "taskClosed": "Task đã xong hoặc đã hủy.",
+      "taskNotLeaf": "Task có task con. Hãy chọn task con.",
+      "projectInactive": "Dự án không còn chạy.",
+      "notProjectManager": "Chỉ PM của dự án mới giao được làm thêm giờ.",
+      "beforeScheduleEnd": "Ngày làm việc thì làm thêm phải bắt đầu sau giờ làm thường.",
+      "dailyLimit": "Quá số giờ làm thêm cho phép trong một ngày.",
+      "monthCap": "Vượt số giờ làm thêm cho phép trong tháng.",
+      "yearCap": "Vượt số giờ làm thêm cho phép trong năm.",
+      "overlap": "Người này đã có phiếu làm thêm trùng giờ.",
+      "onLeave": "Người này nghỉ cả ngày hôm đó.",
+      "claimWindowClosed": "Đã quá hạn khai làm thêm cho ngày đó.",
+      "endTooLate": "Giờ kết thúc muộn hơn mức cho phép.",
+      "invalidState": "Phiếu này vừa đổi trạng thái. Danh sách đã được tải lại.",
+      "expired": "Phiếu đã tới giờ bắt đầu mà chưa ai xác nhận.",
+      "assignTooLate": "Phiếu giao phải bắt đầu sau bây giờ. Nhân viên có thể tự khai.",
+      "selfAssign": "PM tự khai làm thêm của mình, không tự giao.",
+      "notFound": "Phiếu này không còn."
     }
   },
   "Approvals": {
@@ -1479,7 +1668,8 @@
       "ALLOCATION": "Phân bổ dự án",
       "TRANSFER": "Điều chuyển",
       "SALARY_ADJUSTMENT": "Điều chỉnh lương",
-      "PAYROLL_APPROVAL": "Duyệt bảng lương"
+      "PAYROLL_APPROVAL": "Duyệt bảng lương",
+      "OVERTIME": "Làm thêm giờ"
     },
     "status": {
       "PENDING": "Chờ duyệt",
@@ -2828,7 +3018,8 @@
       "sprint": "Sprint",
       "capacity": "Năng lực",
       "members": "Thành viên",
-      "info": "Thông tin"
+      "info": "Thông tin",
+      "overtime": "Làm thêm giờ"
     },
     "risk": {
       "DUE_ON_LEAVE": "Trùng ngày nghỉ",
@@ -3287,7 +3478,10 @@
       "CONTRACT_EXPIRING": "Hợp đồng {contractNumber} của {employeeName} hết hạn ngày {endDate}",
       "MISSING_CHECKOUT": "Bạn chưa chấm giờ ra ngày {workDate}",
       "PAYSLIP_PUBLISHED": "Phiếu lương tháng {period} đã phát hành. Có thắc mắc thì gửi trước hết ngày {complaintDeadline}",
-      "ANNOUNCEMENT_PUBLISHED": "Bảng tin có bài mới: “{title}”"
+      "ANNOUNCEMENT_PUBLISHED": "Bảng tin có bài mới: “{title}”",
+      "OVERTIME_ASSIGNED": "{assignerName} giao bạn làm thêm {taskKey} ngày {workDate}, {startTime}–{endTime}. Hãy đồng ý hoặc từ chối",
+      "OVERTIME_RESPONDED": "{employeeName} {accepted, select, true {đã đồng ý} other {đã từ chối}} làm thêm {taskKey} ngày {workDate}",
+      "OVERTIME_CANCELLED": "Làm thêm {taskKey} ngày {workDate} đã bị hủy {cause, select, PM {do PM hủy} LEAVE {vì bạn nghỉ cả ngày} EXPIRED {vì quá giờ mà chưa xác nhận} other {}}"
     }
   },
   "Announcements": {
@@ -4194,7 +4388,8 @@
       "REGION_FALLBACK": "Văn phòng vùng {region} chưa có mức lương tối thiểu riêng, đang dùng mức chung",
       "TIMESHEET_PENDING": "Còn {days} ngày công chờ HR quyết",
       "PAID_OUTSIDE_CONTRACT": "Có công ngoài thời hạn hợp đồng",
-      "LEGACY": "Cảnh báo cũ"
+      "LEGACY": "Cảnh báo cũ",
+      "OT_MANUAL_OVERRIDE": "Giờ OT nhập tay thay cho giờ tính từ phiếu làm thêm"
     },
     "checks": {
       "loading": "Đang kiểm tra...",
@@ -4344,7 +4539,8 @@
       "LEAVE_APPROVED": "Đơn nghỉ duyệt sau chốt",
       "WFH_APPROVED": "Đơn WFH duyệt sau chốt",
       "INCIDENT": "Sự cố chấm công",
-      "HR_REQUEST": "HR ghi tay"
+      "HR_REQUEST": "HR ghi tay",
+      "OVERTIME_APPROVED": "Làm thêm được duyệt sau khi chốt"
     }
   },
   "Workload": {

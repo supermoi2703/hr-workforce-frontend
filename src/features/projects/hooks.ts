@@ -9,6 +9,7 @@ import {
   getOrgDepartments,
   getOrgOffices,
   getProjectByCode,
+  getProjectById,
   getProjectCreateScope,
   getProjectMembers,
   getProjects,
@@ -40,8 +41,14 @@ export function useProjects(filters: ProjectFilters, params: PageParams) {
   });
 }
 
+// Mã dự án không có dạng UUID, nên /projects/<uuid> là link theo id (vd thông báo làm thêm giờ: /projects/{projectId}?tab=overtime).
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function useProject(code: string) {
-  return useQuery({ queryKey: projectKeys.detail(code), queryFn: () => getProjectByCode(code) });
+  return useQuery({
+    queryKey: projectKeys.detail(code),
+    queryFn: () => (UUID.test(code) ? getProjectById(code) : getProjectByCode(code)),
+  });
 }
 
 export function useProjectMembers(id: string, date?: string) {

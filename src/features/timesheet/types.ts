@@ -193,10 +193,11 @@ export type ApprovalType =
   | "ATTENDANCE_EXPLANATION"
   | "ALLOCATION"
   | "TRANSFER"
-  | "SALARY_ADJUSTMENT";
+  | "SALARY_ADJUSTMENT"
+  | "OVERTIME";
 
 /** Loại yêu cầu của cụm công & phép, hiện ở hộp "Cần tôi duyệt". */
-export type TimeApprovalType = "LEAVE" | "LEAVE_CANCEL" | "WFH" | "WFH_CANCEL" | "SHIFT_CHANGE";
+export type TimeApprovalType = "LEAVE" | "LEAVE_CANCEL" | "WFH" | "WFH_CANCEL" | "SHIFT_CHANGE" | "OVERTIME";
 
 export type ApprovalSummary = {
   id: string;
@@ -351,7 +352,7 @@ export type LateChange = {
   employeeId: string;
   workDate: string;
   month: string;
-  source: "EXPLANATION_APPROVED" | "LEAVE_APPROVED" | "WFH_APPROVED" | "INCIDENT" | "HR_REQUEST";
+  source: "EXPLANATION_APPROVED" | "LEAVE_APPROVED" | "WFH_APPROVED" | "OVERTIME_APPROVED" | "INCIDENT" | "HR_REQUEST";
   refType: string | null;
   refId: string | null;
   proposedPaidUnits: number | null;

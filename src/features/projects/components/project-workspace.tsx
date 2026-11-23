@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Project } from "../types";
+import type { Task } from "../work-types";
 import { setSprintMode } from "../work-api";
 import { useWorkErrorMessage, useWorkMutation } from "../work-hooks";
 import { BoardTab } from "./board-tab";
@@ -20,7 +21,7 @@ import { TaskFormDialog } from "./task-form-dialog";
 import { TaskSheet } from "./task-sheet";
 import { TasksTab } from "./tasks-tab";
 
-const TABS = ["overview", "list", "board", "sprint", "capacity", "members", "info"] as const;
+const TABS = ["overview", "list", "board", "sprint", "capacity", "overtime", "members", "info"] as const;
 type Tab = (typeof TABS)[number];
 const TASK_TABS: readonly Tab[] = ["list", "board", "sprint"];
 
@@ -29,6 +30,10 @@ type ProjectWorkspaceProps = {
   /** Thông tin dự án và danh sách người tham gia: phần của 3.1 + 3.2, truyền từ trang chi tiết. */
   info: ReactNode;
   members: ReactNode;
+  /** Tab "Làm thêm giờ" (feature overtime, chỉ PM); null / không truyền thì ẩn tab. */
+  overtime?: ReactNode;
+  /** Nút thêm trong chi tiết task (vd "Giao làm thêm giờ"). */
+  renderTaskActions?: (task: Task) => ReactNode;
 };
 
 export function ProjectWorkspace(props: ProjectWorkspaceProps) {
@@ -43,7 +48,7 @@ export function ProjectWorkspace(props: ProjectWorkspaceProps) {
  * Các tab của một dự án. Tab và việc đang mở nằm trên URL để chia sẻ được: ?tab=board&task=HRM-12.
  * Người ngoài dự án chỉ thấy Thông tin và Người tham gia; HR thấy thêm số liệu, không thấy nội dung việc.
  */
-function Workspace({ project, info, members }: ProjectWorkspaceProps) {
+function Workspace({ project, info, members, overtime, renderTaskActions }: ProjectWorkspaceProps) {
   const t = useTranslations("ProjectWork");
   const errorMessage = useWorkErrorMessage();
   const router = useRouter();
@@ -72,6 +77,7 @@ function Workspace({ project, info, members }: ProjectWorkspaceProps) {
     if (tab === "overview") return can.viewTaskContent || can.viewAllocation;
     // Năng lực có ngày nghỉ của từng người nên thành viên thường không xem.
     if (tab === "capacity") return can.viewAllocation;
+    if (tab === "overtime") return overtime != null && overtime !== false;
     return true;
   });
   const asked = params.get("tab") as Tab | null;
@@ -110,6 +116,9 @@ function Workspace({ project, info, members }: ProjectWorkspaceProps) {
           <TabsContent value="capacity" className="mt-4">
             {tab === "capacity" && <CapacityTab project={project} />}
           </TabsContent>
+          <TabsContent value="overtime" className="mt-4">
+            {tab === "overtime" && overtime}
+          </TabsContent>
           <TabsContent value="members" className="mt-4">
             {tab === "members" && members}
           </TabsContent>
@@ -130,7 +139,13 @@ function Workspace({ project, info, members }: ProjectWorkspaceProps) {
         </Tabs>
       </div>
       {creating && <TaskFormDialog project={project} onClose={() => setCreating(false)} />}
-      <TaskSheet taskKey={params.get("task")} project={project} onClose={() => openTask(null)} onOpenTask={openTask} />
+      <TaskSheet
+        taskKey={params.get("task")}
+        project={project}
+        onClose={() => openTask(null)}
+        onOpenTask={openTask}
+        renderActions={renderTaskActions}
+      />
     </>
   );
 }
