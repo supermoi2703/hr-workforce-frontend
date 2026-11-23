@@ -1,4 +1,18 @@
-import type { AssignPreview, BOARD_STATUSES, LoadWeek, MyWork, TaskCard, TaskSkillInput, WeekCell, WorkCategory, ZoneReason } from "./work-types";
+import type {
+  AssignPreview,
+  BOARD_STATUSES,
+  LoadWeek,
+  MyWork,
+  SkillFit,
+  SuggestionCandidate,
+  SuggestionReason,
+  SuggestionReasonCode,
+  TaskCard,
+  TaskSkillInput,
+  WeekCell,
+  WorkCategory,
+  ZoneReason,
+} from "./work-types";
 
 const MINUTES_PER_HOUR = 60;
 
@@ -161,4 +175,43 @@ export function needsConfirm(preview: AssignPreview | null | undefined): boolean
 /** 2880 → "48", 90 → "1,5": giờ để hiển thị trong câu (dấu phẩy thập phân). */
 export function hoursText(minutes: number): string {
   return minutesToHoursText(minutes).replace(".", ",");
+}
+
+// ===== Gợi ý người (workload bước 4)
+
+/** Một dòng lý do của người được gợi ý; nội dung chữ do component dịch. */
+export type SuggestionLine =
+  | { kind: "skills"; belowMin: boolean; unconfirmed: boolean; skills: SkillFit[] }
+  | { kind: "peak"; week: LoadWeek }
+  | { kind: "reason"; reason: SuggestionReason };
+
+// Lý do phụ theo thứ tự ưu tiên. "Chưa ở dự án" không cần: danh sách đã chia nhóm trong / ngoài dự án.
+const EXTRA_REASONS: SuggestionReasonCode[] = ["LEAVE_ON_DUE", "ENDS_BEFORE_START", "LEAVE_IN_RANGE", "UNSCHEDULED_WORK"];
+
+/** Tối đa `max` dòng: kỹ năng → tuần nặng nhất → một lý do phụ (nghỉ đúng hạn, việc kết thúc trước, ngày nghỉ, việc chưa lên lịch). */
+export function suggestionLines(candidate: SuggestionCandidate, max = 3): SuggestionLine[] {
+  const lines: SuggestionLine[] = [];
+  const codes = new Set(candidate.reasons.map((reason) => reason.code));
+  if (candidate.skills.length > 0) {
+    lines.push({
+      kind: "skills",
+      belowMin: codes.has("BELOW_MIN_LEVEL"),
+      unconfirmed: codes.has("SKILL_UNCONFIRMED"),
+      skills: candidate.skills,
+    });
+  }
+  if (candidate.load.peakWeek) lines.push({ kind: "peak", week: candidate.load.peakWeek });
+  for (const code of EXTRA_REASONS) {
+    if (lines.length >= max) break;
+    const reason = candidate.reasons.find((item) => item.code === code);
+    if (reason) lines.push({ kind: "reason", reason });
+  }
+  return lines.slice(0, max);
+}
+
+/** "Java 3, SQL 2 (cần ≥ 3)": mức của từng kỹ năng yêu cầu; kỹ năng dưới mức ghi kèm mức tối thiểu. */
+export function skillFitText(skills: SkillFit[], belowLabel: (min: number) => string): string {
+  return skills
+    .map((skill) => `${skill.skillName} ${skill.level}${skill.level < skill.minLevel ? ` ${belowLabel(skill.minLevel)}` : ""}`)
+    .join(", ");
 }

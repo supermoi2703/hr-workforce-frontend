@@ -2956,12 +2956,6 @@
     "estimateHours": "Estimate (hours)",
     "estimateHint": "For example 8, 1.5 or 1:30",
     "requiredSkills": "Required skills",
-    "reassignTitle": "Reassign {key}",
-    "reassignHint": "Ranked by: not on leave on the due date, skills, free time. Nothing is assigned automatically.",
-    "noSuggestions": "No suitable member in this project.",
-    "skillsMatched": "Skills {matched}/{total}",
-    "freeTime": "{time} free",
-    "leaveOnDue": "On leave on the due date",
     "assign": "Assign",
     "assignedTo": "Assigned to {name}",
     "edit": "Edit",
@@ -3117,7 +3111,8 @@
     "suggestionHoursOnly": "Category suggests: {hours}, no fixed skills",
     "dateHintSprintStart": "Empty start date: uses the sprint start ({date}).",
     "dateHintSprintEnd": "Empty due date: uses the sprint end ({date}).",
-    "notPlanned": "Not scheduled yet"
+    "notPlanned": "Not scheduled yet",
+    "suggestPeople": "Suggest people"
   },
   "Contracts": {
     "metaTitle": "Contracts",
@@ -3357,6 +3352,8 @@
     "proposeHint": "Bring people into the project for a period. Each person's department head and the PM approve on the Approvals page; the requester counts as agreed. The dot next to each person is their load from tasks in this period: for judgement only, nothing is blocked.",
     "changeTitle": "Extend or change dates: {name}",
     "changeHint": "Resets the participation period for exactly the dates chosen; outside them nothing changes. This person's department head and the PM approve.",
+    "joinTitle": "Propose {name} for the project",
+    "joinHint": "Dates are taken from the task. This person's department head and the PM approve; assign the task after approval.",
     "source": "Pick from",
     "sourceTeam": "Organization team",
     "sourceProject": "Another project",
@@ -4569,5 +4566,33 @@
     "confirmTitle": "Assign to {name} anyway?",
     "confirmDescription": "{name} would be overloaded with this task. Nothing is blocked; make sure you have talked to {name}, or move the due date or split the task.",
     "confirmAction": "Assign anyway"
+  },
+  "Suggest": {
+    "title": "Suggest people for {key}",
+    "hint": "Ranked by load zone if they take this task, then by skills. The system only suggests; it never assigns.",
+    "period": "Load from {from} to {to}, including this task.",
+    "currentLoadOnly": "The task has no hours or due date: only current load over the next 2 weeks is checked. Add hours and a due date to see who would be overloaded.",
+    "members": "In the project ({count})",
+    "outside": "Outside the project ({count})",
+    "noMembers": "No project member fits.",
+    "noOutside": "Nobody outside the project fits.",
+    "outsideNeedsSkills": "The task lists no skills. Add skills to find people outside the project.",
+    "allOffices": "All offices",
+    "proposeJoin": "Propose joining",
+    "notMember": "Not in the project",
+    "showMore": "Show more ({count})",
+    "excludedMissingSkill": "{count} members lack a required skill.",
+    "excludedOverloaded": "{count} people left out as overloaded · show",
+    "hideOverloaded": "{count} people left out as overloaded · hide",
+    "skills": "Skills: {skills}",
+    "belowMin": "(needs ≥ {min})",
+    "unconfirmed": "self-declared level, not confirmed",
+    "reason": {
+      "endsSameProject": "{key} ends {date}, before this task starts",
+      "endsOtherProject": "A task in another project ends {date}, before this task starts",
+      "leaveInRange": "{days} days of leave within the task dates",
+      "leaveOnDue": "On leave on the due date",
+      "unscheduled": "{hours} hours of work not scheduled yet"
+    }
   }
 }

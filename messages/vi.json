@@ -2956,12 +2956,6 @@
     "estimateHours": "Ước lượng (giờ)",
     "estimateHint": "Ví dụ 8, 1.5 hoặc 1:30",
     "requiredSkills": "Kỹ năng cần có",
-    "reassignTitle": "Giao lại {key}",
-    "reassignHint": "Xếp theo: không nghỉ ngày hạn, đủ kỹ năng, giờ trống. Hệ thống không tự giao.",
-    "noSuggestions": "Không có người phù hợp trong dự án.",
-    "skillsMatched": "Kỹ năng {matched}/{total}",
-    "freeTime": "Trống {time}",
-    "leaveOnDue": "Nghỉ đúng ngày hạn",
     "assign": "Giao",
     "assignedTo": "Đã giao cho {name}",
     "edit": "Sửa",
@@ -3117,7 +3111,8 @@
     "suggestionHoursOnly": "Gợi ý của nhóm: {hours}, không gắn kỹ năng cố định",
     "dateHintSprintStart": "Ngày bắt đầu để trống: lấy ngày bắt đầu sprint ({date}).",
     "dateHintSprintEnd": "Hạn để trống: lấy ngày kết thúc sprint ({date}).",
-    "notPlanned": "Chưa lên lịch"
+    "notPlanned": "Chưa lên lịch",
+    "suggestPeople": "Gợi ý người"
   },
   "Contracts": {
     "metaTitle": "Hợp đồng",
@@ -3357,6 +3352,8 @@
     "proposeHint": "Đưa người vào dự án trong một khoảng ngày. Trưởng phòng của từng người và PM cùng duyệt ở trang Phê duyệt; bên tạo đề xuất coi như đã đồng ý. Chấm màu cạnh mỗi người là tải tính từ task trong khoảng này: chỉ để cân nhắc, không chặn.",
     "changeTitle": "Gia hạn hoặc đổi thời gian: {name}",
     "changeHint": "Đề xuất đặt lại thời gian tham gia trong đúng khoảng ngày đã chọn; ngoài khoảng giữ nguyên. Trưởng phòng của người này và PM cùng duyệt.",
+    "joinTitle": "Đề xuất {name} vào dự án",
+    "joinHint": "Điền sẵn khoảng ngày của việc. Trưởng phòng của người này và PM cùng duyệt; duyệt xong mới giao việc được.",
     "source": "Lấy từ",
     "sourceTeam": "Team tổ chức",
     "sourceProject": "Dự án khác",
@@ -4569,5 +4566,33 @@
     "confirmTitle": "Vẫn giao cho {name}?",
     "confirmDescription": "{name} sẽ quá tải nếu nhận việc này. Hệ thống không chặn; hãy chắc đã trao đổi với {name} hoặc lùi hạn, chia việc.",
     "confirmAction": "Vẫn giao"
+  },
+  "Suggest": {
+    "title": "Gợi ý người cho {key}",
+    "hint": "Xếp theo vùng tải nếu nhận việc này, rồi theo kỹ năng. Hệ thống chỉ gợi ý, không tự giao.",
+    "period": "Xét tải từ {from} đến {to}, đã cộng việc này.",
+    "currentLoadOnly": "Việc chưa có giờ hoặc hạn: chỉ xét tải hiện tại 2 tuần tới. Thêm giờ và hạn để biết ai sẽ quá tải.",
+    "members": "Trong dự án ({count})",
+    "outside": "Ngoài dự án ({count})",
+    "noMembers": "Không có thành viên nào phù hợp.",
+    "noOutside": "Không có người ngoài dự án phù hợp.",
+    "outsideNeedsSkills": "Việc chưa khai kỹ năng. Thêm kỹ năng cho việc để tìm người ngoài dự án.",
+    "allOffices": "Mọi văn phòng",
+    "proposeJoin": "Đề xuất vào dự án",
+    "notMember": "Chưa ở dự án",
+    "showMore": "Xem thêm ({count})",
+    "excludedMissingSkill": "{count} thành viên thiếu kỹ năng yêu cầu.",
+    "excludedOverloaded": "{count} người bị loại vì quá tải · xem",
+    "hideOverloaded": "{count} người bị loại vì quá tải · ẩn",
+    "skills": "Kỹ năng: {skills}",
+    "belowMin": "(cần ≥ {min})",
+    "unconfirmed": "có mức tự khai, chưa xác nhận",
+    "reason": {
+      "endsSameProject": "{key} kết thúc {date}, trước khi việc này bắt đầu",
+      "endsOtherProject": "Một việc ở dự án khác kết thúc {date}, trước khi việc này bắt đầu",
+      "leaveInRange": "Nghỉ {days} ngày trong khoảng của việc",
+      "leaveOnDue": "Nghỉ đúng ngày hạn",
+      "unscheduled": "Còn {hours} giờ việc chưa lên lịch"
+    }
   }
 }
