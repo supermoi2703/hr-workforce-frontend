@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { RequireAccess } from "@/components/shared/require-access";
-import { ProjectDetailPage } from "@/features/projects/components/project-detail-page";
+import { ProjectPage } from "./_components/project-page";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Projects.Detail");
@@ -12,7 +12,7 @@ export default async function ProjectRoute({ params }: PageProps<"/projects/[cod
   const { code } = await params;
   return (
     <RequireAccess access={{ permissions: ["project:read"] }}>
-      <ProjectDetailPage code={code} />
+      <ProjectPage code={code} />
     </RequireAccess>
   );
 }

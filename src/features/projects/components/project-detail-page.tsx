@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeftIcon, ChevronDownIcon, FolderXIcon, PencilIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,6 +18,7 @@ import { closeProject } from "../api";
 import { useProject, useProjectErrorMessage, useProjectMembers, useProjectMutation } from "../hooks";
 import { allocatedEmployeeIds } from "../rules";
 import type { Project } from "../types";
+import type { Task } from "../work-types";
 import { ProjectRoleBadge, ProjectStatusBadge } from "./project-badges";
 import { ChangeManagerDialog, EditProjectDialog, ProjectSettingsDialog } from "./project-edit-dialogs";
 import { ProjectMembers } from "./project-members";
@@ -26,8 +27,17 @@ import { ProjectWorkspace } from "./project-workspace";
 
 const LIST_PATH = "/projects";
 
+/**
+ * Phần do feature khác gắn vào (feature không import nhau, route ghép lại): tab "Làm thêm giờ" và nút thêm trong chi tiết
+ * task. Trả null thì không hiện.
+ */
+export type ProjectExtensions = {
+  renderOvertime?: (project: Project) => ReactNode;
+  renderTaskActions?: (task: Task, project: Project) => ReactNode;
+};
+
 /** Chi tiết một dự án. Nút thao tác hiện theo `can` của backend, không tự suy quyền ở frontend. */
-export function ProjectDetailPage({ code }: { code: string }) {
+export function ProjectDetailPage({ code, ...extensions }: { code: string } & ProjectExtensions) {
   const t = useTranslations("Projects.Detail");
   const query = useProject(code);
 
@@ -55,14 +65,14 @@ export function ProjectDetailPage({ code }: { code: string }) {
   return (
     <>
       {backLink}
-      <ProjectDetail project={query.data} />
+      <ProjectDetail project={query.data} {...extensions} />
     </>
   );
 }
 
 type DialogName = "edit" | "settings" | "pm" | "close";
 
-function ProjectDetail({ project }: { project: Project }) {
+function ProjectDetail({ project, renderOvertime, renderTaskActions }: { project: Project } & ProjectExtensions) {
   const t = useTranslations("Projects.Detail");
   const tType = useTranslations("Projects.types");
   const tColumns = useTranslations("Projects.Columns");
@@ -116,6 +126,8 @@ function ProjectDetail({ project }: { project: Project }) {
 
       <ProjectWorkspace
         project={project}
+        overtime={renderOvertime?.(project)}
+        renderTaskActions={renderTaskActions ? (task) => renderTaskActions(task, project) : undefined}
         info={
             <DetailList>
               <DetailRow label={t("type")}>

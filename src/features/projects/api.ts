@@ -29,6 +29,7 @@ export const getProjects = (filters: ProjectFilters, params: PageParams) =>
   });
 
 export const getProjectByCode = (code: string) => http.get<Project>(`/api/projects/by-code/${enc(code)}`);
+export const getProjectById = (id: string) => http.get<Project>(`/api/projects/${enc(id)}`);
 export const getProjectCreateScope = () => http.get<ProjectCreateScope>("/api/projects/create-scope");
 
 export const createProject = (body: CreateProjectInput) => http.post<Project>("/api/projects", body);
