@@ -16,14 +16,15 @@ import { useWorkErrorMessage, useWorkMutation } from "../work-hooks";
 import { BoardTab } from "./board-tab";
 import { CapacityTab } from "./capacity-tab";
 import { OverviewTab } from "./overview-tab";
+import { ProjectTimelineTab } from "./project-timeline-tab";
 import { SprintTab } from "./sprint-tab";
 import { TaskFormDialog } from "./task-form-dialog";
 import { TaskSheet } from "./task-sheet";
 import { TasksTab } from "./tasks-tab";
 
-const TABS = ["overview", "list", "board", "sprint", "capacity", "overtime", "members", "info"] as const;
+const TABS = ["overview", "list", "board", "timeline", "sprint", "capacity", "overtime", "members", "info"] as const;
 type Tab = (typeof TABS)[number];
-const TASK_TABS: readonly Tab[] = ["list", "board", "sprint"];
+const TASK_TABS: readonly Tab[] = ["list", "board", "timeline", "sprint"];
 
 type ProjectWorkspaceProps = {
   project: Project;
@@ -88,7 +89,7 @@ function Workspace({ project, info, members, overtime, renderTaskActions }: Proj
       <div>
         <Tabs value={tab} onValueChange={(value) => setQuery({ tab: value as string })}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <TabsList className="max-w-full overflow-x-auto">
+            <TabsList className="max-w-full overflow-x-auto overflow-y-hidden">
               {tabs.map((value) => (
                 <TabsTrigger key={value} value={value}>
                   {t(`tabs.${value}`)}
@@ -109,6 +110,11 @@ function Workspace({ project, info, members, overtime, renderTaskActions }: Proj
           </TabsContent>
           <TabsContent value="board" className="mt-4">
             {tab === "board" && <BoardTab project={project} onOpenTask={openTask} />}
+          </TabsContent>
+          <TabsContent value="timeline" className="mt-4">
+            {tab === "timeline" && (
+              <ProjectTimelineTab project={project} onOpenTask={openTask} onShowList={() => setQuery({ tab: "list" })} />
+            )}
           </TabsContent>
           <TabsContent value="sprint" className="mt-4">
             {tab === "sprint" && <SprintTab project={project} onOpenTask={openTask} />}

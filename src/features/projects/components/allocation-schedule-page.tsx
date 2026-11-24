@@ -1,34 +1,37 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LockIcon, UserRoundSearchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { isApiError } from "@/lib/api/errors";
 import { useCurrentUser } from "@/lib/auth/auth-provider";
-import { formatDate, todayIsoDate } from "@/lib/format";
-import { scheduleRange, weekBars, type WeekBar } from "../allocation-rules";
+import { cn } from "@/lib/utils";
+import { todayIsoDate } from "@/lib/format";
 import { EMPLOYEE_SEARCH_MIN_LENGTH } from "../hooks";
 import type { ProjectPerson } from "../types";
 import { useAllocationPeople, usePersonAllocations } from "../work-hooks";
-import { hoursText } from "../work-rules";
-import type { AllocationViewerReach, PersonAllocations } from "../work-types";
+import type { AllocationViewerReach } from "../work-types";
+import { TimelineToolbar } from "../timeline/timeline-parts";
+import { parseZoom, shiftedFrom, timelineWindow, type Zoom } from "../timeline/timeline-scale";
 import { PersonPicker } from "./employee-picker";
-import { AllocationTimeline } from "./allocation-timeline";
-import { LoadLine, ZoneDot } from "./load-summary";
+import { AllocationPersonView } from "./allocation-person-view";
+import { AllocationTeamView } from "./allocation-team-view";
 
-type UrlPatch = { employeeId?: string | null; from?: string | null; to?: string | null };
+type Mode = "person" | "team";
+type UrlPatch = { employeeId?: string | null; from?: string | null; zoom?: string | null; mode?: string | null };
 
 /**
- * Trang /allocations: lịch phân bổ của một người trên mọi dự án (chỉ xem). Ai mở được lịch của ai do backend quyết định
- * (README module project mục 8.6); trang chỉ hiện ô chọn người theo `reach`. Người và khoảng ngày nằm trên URL.
+ * Trang /allocations: lịch tải theo người (workload bước 5). Hai chế độ:
+ * - Một người: biểu đồ tải theo tuần + việc trên mọi dự án (dự án không xem được nội dung thì chỉ có số việc);
+ * - Cả nhóm: bảng tải theo tuần của những người mình xem được lịch, nặng nhất trước.
+ * Ai xem được lịch của ai do backend quyết định (README module project mục 8.6). Người, chế độ, mức phóng to và ngày đầu
+ * nằm trên URL để gửi link được.
  */
 export function AllocationSchedulePage() {
   const t = useTranslations("Allocations.Schedule");
@@ -37,11 +40,15 @@ export function AllocationSchedulePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-
-  const range = useMemo(() => scheduleRange(searchParams.get("from"), searchParams.get("to")), [searchParams]);
-  const target = searchParams.get("employeeId") ?? me;
-  const schedule = usePersonAllocations(target, range.from, range.to);
+  const today = todayIsoDate();
+  const zoom = parseZoom(searchParams.get("zoom"));
+  const window = timelineWindow(zoom, searchParams.get("from"), today);
   const reach = useAllocationPeople("").data?.reach;
+  const canSeeOthers = reach !== undefined && reach !== "SELF";
+  const mode: Mode = canSeeOthers && searchParams.get("mode") === "team" ? "team" : "person";
+  const target = searchParams.get("employeeId") ?? me;
+  // Chờ biết `reach` rồi mới tải: link ?mode=team không tải nhầm lịch một người.
+  const schedule = usePersonAllocations(mode === "person" && reach !== undefined ? target : null, window.from, window.to);
 
   const update = useCallback(
     (patch: UrlPatch) => {
@@ -60,73 +67,83 @@ export function AllocationSchedulePage() {
     ? { ...schedule.data.employee, employeeCode: schedule.data.employee.employeeCode ?? "" }
     : null;
   const forbidden = isApiError(schedule.error) && schedule.error.status === 403;
+  const toolbar = (
+    <TimelineToolbar
+      window={window}
+      zoom={zoom}
+      onZoom={(value: Zoom) => update({ zoom: value === "month" ? null : value, from: null })}
+      onShift={(direction) => update({ from: shiftedFrom(window.from, zoom, direction) })}
+      onToday={() => update({ from: null })}
+    />
+  );
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          canSeeOthers ? (
+            <div role="group" aria-label={t("modeLabel")} className="flex rounded-lg bg-muted p-0.5">
+              {(["person", "team"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={mode === value}
+                  onClick={() => update({ mode: value === "person" ? null : value })}
+                  className={cn(
+                    "rounded-md px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                    mode === value && "bg-card text-primary shadow-sm",
+                  )}
+                >
+                  {t(`mode.${value}`)}
+                </button>
+              ))}
+            </div>
+          ) : undefined
+        }
+      />
 
-      <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 md:flex-row md:items-end">
-        {reach && reach !== "SELF" && (
-          <div className="grid gap-1.5 md:w-80">
-            <Label htmlFor="schedule-person">{t("person")}</Label>
-            <AllocationPersonPicker
-              id="schedule-person"
-              reach={reach}
-              value={viewed}
-              onChange={(person) => update({ employeeId: person.id === me ? null : person.id })}
-            />
-          </div>
-        )}
-        <div className="grid grid-cols-2 gap-3 md:flex">
-          <div className="grid gap-1.5">
-            <Label htmlFor="schedule-from">{t("from")}</Label>
-            <Input
-              id="schedule-from"
-              type="date"
-              value={range.from ?? schedule.data?.from ?? ""}
-              onChange={(event) => update({ from: event.target.value || null })}
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="schedule-to">{t("to")}</Label>
-            <Input
-              id="schedule-to"
-              type="date"
-              min={range.from ?? schedule.data?.from}
-              value={range.to ?? schedule.data?.to ?? ""}
-              onChange={(event) => update({ to: event.target.value || null })}
-            />
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2 md:ml-auto">
-          {(range.from || range.to) && (
-            <Button variant="ghost" onClick={() => update({ from: null, to: null })}>
-              {t("resetRange")}
-            </Button>
-          )}
-          {me && target !== me && (
-            <Button variant="outline" onClick={() => update({ employeeId: null })}>
-              {t("mine")}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {!target ? (
-        <EmptyState
-          className="border border-dashed"
-          icon={<UserRoundSearchIcon />}
-          title={t("pickTitle")}
-          description={t("pickDescription")}
+      {mode === "team" ? (
+        <AllocationTeamView
+          reach={reach!}
+          window={window}
+          toolbar={toolbar}
+          onOpenPerson={(id) => update({ mode: null, employeeId: id === me ? null : id })}
         />
-      ) : schedule.isPending ? (
-        <LoadingState />
-      ) : forbidden ? (
-        <EmptyState className="border border-dashed" icon={<LockIcon />} title={t("forbiddenTitle")} description={t("forbidden")} />
-      ) : schedule.isError ? (
-        <ErrorState error={schedule.error} onRetry={() => schedule.refetch()} />
       ) : (
-        <ScheduleView schedule={schedule.data} isMine={schedule.data.employee.id === me} />
+        <>
+          {canSeeOthers && (
+            <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 md:flex-row md:items-end">
+              <div className="grid gap-1.5 md:w-80">
+                <Label htmlFor="schedule-person">{t("person")}</Label>
+                <AllocationPersonPicker
+                  id="schedule-person"
+                  reach={reach as Exclude<AllocationViewerReach, "SELF">}
+                  value={viewed}
+                  onChange={(person) => update({ employeeId: person.id === me ? null : person.id })}
+                />
+              </div>
+              {me && target !== me && (
+                <Button variant="outline" className="md:ml-auto" onClick={() => update({ employeeId: null })}>
+                  {t("mine")}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {!target ? (
+            <EmptyState className="border border-dashed" icon={<UserRoundSearchIcon />} title={t("pickTitle")} description={t("pickDescription")} />
+          ) : schedule.isPending ? (
+            <LoadingState />
+          ) : forbidden ? (
+            <EmptyState className="border border-dashed" icon={<LockIcon />} title={t("forbiddenTitle")} description={t("forbidden")} />
+          ) : schedule.isError ? (
+            <ErrorState error={schedule.error} onRetry={() => schedule.refetch()} />
+          ) : (
+            <AllocationPersonView schedule={schedule.data} isMine={schedule.data.employee.id === me} window={window} zoom={zoom} today={today} toolbar={toolbar} />
+          )}
+        </>
       )}
     </>
   );
@@ -160,52 +177,5 @@ function AllocationPersonPicker({ id, reach, value, onChange }: AllocationPerson
       options={{ data: options.data?.people, isPending: options.isPending, isError: options.isError }}
       hint={tooShort ? tPicker("typeMore") : null}
     />
-  );
-}
-
-function ScheduleView({ schedule, isMine }: { schedule: PersonAllocations; isMine: boolean }) {
-  const t = useTranslations("Allocations.Schedule");
-  const today = todayIsoDate();
-  const weeks = weekBars(schedule.load.weeks, schedule.from, schedule.to);
-  const { fullName, employeeCode } = schedule.employee;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{isMine ? t("myScheduleTitle") : t("scheduleOf", { name: fullName })}</CardTitle>
-        <CardDescription>
-          {[employeeCode, t("period", { from: formatDate(schedule.from), to: formatDate(schedule.to) })]
-            .filter(Boolean)
-            .join(" · ")}
-        </CardDescription>
-        <LoadLine load={schedule.load} />
-      </CardHeader>
-      <CardContent className="grid gap-6">
-        <AllocationTimeline from={schedule.from} to={schedule.to} today={today} weeks={weeks} items={schedule.items} />
-        <WeekList weeks={weeks} />
-      </CardContent>
-    </Card>
-  );
-}
-
-/** Cùng số liệu với dòng tải, dạng chữ: đọc được bằng trình đọc màn hình và trên màn hình hẹp. */
-function WeekList({ weeks }: { weeks: WeekBar[] }) {
-  const t = useTranslations("Allocations.Schedule");
-  return (
-    <section className="grid gap-1.5">
-      <h3 className="text-sm font-medium">{t("weeksTitle")}</h3>
-      <ul className="grid gap-1 text-sm">
-        {weeks.map((week) => (
-          <li key={week.weekStart} className="flex flex-wrap items-baseline justify-between gap-x-3 border-b border-dashed py-1 last:border-b-0">
-            <span className="tabular-nums">{t("weekOf", { week: formatDate(week.weekStart) })}</span>
-            <span className="flex items-center gap-1.5 text-muted-foreground tabular-nums">
-              <ZoneDot zone={week.zone} />
-              {t("weekHours", { load: hoursText(week.loadMinutes), capacity: hoursText(week.capacityMinutes) })}
-              {week.percent !== null && <span className="font-medium text-foreground">{week.percent}%</span>}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }

@@ -62,7 +62,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const DAY_MS = 86_400_000;
 
 /** Số thứ tự ngày (UTC) của "yyyy-MM-dd"; null nếu không phải ngày hợp lệ. */
-function dayNumber(iso: string): number | null {
+export function dayNumber(iso: string): number | null {
   if (!ISO_DATE.test(iso)) return null;
   const [year, month, day] = iso.split("-").map(Number);
   const time = Date.UTC(year, month - 1, day);
@@ -156,7 +156,7 @@ export function weekBars(weeks: LoadWeek[], from: string, to: string): WeekBar[]
 }
 
 /** Ngày cách `iso` một số ngày; null nếu không phải ngày hợp lệ. */
-function addDays(iso: string, days: number): string | null {
+export function addDays(iso: string, days: number): string | null {
   const day = dayNumber(iso);
   return day === null ? null : new Date((day + days) * DAY_MS).toISOString().slice(0, 10);
 }

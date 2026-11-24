@@ -145,8 +145,13 @@ const { user, can, hasRole, hasPermission } = useCurrentUser();
   đậm; nút phụ `variant="outline"` có viền và chữ màu chủ đạo (`SECONDARY_ACTION` trong `features/skills`), để cả hai
   nhìn rõ là nút. Không cần icon.
 - Mảng màu "đang chờ" (thanh, khối trên biểu đồ / dòng thời gian): token `pending` (vàng cam, `bg-pending`,
-  `text-pending-foreground`). `warning` là sắc 700 dành cho chữ nhỏ, tô thành mảng lớn sẽ ra màu nâu. Ví dụ: trang
-  `/allocations` (`features/projects/components/allocation-timeline.tsx`).
+  `text-pending-foreground`). `warning` là sắc 700 dành cho chữ nhỏ, tô thành mảng lớn sẽ ra màu nâu. Ví dụ: dòng "Đang
+  chờ duyệt vào dự án" ở trang `/allocations` (`features/projects/components/allocation-person-view.tsx`).
+- Dòng thời gian (Gantt dự án, lịch tải; bộ vẽ chung `features/projects/timeline/`): **ngoại lệ có chủ ý** với quy tắc một
+  màu nhấn (Quang chốt 25/11). Thanh việc tô theo giai đoạn của nhóm công việc bằng token biểu đồ (tím `--chart-5` phân
+  tích & thiết kế, xanh dương `--chart-1` lập trình, xanh ngọc `--chart-2` kiểm thử & vận hành), trạng thái thể hiện bằng
+  độ đậm (`BAR_CLASS` trong `timeline-colors.ts`). Xanh lá / cam / đỏ (`success` / `warning` / `destructive`) chỉ dành cho
+  vùng tải, để không lẫn với màu thanh.
 - Mỗi nhóm chức năng một màu cố định (`DomainTone` trong `components/shared/icon-tile.tsx`): `time` chấm công/bảng công,
   `leave` nghỉ phép/WFH, `approval` việc cần duyệt, `project` tổng quan/dự án/phân bổ/kỹ năng, `people` nhân viên/tổ chức,
   `money` lương, `neutral` quản trị. Dùng `<IconTile icon={...} tone="leave" />` và cùng tông đó cho badge/biểu đồ
