@@ -23,13 +23,15 @@ import type { LockResult, PeriodRow } from "../types";
  * Kỳ công theo năm: 12 tháng với trạng thái và số ngày còn chặn. Chọn một kỳ để xem kiểm tra trước khi chốt (ngày
  * thiếu check-out chưa quyết, cảnh báo), chốt kỳ (không mở lại được) hoặc, với kỳ đã chốt, xem các thay đổi muộn.
  */
-export function PeriodsPage() {
+export function PeriodsPage({ initialMonth }: { initialMonth?: string }) {
   const t = useTranslations("TimesheetPeriods");
   const thisYear = Number(todayIsoDate().slice(0, 4));
-  const [year, setYear] = useState(thisYear);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [year, setYear] = useState(initialMonth ? Number(initialMonth.slice(0, 4)) : thisYear);
+  const [selected, setSelected] = useState<string | null>(initialMonth ?? null);
   const periods = useTimesheetPeriods(year);
-  const yearChoices = Array.from({ length: 5 }, (_, i) => String(thisYear + 1 - i)).map((value) => ({ value, label: value }));
+  const years = Array.from({ length: 5 }, (_, i) => thisYear + 1 - i);
+  if (!years.includes(year)) years.push(year);
+  const yearChoices = years.map((value) => ({ value: String(value), label: String(value) }));
   const row = periods.data?.find((p) => p.month === selected) ?? null;
 
   return (

@@ -23,10 +23,11 @@ type DayDetailProps = {
   onExplain: () => void;
   onRequestLeave: () => void;
   onRequestRemote: () => void;
+  onHistory?: () => void;
 };
 
 /** Chi tiết một ngày bấm trên lịch: giờ phải có mặt, vào / ra, muộn / sớm, công, đơn nghỉ, WFH; nút xin nghỉ, xin WFH. */
-export function DayDetail({ day, date, today, requests, remote, explanations, onExplain, onRequestLeave, onRequestRemote }: DayDetailProps) {
+export function DayDetail({ day, date, today, requests, remote, explanations, onExplain, onRequestLeave, onRequestRemote, onHistory }: DayDetailProps) {
   const t = useTranslations("Timesheet.day");
   const tStatus = useTranslations("Timesheet");
   const tLeave = useTranslations("Leave");
@@ -58,6 +59,7 @@ export function DayDetail({ day, date, today, requests, remote, explanations, on
             {(past || date === today) && (
               <DetailRow label={t("status")}>
                 <DayStatusBadge status={day.status} />
+                {day.source === "HR_ADJUST" && <Badge variant="outline" className="ml-1">{tStatus("source.HR_ADJUST")}</Badge>}
               </DetailRow>
             )}
             {day.firstIn && (
@@ -84,6 +86,8 @@ export function DayDetail({ day, date, today, requests, remote, explanations, on
             )}
           </DetailList>
         )}
+
+        {day && onHistory && <Button variant="outline" className="w-full" onClick={onHistory}>{tStatus("history.title")}</Button>}
 
         {onDay.length > 0 && (
           <div className="space-y-2">
