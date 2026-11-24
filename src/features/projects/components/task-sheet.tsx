@@ -13,16 +13,19 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { isApiError } from "@/lib/api/errors";
 import { formatDate, formatDateTime, todayIsoDate } from "@/lib/format";
 import { addComment, addLink, addWorklog, deleteTask, deleteWorklog, removeLink, transitionTask } from "../work-api";
 import { useComments, useEvents, useSkillOptions, useWorkErrorMessage, useWorkMutation, useTask, useWorklogs } from "../work-hooks";
 import { formatMinutes, parseHours, percent, scheduleInfo } from "../work-rules";
 import type { Project } from "../types";
-import { BOARD_STATUSES, TASK_STATUSES, type LinkedTask, type Task, type TaskStatus } from "../work-types";
+import { BOARD_STATUSES, TASK_STATUSES, type LinkedTask, type Task, type TaskStatus, type Worklog } from "../work-types";
 import { PersonChip, PriorityIcon, TaskStatusBadge, TypeIcon } from "./badges";
 import { EventLine } from "./overview-tab";
 import { SuggestAssigneeDialog } from "./suggest-assignee-dialog";
 import { SimpleSelect } from "./simple-select";
+import { TaskBaselineSection } from "./task-baseline";
 import { TaskFormDialog } from "./task-form-dialog";
 
 /** S10: panel chi tiết việc, mở từ List, Board, Tổng quan bằng ?task=HRM-12. */
@@ -185,6 +188,8 @@ function TaskDetail({
         </div>
       )}
 
+      <TaskBaselineSection key={card.id} task={task} />
+
       {task.description && <p className="text-sm whitespace-pre-wrap">{task.description}</p>}
 
       <Links task={task} onOpenTask={onOpenTask} />
@@ -290,7 +295,6 @@ function WorklogSection({ task }: { task: Task }) {
   const [hours, setHours] = useState("");
   const [note, setNote] = useState("");
   const minutes = parseHours(hours);
-  const fail = { onError: (error: unknown) => toast.error(errorMessage(error)) };
   const add = useWorkMutation(() => addWorklog(task.card.id, { workDate: day, minutes: minutes!, note: note.trim() || null }));
   const remove = useWorkMutation(deleteWorklog);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -308,7 +312,10 @@ function WorklogSection({ task }: { task: Task }) {
             disabled={!minutes}
             onClick={() =>
               add.mutate(undefined, {
-                ...fail,
+                onError: (error) => {
+                  const message = isApiError(error) && error.status === 400 ? error.message : "";
+                  toast.error(message || errorMessage(error));
+                },
                 onSuccess: () => {
                   setHours("");
                   setNote("");
@@ -320,23 +327,32 @@ function WorklogSection({ task }: { task: Task }) {
           </Button>
         </div>
       )}
-      <ul className="grid gap-1 text-sm">
-        {(worklogs.data ?? []).map((log) => (
-          <li key={log.id} className="flex items-center gap-2">
-            <span className="tabular-nums">{formatDate(log.workDate)}</span>
-            <span className="font-medium tabular-nums">{formatMinutes(log.minutes)}</span>
-            <span className="text-muted-foreground truncate">
-              {log.employeeName}
-              {log.note ? ` · ${log.note}` : ""}
-            </span>
-            {log.mine && (
-              <button type="button" aria-label={t("delete")} className="text-muted-foreground ml-auto" onClick={() => setDeleting(log.id)}>
-                <Trash2Icon className="size-3.5" />
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+      {worklogs.isPending ? (
+        <LoadingState className="py-2" />
+      ) : worklogs.isError ? (
+        <ErrorState error={worklogs.error} onRetry={() => worklogs.refetch()} />
+      ) : worklogs.data.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{t("worklogEmpty")}</p>
+      ) : (
+        <ul className="grid gap-1 text-sm">
+          {worklogs.data.map((log) => (
+            <li key={log.id} className="flex items-center gap-2">
+              <span className="tabular-nums">{formatDate(log.workDate)}</span>
+              <span className="font-medium tabular-nums">{formatMinutes(log.minutes)}</span>
+              <WorklogOvertimeBadge log={log} />
+              <span className="text-muted-foreground truncate">
+                {log.employeeName}
+                {log.note ? ` · ${log.note}` : ""}
+              </span>
+              {log.mine && (
+                <button type="button" aria-label={t("delete")} className="text-muted-foreground ml-auto" onClick={() => setDeleting(log.id)}>
+                  <Trash2Icon className="size-3.5" />
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
@@ -355,6 +371,21 @@ function WorklogSection({ task }: { task: Task }) {
         }
       />
     </section>
+  );
+}
+
+function WorklogOvertimeBadge({ log }: { log: Worklog }) {
+  const t = useTranslations("ProjectWork");
+  if (log.otState === "OK") return <Badge variant="success">{t("overtimeApproved")}</Badge>;
+  if (log.otState !== "WAIT") return null;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<Badge variant="warning" render={<button type="button" />} />}>
+        {t("overtimePending", { hours: Math.floor(log.overCapMinutes / 60), minutes: log.overCapMinutes % 60 })}
+      </TooltipTrigger>
+      <TooltipContent>{t("overtimePendingHint")}</TooltipContent>
+    </Tooltip>
   );
 }
 

@@ -1,3 +1,4 @@
+import { createTranslator } from "next-intl";
 import { describe, expect, it } from "vitest";
 import en from "../../messages/en.json";
 import vi from "../../messages/vi.json";
@@ -23,5 +24,15 @@ describe("messages", () => {
       });
       expect(empty, name).toEqual([]);
     }
+  });
+
+  it("formats pending worklog overtime in hours and minutes in both languages", () => {
+    const tVi = createTranslator({ locale: "vi", messages: vi, namespace: "ProjectWork" });
+    const tEn = createTranslator({ locale: "en", messages: en, namespace: "ProjectWork" });
+
+    expect(tVi("overtimePending", { hours: 1, minutes: 0 })).toBe("Chờ OT · 1g");
+    expect(tVi("overtimePending", { hours: 1, minutes: 15 })).toBe("Chờ OT · 1g 15p");
+    expect(tVi("overtimePending", { hours: 0, minutes: 15 })).toBe("Chờ OT · 15p");
+    expect(tEn("overtimePending", { hours: 1, minutes: 15 })).toBe("Pending OT · 1h 15m");
   });
 });

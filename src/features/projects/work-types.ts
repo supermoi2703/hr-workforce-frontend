@@ -48,6 +48,9 @@ export type TaskEventKind =
   | "DUE_CHANGED"
   | "START_CHANGED"
   | "ESTIMATE_CHANGED"
+  | "BASELINE_SET"
+  | "BASELINE_CHANGED"
+  | "REMAINING_CHANGED"
   | "PRIORITY_CHANGED"
   | "TITLE_CHANGED"
   | "SPRINT_CHANGED"
@@ -86,8 +89,22 @@ export type TaskCard = {
 
 export type LinkedTask = { linkId: string | null; taskId: string; key: string; title: string; status: TaskStatus };
 
+export type TaskBaseline = {
+  estimateMinutes: number | null;
+  dueDate: string | null;
+  setAt: string | null;
+  canEdit: boolean;
+};
+
+export type TaskBaselineInput = {
+  estimateMinutes?: number | null;
+  dueDate?: string | null;
+  reason: string;
+};
+
 export type Task = {
   card: TaskCard;
+  baseline: TaskBaseline;
   projectId: string;
   projectCode: string;
   description: string | null;
@@ -160,6 +177,7 @@ export type TaskEvent = {
   kind: TaskEventKind;
   from: string | null;
   to: string | null;
+  note?: string | null;
   occurredAt: string;
 };
 export type Worklog = {
@@ -168,6 +186,8 @@ export type Worklog = {
   employeeName: string | null;
   workDate: string;
   minutes: number;
+  otState: "NONE" | "WAIT" | "OK";
+  overCapMinutes: number;
   note: string | null;
   mine: boolean;
   createdAt: string;

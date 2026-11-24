@@ -24,6 +24,7 @@ import type {
   AssigneeSuggestions,
   SuggestionParams,
   Task,
+  TaskBaselineInput,
   TaskCard,
   TaskEvent,
   TaskInput,
@@ -93,6 +94,8 @@ export const getBoard = (projectId: string, filter: { sprintId?: string; assigne
 export const createTask = (projectId: string, body: TaskInput) => http.post<Task>(`/api/projects/${enc(projectId)}/tasks`, body);
 export const getTask = (key: string) => http.get<Task>(`/api/tasks/by-key/${enc(key)}`);
 export const updateTask = (id: string, body: TaskInput) => http.put<Task>(`/api/tasks/${enc(id)}`, body);
+export const updateTaskBaseline = (id: string, body: TaskBaselineInput) =>
+  http.put<Task>(`/api/tasks/${enc(id)}/baseline`, body);
 export const transitionTask = (id: string, to: TaskStatus, version: number) =>
   http.post<Task>(`/api/tasks/${enc(id)}/transitions`, { to, version });
 export const assignTask = (id: string, assigneeId: string | null, version: number) =>
