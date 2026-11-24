@@ -319,3 +319,15 @@ export type PayrollApprovalSummary = {
   approvalRequestId: string | null;
   canDecide: boolean;
 };
+export type PerformanceRateLevel = "INTERN" | "FRESHER" | "JUNIOR" | "MIDDLE" | "SENIOR" | "LEAD" | "PRINCIPAL";
+
+export type CreatePerformanceRate = {
+  level: PerformanceRateLevel;
+  positionId: string | null;
+  amount: number;
+  effectiveFrom: string;
+};
+
+export type PerformanceRate = CreatePerformanceRate & { id: string; active: boolean };
+
+export type PerformanceRatePosition = { id: string; code: string; name: string; active: boolean };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { SearchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -13,7 +13,7 @@ import { useFormatPolicyValue, usePolicies, usePolicyLabels } from "../hooks";
 import { effectiveValueType, groupByModule } from "../values";
 
 /** Mọi khóa chính sách theo module, kèm giá trị toàn công ty đang áp dụng hôm nay. */
-export function PolicyListPage() {
+export function PolicyListPage({ actions }: { actions?: ReactNode }) {
   const t = useTranslations("Policies");
   const policies = usePolicies();
   const labels = usePolicyLabels();
@@ -34,7 +34,7 @@ export function PolicyListPage() {
 
   return (
     <>
-      <PageHeader title={t("List.title")} description={t("List.description")} />
+      <PageHeader title={t("List.title")} description={t("List.description")} actions={actions} />
 
       {policies.isPending ? (
         <LoadingState />

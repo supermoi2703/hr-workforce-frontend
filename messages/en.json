@@ -31,6 +31,7 @@
       "dev": "Development"
     },
     "items": {
+      "performanceRates": "Performance pay rates",
       "home": "Home",
       "dashboard": "Dashboard",
       "approvals": "Approvals",
@@ -4319,7 +4320,10 @@
       "targetLocked": "The period receiving the adjustment is approved or waiting for approval. Pick another period or open a later one.",
       "targetNotFound": "The receiving period is not open yet. Open it first.",
       "periodNotPublished": "Mail can only be sent after the period is published.",
-      "sheetEmpty": "Period not calculated yet, cannot export"
+      "sheetEmpty": "Period not calculated yet, cannot export",
+      "rateAlreadyExists": "A rate already exists for this level, position and effective date.",
+      "rateNotFound": "This performance pay rate no longer exists.",
+      "rateInUse": "In-force and historical rates cannot be deleted."
     },
     "inputs": {
       "metaTitle": "Payroll inputs",
@@ -4549,9 +4553,40 @@
         "NO_EMAIL": "No email address"
       }
     },
+    "performanceRates": {
+      "title": "Performance pay rates",
+      "add": "Add rate",
+      "addDescription": "Choose a level, an optional position, and the date the rate starts.",
+      "created": "Performance pay rate added.",
+      "deleted": "Performance pay rate deleted.",
+      "delete": "Delete rate",
+      "deleteTitle": "Delete the scheduled rate?",
+      "deleteDescription": "{level} · {position} · Effective {date}",
+      "save": "Save rate",
+      "empty": "No performance pay rates.",
+      "level": "Level",
+      "position": "Position",
+      "allPositions": "All positions",
+      "amount": "Amount (VND)",
+      "effectiveFrom": "Effective from",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Current",
+      "scheduled": "Scheduled",
+      "historical": "Historical",
+      "positionsError": "Unable to load positions",
+      "selectLevel": "Choose a level.",
+      "invalidAmount": "Enter a whole VND amount from 0 to 999,999,999,999,999.",
+      "invalidDate": "Enter a valid effective date."
+    },
     "warnings": {
       "W_GT_N": "Worked days W ({w}) exceed standard days N ({n})",
       "KPI_MISSING": "No KPI coefficient, performance pay counted as 0",
+      "KPI_NOT_LOCKED": "KPI not locked",
+      "KPI_NOT_LOCKED_DETAIL": "KPI is not locked. Using the system coefficient {coefficient}.",
+      "KPI_MANUAL_OVERRIDE": "Manual KPI override",
+      "KPI_MANUAL_OVERRIDE_DETAIL": "The manually entered KPI coefficient replaces the system coefficient ({systemCoefficient}).",
+      "KPI_MANUAL_OVERRIDE_NO_SYSTEM": "The manually entered KPI coefficient is in use because the system has no coefficient.",
       "OT_MONTH_CAP": "OT {hours} h exceeds {cap} h/month",
       "NET_NEGATIVE": "Net pay is negative",
       "NET_BELOW_MIN_WAGE": "Net pay is below the regional minimum wage",

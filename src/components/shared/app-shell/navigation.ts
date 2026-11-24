@@ -114,6 +114,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "kpiReviews", href: "/kpi/reviews", icon: ClipboardCheckIcon, access: { employeeProfile: true } },
       { id: "kpiManage", href: "/kpi/manage", icon: BadgeCheckIcon, access: { permissions: ["kpi:read"] } },
       { id: "payroll", href: "/payroll", icon: WalletIcon, access: HR_ONLY, task: "2.7, 2.8" },
+      { id: "performanceRates", href: "/admin/policies/performance-rates", icon: SlidersHorizontalIcon, access: { permissions: ["payroll:config"] } },
       { id: "payslips", href: "/payslips", icon: ReceiptTextIcon, task: "2.9" },
     ],
   },

@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { LEGACY_WARNING, warningParams } from "./warnings";
+import { LEGACY_WARNING, warningMessageKey, warningParams } from "./warnings";
 
 type WarningLike = { code: string; params?: Record<string, unknown> | null; text?: string | null };
 
@@ -12,7 +12,7 @@ export function useWarningLabel() {
   return useCallback(
     (warning: WarningLike) => {
       if (warning.code === LEGACY_WARNING && warning.text) return warning.text;
-      const key = warning.code as Parameters<typeof t>[0];
+      const key = warningMessageKey(warning.code, warning.params) as Parameters<typeof t>[0];
       return t.has(key) ? t(key, warningParams(warning.params)) : warning.code;
     },
     [t],
