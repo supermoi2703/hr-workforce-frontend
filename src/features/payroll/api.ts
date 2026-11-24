@@ -3,6 +3,7 @@ import type { PageResponse } from "@/lib/api/types";
 import type {
   CalculateResponse,
   ComplaintView,
+  CreatePerformanceRate,
   EmployeeOption,
   FeedbackKind,
   FeedbackStatus,
@@ -22,10 +23,24 @@ import type {
   PayrollApprovalSummary,
   PeriodDetail,
   PeriodRow,
+  PerformanceRate,
+  PerformanceRatePosition,
   SheetResponse,
 } from "./types";
 
 const base = (month: string) => `/api/payroll/periods/${encodeURIComponent(month)}`;
+const performanceRatesPath = "/api/payroll/performance-rates";
+
+export const listPerformanceRates = () => http.get<PerformanceRate[]>(performanceRatesPath);
+
+export const createPerformanceRate = (body: CreatePerformanceRate) =>
+  http.post<PerformanceRate>(performanceRatesPath, body);
+
+export const removePerformanceRate = (id: string) =>
+  http.delete<void>(`${performanceRatesPath}/${encodeURIComponent(id)}`);
+
+export const listPerformanceRatePositions = () =>
+  http.get<PerformanceRatePosition[]>("/api/positions", { query: { includeInactive: true } });
 
 export const listPeriods = (year: number) => http.get<PeriodRow[]>("/api/payroll/periods", { query: { year } });
 

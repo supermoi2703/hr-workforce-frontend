@@ -14,6 +14,7 @@ import {
   calculatePeriod,
   closePeriod,
   addInput,
+  createPerformanceRate,
   deleteInput,
   getMailStatus,
   getMyPayslip,
@@ -23,6 +24,9 @@ import {
   getPayslip,
   listComplaints,
   listMyPeriods,
+  listPerformanceRates,
+  listPerformanceRatePositions,
+  removePerformanceRate,
   resolveComplaint,
   searchEmployees,
   sendFeedback,
@@ -44,6 +48,8 @@ import type { CheckStep, FeedbackKind, InputCreateBody, InputUpdateBody, Resolve
 
 export const payrollKeys = {
   all: ["payroll"] as const,
+  performanceRates: ["payroll", "performance-rates"] as const,
+  performanceRatePositions: ["payroll", "performance-rate-positions"] as const,
   periods: (year: number) => ["payroll", "periods", year] as const,
   period: (month: string) => ["payroll", "period", month] as const,
   sheet: (month: string, query: SheetQuery) => ["payroll", "sheet", month, query] as const,
@@ -58,6 +64,28 @@ export const payrollKeys = {
   approvalSummary: (month: string) => ["payroll", "approval-summary", month] as const,
   payslip: (month: string, employeeId: string) => ["payroll", "payslip", month, employeeId] as const,
 };
+
+export const usePerformanceRates = () =>
+  useQuery({ queryKey: payrollKeys.performanceRates, queryFn: listPerformanceRates });
+
+export const usePerformanceRatePositions = () =>
+  useQuery({ queryKey: payrollKeys.performanceRatePositions, queryFn: listPerformanceRatePositions });
+
+export function useCreatePerformanceRate() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: createPerformanceRate,
+    onSuccess: () => client.invalidateQueries({ queryKey: payrollKeys.performanceRates }),
+  });
+}
+
+export function useRemovePerformanceRate() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: removePerformanceRate,
+    onSettled: () => client.invalidateQueries({ queryKey: payrollKeys.performanceRates }),
+  });
+}
 
 export const usePeriods = (year: number) =>
   useQuery({ queryKey: payrollKeys.periods(year), queryFn: () => listPeriods(year) });
@@ -264,6 +292,9 @@ const ERROR_KEYS: Record<string, ErrorKey> = {
   COMPLAINT_NOT_FOUND: "complaintNotFound",
   COMPLAINT_ALREADY_RESOLVED: "complaintAlreadyResolved",
   PAYROLL_SHEET_EMPTY: "sheetEmpty",
+  RATE_ALREADY_EXISTS: "rateAlreadyExists",
+  RATE_NOT_FOUND: "rateNotFound",
+  RATE_IN_USE: "rateInUse",
   FORBIDDEN: "forbidden",
 };
 

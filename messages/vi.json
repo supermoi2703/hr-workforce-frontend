@@ -31,6 +31,7 @@
       "dev": "Phát triển"
     },
     "items": {
+      "performanceRates": "Mức lương hiệu suất",
       "home": "Trang chủ",
       "dashboard": "Dashboard",
       "approvals": "Việc cần duyệt",
@@ -4319,7 +4320,10 @@
       "targetLocked": "Kỳ nhận điều chỉnh đã duyệt hoặc đang chờ duyệt. Chọn kỳ khác hoặc mở kỳ sau.",
       "targetNotFound": "Kỳ nhận chưa mở. Hãy mở kỳ đó trước.",
       "periodNotPublished": "Chỉ gửi được sau khi phát hành.",
-      "sheetEmpty": "Kỳ chưa tính lương, chưa xuất được"
+      "sheetEmpty": "Kỳ chưa tính lương, chưa xuất được",
+      "rateAlreadyExists": "Đã có mức lương cho bậc, chức danh và ngày hiệu lực này.",
+      "rateNotFound": "Mức lương hiệu suất này không còn tồn tại.",
+      "rateInUse": "Chỉ xóa được mức lương chưa đến ngày hiệu lực."
     },
     "inputs": {
       "metaTitle": "Nhập khoản lương",
@@ -4549,9 +4553,40 @@
         "NO_EMAIL": "Không có email"
       }
     },
+    "performanceRates": {
+      "title": "Mức lương hiệu suất",
+      "add": "Thêm mức lương",
+      "addDescription": "Chọn bậc, chức danh (nếu có) và ngày bắt đầu áp dụng.",
+      "created": "Đã thêm mức lương hiệu suất.",
+      "deleted": "Đã xóa mức lương hiệu suất.",
+      "delete": "Xóa mức",
+      "deleteTitle": "Xóa mức lương đã lên lịch?",
+      "deleteDescription": "{level} · {position} · Hiệu lực từ {date}",
+      "save": "Lưu mức lương",
+      "empty": "Chưa có mức lương hiệu suất.",
+      "level": "Bậc",
+      "position": "Chức danh",
+      "allPositions": "Mọi chức danh",
+      "amount": "Số tiền (VND)",
+      "effectiveFrom": "Hiệu lực từ",
+      "status": "Trạng thái",
+      "actions": "Thao tác",
+      "active": "Đang hiệu lực",
+      "scheduled": "Chưa đến ngày hiệu lực",
+      "historical": "Lịch sử",
+      "positionsError": "Không tải được danh mục chức danh",
+      "selectLevel": "Chọn một bậc.",
+      "invalidAmount": "Nhập số nguyên VND từ 0 đến 999.999.999.999.999.",
+      "invalidDate": "Nhập ngày hiệu lực hợp lệ."
+    },
     "warnings": {
       "W_GT_N": "Công W ({w}) lớn hơn công chuẩn N ({n})",
       "KPI_MISSING": "Chưa có hệ số KPI, lương hiệu suất tính 0",
+      "KPI_NOT_LOCKED": "KPI chưa khóa",
+      "KPI_NOT_LOCKED_DETAIL": "KPI chưa khóa, đang dùng số máy {coefficient}.",
+      "KPI_MANUAL_OVERRIDE": "KPI nhập tay",
+      "KPI_MANUAL_OVERRIDE_DETAIL": "Hệ số KPI nhập tay thay số hệ thống ({systemCoefficient}).",
+      "KPI_MANUAL_OVERRIDE_NO_SYSTEM": "Đang dùng hệ số KPI nhập tay vì hệ thống chưa có số.",
       "OT_MONTH_CAP": "OT {hours} giờ vượt {cap} giờ/tháng",
       "NET_NEGATIVE": "Thực lĩnh âm",
       "NET_BELOW_MIN_WAGE": "Thực lĩnh nhỏ hơn lương tối thiểu vùng",

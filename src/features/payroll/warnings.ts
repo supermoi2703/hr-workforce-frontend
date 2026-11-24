@@ -6,6 +6,8 @@ export const LEGACY_WARNING = "LEGACY";
 export const WARNING_CODES = [
   "W_GT_N",
   "KPI_MISSING",
+  "KPI_NOT_LOCKED",
+  "KPI_MANUAL_OVERRIDE",
   "OT_MONTH_CAP",
   "OT_MANUAL_OVERRIDE",
   "NET_NEGATIVE",
@@ -16,6 +18,16 @@ export const WARNING_CODES = [
   "PAID_OUTSIDE_CONTRACT",
   LEGACY_WARNING,
 ] as const;
+
+export function warningMessageKey(code: string, params?: Record<string, unknown> | null): string {
+  if (code === "KPI_NOT_LOCKED" && params?.coefficient != null) {
+    return "KPI_NOT_LOCKED_DETAIL";
+  }
+  if (code === "KPI_MANUAL_OVERRIDE" && params && Object.hasOwn(params, "systemCoefficient")) {
+    return params.systemCoefficient == null ? "KPI_MANUAL_OVERRIDE_NO_SYSTEM" : "KPI_MANUAL_OVERRIDE_DETAIL";
+  }
+  return code;
+}
 
 /** Chuẩn hóa cảnh báo: backend cũ trả chuỗi, backend mới trả {code, params, text}. */
 export function normalizeWarnings(raw: RawWarning[] | null | undefined): PayrollWarning[] {
