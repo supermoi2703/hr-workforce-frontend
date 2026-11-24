@@ -18,8 +18,15 @@ export const WORKLOAD_ZONES = ["GREEN", "YELLOW", "RED"] as const;
 export type WorkloadZone = (typeof WORKLOAD_ZONES)[number];
 export type ZoneReason = "WEEK_OVER_CAPACITY" | "NO_CAPACITY" | "DAY_OVER_MAX" | "MONTH_OVERTIME";
 
-/** percent: tải ÷ năng lực; null khi không còn năng lực mà vẫn có việc. */
-export type LoadWeek = { weekStart: string; capacityMinutes: number; loadMinutes: number; percent: number | null; zone: WorkloadZone };
+/** percent: tải ÷ năng lực; null khi không còn năng lực mà vẫn có việc. overtimeMinutes: OT đã duyệt, đã nằm trong năng lực. */
+export type LoadWeek = {
+  weekStart: string;
+  capacityMinutes: number;
+  loadMinutes: number;
+  percent: number | null;
+  zone: WorkloadZone;
+  overtimeMinutes?: number;
+};
 
 /** Tải trong một khoảng; `weeks` rỗng ở chỗ chỉ cần tóm tắt (danh sách ứng viên). */
 export type LoadSummary = {
@@ -392,12 +399,90 @@ export type PersonAllocations = {
   items: PersonAllocationItem[];
   /** Tải theo tuần tính từ task trên mọi dự án */
   load: LoadSummary;
+  /** Việc theo dự án (workload bước 5) */
+  projects?: PersonProjectTasks[];
+  /** Tải từng ngày, chỉ khi khoảng ≤ 31 ngày */
+  days?: LoadDay[];
 };
 
 /** SELF: chỉ chính mình; SCOPED: danh sách có hạn (cấp dưới, văn phòng của HR); ALL: tìm cả công ty. */
 export type AllocationViewerReach = "SELF" | "SCOPED" | "ALL";
 
 export type AllocationPeople = { reach: AllocationViewerReach; people: EmployeeOption[] };
+
+// ===== Gantt dự án và lịch tải (workload bước 5), backend README module project mục 7.5, 8.6
+
+/** Một việc lá trên dòng thời gian. Ngày là ngày hiệu lực: trống thì lấy theo sprint. `start` null = chỉ có hạn. */
+export type TimelineTask = {
+  id: string;
+  key: string;
+  title: string;
+  status: TaskStatus;
+  assigneeId: string | null;
+  parentKey: string | null;
+  workCategoryName: string | null;
+  workPhase: WorkPhase | null;
+  start: string | null;
+  end: string;
+  startFromSprint: boolean;
+  endFromSprint: boolean;
+  estimateMinutes: number | null;
+  loggedMinutes: number;
+  remainingMinutes: number;
+  overdue: boolean;
+};
+
+/** zone: vùng chung 4 tuần tới như tab Thành viên; null = người xem không được xem. role null = đã rời dự án. */
+export type TimelinePerson = {
+  person: Person;
+  role: ProjectRole | null;
+  zone: WorkloadZone | null;
+  openTaskCount: number;
+  remainingMinutes: number;
+};
+
+export type TimelineSprint = { id: string; name: string; startDate: string; endDate: string };
+
+export type ProjectTimeline = {
+  from: string;
+  to: string;
+  today: string;
+  sprints: TimelineSprint[];
+  people: TimelinePerson[];
+  tasks: TimelineTask[];
+  unscheduledCount: number;
+};
+
+/** Việc của một người ở một dự án; dự án không được xem nội dung thì chỉ có số việc, số phút, khoảng ngày gộp. */
+export type PersonProjectTasks = {
+  projectId: string;
+  code: string;
+  name: string;
+  pm: Person | null;
+  canViewTasks: boolean;
+  tasks: TimelineTask[];
+  hiddenTaskCount: number;
+  hiddenMinutes: number;
+  hiddenStart: string | null;
+  hiddenEnd: string | null;
+};
+
+export type DayLeave = "NONE" | "HALF" | "FULL";
+export type LoadDay = { date: string; capacityMinutes: number; loadMinutes: number; overtimeMinutes: number; leave: DayLeave };
+
+export type TeamLoadWeek = {
+  weekStart: string;
+  capacityMinutes: number;
+  loadMinutes: number;
+  percent: number | null;
+  zone: WorkloadZone;
+  overtimeMinutes: number;
+  fullLeave: boolean;
+};
+export type TeamLoadRow = { person: Person; teamName: string | null; zone: WorkloadZone; peakWeekStart: string | null; weeks: TeamLoadWeek[] };
+/** total: số người khớp lọc; people tối đa 100, nặng nhất trước. */
+export type TeamLoad = { from: string; to: string; total: number; counts: Record<WorkloadZone, number>; people: TeamLoadRow[] };
+export type TeamLoadFilter = { officeId?: string; departmentId?: string; teamId?: string; keyword?: string; from?: string; to?: string };
 
 export type OrgTeam = { id: string; code: string; name: string; departmentName: string };
 export type SkillOption = { id: string; name: string; active: boolean };

@@ -16,6 +16,7 @@ import type {
   OrgTeam,
   Overview,
   PersonAllocations,
+  ProjectTimeline,
   Risk,
   SkillOption,
   Sprint,
@@ -28,6 +29,8 @@ import type {
   TaskCard,
   TaskEvent,
   TaskInput,
+  TeamLoad,
+  TeamLoadFilter,
   TaskStatus,
   WorkCategory,
   Worklog,
@@ -74,6 +77,11 @@ export const getOrgTeams = () => http.get<OrgTeam[]>("/api/teams");
 /** Lịch phân bổ của một người trên mọi dự án; không có from / to thì backend lấy 180 ngày tới. */
 export const getPersonAllocations = (employeeId: string, from?: string, to?: string) =>
   http.get<PersonAllocations>("/api/allocations", { query: { employeeId, from, to } });
+/** Lịch tải cả nhóm: người mình xem được lịch, lọc theo đơn vị / tên, nặng nhất trước (tối đa 100). */
+export const getTeamLoad = (filter: TeamLoadFilter) => http.get<TeamLoad>("/api/allocations/team", { query: filter });
+/** Gantt của dự án; không có from / to thì backend lấy 10 tuần từ thứ Hai tuần trước. */
+export const getProjectTimeline = (projectId: string, from?: string, to?: string) =>
+  http.get<ProjectTimeline>(`/api/projects/${enc(projectId)}/timeline`, { query: { from, to } });
 /** Người mình mở được lịch (không gồm mình); `reach` cho biết kiểu ô chọn người. */
 export const getAllocationPeople = (keyword?: string) =>
   http.get<AllocationPeople>("/api/allocations/people", { query: { keyword: keyword || undefined } });

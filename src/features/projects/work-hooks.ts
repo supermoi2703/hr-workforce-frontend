@@ -21,6 +21,8 @@ import {
   getOrgTeams,
   getOverview,
   getPersonAllocations,
+  getProjectTimeline,
+  getTeamLoad,
   getRisks,
   getSkillOptions,
   getSprintCapacity,
@@ -34,7 +36,7 @@ import {
 } from "./work-api";
 import { useProjectErrorMessage } from "./hooks";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import type { AssignPreviewInput, SuggestionParams, TaskStatus } from "./work-types";
+import type { AssignPreviewInput, SuggestionParams, TaskStatus, TeamLoadFilter } from "./work-types";
 
 // Board và cảnh báo tự tải lại để nhiều người cùng xem thấy thay đổi gần như ngay (đặc tả mục 10).
 const BOARD_POLL_MS = 3_000;
@@ -106,6 +108,12 @@ export const usePersonAllocations = (employeeId: string | null, from?: string, t
     enabled: !!employeeId,
     retry: false,
   });
+/** Lịch tải cả nhóm; 403 / 400 (quá nhiều người) không thử lại. */
+export const useTeamLoad = (filter: TeamLoadFilter, enabled = true) =>
+  useQuery({ queryKey: key("team-load", filter), queryFn: () => getTeamLoad(filter), enabled, retry: false });
+/** Gantt của dự án. */
+export const useProjectTimeline = (projectId: string, from?: string, to?: string) =>
+  useQuery({ queryKey: key("timeline", projectId, from, to), queryFn: () => getProjectTimeline(projectId, from, to), retry: false });
 /** Ô chọn người của trang lịch. Từ khóa trống vẫn gọi: lấy `reach` và danh sách có hạn. */
 export const useAllocationPeople = (keyword: string, enabled = true) =>
   useQuery({
@@ -153,6 +161,9 @@ const ERROR_KEYS: readonly string[] = [
   "TASK_NOT_DELETABLE",
   "TASK_BASELINE_FORBIDDEN",
   "TASK_BASELINE_REASON_REQUIRED",
+  "TIMELINE_RANGE_TOO_LONG",
+  "TIMELINE_TOO_MANY_TASKS",
+  "ALLOCATION_TEAM_TOO_MANY",
   "SPRINT_DISABLED",
   "SPRINT_ALREADY_ACTIVE",
   "SPRINT_INVALID_STATE",
