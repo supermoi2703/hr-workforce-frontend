@@ -10,7 +10,7 @@ export function hasPermission(user: CurrentUser | null, permission: string): boo
 
 /** Kiểm tra điều kiện truy cập (xem kiểu `Access`). Chỉ để ẩn/hiện giao diện: backend vẫn phải tự chặn. */
 export function canAccess(user: CurrentUser | null, access?: Access): boolean {
-  if (!user) return false;
+  if (!user || (access?.employeeProfile && !user.employeeId)) return false;
   const roles = access?.roles ?? [];
   const permissions = access?.permissions ?? [];
   if (roles.length === 0 && permissions.length === 0) return true;

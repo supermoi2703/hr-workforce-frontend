@@ -15,6 +15,9 @@ export const NOTIFICATION_TYPES = [
   "OVERTIME_ASSIGNED",
   "OVERTIME_RESPONDED",
   "OVERTIME_CANCELLED",
+  "KPI_RATING_OPENED",
+  "KPI_REVIEW_READY",
+  "KPI_LOCKED",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
