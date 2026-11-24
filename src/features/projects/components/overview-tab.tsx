@@ -215,14 +215,18 @@ export function EventLine({ event, showKey, onOpenTask }: { event: TaskEvent; sh
   const t = useTranslations("ProjectWork");
   const status = (value: string | null) => (value && value in STATUS_LABEL_KEYS ? t(`status.${value as keyof typeof STATUS_LABEL_KEYS}`) : value ?? "—");
   const useStatus = event.kind === "STATUS_CHANGED";
+  const label = event.kind === "BASELINE_SET" && event.note === "reassigned" ? "baselineRetaken" : `event.${event.kind}` as const;
   // Ngày đổi (hạn, ngày bắt đầu) lưu dạng yyyy-MM-dd: hiện theo kiểu ngày Việt Nam.
   const value = (raw: string | null) => (useStatus ? status(raw) : raw && ISO_DATE.test(raw) ? formatDate(raw) : (raw ?? "—"));
   return (
     <li className="flex flex-wrap items-baseline gap-x-2">
       <span className="font-medium">{event.actor?.fullName ?? t("system")}</span>
       <span className="text-muted-foreground">
-        {t(`event.${event.kind}`, { from: value(event.from), to: value(event.to) })}
+        {t(label, { from: value(event.from), to: value(event.to) })}
       </span>
+      {event.kind === "BASELINE_CHANGED" && event.note ? (
+        <span className="min-w-0 wrap-break-word whitespace-pre-wrap">{event.note}</span>
+      ) : null}
       {showKey && (
         <button type="button" className="text-primary font-mono hover:underline" onClick={() => onOpenTask?.(event.taskKey)}>
           {event.taskKey}
