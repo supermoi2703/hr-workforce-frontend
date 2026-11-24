@@ -2,11 +2,16 @@ import { http } from "@/lib/api/http-client";
 import type { PageResponse } from "@/lib/api/types";
 import type {
   ApprovalSummary,
+  AdjustmentResult,
+  AttendanceIncident,
   BatchItemResult,
   DecisionBody,
   DecisionResult,
   Explanation,
   ExplanationBody,
+  IncidentCancellation,
+  IncidentDraft,
+  IncidentResult,
   LateChange,
   LockCheck,
   LockResult,
@@ -25,6 +30,8 @@ import type {
   RemoteWorkRequest,
   RemoteWorkUsage,
   ShiftChange,
+  TimesheetAdjustment,
+  TimesheetHistoryEntry,
 } from "./types";
 
 // ===== Bảng công =====
@@ -33,8 +40,30 @@ export const getTimesheet = (from: string, to: string, employeeId?: string) =>
   http.get<EmployeeTimesheet>("/api/timesheet-days", { query: { from, to, employeeId } });
 
 /** Bảng công của những người trong phạm vi (quản lý: đội của mình), tối đa 31 ngày. */
-export const getTeamTimesheet = (from: string, to: string) =>
-  http.get<EmployeeTimesheet[]>("/api/timesheet-days/team", { query: { from, to } });
+export const getTeamTimesheet = (from: string, to: string, officeId?: string) =>
+  http.get<EmployeeTimesheet[]>("/api/timesheet-days/team", { query: { from, to, officeId } });
+
+export const getAttendanceOffices = () => http.get<{ id: string; name: string }[]>("/api/org-chart/offices");
+
+export async function getOwnAttendanceOffice() {
+  const profile = await http.get<{ officeId: string }>("/api/employees/me");
+  return profile.officeId;
+}
+
+export const adjustTimesheetDay = (body: TimesheetAdjustment) =>
+  http.post<AdjustmentResult>("/api/timesheet-days/adjustments", body);
+
+export const getTimesheetHistory = (employeeId: string, date: string) =>
+  http.get<TimesheetHistoryEntry[]>(`/api/timesheet-days/${employeeId}/${date}/history`);
+
+export const getAttendanceIncidents = (month: string, officeId?: string) =>
+  http.get<AttendanceIncident[]>("/api/attendance-incidents", { query: { month, officeId } });
+
+export const createAttendanceIncident = (body: IncidentDraft) =>
+  http.post<IncidentResult>("/api/attendance-incidents", body);
+
+export const cancelAttendanceIncident = ({ id, reason }: { id: string; reason: string }) =>
+  http.post<IncidentCancellation>(`/api/attendance-incidents/${id}/cancel`, { reason });
 
 // ===== Giờ làm =====
 

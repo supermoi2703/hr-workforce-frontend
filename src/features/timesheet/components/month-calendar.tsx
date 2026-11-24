@@ -73,12 +73,13 @@ export function MonthCalendar({ month, today, days, requests, remote, selected, 
 
 function CellBody({ day, today }: { day: TimesheetDay; today: string }) {
   const t = useTranslations("Timesheet");
-  if (day.dayType === "HOLIDAY") return <span className="font-medium text-info">{t("status.HOLIDAY")}</span>;
-  if (day.dayType === "WEEKLY_OFF") return null;
+  if (day.dayType === "HOLIDAY" && day.status !== "INCIDENT" && day.source !== "HR_ADJUST") return <span className="font-medium text-info">{t("status.HOLIDAY")}</span>;
+  if (day.dayType === "WEEKLY_OFF" && day.status !== "INCIDENT" && day.source !== "HR_ADJUST") return null;
   const label = day.status === "UPCOMING" ? null : t(`status.${day.status}`);
   return (
     <>
       {label && <span className="font-medium">{label}</span>}
+      {day.source === "HR_ADJUST" && <span className="text-info">{t("source.HR_ADJUST")}</span>}
       {day.leavePart && day.leavePart !== "FULL_DAY" && <span className="text-info">{t(`leavePart.${day.leavePart}`)}</span>}
       {day.remotePart && <span className="text-info">{t(`remotePart.${day.remotePart}`)}</span>}
       {day.outsideOffice && <span className="text-warning">{t("outsideOffice")}</span>}

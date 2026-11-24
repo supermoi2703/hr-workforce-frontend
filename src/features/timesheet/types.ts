@@ -14,6 +14,7 @@ export type TimesheetStatus =
   | "ABSENT"
   | "UPCOMING"
   | "HOLIDAY"
+  | "INCIDENT"
   | "OFF"
   | "LEAVE_PAID"
   | "LEAVE_UNPAID"
@@ -43,7 +44,48 @@ export type TimesheetDay = {
   remotePart: LeavePart | null;
   /** Có chấm cá nhân mà không có đơn WFH đã duyệt: HR rà soát. */
   outsideOffice: boolean;
+  currentAdjustmentId?: string | null;
+  source?: string | null;
 };
+
+type AdjustmentTarget = {
+  employeeId: string;
+  date: string;
+  reason: string;
+  currentAdjustmentId: string | null;
+};
+
+export type TimesheetAdjustment = AdjustmentTarget & (
+  | { paidUnits: number }
+  | { checkIn: string; checkOut: string }
+  | { clear: true }
+);
+
+export type AdjustmentResult = { adjustmentId: string; day: TimesheetDay };
+
+export type HistorySnapshot = Pick<TimesheetDay, "status" | "paidUnits" | "firstIn" | "lastOut" | "lateMinutes">;
+
+export type TimesheetHistoryEntry = {
+  at: string;
+  action: string;
+  actorName: string | null;
+  reason: string | null;
+  before: HistorySnapshot | null;
+  after: HistorySnapshot | null;
+};
+
+export type IncidentDraft = { officeId: string; startAt: string; endAt: string; reason: string };
+export type IncidentStatus = "ACTIVE" | "CANCELLED";
+export type AttendanceIncident = IncidentDraft & {
+  id: string;
+  officeName: string;
+  status: IncidentStatus;
+  createdByName: string | null;
+  createdAt: string;
+  cancelReason: string | null;
+};
+export type IncidentResult = { id: string; affectedEmployees: number; affectedDays: number };
+export type IncidentCancellation = { id: string; status: "CANCELLED"; affectedDays: number };
 
 export type TimesheetSummary = {
   paidUnits: number;

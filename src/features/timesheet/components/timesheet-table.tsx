@@ -53,6 +53,7 @@ export function TimesheetTable({ sheet, today, onSelect }: { sheet: EmployeeTime
                 <TableCell>
                   <span className="inline-flex flex-wrap items-center gap-1">
                     <DayStatusBadge status={day.status} />
+                    {day.source === "HR_ADJUST" && <Badge variant="outline">{t("source.HR_ADJUST")}</Badge>}
                     {day.leavePart && day.leavePart !== "FULL_DAY" && (
                       <span className="text-xs text-info">{t(`leavePart.${day.leavePart}`)}</span>
                     )}

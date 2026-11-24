@@ -3,21 +3,28 @@
 import { useCallback } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations, type Messages } from "next-intl";
-import { isApiError } from "@/lib/api/errors";
+import { isApiError, type ApiError } from "@/lib/api/errors";
 import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
+  adjustTimesheetDay,
   approve,
+  cancelAttendanceIncident,
   cancelExplanation,
   cancelLeave,
   cancelRemoteWork,
   decideMissingOut,
   decideMissingOutBatch,
+  createAttendanceIncident,
+  getAttendanceIncidents,
+  getAttendanceOffices,
+  getOwnAttendanceOffice,
   getLockCheck,
   getMyBalance,
   getMyRemoteUsage,
   getMySchedule,
   getTeamTimesheet,
   getTimesheet,
+  getTimesheetHistory,
   hrDecideExplanation,
   listHrExplanations,
   listInbox,
@@ -51,7 +58,11 @@ export type TimeApproval = ApprovalSummary & { type: TimeApprovalType };
 export const timesheetKeys = {
   all: ["timesheet"] as const,
   days: (from: string, to: string) => ["timesheet", "days", from, to] as const,
-  team: (from: string, to: string) => ["timesheet", "team", from, to] as const,
+  team: (from: string, to: string, officeId?: string) => ["timesheet", "team", from, to, officeId] as const,
+  offices: ["timesheet", "offices"] as const,
+  ownOffice: (employeeId?: string | null) => ["timesheet", "own-office", employeeId] as const,
+  history: (employeeId: string, date: string) => ["timesheet", "history", employeeId, date] as const,
+  incidents: (month: string, officeId?: string) => ["timesheet", "incidents", month, officeId] as const,
   schedule: ["timesheet", "schedule"] as const,
   shiftChanges: ["timesheet", "shift-changes"] as const,
   leaveTypes: ["timesheet", "leave-types"] as const,
@@ -78,13 +89,62 @@ export function useMyTimesheet(from: string, to: string) {
   });
 }
 
-export function useTeamTimesheet(from: string, to: string, enabled: boolean) {
+export function useTeamTimesheet(from: string, to: string, enabled: boolean, officeId?: string) {
   return useQuery({
-    queryKey: timesheetKeys.team(from, to),
-    queryFn: () => getTeamTimesheet(from, to),
-    placeholderData: keepPreviousData,
+    queryKey: timesheetKeys.team(from, to, officeId),
+    queryFn: () => getTeamTimesheet(from, to, officeId),
     enabled,
   });
+}
+
+export function useAttendanceOffices(enabled = true) {
+  return useQuery({ queryKey: timesheetKeys.offices, queryFn: getAttendanceOffices, enabled });
+}
+
+export function useOwnAttendanceOffice(employeeId: string | null | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: timesheetKeys.ownOffice(employeeId),
+    queryFn: getOwnAttendanceOffice,
+    enabled,
+  });
+}
+
+export function useTimesheetHistory(employeeId: string, date: string) {
+  return useQuery({
+    queryKey: timesheetKeys.history(employeeId, date),
+    queryFn: () => getTimesheetHistory(employeeId, date),
+  });
+}
+
+export function useAttendanceIncidents(month: string, officeId: string) {
+  return useQuery({
+    queryKey: timesheetKeys.incidents(month, officeId || undefined),
+    queryFn: () => getAttendanceIncidents(month, officeId || undefined),
+    enabled: !!month,
+  });
+}
+
+export function useAdjustTimesheetDay(onStaleDay: (error: ApiError) => Promise<void>) {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: adjustTimesheetDay,
+    onSuccess: invalidate,
+    onError: async (error) => {
+      if (isApiError(error) && (error.code === "ADJUSTMENT_CONFLICT" || error.code === "PERIOD_LOCKED")) {
+        await onStaleDay(error);
+      }
+    },
+  });
+}
+
+export function useCreateAttendanceIncident() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: createAttendanceIncident, onSuccess: invalidate });
+}
+
+export function useCancelAttendanceIncident() {
+  const invalidate = useInvalidateAll();
+  return useMutation({ mutationFn: cancelAttendanceIncident, onSuccess: invalidate });
 }
 
 export function useMySchedule() {
@@ -164,8 +224,8 @@ export function usePendingDecisions(from: string, to: string) {
   });
 }
 
-export function useTimesheetPeriods(year: number) {
-  return useQuery({ queryKey: timesheetKeys.periods(year), queryFn: () => listTimesheetPeriods(year) });
+export function useTimesheetPeriods(year: number, enabled = true) {
+  return useQuery({ queryKey: timesheetKeys.periods(year), queryFn: () => listTimesheetPeriods(year), enabled });
 }
 
 export function useLockCheck(month: string | null) {
@@ -330,22 +390,36 @@ const ERROR_KEYS: Record<string, TimesheetErrorKey> = {
   LOCK_RECOMPUTE_FAILED: "lockRecomputeFailed",
   INVALID_PERIOD: "invalidPeriod",
   REASON_REQUIRED: "reasonRequired",
-  SELF_ADJUST_FORBIDDEN: "selfDecideForbidden",
+  INVALID_PAID_UNITS: "invalidPaidUnits",
+  INVALID_ADJUSTMENT: "invalidAdjustment",
+  SELF_ADJUST_FORBIDDEN: "selfAdjustForbidden",
+  ADJUSTMENT_CONFLICT: "adjustmentConflict",
+  DAY_NOT_ADJUSTABLE: "dayNotAdjustable",
+  INVALID_RANGE: "invalidIncidentRange",
+  INCIDENT_TOO_LONG: "incidentTooLong",
+  INCIDENT_OVERLAP: "incidentOverlap",
+  ALREADY_CANCELLED: "incidentAlreadyCancelled",
   CONFLICT: "decisionConflict",
   FORBIDDEN: "selfDecideForbidden",
 };
 
 /** Mã lỗi (từ API hoặc từ trường problem của bản xem trước) → câu thông báo. */
-export function useTimesheetErrorMessage() {
+export function useTimesheetErrorMessage(context?: "adjustment" | "incident") {
   const t = useTranslations("Timesheet.errors");
+  const common = useTranslations("Errors");
   const generic = useErrorMessage();
   return useCallback(
     (error: unknown) => {
       const code = typeof error === "string" ? error : isApiError(error) ? error.code : null;
+      if (context && isApiError(error)) {
+        if (error.status === 403 && code !== "SELF_ADJUST_FORBIDDEN") return common("forbidden");
+        if (error.status === 404) return common("notFound");
+        if (code === "PERIOD_LOCKED" && context === "adjustment") return t("adjustmentPeriodLocked");
+      }
       const key = code ? ERROR_KEYS[code] : undefined;
       if (key) return t(key);
       return typeof error === "string" ? t("unknown") : generic(error);
     },
-    [t, generic],
+    [t, common, generic, context],
   );
 }

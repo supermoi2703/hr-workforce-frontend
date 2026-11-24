@@ -19,6 +19,7 @@ import { MySchedulePanel } from "./my-schedule-panel";
 import { RemoteWorkDialog } from "./remote-work-dialog";
 import { TeamCalendar } from "./team-calendar";
 import { TimesheetTable } from "./timesheet-table";
+import { TimesheetDayDialog } from "./timesheet-day-dialog";
 
 type Tab = "calendar" | "list" | "team" | "schedule";
 
@@ -28,7 +29,7 @@ type Tab = "calendar" | "list" | "team" | "schedule";
  */
 export function TimesheetPage() {
   const t = useTranslations("Timesheet");
-  const { hasRole } = useCurrentUser();
+  const { hasRole, hasPermission } = useCurrentUser();
   const today = todayIsoDate();
   const [tab, setTab] = useState<Tab>("calendar");
   const [month, setMonth] = useState(today.slice(0, 7));
@@ -42,8 +43,9 @@ export function TimesheetPage() {
   const remote = useMyRemoteWork().data ?? [];
   const explanations = useMyExplanations().data ?? [];
   const [explaining, setExplaining] = useState<string | null>(null);
-  // HR toàn công ty chưa xem được: API cần chọn văn phòng mà tab này chưa có ô chọn.
-  const canSeeTeam = hasRole("MANAGER") || (hasRole("HR") && !hasRole("HR_COMPANY"));
+  const [historyDate, setHistoryDate] = useState<string | null>(null);
+  const historyDay = historyDate ? sheet.data?.days.find((day) => day.workDate === historyDate) : undefined;
+  const canSeeTeam = hasPermission("attendance:manage") || hasRole("MANAGER") || (hasRole("HR") && !hasRole("HR_COMPANY"));
 
   function changeMonth(delta: number) {
     const next = shiftMonth(month, delta);
@@ -119,6 +121,7 @@ export function TimesheetPage() {
                 onExplain={() => setExplaining(selected)}
                 onRequestLeave={() => setRequesting(selected)}
                 onRequestRemote={() => setRequestingRemote(selected)}
+                onHistory={sheet.data.employee.id ? () => setHistoryDate(selected) : undefined}
               />
             </div>
           )}
@@ -146,6 +149,10 @@ export function TimesheetPage() {
       </Tabs>
 
       {explaining && <ExplanationDialog date={explaining} onClose={() => setExplaining(null)} />}
+      {historyDay && sheet.data && (
+        <TimesheetDayDialog key={historyDay.workDate} employeeId={sheet.data.employee.id} employeeName={sheet.data.employee.fullName}
+          day={historyDay} onClose={() => setHistoryDate(null)} />
+      )}
       {requesting && (
         <LeaveRequestDialog
           initialDate={requesting}

@@ -59,6 +59,7 @@ export function statusTone(status: TimesheetStatus): Tone {
     case "EARLY":
     case "LATE_EARLY":
     case "MISSING_OUT":
+    case "INCIDENT":
       return "warning";
     case "ABSENT":
       return "destructive";
