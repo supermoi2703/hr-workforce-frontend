@@ -60,6 +60,11 @@ function iconOf(notification: AppNotification): ReactNode {
       return <ClockIcon className="text-destructive" />;
     case "OVERTIME_CANCELLED":
       return <CalendarX2Icon />;
+    case "KPI_RATING_OPENED":
+    case "KPI_REVIEW_READY":
+      return <ClipboardCheckIcon />;
+    case "KPI_LOCKED":
+      return <BadgeCheckIcon className="text-success" />;
     default:
       return <BellIcon />;
   }

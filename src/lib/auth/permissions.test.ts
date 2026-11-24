@@ -22,4 +22,11 @@ describe("canAccess", () => {
     expect(canAccess(hr, { permissions: ["role:manage"] })).toBe(false);
     expect(canAccess(hr, { roles: ["ADMIN"], permissions: ["user:lock"] })).toBe(true);
   });
+
+  it("kiểm tra hồ sơ nhân viên cùng với quyền được yêu cầu", () => {
+    const access = { employeeProfile: true, permissions: ["user:read"] };
+    expect(canAccess(hr, access)).toBe(false);
+    expect(canAccess({ ...hr, employeeId: "employee-1" }, access)).toBe(true);
+    expect(canAccess({ ...employee, employeeId: "employee-2" }, access)).toBe(false);
+  });
 });

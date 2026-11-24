@@ -37,6 +37,8 @@ export type AuthResponse = {
 export type Access = {
   roles?: RoleCode[];
   permissions?: string[];
+  /** Đồng thời yêu cầu tài khoản có hồ sơ nhân viên. */
+  employeeProfile?: boolean;
 };
 
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";

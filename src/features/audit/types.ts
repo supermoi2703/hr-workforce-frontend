@@ -81,6 +81,11 @@ export const AUDIT_ACTIONS_BY_CATEGORY = {
     "EMPLOYEE_SKILL_DECLARED",
     "EMPLOYEE_SKILL_REMOVED",
     "EMPLOYEE_SKILL_CONFIRMED",
+    "KPI_PERIOD_STATUS_CHANGED",
+    "KPI_PERIOD_UNLOCKED",
+    "KPI_REVIEW_ADJUSTED",
+    "KPI_REVIEW_LOCKED",
+    "KPI_REVIEW_UNLOCKED",
   ],
 } as const;
 
@@ -91,7 +96,7 @@ export const AUDIT_ACTIONS: readonly AuditAction[] = Object.values(AUDIT_ACTIONS
 export const AUDIT_OUTCOMES = ["SUCCESS", "FAILURE"] as const;
 export type AuditOutcome = (typeof AUDIT_OUTCOMES)[number];
 
-export const AUDIT_TARGET_TYPES = ["USER", "ROLE", "POLICY", "EMPLOYEE", "CONTRACT"] as const;
+export const AUDIT_TARGET_TYPES = ["USER", "ROLE", "POLICY", "EMPLOYEE", "CONTRACT", "KPI_PERIOD", "KPI_REVIEW"] as const;
 export type AuditTargetType = (typeof AUDIT_TARGET_TYPES)[number];
 
 /** Một dòng nhật ký (AuditLogResponse). Thời điểm là chuỗi ISO. */

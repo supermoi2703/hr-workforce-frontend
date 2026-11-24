@@ -38,13 +38,16 @@ const PARAM_KEYS: Record<NotificationType, readonly string[]> = {
   OVERTIME_RESPONDED: ["employeeName", "taskKey", "workDate", "accepted"],
   // cause: PM / LEAVE / EXPIRED.
   OVERTIME_CANCELLED: ["taskKey", "workDate", "cause"],
+  KPI_RATING_OPENED: ["month"],
+  KPI_REVIEW_READY: ["month"],
+  KPI_LOCKED: ["month"],
 };
 
 /** Tham số là ngày (yyyy-MM-dd) cần định dạng theo kiểu Việt Nam trước khi ghép câu. */
 const DATE_KEYS = new Set(["lastDay", "effectiveFrom", "endDate", "workDate", "complaintDeadline"]);
 
 /** Tham số là tháng (yyyy-MM, ví dụ kỳ lương) hiển thị dạng MM/yyyy. */
-const MONTH_KEYS = new Set(["period"]);
+const MONTH_KEYS = new Set(["period", "month"]);
 
 /** Tham số là giờ "HH:mm" (backend có thể gửi "HH:mm:ss"): bỏ phần giây. */
 const TIME_KEYS = new Set(["startTime", "endTime"]);
