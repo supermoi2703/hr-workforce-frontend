@@ -15,7 +15,11 @@ import { formatDate } from "@/lib/format";
 import { createTask, getAssignPreview, updateTask } from "../work-api";
 import { useProjectMembers } from "../hooks";
 import { useAssignPreview, useSkillOptions, useWorkCategories, useWorkErrorMessage, useWorkMutation } from "../work-hooks";
+import { useAssistantStatus } from "../ai/hooks";
+import { TaskProfileHint } from "../ai/task-profile-hint";
+import type { TaskProfile } from "../ai/types";
 import {
+  applyAiProfile,
   applyCategory,
   applySuggestion,
   categorySuggestion,
@@ -48,6 +52,7 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   const members = useProjectMembers(project.id);
   const skillOptions = useSkillOptions();
   const categories = useWorkCategories();
+  const aiEnabled = useAssistantStatus();
   const mode = task ? "edit" : "create";
 
   const [title, setTitle] = useState(task?.card.title ?? "");
@@ -94,6 +99,12 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   function chooseCategory(next: WorkCategory | null) {
     setCategoryId(next?.id ?? "");
     setDraft((current) => applyCategory(current, next, mode));
+  }
+
+  // Gợi ý AI (trợ lý phân bổ, phần A): đặt nhóm mà không chạy luật điền sẵn của nhóm, rồi thay kỹ năng bằng kỹ năng AI.
+  function applyProfile(profile: TaskProfile) {
+    if (profile.category) setCategoryId(profile.category.id);
+    setDraft((current) => applyAiProfile(current, profile));
   }
 
   const people = (members.data ?? []).filter((member) => member.role !== "OBSERVER");
@@ -151,6 +162,10 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
               <FieldLabel htmlFor="task-title">{t("taskTitle")}</FieldLabel>
               <Input id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
             </Field>
+            <Field>
+              <FieldLabel htmlFor="task-description">{t("descriptionLabel")}</FieldLabel>
+              <Textarea id="task-description" rows={3} value={description} onChange={(event) => setDescription(event.target.value)} />
+            </Field>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field>
                 <FieldLabel htmlFor="task-type">{t("typeLabel")}</FieldLabel>
@@ -176,6 +191,9 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
           </Section>
 
           <Section title={common ? t("sectionWork") : t("sectionCategory")}>
+            {!common && aiEnabled && (
+              <TaskProfileHint projectId={project.id} title={title} description={description} onApply={applyProfile} />
+            )}
             {!common && (
               <Field>
                 <FieldLabel htmlFor="task-category">{t("workCategory")}</FieldLabel>
@@ -260,13 +278,6 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
               />
             </Section>
           )}
-
-          <Section>
-            <Field>
-              <FieldLabel htmlFor="task-description">{t("descriptionLabel")}</FieldLabel>
-              <Textarea id="task-description" rows={3} value={description} onChange={(event) => setDescription(event.target.value)} />
-            </Field>
-          </Section>
         </FieldGroup>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>

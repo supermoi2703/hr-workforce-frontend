@@ -51,7 +51,6 @@
       "projects": "Projects",
       "allocations": "Staff allocation",
       "policyQa": "Policy Q&A",
-      "allocationSuggest": "Allocation suggestions",
       "dataQa": "Data Q&A",
       "users": "Accounts",
       "roles": "Roles & permissions",
@@ -5021,5 +5020,29 @@
     "loadRowTitle": "Load by week",
     "loadRowTitleDay": "Load by day",
     "loadRowHint": "Task hours on every project ÷ capacity. The dashed line is 100%."
+  },
+  "AllocationAi": {
+    "profile": {
+      "ask": "Suggest with AI",
+      "askAgain": "Suggest again",
+      "hint": "AI reads the title and description to suggest a work category and the skills needed.",
+      "needTitle": "Enter a title so AI can suggest a work category and skills.",
+      "category": "Work category",
+      "categoryValue": "{name} ({hours})",
+      "noCategory": "No matching category",
+      "skills": "Skills needed",
+      "skillLevel": "{name} ≥ {level}",
+      "noSkills": "No matching skill in the catalog",
+      "empty": "No matching work category or skill in the catalog. Try a clearer description.",
+      "sourceAi": "AI picked from the company catalog. Check before saving.",
+      "sourceSearch": "AI is unavailable right now: suggestions come from catalog search only, without skill levels.",
+      "stale": "The title or description changed after this suggestion. Click \"Suggest again\" to update.",
+      "apply": "Apply",
+      "dismiss": "Dismiss"
+    },
+    "errors": {
+      "disabled": "The AI assistant is turned off.",
+      "unavailable": "The AI assistant is unavailable right now. Try again in a few minutes or pick the category yourself."
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyAiProfile,
   assignWarning,
   hoursText,
   needsConfirm,
@@ -150,6 +151,33 @@ describe("work categories", () => {
     const draft = { estimate: "8", skills: [{ skillId: "sql", minLevel: 2 }, { skillId: "java", minLevel: 2 }] };
     expect(differsFromSuggestion(draft, API)).toBe(false);
     expect(differsFromSuggestion({ ...draft, skills: [{ skillId: "sql", minLevel: 2 }, { skillId: "java", minLevel: null }] }, API)).toBe(true);
+  });
+
+  it("applies an AI profile: category hours, AI skills, and later category changes keep those skills", () => {
+    const typed = { ...EMPTY, estimate: "40", estimateTouched: true, skills: [{ skillId: "sql", minLevel: 3 }] };
+    const profile = {
+      category: { defaultMinutes: 720 },
+      skills: [
+        { skillId: "react", minLevel: 3 },
+        { skillId: "ts", minLevel: null },
+      ],
+    };
+    const next = applyAiProfile(typed, profile);
+    expect(next.estimate).toBe("12");
+    expect(next.estimateTouched).toBe(false);
+    expect(next.skills).toEqual([
+      { skillId: "react", minLevel: 3 },
+      { skillId: "ts", minLevel: null },
+    ]);
+    expect(applyCategory(next, API, "create").skills).toEqual(next.skills);
+  });
+
+  it("an AI profile without a category keeps the estimate the PM typed", () => {
+    const typed = { ...EMPTY, estimate: "6", estimateTouched: true };
+    const next = applyAiProfile(typed, { category: null, skills: [{ skillId: "java", minLevel: 2 }] });
+    expect(next.estimate).toBe("6");
+    expect(next.estimateTouched).toBe(true);
+    expect(next.skills).toEqual([{ skillId: "java", minLevel: 2 }]);
   });
 
   it("writes hours for the estimate box", () => {
