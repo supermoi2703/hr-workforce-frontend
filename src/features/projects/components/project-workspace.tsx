@@ -2,13 +2,15 @@
 
 import { Suspense, useCallback, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SparklesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/shared/states";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AssistantSheet } from "../ai/assistant-sheet";
+import { useAssistantConversation, useAssistantStatus } from "../ai/hooks";
 import type { Project } from "../types";
 import type { Task } from "../work-types";
 import { setSprintMode } from "../work-api";
@@ -57,6 +59,15 @@ function Workspace({ project, info, members, overtime, renderTaskActions }: Proj
   const params = useSearchParams();
   const [creating, setCreating] = useState(false);
   const { can } = project;
+  // Trợ lý phân bổ AI (workload bước 6): chỉ người điều phối dự án, khi backend bật. Hội thoại giữ ở đây.
+  const tAi = useTranslations("AllocationAi.assistant");
+  const aiEnabled = useAssistantStatus();
+  const showAssistant = aiEnabled && can.editAnyTask;
+  const conversation = useAssistantConversation(project.id);
+  const [assistant, setAssistant] = useState<{ open: boolean; task: { id: string; key: string } | null }>({
+    open: false,
+    task: null,
+  });
   const toggleSprint = useWorkMutation((enabled: boolean) => setSprintMode(project.id, enabled));
 
   const setQuery = useCallback(
@@ -71,6 +82,26 @@ function Workspace({ project, info, members, overtime, renderTaskActions }: Proj
     [params, pathname, router],
   );
   const openTask = useCallback((key: string | null) => setQuery({ task: key }), [setQuery]);
+  const taskActions = useCallback(
+    (task: Task) => (
+      <>
+        {renderTaskActions?.(task)}
+        {showAssistant && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setQuery({ task: null });
+              setAssistant({ open: true, task: { id: task.card.id, key: task.card.key } });
+            }}
+          >
+            <SparklesIcon /> {tAi("askAboutTask")}
+          </Button>
+        )}
+      </>
+    ),
+    [renderTaskActions, showAssistant, setQuery, tAi],
+  );
 
   const tabs = TABS.filter((tab) => {
     if (tab === "sprint" && !project.sprintEnabled) return false;
@@ -96,11 +127,18 @@ function Workspace({ project, info, members, overtime, renderTaskActions }: Proj
                 </TabsTrigger>
               ))}
             </TabsList>
-            {can.createTask && (
-              <Button onClick={() => setCreating(true)}>
-                <PlusIcon /> {t("newTask")}
-              </Button>
-            )}
+            <div className="flex flex-wrap items-center gap-2">
+              {showAssistant && (
+                <Button variant="outline" onClick={() => setAssistant({ open: true, task: null })}>
+                  <SparklesIcon /> {tAi("open")}
+                </Button>
+              )}
+              {can.createTask && (
+                <Button onClick={() => setCreating(true)}>
+                  <PlusIcon /> {t("newTask")}
+                </Button>
+              )}
+            </div>
           </div>
           <TabsContent value="overview" className="mt-4">
             {tab === "overview" && <OverviewTab project={project} onOpenTask={openTask} />}
@@ -150,8 +188,18 @@ function Workspace({ project, info, members, overtime, renderTaskActions }: Proj
         project={project}
         onClose={() => openTask(null)}
         onOpenTask={openTask}
-        renderActions={renderTaskActions}
+        renderActions={taskActions}
       />
+      {showAssistant && (
+        <AssistantSheet
+          project={project}
+          open={assistant.open}
+          onOpenChange={(open) => setAssistant((current) => ({ open, task: open ? current.task : null }))}
+          conversation={conversation}
+          task={assistant.task}
+          onOpenTask={openTask}
+        />
+      )}
     </>
   );
 }

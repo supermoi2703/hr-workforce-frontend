@@ -133,13 +133,25 @@ export function AllocationTeamView({ reach, window, toolbar, onOpenPerson }: Pro
   );
 }
 
-function HeatTable({ rows, onOpenPerson }: { rows: TeamLoadRow[]; onOpenPerson: (employeeId: string) => void }) {
+/** Bảng nhiệt tải theo tuần (một dòng một người), dùng cả ở trợ lý phân bổ AI. */
+export function HeatTable({
+  rows,
+  onOpenPerson,
+  compact = false,
+}: {
+  rows: TeamLoadRow[];
+  onOpenPerson: (employeeId: string) => void;
+  /** Bảng hẹp (trong bảng trợ lý): không giữ độ rộng tối thiểu của trang /allocations. */
+  compact?: boolean;
+}) {
   const t = useTranslations("Allocations.Team");
   const weeks = rows[0].weeks.map((week) => week.weekStart);
-  const columns = { gridTemplateColumns: `minmax(12rem, 16rem) repeat(${weeks.length}, minmax(3.25rem, 1fr)) 2rem` };
+  const columns = {
+    gridTemplateColumns: `${compact ? "minmax(9rem, 14rem)" : "minmax(12rem, 16rem)"} repeat(${weeks.length}, minmax(3.25rem, 1fr)) 2rem`,
+  };
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[44rem]">
+      <div className={compact ? "min-w-0" : "min-w-[44rem]"}>
         <div className="grid border-b bg-muted/40 text-[11px] text-muted-foreground" style={columns}>
           <span className="px-4 py-2.5 text-xs font-medium">{t("headerPerson")}</span>
           {weeks.map((week) => (

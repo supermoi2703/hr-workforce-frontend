@@ -5022,6 +5022,79 @@
     "loadRowHint": "Giờ việc trên mọi dự án ÷ năng lực. Vạch đứt là 100%."
   },
   "AllocationAi": {
+    "assistant": {
+      "open": "Trợ lý AI",
+      "askAboutTask": "Hỏi trợ lý",
+      "title": "Trợ lý phân bổ",
+      "description": "Hỏi bằng câu về người làm, tải và rủi ro của dự án. Danh sách và số liệu do hệ thống tính theo luật.",
+      "descriptionTask": "Đang hỏi về {key}. Gõ \"việc này\" để nhắc tới việc đó.",
+      "intro": "Bạn có thể hỏi:",
+      "thinking": "Trợ lý đang đọc câu hỏi…",
+      "fallback": "Bạn vẫn dùng được nút \"Gợi ý người\" trong từng việc.",
+      "retry": "Hỏi lại",
+      "placeholder": "Ví dụ: Cần 2 người biết React mức 3 tuần sau, khoảng 20 giờ",
+      "inputLabel": "Câu hỏi cho trợ lý",
+      "send": "Gửi",
+      "privacy": "Câu hỏi được gửi tới Gemini để hiểu ý. Đừng nhập thông tin cá nhân.",
+      "clear": "Xoá hội thoại",
+      "intent": {
+        "FIND_PEOPLE": "Tìm người:",
+        "TEAM_AVAILABILITY": "Ai còn trống:",
+        "PROJECT_RISK": "Rủi ro:",
+        "UNSUPPORTED": "Chưa hỗ trợ"
+      },
+      "chip": {
+        "work": "Việc: {text}",
+        "skillLevel": "{name} ≥ {level}",
+        "headcount": "{count} người",
+        "hours": "{hours} giờ",
+        "from": "Từ {date}",
+        "scopeAll": "Gồm người ngoài dự án",
+        "scopeProject": "Chỉ trong dự án",
+        "unmatchedHint": "Không có trong danh mục kỹ năng nên không dùng để lọc"
+      },
+      "notes": {
+        "TASK_NOT_FOUND": "Không tìm thấy mã việc đó trong dự án này.",
+        "RANGE_CLAMPED": "Khoảng ngày đã được thu lại cho hợp lệ (không trước hôm nay, không quá dài).",
+        "DATE_IGNORED": "Không hiểu được ngày trong câu hỏi nên đã bỏ qua.",
+        "SKILL_NOT_IN_CATALOG": "Có kỹ năng không nằm trong danh mục (gạch ngang) nên không dùng để lọc.",
+        "OFFICE_NOT_FOUND": "Không tìm thấy văn phòng đã nêu nên không lọc theo văn phòng.",
+        "SKILLS_FROM_DESCRIPTION": "Kỹ năng được suy ra từ mô tả việc; mức tối thiểu để trống."
+      },
+      "people": {
+        "period": "Xét tải từ {from} đến {to}",
+        "empty": "Không có ai phù hợp trong khoảng này.",
+        "more": "Xem thêm {count} người",
+        "overloaded": "{count} người quá tải đã bị loại",
+        "missingSkill": "{count} người thiếu kỹ năng đã bị loại",
+        "openToAssign": "Mở để giao",
+        "createTask": "Tạo task với yêu cầu này"
+      },
+      "team": {
+        "empty": "Dự án chưa có ai đang làm.",
+        "hint": "{count} người trong dự án, nặng nhất trước. Bấm một người để xem lịch."
+      },
+      "risks": {
+        "empty": "Không thấy việc nào có nguy cơ trong khoảng này.",
+        "nobody": "Chưa có người làm",
+        "due": "hạn {date}",
+        "code": {
+          "OVERDUE": "Quá hạn",
+          "ASSIGNEE_RED": "Người làm quá tải",
+          "ASSIGNEE_YELLOW": "Người làm gần đầy",
+          "UNASSIGNED_STARTING": "Sắp bắt đầu, chưa có người"
+        }
+      },
+      "clarify": "Bạn cần người cho việc nào? Nêu mã việc (ví dụ HRM-12) hoặc kỹ năng cần, như các câu dưới đây.",
+      "unsupported": "Trợ lý chưa hỗ trợ câu này. Trợ lý trả lời được về người làm, tải và rủi ro của dự án, ví dụ:",
+      "examples": {
+        "thisTask": "Ai làm được việc này?",
+        "findPeople": "Ai biết Java mức 2 còn rảnh trong 2 tuần tới?",
+        "virtualWork": "Cần 2 người biết React mức 3 tuần sau, khoảng 20 giờ",
+        "team": "Tuần sau người trong dự án ai còn rảnh?",
+        "risks": "Việc nào có nguy cơ trễ?"
+      }
+    },
     "profile": {
       "ask": "Gợi ý bằng AI",
       "askAgain": "Gợi ý lại",
@@ -5042,7 +5115,7 @@
     },
     "errors": {
       "disabled": "Trợ lý AI đang tắt.",
-      "unavailable": "Trợ lý AI tạm không dùng được. Thử lại sau ít phút hoặc tự chọn nhóm công việc."
+      "unavailable": "Trợ lý AI tạm không dùng được (Gemini đang bận hoặc đã hết hạn mức). Thử lại sau ít phút."
     }
   }
 }

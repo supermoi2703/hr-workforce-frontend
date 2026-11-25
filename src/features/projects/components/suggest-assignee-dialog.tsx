@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -13,35 +13,51 @@ import { useOrgOffices } from "../hooks";
 import type { Project } from "../types";
 import { assignTask, getAssignPreview, getTask } from "../work-api";
 import { useSuggestions, useWorkErrorMessage, useWorkMutation } from "../work-hooks";
-import { assignWarning, hoursText, needsConfirm, skillFitText, suggestionLines, type SuggestionLine } from "../work-rules";
-import type { AssignPreview, Person, SuggestionCandidate, Task } from "../work-types";
+import { assignWarning, hoursText, needsConfirm } from "../work-rules";
+import type { AssignPreview, Person, SuggestionParams, Task } from "../work-types";
 import { ProposeAllocationDialog } from "./allocation-dialogs";
 import { PersonChip } from "./badges";
-import { LoadLine, ZoneDot } from "./load-summary";
+import { LoadLine } from "./load-summary";
 import { SimpleSelect } from "./simple-select";
+import { CandidateRow } from "./suggestion-rows";
 
 const OUTSIDE_PAGE = 10;
 const OUTSIDE_MAX = 50;
 const ALL_OFFICES = "all";
 
-type SuggestAssigneeDialogProps = { project: Project; taskId: string; taskKey: string; onClose: () => void };
+/** Điều kiện mở sẵn (trợ lý phân bổ AI): kỹ năng thêm, khoảng ngày, văn phòng của người ngoài dự án. */
+export type SuggestionInitialCriteria = Pick<SuggestionParams, "skills" | "from" | "to" | "officeId">;
+
+type SuggestAssigneeDialogProps = {
+  project: Project;
+  taskId: string;
+  taskKey: string;
+  onClose: () => void;
+  initialCriteria?: SuggestionInitialCriteria;
+};
 
 /**
  * Gợi ý người cho một việc (workload bước 4, backend README module project mục 7.3): thành viên dự án và người ngoài dự án
  * có đủ kỹ năng, xếp theo vùng tải nếu nhận việc này, kèm lý do. Hệ thống không tự giao: PM chọn "Giao" (thành viên) hoặc
  * "Đề xuất vào dự án" (người ngoài, cần duyệt trước khi giao). Người đỏ không vào danh sách, cuối hộp mở ra xem được.
  */
-export function SuggestAssigneeDialog({ project, taskId, taskKey, onClose }: SuggestAssigneeDialogProps) {
+export function SuggestAssigneeDialog({ project, taskId, taskKey, onClose, initialCriteria }: SuggestAssigneeDialogProps) {
   const t = useTranslations("Suggest");
   const tWork = useTranslations("ProjectWork");
   const tLoad = useTranslations("Workload");
   const errorMessage = useWorkErrorMessage();
-  const [officeId, setOfficeId] = useState<string | null>(null);
+  const [officeId, setOfficeId] = useState<string | null>(initialCriteria?.officeId ?? null);
   const [outsideLimit, setOutsideLimit] = useState(OUTSIDE_PAGE);
   const [showOverloaded, setShowOverloaded] = useState(false);
   const [proposing, setProposing] = useState<Person | null>(null);
   const [confirming, setConfirming] = useState<{ person: Person; task: Task } | null>(null);
-  const suggestions = useSuggestions(taskId, { officeId, outsideLimit });
+  const suggestions = useSuggestions(taskId, {
+    officeId,
+    outsideLimit,
+    skills: initialCriteria?.skills,
+    from: initialCriteria?.from,
+    to: initialCriteria?.to,
+  });
   const offices = useOrgOffices();
   const assign = useWorkMutation(({ person, task }: { person: Person; task: Task }) => assignTask(taskId, person.id, task.card.version));
 
@@ -247,61 +263,4 @@ export function SuggestAssigneeDialog({ project, taskId, taskKey, onClose }: Sug
       </DialogContent>
     </Dialog>
   );
-}
-
-/** Một người được gợi ý: tên, chấm vùng, tối đa 3 dòng lý do, nút hành động bên phải. */
-function CandidateRow({ candidate, children }: { candidate: SuggestionCandidate; children: ReactNode }) {
-  return (
-    <li className="flex items-start gap-3 px-3 py-2.5">
-      <ZoneDot zone={candidate.load.zone} className="mt-1.5" />
-      <div className="grid min-w-0 flex-1 gap-0.5">
-        <PersonChip person={candidate.person} />
-        {suggestionLines(candidate).map((line, index) => (
-          <ReasonLine key={index} line={line} />
-        ))}
-      </div>
-      <div className="shrink-0">{children}</div>
-    </li>
-  );
-}
-
-function ReasonLine({ line }: { line: SuggestionLine }) {
-  const t = useTranslations("Suggest");
-  const tLoad = useTranslations("Workload");
-  const className = "text-muted-foreground text-xs";
-  if (line.kind === "skills") {
-    const text = skillFitText(line.skills, (min) => t("belowMin", { min }));
-    return (
-      <p className={className}>
-        {t("skills", { skills: text })}
-        {line.unconfirmed && ` · ${t("unconfirmed")}`}
-      </p>
-    );
-  }
-  if (line.kind === "peak") {
-    return (
-      <p className={line.week.zone === "GREEN" ? `${className} tabular-nums` : "text-warning text-xs tabular-nums"}>
-        {tLoad("peak", { week: formatDate(line.week.weekStart), load: hoursText(line.week.loadMinutes), capacity: hoursText(line.week.capacityMinutes) })}
-      </p>
-    );
-  }
-  const reason = line.reason;
-  switch (reason.code) {
-    case "ENDS_BEFORE_START":
-      return (
-        <p className={className}>
-          {reason.taskKey
-            ? t("reason.endsSameProject", { key: reason.taskKey, date: formatDate(reason.date) })
-            : t("reason.endsOtherProject", { date: formatDate(reason.date) })}
-        </p>
-      );
-    case "LEAVE_IN_RANGE":
-      return <p className={className}>{t("reason.leaveInRange", { days: reason.amount ?? 0 })}</p>;
-    case "UNSCHEDULED_WORK":
-      return <p className={className}>{t("reason.unscheduled", { hours: hoursText(reason.amount ?? 0) })}</p>;
-    case "LEAVE_ON_DUE":
-      return <p className="text-destructive text-xs">{t("reason.leaveOnDue")}</p>;
-    default:
-      return null;
-  }
 }

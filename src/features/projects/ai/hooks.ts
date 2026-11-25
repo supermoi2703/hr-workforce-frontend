@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { isApiError } from "@/lib/api/errors";
 import { useWorkErrorMessage } from "../work-hooks";
-import { getAssistantStatus, getTaskProfile } from "./api";
-import type { TaskProfileInput } from "./types";
+import { askAssistant, getAssistantStatus, getTaskProfile } from "./api";
+import { historyFor } from "./assistant-rules";
+import type { AssistantEntry, AssistantTurn, TaskProfileInput } from "./types";
 
 /** Trợ lý đang bật không. Lỗi khi hỏi trạng thái thì coi như tắt (ẩn nút), không báo lỗi. */
 export function useAssistantStatus() {
@@ -36,4 +37,48 @@ export function useAiErrorMessage() {
     },
     [t, fallback],
   );
+}
+
+/**
+ * Hội thoại với trợ lý phân bổ của một dự án. State nằm ở trang dự án nên đóng / mở lại bảng vẫn giữ các lượt. Mỗi
+ * câu hỏi gửi kèm điều kiện 2 lượt trả lời gần nhất để hỏi nối tiếp.
+ */
+export function useAssistantConversation(projectId: string) {
+  const [entries, setEntries] = useState<AssistantEntry[]>([]);
+  const nextId = useRef(1);
+  const pending = entries.some((entry) => entry.status === "pending");
+
+  const run = useCallback(
+    (id: number, question: string, taskId: string | null, history: AssistantTurn[]) => {
+      askAssistant(projectId, { question, taskId, history }).then(
+        (answer) => setEntries((list) => list.map((entry) => (entry.id === id ? { ...entry, status: "done", answer } : entry))),
+        (error: unknown) => setEntries((list) => list.map((entry) => (entry.id === id ? { ...entry, status: "error", error } : entry))),
+      );
+    },
+    [projectId],
+  );
+
+  const ask = useCallback(
+    (question: string, taskId: string | null) => {
+      const id = nextId.current++;
+      const history = historyFor(entries);
+      setEntries((list) => [...list, { id, question, taskId, status: "pending" }]);
+      run(id, question, taskId, history);
+    },
+    [entries, run],
+  );
+
+  const retry = useCallback(
+    (id: number) => {
+      const entry = entries.find((item) => item.id === id);
+      if (!entry) return;
+      const history = historyFor(entries.slice(0, entries.indexOf(entry)));
+      setEntries((list) => list.map((item) => (item.id === id ? { ...item, status: "pending", error: undefined } : item)));
+      run(id, entry.question, entry.taskId, history);
+    },
+    [entries, run],
+  );
+
+  const clear = useCallback(() => setEntries([]), []);
+  return { entries, pending, ask, retry, clear };
 }
