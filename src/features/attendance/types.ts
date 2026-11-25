@@ -20,6 +20,8 @@ export type Punch = {
   matchLevel: MatchLevel | null;
   userConfirmed: boolean;
   photoFileId: string | null;
+  outsideNetwork?: boolean;
+  kioskDeviceId?: string | null;
 };
 
 export type ScanStatus = "RECORDED" | "DUPLICATE" | "CONFIRM_REQUIRED" | "NOT_RECOGNIZED";

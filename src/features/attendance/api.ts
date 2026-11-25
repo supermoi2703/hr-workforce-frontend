@@ -1,5 +1,6 @@
 import { http } from "@/lib/api/http-client";
 import type { PageResponse } from "@/lib/api/types";
+import { kioskRequestOptions } from "./kiosk-api";
 import type { EmployeeFaceStatus, FaceProfile, Punch, PunchFilters, ScanResult } from "./types";
 
 // Backend giới hạn 100 dòng mỗi trang; bản demo lấy một trang (đủ cho vài người chấm thử).
@@ -17,16 +18,16 @@ export const listPunches = (filters: PunchFilters) =>
   });
 
 /** Chấm công cá nhân: so 1:1 với khuôn mặt đã đăng ký của người đang đăng nhập. */
-export const punchWithMyFace = (image: Blob, signal: AbortSignal) =>
+export const punchWithMyFace = (image: Blob, signal?: AbortSignal) =>
   http.post<ScanResult>("/api/attendance-punches/me", imageForm(image), { signal });
 
 /** Kiosk: nhận diện 1:N, khớp cao thì ghi lần chấm luôn. */
-export const kioskScan = (image: Blob, signal: AbortSignal) =>
-  http.post<ScanResult>("/api/kiosk/scans", imageForm(image), { signal });
+export const kioskScan = (image: Blob, token: string, signal?: AbortSignal) =>
+  http.post<ScanResult>("/api/kiosk/scans", imageForm(image), { ...kioskRequestOptions(token), signal });
 
 /** Trả lời "Đây có phải bạn không?" cho lần quét khớp vừa. */
-export const kioskConfirm = (confirmationId: string, accepted: boolean) =>
-  http.post<ScanResult>(`/api/kiosk/scans/${confirmationId}/confirmation`, { accepted });
+export const kioskConfirm = (confirmationId: string, accepted: boolean, token: string) =>
+  http.post<ScanResult>(`/api/kiosk/scans/${encodeURIComponent(confirmationId)}/confirmation`, { accepted }, kioskRequestOptions(token));
 
 export const listFaceProfiles = (keyword: string | undefined, page: number, size: number) =>
   http.get<PageResponse<EmployeeFaceStatus>>("/api/face-profiles", { query: { keyword, page, size } });

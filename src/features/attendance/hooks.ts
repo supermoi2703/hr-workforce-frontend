@@ -90,14 +90,15 @@ export function usePunchWithMyFace() {
 export function useKioskScan() {
   return useMutation({
     networkMode: "always",
-    mutationFn: ({ image, signal }: { image: Blob; signal: AbortSignal }) => kioskScan(image, signal),
+    mutationFn: ({ image, token, signal }: { image: Blob; token: string; signal?: AbortSignal }) => kioskScan(image, token, signal),
   });
 }
 
 export function useKioskConfirm() {
   return useMutation({
-    mutationFn: ({ confirmationId, accepted }: { confirmationId: string; accepted: boolean }) =>
-      kioskConfirm(confirmationId, accepted),
+    networkMode: "always",
+    mutationFn: ({ confirmationId, accepted, token }: { confirmationId: string; accepted: boolean; token: string }) =>
+      kioskConfirm(confirmationId, accepted, token),
   });
 }
 
@@ -119,6 +120,10 @@ const ERROR_KEYS: Record<string, AttendanceErrorKey> = {
   PUNCH_CONFIRMATION_NOT_FOUND: "confirmationExpired",
   EMPLOYEE_PROFILE_REQUIRED: "employeeProfileRequired",
   STORAGE_UNAVAILABLE: "storageUnavailable",
+  KIOSK_PAIRING_CODE_INVALID: "kioskPairingCodeInvalid",
+  KIOSK_OUTSIDE_OFFICE_NETWORK: "kioskOutsideOfficeNetwork",
+  KIOSK_CIDR_INVALID: "kioskCidrInvalid",
+  KIOSK_CIDR_DUPLICATE: "kioskCidrDuplicate",
 };
 
 /** Câu thông báo lỗi chấm công theo ngôn ngữ đang chọn; mã chung (mất mạng...) dùng thông báo chung. */

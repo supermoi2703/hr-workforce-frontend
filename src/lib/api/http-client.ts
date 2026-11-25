@@ -11,6 +11,7 @@ export type RequestOptions = {
   body?: unknown;
   headers?: HeadersInit;
   signal?: AbortSignal;
+  credentials?: RequestCredentials;
   /**
    * true (mặc định): phản hồi là ApiResponse<T>, client trả về `data`.
    * false: trả nguyên JSON (vd. /actuator/health không bọc ApiResponse).
@@ -106,7 +107,7 @@ async function send(method: string, path: string, options: RequestOptions, token
       headers,
       body,
       signal: options.signal,
-      credentials: "same-origin",
+      credentials: options.credentials ?? "same-origin",
     });
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") throw error;

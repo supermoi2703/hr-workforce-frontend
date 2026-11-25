@@ -12,6 +12,7 @@ import { useBlinkCapture, type BlinkCaptureStatus } from "../blink-capture";
 import { useCamera, useWakeLock } from "../camera";
 import { scorePercent } from "../daily";
 import { useAttendanceErrorMessage, useKioskConfirm, useKioskScan } from "../hooks";
+import { isKioskTokenRejected } from "../kiosk-session";
 import type { ScanResult } from "../types";
 import { BlinkHint } from "./blink-hint";
 import { CameraView } from "./camera-view";
@@ -30,7 +31,7 @@ type KioskState =
  * Máy chấm công ở văn phòng: camera tự chụp khi có một người trong khung và người đó chớp mắt
  * và gửi đi. Khớp cao → chào tên + giờ; khớp vừa → hỏi "Đây có phải bạn không?"; không nhận ra → chờ tiếp.
  */
-export function KioskScreen() {
+export function KioskScreen({ token, onTokenRejected }: { token: string; onTokenRejected: (token: string) => void }) {
   const t = useTranslations("Attendance.kiosk");
   const errorMessage = useAttendanceErrorMessage();
   const camera = useCamera();
@@ -52,17 +53,26 @@ export function KioskScreen() {
     }
   }, []);
 
+  function handleKioskError(error: unknown) {
+    if (isKioskTokenRejected(error)) {
+      camera.stop();
+      onTokenRejected(token);
+    } else {
+      finish({ kind: "error", message: errorMessage(error) });
+    }
+  }
+      
   async function onBlinkCapture(image: Blob, signal: AbortSignal) {
     const stream = camera.videoRef.current?.srcObject;
     setState({ kind: "processing" });
     try {
-      const result = await scan.mutateAsync({ image, signal });
+      const result = await scan.mutateAsync({ image, token, signal });
       if (!signal.aborted && camera.videoRef.current?.srcObject === stream) {
         finish(result.status === "CONFIRM_REQUIRED" ? { kind: "confirm", result } : { kind: "result", result });
       }
     } catch (error) {
-      if (!signal.aborted && camera.videoRef.current?.srcObject === stream) {
-        finish({ kind: "error", message: errorMessage(error) });
+      if (isKioskTokenRejected(error) || (!signal.aborted && camera.videoRef.current?.srcObject === stream)) {
+        handleKioskError(error);
       }
     }
   }
@@ -86,10 +96,14 @@ export function KioskScreen() {
     const stream = camera.videoRef.current?.srcObject;
     setState({ kind: "processing" });
     try {
-      const result = await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted });
-      if (camera.videoRef.current?.srcObject === stream) finish({ kind: "result", result });
+      const result = await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted, token });
+      if (camera.videoRef.current?.srcObject === stream) {
+        finish({ kind: "result", result });
+      }
     } catch (error) {
-      if (camera.videoRef.current?.srcObject === stream) finish({ kind: "error", message: errorMessage(error) });
+      if (isKioskTokenRejected(error) || camera.videoRef.current?.srcObject === stream) {
+        handleKioskError(error);
+      }
     }
   }
 

@@ -464,6 +464,10 @@
       "name": "Quản lý chính sách",
       "description": "Thêm hoặc xóa giá trị chính sách theo ngày hiệu lực"
     },
+    "kiosk_manage": {
+      "name": "Quản lý máy chấm công",
+      "description": "Ghép thiết bị và quản lý dải IP văn phòng trong phạm vi dữ liệu của mình"
+    },
     "employee_read": {
       "name": "Xem hồ sơ nhân viên",
       "description": "Xem hồ sơ nhân viên trong phạm vi dữ liệu, không gồm thông tin cá nhân và nhạy cảm"
@@ -880,6 +884,7 @@
     "noCheckOut": "Chưa có",
     "matchScore": "Khớp {score}",
     "userConfirmed": "Người chấm xác nhận",
+    "outsideNetwork": "Ngoài dải IP văn phòng",
     "photoAlt": "Ảnh chấm công lúc {time}",
     "emptyTitle": "Chưa có lần chấm công nào",
     "emptyDescription": "Đổi khoảng ngày, hoặc chấm công bằng khuôn mặt ở máy chấm công.",
@@ -931,6 +936,14 @@
       "timing": "{ms} ms",
       "recent": "Vừa chấm công",
       "recentEmpty": "Chưa có ai chấm trong phiên này."
+    },
+    "kioskPairing": {
+      "title": "Ghép máy chấm công",
+      "description": "Xin mã ghép dùng một lần từ HR rồi nhập mã trên thiết bị này.",
+      "code": "Mã ghép",
+      "submit": "Ghép thiết bị",
+      "tokenRejected": "Cần ghép lại thiết bị này. Vui lòng xin mã mới từ HR.",
+      "storageError": "Trình duyệt không lưu được thông tin thiết bị. Hãy bật bộ nhớ trang web và xin mã mới từ HR."
     },
     "enroll": {
       "metaTitle": "Đăng ký khuôn mặt",
@@ -986,7 +999,48 @@
       "notMatched": "Khuôn mặt không khớp với khuôn mặt đã đăng ký, vui lòng thử lại.",
       "confirmationExpired": "Đã quá thời gian xác nhận, mời quét lại.",
       "employeeProfileRequired": "Tài khoản chưa gắn với hồ sơ nhân viên.",
-      "storageUnavailable": "Kho lưu ảnh đang không hoạt động, vui lòng thử lại sau."
+      "storageUnavailable": "Kho lưu ảnh đang không hoạt động, vui lòng thử lại sau.",
+      "kioskPairingCodeInvalid": "Mã ghép không hợp lệ, đã hết hạn hoặc đã được sử dụng. Vui lòng xin mã mới từ HR.",
+      "kioskOutsideOfficeNetwork": "Máy chấm công đang ở ngoài mạng văn phòng. Hãy kết nối với mạng văn phòng rồi thử lại.",
+      "kioskCidrInvalid": "Nhập dải IPv4 hoặc IPv6 hợp lệ theo định dạng CIDR.",
+      "kioskCidrDuplicate": "Dải IP này đã có trong danh sách của văn phòng."
+    }
+  },
+  "KioskManagement": {
+    "title": "Máy chấm công",
+    "description": "Ghép thiết bị và quản lý dải IP của từng văn phòng.",
+    "openKiosk": "Mở máy chấm công ở tab mới",
+    "office": "Văn phòng",
+    "devicesTab": "Thiết bị",
+    "ipRangesTab": "Dải IP văn phòng",
+    "noOffices": "Không có văn phòng thuộc phạm vi quản lý",
+    "devices": {
+      "name": "Tên thiết bị",
+      "create": "Thêm thiết bị",
+      "statusColumn": "Trạng thái",
+      "actions": "Thao tác",
+      "status": { "UNPAIRED": "Chờ ghép", "ACTIVE": "Đang hoạt động", "REVOKED": "Đã thu hồi" },
+      "empty": "Văn phòng này chưa có thiết bị",
+      "reissue": "Cấp mã mới",
+      "reissueTitle": "Cấp mã mới cho {name}?",
+      "reissueDescription": "Mã ghép và kết nối hiện tại sẽ mất hiệu lực ngay. Cần ghép lại thiết bị.",
+      "revoke": "Thu hồi thiết bị",
+      "revokeTitle": "Thu hồi {name}?",
+      "revokeDescription": "Thiết bị sẽ không ghi được lần chấm công cho đến khi được cấp mã mới và ghép lại.",
+      "codeTitle": "Mã ghép cho {name}",
+      "codeDescription": "Nhập mã dùng một lần này trên thiết bị trước {expiry}. Mã chỉ hiện ở đây.",
+      "close": "Đóng"
+    },
+    "networks": {
+      "cidr": "Dải IP (CIDR)",
+      "note": "Ghi chú (không bắt buộc)",
+      "add": "Thêm dải IP",
+      "actions": "Thao tác",
+      "empty": "Văn phòng này chưa có dải IP",
+      "emptyDescription": "Máy chấm công tại văn phòng này bỏ qua kiểm tra IP cho đến khi bạn thêm dải IP.",
+      "remove": "Xóa",
+      "removeTitle": "Xóa {cidr}?",
+      "removeDescription": "Máy chấm công sẽ kiểm tra IP theo các dải còn lại của văn phòng."
     }
   },
   "Timesheet": {
