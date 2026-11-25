@@ -102,7 +102,7 @@ export const NAV_GROUPS: NavGroup[] = [
     owner: "truongnd",
     items: [
       { id: "attendance", href: "/attendance", icon: TimerIcon, task: "2.2" },
-      { id: "kiosk", href: "/attendance/kiosk", icon: TabletSmartphoneIcon, access: { permissions: ["attendance:kiosk"] }, task: "2.10.2" },
+      { id: "kiosk", href: "/attendance/kiosk", icon: TabletSmartphoneIcon, access: { permissions: ["kiosk:manage"] }, task: "2.10.2" },
       { id: "faceProfiles", href: "/attendance/face-profiles", icon: ScanFaceIcon, access: { permissions: ["face:manage"] }, task: "2.10.2" },
       { id: "missingOut", href: "/attendance/missing-out", icon: UserRoundXIcon, access: { permissions: ["attendance:manage"] }, task: "2.6" },
       { id: "timesheets", href: "/timesheets", icon: CalendarDaysIcon, task: "2.3" },

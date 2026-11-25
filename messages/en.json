@@ -464,6 +464,10 @@
       "name": "Manage policies",
       "description": "Add or delete effective-dated policy values"
     },
+    "kiosk_manage": {
+      "name": "Manage attendance kiosks",
+      "description": "Pair devices and manage office IP ranges within your data scope"
+    },
     "employee_read": {
       "name": "View employee profiles",
       "description": "See employee profiles in the data scope, without personal or sensitive details"
@@ -880,6 +884,7 @@
     "noCheckOut": "Not yet",
     "matchScore": "Match {score}",
     "userConfirmed": "Confirmed by user",
+    "outsideNetwork": "Outside office IP range",
     "photoAlt": "Punch photo at {time}",
     "emptyTitle": "No punches yet",
     "emptyDescription": "Change the date range, or punch with your face at the kiosk.",
@@ -926,6 +931,14 @@
       "timing": "{ms} ms",
       "recent": "Just punched",
       "recentEmpty": "Nobody has punched in this session yet."
+    },
+    "kioskPairing": {
+      "title": "Pair an attendance kiosk",
+      "description": "Ask HR for a one-time pairing code and enter it on this device.",
+      "code": "Pairing code",
+      "submit": "Pair device",
+      "tokenRejected": "This device must be paired again. Ask HR for a new code.",
+      "storageError": "This browser could not save the device credentials. Enable site storage and ask HR for a new code."
     },
     "enroll": {
       "metaTitle": "Face registration",
@@ -981,7 +994,48 @@
       "notMatched": "The face does not match the registered face, please try again.",
       "confirmationExpired": "The confirmation has expired, please scan again.",
       "employeeProfileRequired": "This account is not linked to an employee profile.",
-      "storageUnavailable": "Photo storage is not available, please try again later."
+      "storageUnavailable": "Photo storage is not available, please try again later.",
+      "kioskPairingCodeInvalid": "The pairing code is invalid, expired, or already used. Ask HR for a new code.",
+      "kioskOutsideOfficeNetwork": "This kiosk is outside the office network. Connect to the office network and try again.",
+      "kioskCidrInvalid": "Enter a valid IPv4 or IPv6 range in CIDR notation.",
+      "kioskCidrDuplicate": "This IP range already exists for the office."
+    }
+  },
+  "KioskManagement": {
+    "title": "Attendance kiosks",
+    "description": "Pair devices and manage the IP ranges used by each office.",
+    "openKiosk": "Open kiosk in a new tab",
+    "office": "Office",
+    "devicesTab": "Devices",
+    "ipRangesTab": "Office IP ranges",
+    "noOffices": "No offices available to manage",
+    "devices": {
+      "name": "Device name",
+      "create": "Add device",
+      "statusColumn": "Status",
+      "actions": "Actions",
+      "status": { "UNPAIRED": "Awaiting pairing", "ACTIVE": "Active", "REVOKED": "Revoked" },
+      "empty": "No devices in this office",
+      "reissue": "Issue new code",
+      "reissueTitle": "Issue a new code for {name}?",
+      "reissueDescription": "Any previous code and connection will stop working immediately. The device must be paired again.",
+      "revoke": "Revoke device",
+      "revokeTitle": "Revoke {name}?",
+      "revokeDescription": "This device will be unable to record punches until you issue a new code and pair it again.",
+      "codeTitle": "Pairing code for {name}",
+      "codeDescription": "Enter this one-time code on the device before {expiry}. The code is only shown here.",
+      "close": "Close"
+    },
+    "networks": {
+      "cidr": "IP range (CIDR)",
+      "note": "Note (optional)",
+      "add": "Add range",
+      "actions": "Actions",
+      "empty": "No IP ranges for this office",
+      "emptyDescription": "Kiosks in this office skip IP checks until you add a range.",
+      "remove": "Remove",
+      "removeTitle": "Remove {cidr}?",
+      "removeDescription": "The kiosk will use the remaining office ranges for IP checks."
     }
   },
   "Timesheet": {

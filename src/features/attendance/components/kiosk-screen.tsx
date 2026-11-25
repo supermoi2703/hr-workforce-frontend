@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { captureSquare, useCamera, useStillnessTrigger, useWakeLock } from "../camera";
 import { scorePercent } from "../daily";
 import { useAttendanceErrorMessage, useKioskConfirm, useKioskScan } from "../hooks";
+import { isKioskTokenRejected } from "../kiosk-session";
 import type { ScanResult } from "../types";
 import { CameraView } from "./camera-view";
 
@@ -28,7 +29,7 @@ type KioskState =
  * Máy chấm công ở văn phòng (docs/06 B1): camera luôn bật, ai bước vào khung và đứng yên một chút thì tự chụp
  * và gửi đi. Khớp cao → chào tên + giờ; khớp vừa → hỏi "Đây có phải bạn không?"; không nhận ra → chờ tiếp.
  */
-export function KioskScreen() {
+export function KioskScreen({ token, onTokenRejected }: { token: string; onTokenRejected: (token: string) => void }) {
   const t = useTranslations("Attendance.kiosk");
   const errorMessage = useAttendanceErrorMessage();
   const camera = useCamera();
@@ -50,18 +51,28 @@ export function KioskScreen() {
     }
   }, []);
 
+  function handleKioskError(error: unknown) {
+    if (isKioskTokenRejected(error)) {
+      camera.stop();
+      onTokenRejected(token);
+    } else {
+      finish({ kind: "error", message: errorMessage(error) });
+    }
+  }
+
   // Không bọc useCallback: useStillnessTrigger luôn gọi bản mới nhất qua ref.
   async function onStill() {
     const video = camera.videoRef.current;
-    if (!video) return;
+    const stream = video?.srcObject;
+    if (!video || !stream) return;
     const image = await captureSquare(video);
-    if (!image) return;
+    if (!image || video.srcObject !== stream) return;
     setState({ kind: "processing" });
     try {
-      const result = await scan.mutateAsync(image);
+      const result = await scan.mutateAsync({ image, token });
       finish(result.status === "CONFIRM_REQUIRED" ? { kind: "confirm", result } : { kind: "result", result });
     } catch (error) {
-      finish({ kind: "error", message: errorMessage(error) });
+      handleKioskError(error);
     }
   }
 
@@ -84,9 +95,9 @@ export function KioskScreen() {
     if (state.kind !== "confirm" || !state.result.confirmationId) return;
     setState({ kind: "processing" });
     try {
-      finish({ kind: "result", result: await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted }) });
+      finish({ kind: "result", result: await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted, token }) });
     } catch (error) {
-      finish({ kind: "error", message: errorMessage(error) });
+      handleKioskError(error);
     }
   }
 

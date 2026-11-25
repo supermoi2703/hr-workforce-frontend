@@ -144,6 +144,7 @@ function PunchCell({ punch }: { punch: Punch }) {
       <div>
         <div className="font-medium tabular-nums">{formatTime(punch.punchedAt)}</div>
         <div className="text-xs text-muted-foreground">{t(`source.${punch.source}`)}</div>
+        {punch.outsideNetwork && <Badge variant="warning">{t("outsideNetwork")}</Badge>}
       </div>
     </div>
   );
@@ -156,6 +157,7 @@ function PunchMeta({ punch }: { punch: Punch }) {
       <Badge variant="outline">{t(`source.${punch.source}`)}</Badge>
       <Badge variant={punch.matchLevel === "HIGH" ? "success" : "warning"}>{t("matchScore", { score: scorePercent(punch.matchScore) })}</Badge>
       {punch.userConfirmed && <Badge variant="info">{t("userConfirmed")}</Badge>}
+      {punch.outsideNetwork && <Badge variant="warning">{t("outsideNetwork")}</Badge>}
     </div>
   );
 }
