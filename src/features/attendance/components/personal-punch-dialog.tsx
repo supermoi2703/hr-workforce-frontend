@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { formatTime } from "@/lib/format";
-import { captureSquare, useCamera } from "../camera";
+import { useBlinkCapture } from "../blink-capture";
+import { useCamera } from "../camera";
 import { scorePercent } from "../daily";
 import { useAttendanceErrorMessage, usePunchWithMyFace } from "../hooks";
 import type { ScanResult } from "../types";
+import { BlinkHint } from "./blink-hint";
 import { CameraView } from "./camera-view";
 
 /**
@@ -24,6 +26,7 @@ export function PersonalPunchDialog({ onClose }: { onClose: () => void }) {
   const camera = useCamera();
   const punch = usePunchWithMyFace();
   const [result, setResult] = useState<ScanResult | null>(null);
+  const [armed, setArmed] = useState(false);
   const { start, stop } = camera;
 
   useEffect(() => {
@@ -31,21 +34,32 @@ export function PersonalPunchDialog({ onClose }: { onClose: () => void }) {
     return stop;
   }, [start, stop]);
 
-  async function captureAndPunch() {
-    const video = camera.videoRef.current;
-    if (!video) return;
-    const image = await captureSquare(video);
-    if (!image) return;
-    setResult(null);
+  async function captureAndPunch(image: Blob, signal: AbortSignal) {
+    setArmed(false);
     try {
-      setResult(await punch.mutateAsync(image));
+      const result = await punch.mutateAsync({ image, signal });
+      if (!signal.aborted) setResult(result);
     } catch {
       // Lỗi hiện ở Alert bên dưới (punch.error).
     }
   }
 
+  const ready = camera.status === "ready";
+  const blinkStatus = useBlinkCapture(camera.videoRef, ready, armed, captureAndPunch);
+
+  function startPunch() {
+    setResult(null);
+    punch.reset();
+    setArmed(true);
+  }
+
+  function close() {
+    stop();
+    onClose();
+  }
+
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && close()}>
       <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
@@ -53,6 +67,12 @@ export function PersonalPunchDialog({ onClose }: { onClose: () => void }) {
         </DialogHeader>
 
         <CameraView videoRef={camera.videoRef} status={camera.status} error={camera.error} className="mx-auto max-w-[50svh]" />
+
+        {ready && (armed || blinkStatus === "loading" || blinkStatus === "error") && (
+          <div className="text-center text-sm text-muted-foreground">
+            <BlinkHint status={blinkStatus} />
+          </div>
+        )}
 
         {result && (
           <Alert>
@@ -72,10 +92,10 @@ export function PersonalPunchDialog({ onClose }: { onClose: () => void }) {
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={close}>
             {t("close")}
           </Button>
-          <Button onClick={captureAndPunch} disabled={camera.status !== "ready" || punch.isPending}>
+          <Button onClick={startPunch} disabled={!ready || armed || punch.isPending || blinkStatus === "loading" || blinkStatus === "error"}>
             {punch.isPending ? <Spinner /> : <CameraIcon />} {t("capture")}
           </Button>
         </DialogFooter>
