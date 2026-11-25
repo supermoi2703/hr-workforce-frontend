@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { captureSquare, useCamera, useStillnessTrigger, useWakeLock } from "../camera";
+import { useBlinkCapture, type BlinkCaptureStatus } from "../blink-capture";
+import { useCamera, useWakeLock } from "../camera";
 import { scorePercent } from "../daily";
 import { useAttendanceErrorMessage, useKioskConfirm, useKioskScan } from "../hooks";
 import { isKioskTokenRejected } from "../kiosk-session";
 import type { ScanResult } from "../types";
+import { BlinkHint } from "./blink-hint";
 import { CameraView } from "./camera-view";
 
 // Thời gian hiện kết quả trước khi quay lại chờ người tiếp theo.
@@ -26,7 +28,7 @@ type KioskState =
   | { kind: "error"; message: string };
 
 /**
- * Máy chấm công ở văn phòng (docs/06 B1): camera luôn bật, ai bước vào khung và đứng yên một chút thì tự chụp
+ * Máy chấm công ở văn phòng: camera tự chụp khi có một người trong khung và người đó chớp mắt
  * và gửi đi. Khớp cao → chào tên + giờ; khớp vừa → hỏi "Đây có phải bạn không?"; không nhận ra → chờ tiếp.
  */
 export function KioskScreen({ token, onTokenRejected }: { token: string; onTokenRejected: (token: string) => void }) {
@@ -59,25 +61,23 @@ export function KioskScreen({ token, onTokenRejected }: { token: string; onToken
       finish({ kind: "error", message: errorMessage(error) });
     }
   }
-
-  // Không bọc useCallback: useStillnessTrigger luôn gọi bản mới nhất qua ref.
-  async function onStill() {
-    const video = camera.videoRef.current;
-    const stream = video?.srcObject;
-    if (!video || !stream) return;
-    const image = await captureSquare(video);
-    if (!image || video.srcObject !== stream) return;
+      
+  async function onBlinkCapture(image: Blob, signal: AbortSignal) {
+    const stream = camera.videoRef.current?.srcObject;
     setState({ kind: "processing" });
     try {
-      const result = await scan.mutateAsync({ image, token });
-      finish(result.status === "CONFIRM_REQUIRED" ? { kind: "confirm", result } : { kind: "result", result });
+      const result = await scan.mutateAsync({ image, token, signal });
+      if (!signal.aborted && camera.videoRef.current?.srcObject === stream) {
+        finish(result.status === "CONFIRM_REQUIRED" ? { kind: "confirm", result } : { kind: "result", result });
+      }
     } catch (error) {
-      handleKioskError(error);
+      if (!signal.aborted && camera.videoRef.current?.srcObject === stream) {
+        finish({ kind: "error", message: errorMessage(error) });
+      }
     }
   }
 
-  // Chỉ nghe "đứng yên" khi đang chờ người; đang xử lý / đang hỏi xác nhận thì không chụp thêm.
-  useStillnessTrigger(camera.videoRef, running && state.kind === "waiting", onStill);
+  const blinkStatus = useBlinkCapture(camera.videoRef, running, state.kind === "waiting", onBlinkCapture);
 
   useEffect(() => {
     if (state.kind !== "result" && state.kind !== "error") return;
@@ -93,12 +93,22 @@ export function KioskScreen({ token, onTokenRejected }: { token: string; onToken
 
   async function answer(accepted: boolean) {
     if (state.kind !== "confirm" || !state.result.confirmationId) return;
+    const stream = camera.videoRef.current?.srcObject;
     setState({ kind: "processing" });
     try {
       finish({ kind: "result", result: await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted, token }) });
     } catch (error) {
       handleKioskError(error);
+      const result = await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted });
+      if (camera.videoRef.current?.srcObject === stream) finish({ kind: "result", result });
+    } catch (error) {
+      if (camera.videoRef.current?.srcObject === stream) finish({ kind: "error", message: errorMessage(error) });
     }
+  }
+
+  function stopCamera() {
+    camera.stop();
+    setState({ kind: "waiting" });
   }
 
   function toggleFullscreen() {
@@ -118,11 +128,11 @@ export function KioskScreen({ token, onTokenRejected }: { token: string; onToken
             videoRef={camera.videoRef}
             status={camera.status}
             error={camera.error}
-            overlay={running && <KioskOverlay state={state} onAnswer={answer} />}
+            overlay={running && <KioskOverlay state={state} blinkStatus={blinkStatus} onAnswer={answer} />}
           />
           <div className="flex flex-wrap items-center justify-center gap-2">
             {running ? (
-              <Button variant="outline" onClick={camera.stop}>
+              <Button variant="outline" onClick={stopCamera}>
                 <PowerIcon /> {t("stop")}
               </Button>
             ) : (
@@ -157,11 +167,15 @@ export function KioskScreen({ token, onTokenRejected }: { token: string; onToken
   );
 }
 
-function KioskOverlay({ state, onAnswer }: { state: KioskState; onAnswer: (accepted: boolean) => void }) {
+function KioskOverlay({ state, blinkStatus, onAnswer }: {
+  state: KioskState;
+  blinkStatus: BlinkCaptureStatus;
+  onAnswer: (accepted: boolean) => void;
+}) {
   const t = useTranslations("Attendance.kiosk");
 
   if (state.kind === "waiting") {
-    return <OverlayBar className="bg-black/50 text-white">{t("guide")}</OverlayBar>;
+    return <OverlayBar className="bg-black/50 text-white"><BlinkHint status={blinkStatus} /></OverlayBar>;
   }
   if (state.kind === "processing") {
     return (

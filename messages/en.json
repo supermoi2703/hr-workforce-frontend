@@ -900,10 +900,16 @@
         "unknown": "The camera could not be started."
       }
     },
+    "blink": {
+      "loading": "Loading blink detection…",
+      "guide": "Look straight at the camera and blink once with your face in the frame.",
+      "multipleFaces": "Only one person can be in front of the camera at a time.",
+      "error": "Blink detection is unavailable. Restart the camera or reopen this dialog to try again."
+    },
     "personal": {
       "title": "Punch with my face",
-      "description": "Look straight at the camera, keep your face inside the frame and press Capture. Your face is compared with the registered one.",
-      "capture": "Capture and punch",
+      "description": "Select Start punch and blink to take a photo. Your face is compared with the registered one.",
+      "capture": "Start punch",
       "success": "Punched at {time}.",
       "duplicate": "You just punched at {time}; nothing was added.",
       "score": "Match {score}.",
@@ -912,13 +918,12 @@
     "kiosk": {
       "metaTitle": "Attendance kiosk",
       "title": "Attendance kiosk",
-      "description": "Keep this device at the office. Anyone who steps into the frame and holds still is recognized automatically.",
+      "description": "Keep this device at the office. The kiosk takes a photo when one person steps into the frame and blinks.",
       "start": "Start the kiosk",
       "stop": "Turn off camera",
       "fullscreen": "Full screen",
       "exitFullscreen": "Exit full screen",
       "idleHint": "The kiosk is off.",
-      "guide": "Step into the frame and hold still",
       "processing": "Recognizing...",
       "welcome": "Hello {name}",
       "recordedAt": "Punched at {time}",

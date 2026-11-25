@@ -81,7 +81,8 @@ export function useRevokeFace() {
 export function usePunchWithMyFace() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: punchWithMyFace,
+    networkMode: "always", // Ảnh từ một lần chớp mắt không chờ gửi lại khi có mạng.
+    mutationFn: ({ image, signal }: { image: Blob; signal: AbortSignal }) => punchWithMyFace(image, signal),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance", "punches"] }),
   });
 }
