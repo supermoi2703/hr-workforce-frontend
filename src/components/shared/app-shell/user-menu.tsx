@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { IdCardIcon, LogOutIcon, UserRoundIcon } from "lucide-react";
+import { IdCardIcon, LogOutIcon, ScanFaceIcon, UserRoundIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,9 +38,14 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         {/* Chỉ tài khoản có gắn hồ sơ nhân viên (Admin / tài khoản kỹ thuật thì không). */}
         {user.employeeId && (
-          <DropdownMenuItem render={<Link href="/profile" />}>
-            <IdCardIcon /> {t("myProfile")}
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem render={<Link href="/profile" />}>
+              <IdCardIcon /> {t("myProfile")}
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/attendance/face-consent" />}>
+              <ScanFaceIcon /> {t("faceConsent")}
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuItem render={<Link href="/account" />}>
           <UserRoundIcon /> {t("account")}

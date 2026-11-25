@@ -6,9 +6,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { isApiError } from "@/lib/api/errors";
 import { cn } from "@/lib/utils";
@@ -26,7 +24,7 @@ type Shot = { blob: Blob; url: string };
 
 /**
  * HR đăng ký khuôn mặt cho nhân viên đang đứng trước camera (ngày onboarding): chụp 3–5 ảnh (nên đổi góc nhẹ giữa
- * các ảnh), tick xác nhận nhân viên đã đồng ý, rồi lưu. Backend kiểm tra các ảnh có cùng một người; ảnh nào lệch thì
+ * các ảnh) sau khi nhân viên tự xác nhận đồng ý. Backend kiểm tra các ảnh có cùng một người; ảnh nào lệch thì
  * được đánh dấu để chụp lại.
  */
 export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFaceStatus; onClose: () => void }) {
@@ -35,7 +33,6 @@ export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFace
   const camera = useCamera();
   const enroll = useEnrollFace();
   const [shots, setShots] = useState<Shot[]>([]);
-  const [consent, setConsent] = useState(false);
   const [badIndex, setBadIndex] = useState<number | null>(null);
   const { start, stop } = camera;
 
@@ -48,6 +45,7 @@ export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFace
   useEffect(() => () => shots.forEach((shot) => URL.revokeObjectURL(shot.url)), [shots]);
 
   const error = useMemo(() => (enroll.error ? errorMessage(enroll.error) : null), [enroll.error, errorMessage]);
+  const consentRequired = isApiError(enroll.error) && enroll.error.code === "CONSENT_REQUIRED";
 
   async function capture() {
     const video = camera.videoRef.current;
@@ -64,7 +62,7 @@ export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFace
 
   async function submit() {
     try {
-      const profile = await enroll.mutateAsync({ employeeId: employee.employeeId, photos: shots.map((s) => s.blob), consent });
+      const profile = await enroll.mutateAsync({ employeeId: employee.employeeId, photos: shots.map((s) => s.blob) });
       toast.success(t("success", { name: employee.fullName, score: scorePercent(profile.minPairSimilarity) }));
       onClose();
     } catch (cause) {
@@ -112,13 +110,6 @@ export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFace
           </div>
         </div>
 
-        <div className="flex items-start gap-2 rounded-lg border p-3">
-          <Checkbox id="face-consent" checked={consent} onCheckedChange={(checked) => setConsent(checked === true)} />
-          <Label htmlFor="face-consent" className="block text-sm leading-snug font-normal">
-            <span className="font-medium">{t("consentLabel")}</span> {t("consentText")}
-          </Label>
-        </div>
-
         {error && (
           <Alert variant="destructive">
             <AlertDescription>
@@ -132,7 +123,7 @@ export function EnrollFaceDialog({ employee, onClose }: { employee: EmployeeFace
           <Button variant="outline" onClick={onClose}>
             {t("cancel")}
           </Button>
-          <Button onClick={submit} disabled={!consent || shots.length < MIN_PHOTOS || enroll.isPending}>
+          <Button onClick={submit} disabled={consentRequired || shots.length < MIN_PHOTOS || enroll.isPending}>
             {enroll.isPending && <Spinner />} {t("submit")}
           </Button>
         </DialogFooter>

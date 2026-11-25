@@ -1,7 +1,7 @@
 import { http } from "@/lib/api/http-client";
 import type { PageResponse } from "@/lib/api/types";
 import { kioskRequestOptions } from "./kiosk-api";
-import type { EmployeeFaceStatus, FaceProfile, Punch, PunchFilters, ScanResult } from "./types";
+import type { EmployeeFaceStatus, FaceProfile, MyFaceConsent, Punch, PunchFilters, ScanResult } from "./types";
 
 // Backend giới hạn 100 dòng mỗi trang; bản demo lấy một trang (đủ cho vài người chấm thử).
 const PUNCH_PAGE_SIZE = 100;
@@ -29,19 +29,22 @@ export const kioskScan = (image: Blob, token: string, signal?: AbortSignal) =>
 export const kioskConfirm = (confirmationId: string, accepted: boolean, token: string) =>
   http.post<ScanResult>(`/api/kiosk/scans/${encodeURIComponent(confirmationId)}/confirmation`, { accepted }, kioskRequestOptions(token));
 
-export const listFaceProfiles = (keyword: string | undefined, page: number, size: number) =>
-  http.get<PageResponse<EmployeeFaceStatus>>("/api/face-profiles", { query: { keyword, page, size } });
+export const listFaceProfiles = (keyword: string | undefined, page: number, size: number, withdrawalRequested = false) =>
+  http.get<PageResponse<EmployeeFaceStatus>>("/api/face-profiles", { query: { keyword, page, size, withdrawalRequested: withdrawalRequested || undefined } });
 
 export const getFaceProfile = (employeeId: string) => http.get<FaceProfile>(`/api/face-profiles/${employeeId}`);
 
-export function enrollFace(employeeId: string, photos: Blob[], consent: boolean) {
+export function enrollFace(employeeId: string, photos: Blob[]) {
   const form = new FormData();
   photos.forEach((photo, index) => form.append("photos", photo, `photo-${index + 1}.jpg`));
-  form.append("consent", String(consent));
   return http.post<FaceProfile>(`/api/face-profiles/${employeeId}`, form);
 }
 
 export const revokeFace = (employeeId: string) => http.delete<void>(`/api/face-profiles/${employeeId}`);
+
+export const getMyFaceConsent = (signal?: AbortSignal) => http.get<MyFaceConsent>("/api/face-consents/me", { signal });
+export const acceptMyFaceConsent = (version: number) => http.post<MyFaceConsent>("/api/face-consents/me", { version });
+export const requestMyFaceConsentWithdrawal = () => http.post<MyFaceConsent>("/api/face-consents/me/withdrawal-request");
 
 /** URL có hạn (10 phút) để hiện ảnh chấm công / ảnh mẫu từ kho file. */
 export const getPhotoUrl = (fileId: string) =>

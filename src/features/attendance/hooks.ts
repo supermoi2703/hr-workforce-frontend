@@ -6,22 +6,27 @@ import { useTranslations, type Messages } from "next-intl";
 import { isApiError } from "@/lib/api/errors";
 import { useErrorMessage } from "@/lib/api/use-error-message";
 import {
+  acceptMyFaceConsent,
   enrollFace,
   getFaceProfile,
+  getMyFaceConsent,
   getPhotoUrl,
   kioskConfirm,
   kioskScan,
   listFaceProfiles,
   listPunches,
   punchWithMyFace,
+  requestMyFaceConsentWithdrawal,
   revokeFace,
 } from "./api";
-import type { PunchFilters } from "./types";
+import type { MyFaceConsent, PunchFilters } from "./types";
 
 export const attendanceKeys = {
   punches: (filters: PunchFilters) => ["attendance", "punches", filters] as const,
-  faceProfiles: (keyword: string | undefined, page: number) => ["attendance", "face-profiles", keyword, page] as const,
+  faceProfiles: (keyword: string | undefined, page: number, size: number, withdrawalRequested: boolean) =>
+    ["attendance", "face-profiles", keyword, page, size, withdrawalRequested] as const,
   faceProfile: (employeeId: string) => ["attendance", "face-profile", employeeId] as const,
+  myFaceConsent: (employeeId: string | null) => ["attendance", "face-consent", employeeId] as const,
   photo: (fileId: string) => ["attendance", "photo", fileId] as const,
 };
 
@@ -33,11 +38,12 @@ export function usePunches(filters: PunchFilters) {
   });
 }
 
-export function useFaceProfiles(keyword: string | undefined, page: number, size = 20) {
+export function useFaceProfiles(keyword: string | undefined, page: number, size = 20, withdrawalRequested = false) {
   return useQuery({
-    queryKey: attendanceKeys.faceProfiles(keyword, page),
-    queryFn: () => listFaceProfiles(keyword, page, size),
+    queryKey: attendanceKeys.faceProfiles(keyword, page, size, withdrawalRequested),
+    queryFn: () => listFaceProfiles(keyword, page, size, withdrawalRequested),
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: "always",
   });
 }
 
@@ -64,9 +70,13 @@ export function usePhotoUrl(fileId: string | null) {
 export function useEnrollFace() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ employeeId, photos, consent }: { employeeId: string; photos: Blob[]; consent: boolean }) =>
-      enrollFace(employeeId, photos, consent),
+    mutationFn: ({ employeeId, photos }: { employeeId: string; photos: Blob[] }) => enrollFace(employeeId, photos),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance", "face-profiles"] }),
+    onError: (error) => {
+      if (isApiError(error) && error.code === "CONSENT_REQUIRED") {
+        void queryClient.invalidateQueries({ queryKey: ["attendance", "face-profiles"] });
+      }
+    },
   });
 }
 
@@ -77,6 +87,38 @@ export function useRevokeFace() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance"] }),
   });
 }
+
+export function useMyFaceConsent(employeeId: string | null) {
+  return useQuery({
+    queryKey: attendanceKeys.myFaceConsent(employeeId),
+    queryFn: ({ signal }) => getMyFaceConsent(signal),
+    enabled: employeeId !== null,
+    refetchOnWindowFocus: "always",
+  });
+}
+
+function useUpdateMyFaceConsent<T>(employeeId: string | null, update: (input: T) => Promise<MyFaceConsent>) {
+  const queryClient = useQueryClient();
+  const queryKey = attendanceKeys.myFaceConsent(employeeId);
+  return useMutation({
+    mutationFn: update,
+    networkMode: "always",
+    onSuccess: async (consent) => {
+      await queryClient.cancelQueries({ queryKey });
+      queryClient.setQueryData(queryKey, consent);
+      void queryClient.invalidateQueries({ queryKey: ["attendance", "face-profiles"] });
+    },
+    onError: (error) => {
+      if (isApiError(error) && error.status === 409) {
+        void queryClient.invalidateQueries({ queryKey });
+      }
+    },
+  });
+}
+
+export const useAcceptMyFaceConsent = (employeeId: string | null) => useUpdateMyFaceConsent(employeeId, acceptMyFaceConsent);
+export const useRequestMyFaceConsentWithdrawal = (employeeId: string | null) =>
+  useUpdateMyFaceConsent<void>(employeeId, requestMyFaceConsentWithdrawal);
 
 export function usePunchWithMyFace() {
   const queryClient = useQueryClient();
@@ -113,6 +155,9 @@ const ERROR_KEYS: Record<string, AttendanceErrorKey> = {
   FACE_MULTIPLE: "multipleFaces",
   FACE_TOO_SMALL: "faceTooSmall",
   FACE_CONSENT_REQUIRED: "consentRequired",
+  CONSENT_REQUIRED: "consentRequired",
+  CONSENT_VERSION_MISMATCH: "consentVersionMismatch",
+  CONSENT_WITHDRAWAL_PENDING: "consentWithdrawalPending",
   FACE_ENROLL_PHOTO_COUNT: "photoCount",
   FACE_ENROLL_INCONSISTENT: "inconsistent",
   FACE_NOT_ENROLLED: "notEnrolled",

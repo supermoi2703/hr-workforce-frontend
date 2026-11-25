@@ -40,6 +40,20 @@ export type ScanResult = {
 
 export type FaceProfileStatus = "ACTIVE" | "REVOKED";
 
+export type FaceConsentStatus = "NOT_CONSENTED" | "CURRENT" | "LEGACY" | "PREVIOUS_VERSION" | "WITHDRAWAL_REQUESTED" | "WITHDRAWN";
+
+export type MyFaceConsent = {
+  currentVersion: number;
+  contentVi: string;
+  contentEn: string;
+  status: FaceConsentStatus;
+  consentedVersion: number | null;
+  consentedAt: string | null;
+  withdrawalRequestedAt: string | null;
+  withdrawnAt: string | null;
+  canRequestWithdrawal: boolean;
+};
+
 export type EmployeeFaceStatus = {
   employeeId: string;
   employeeCode: string;
@@ -49,6 +63,8 @@ export type EmployeeFaceStatus = {
   status: FaceProfileStatus | null;
   enrolledAt: string | null;
   templateCount: number;
+  faceConsentStatus: FaceConsentStatus;
+  canEnroll: boolean;
 };
 
 export type FaceProfile = {
