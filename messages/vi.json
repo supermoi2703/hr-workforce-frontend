@@ -51,7 +51,6 @@
       "projects": "Dự án",
       "allocations": "Phân bổ nhân sự",
       "policyQa": "Hỏi đáp chính sách",
-      "allocationSuggest": "Gợi ý phân bổ",
       "dataQa": "Hỏi đáp dữ liệu",
       "users": "Tài khoản",
       "roles": "Vai trò & quyền",
@@ -5021,5 +5020,29 @@
     "loadRowTitle": "Tải theo tuần",
     "loadRowTitleDay": "Tải theo ngày",
     "loadRowHint": "Giờ việc trên mọi dự án ÷ năng lực. Vạch đứt là 100%."
+  },
+  "AllocationAi": {
+    "profile": {
+      "ask": "Gợi ý bằng AI",
+      "askAgain": "Gợi ý lại",
+      "hint": "AI đọc tiêu đề và mô tả để gợi ý nhóm công việc và kỹ năng cần.",
+      "needTitle": "Nhập tiêu đề để AI gợi ý nhóm công việc và kỹ năng.",
+      "category": "Nhóm công việc",
+      "categoryValue": "{name} ({hours})",
+      "noCategory": "Không có nhóm phù hợp",
+      "skills": "Kỹ năng cần",
+      "skillLevel": "{name} ≥ {level}",
+      "noSkills": "Không có kỹ năng phù hợp trong danh mục",
+      "empty": "Không tìm được nhóm công việc hay kỹ năng phù hợp trong danh mục. Thử viết mô tả rõ hơn.",
+      "sourceAi": "AI chọn trong danh mục của công ty. Kiểm tra lại trước khi lưu.",
+      "sourceSearch": "AI tạm không dùng được: gợi ý chỉ từ tìm kiếm trong danh mục, chưa có mức kỹ năng.",
+      "stale": "Tiêu đề hoặc mô tả đã đổi sau lần gợi ý này. Bấm \"Gợi ý lại\" để cập nhật.",
+      "apply": "Áp dụng",
+      "dismiss": "Bỏ qua"
+    },
+    "errors": {
+      "disabled": "Trợ lý AI đang tắt.",
+      "unavailable": "Trợ lý AI tạm không dùng được. Thử lại sau ít phút hoặc tự chọn nhóm công việc."
+    }
   }
 }

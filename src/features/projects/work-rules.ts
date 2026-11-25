@@ -141,6 +141,22 @@ export function applySuggestion(draft: CategoryDraft, category: WorkCategory): C
   return { estimate: suggestion.estimate, skills: suggestion.skills, estimateTouched: false, skillsTouched: false };
 }
 
+/**
+ * Nút "Áp dụng" của gợi ý AI (trợ lý phân bổ, phần A): có nhóm thì lấy giờ mặc định của nhóm; kỹ năng thay bằng kỹ
+ * năng AI đoán. Kỹ năng coi như PM đã chọn (đổi nhóm sau đó không ghi đè), giờ coi như chưa tự sửa.
+ */
+export function applyAiProfile(
+  draft: CategoryDraft,
+  profile: { category: { defaultMinutes: number } | null; skills: { skillId: string; minLevel: number | null }[] },
+): CategoryDraft {
+  return {
+    estimate: profile.category ? minutesToHoursText(profile.category.defaultMinutes) : draft.estimate,
+    estimateTouched: profile.category ? false : draft.estimateTouched,
+    skills: profile.skills.map((skill) => ({ skillId: skill.skillId, minLevel: skill.minLevel })),
+    skillsTouched: true,
+  };
+}
+
 /** Ngày bắt đầu không sau hạn (chuỗi yyyy-MM-dd so sánh được trực tiếp). Thiếu một bên thì hợp lệ. */
 export function dateRangeValid(start: string | null | undefined, due: string | null | undefined): boolean {
   return !start || !due || start <= due;
