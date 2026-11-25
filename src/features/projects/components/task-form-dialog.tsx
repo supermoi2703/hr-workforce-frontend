@@ -26,13 +26,23 @@ import {
   dateRangeValid,
   differsFromSuggestion,
   formatMinutes,
+  minutesToHoursText,
   needsConfirm,
   parseHours,
   scheduleInfo,
   type CategoryDraft,
 } from "../work-rules";
 import type { Project } from "../types";
-import { TASK_PRIORITIES, TASK_TYPES, type AssignPreviewInput, type Task, type TaskPriority, type TaskType, type WorkCategory } from "../work-types";
+import {
+  TASK_PRIORITIES,
+  TASK_TYPES,
+  type AssignPreviewInput,
+  type Task,
+  type TaskPriority,
+  type TaskSkillInput,
+  type TaskType,
+  type WorkCategory,
+} from "../work-types";
 import { AssignLoadNotice } from "./load-summary";
 import { SimpleSelect } from "./simple-select";
 import { TaskSkillsField } from "./task-skills-field";
@@ -40,11 +50,30 @@ import { WorkCategorySelect } from "./work-category-select";
 
 const NOBODY = "NOBODY";
 
+/** Giá trị điền sẵn khi tạo việc mới (trợ lý phân bổ AI: "Tạo task với yêu cầu này"). Kỹ năng coi như PM đã chọn. */
+export type TaskFormInitial = {
+  title?: string;
+  estimateMinutes?: number | null;
+  startDate?: string | null;
+  dueDate?: string | null;
+  skills?: TaskSkillInput[];
+};
+
 /**
  * Tạo hoặc sửa việc. Nhóm công việc điền sẵn giờ và kỹ năng (PM sửa được); ngày bắt đầu, hạn để trống thì lấy theo
  * sprint; kỹ năng kèm mức tối thiểu là đầu vào của gợi ý người (workload, backend README module project mục 7.1).
  */
-export function TaskFormDialog({ project, task, onClose }: { project: Project; task?: Task; onClose: () => void }) {
+export function TaskFormDialog({
+  project,
+  task,
+  initial,
+  onClose,
+}: {
+  project: Project;
+  task?: Task;
+  initial?: TaskFormInitial;
+  onClose: () => void;
+}) {
   const t = useTranslations("ProjectWork");
   const tCommon = useTranslations("Common");
   const tLoad = useTranslations("Workload");
@@ -55,20 +84,30 @@ export function TaskFormDialog({ project, task, onClose }: { project: Project; t
   const aiEnabled = useAssistantStatus();
   const mode = task ? "edit" : "create";
 
-  const [title, setTitle] = useState(task?.card.title ?? "");
+  const start = task ? undefined : initial;
+  const [title, setTitle] = useState(task?.card.title ?? start?.title ?? "");
   const [description, setDescription] = useState(task?.description ?? "");
   const [type, setType] = useState<TaskType>(task?.card.type ?? "TASK");
   const [priority, setPriority] = useState<TaskPriority>(task?.card.priority ?? "MEDIUM");
   const [assignee, setAssignee] = useState(task?.card.assignee?.id ?? NOBODY);
-  const [startDate, setStartDate] = useState(task?.card.startDate ?? "");
-  const [dueDate, setDueDate] = useState(task?.card.dueDate ?? "");
+  const [startDate, setStartDate] = useState(task?.card.startDate ?? start?.startDate ?? "");
+  const [dueDate, setDueDate] = useState(task?.card.dueDate ?? start?.dueDate ?? "");
   const [categoryId, setCategoryId] = useState(task?.workCategory?.id ?? "");
-  const [draft, setDraft] = useState<CategoryDraft>({
-    estimate: task?.card.estimateMinutes != null ? String(task.card.estimateMinutes / 60) : "",
-    skills: task?.skills.map((skill) => ({ skillId: skill.id, minLevel: skill.minLevel })) ?? [],
-    estimateTouched: false,
-    skillsTouched: false,
-  });
+  const [draft, setDraft] = useState<CategoryDraft>(() =>
+    task
+      ? {
+          estimate: task.card.estimateMinutes != null ? String(task.card.estimateMinutes / 60) : "",
+          skills: task.skills.map((skill) => ({ skillId: skill.id, minLevel: skill.minLevel })),
+          estimateTouched: false,
+          skillsTouched: false,
+        }
+      : {
+          estimate: start?.estimateMinutes != null ? minutesToHoursText(start.estimateMinutes) : "",
+          skills: start?.skills ?? [],
+          estimateTouched: start?.estimateMinutes != null,
+          skillsTouched: (start?.skills?.length ?? 0) > 0,
+        },
+  );
   const [common, setCommon] = useState(false);
 
   const category = (categories.data ?? []).find((item) => item.id === categoryId) ?? null;

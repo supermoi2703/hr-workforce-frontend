@@ -305,7 +305,18 @@ export type AssigneeSuggestions = {
   excluded: { missingSkill: number; overloadedTotal: number; overloaded: OverloadedCandidate[] };
 };
 
-export type SuggestionParams = { scope?: "ALL" | "PROJECT"; officeId?: string | null; outsideLimit?: number };
+/**
+ * Tham số gợi ý người. skills / from / to: điều kiện thêm từ trợ lý phân bổ AI (kỹ năng gộp với kỹ năng của việc,
+ * khoảng ngày thay khoảng tính từ việc).
+ */
+export type SuggestionParams = {
+  scope?: "ALL" | "PROJECT";
+  officeId?: string | null;
+  outsideLimit?: number;
+  skills?: { skillId: string; minLevel: number }[];
+  from?: string | null;
+  to?: string | null;
+};
 
 export type Overview = {
   unassigned: number;

@@ -5022,6 +5022,79 @@
     "loadRowHint": "Task hours on every project ÷ capacity. The dashed line is 100%."
   },
   "AllocationAi": {
+    "assistant": {
+      "open": "AI assistant",
+      "askAboutTask": "Ask the assistant",
+      "title": "Allocation assistant",
+      "description": "Ask in plain words about who could do the work, load and risks in this project. Lists and numbers come from the rule-based planner.",
+      "descriptionTask": "Asking about {key}. Say \"this task\" to refer to it.",
+      "intro": "You can ask:",
+      "thinking": "The assistant is reading your question…",
+      "fallback": "You can still use \"Suggest people\" in each task.",
+      "retry": "Ask again",
+      "placeholder": "For example: Need 2 people with React level 3 next week, about 20 hours",
+      "inputLabel": "Question for the assistant",
+      "send": "Send",
+      "privacy": "Your question is sent to Gemini to understand it. Do not enter personal information.",
+      "clear": "Clear conversation",
+      "intent": {
+        "FIND_PEOPLE": "Find people:",
+        "TEAM_AVAILABILITY": "Who is free:",
+        "PROJECT_RISK": "Risks:",
+        "UNSUPPORTED": "Not supported"
+      },
+      "chip": {
+        "work": "Work: {text}",
+        "skillLevel": "{name} ≥ {level}",
+        "headcount": "{count} people",
+        "hours": "{hours} hours",
+        "from": "From {date}",
+        "scopeAll": "Including people outside the project",
+        "scopeProject": "Project members only",
+        "unmatchedHint": "Not in the skill catalog, so not used as a filter"
+      },
+      "notes": {
+        "TASK_NOT_FOUND": "That task code was not found in this project.",
+        "RANGE_CLAMPED": "The dates were narrowed to a valid range (not before today, not too long).",
+        "DATE_IGNORED": "A date in the question could not be understood and was ignored.",
+        "SKILL_NOT_IN_CATALOG": "Some skills are not in the catalog (struck through) and were not used as filters.",
+        "OFFICE_NOT_FOUND": "The office mentioned was not found, so offices were not filtered.",
+        "SKILLS_FROM_DESCRIPTION": "Skills were inferred from the work description; minimum levels are empty."
+      },
+      "people": {
+        "period": "Load considered from {from} to {to}",
+        "empty": "Nobody fits in this period.",
+        "more": "Show {count} more",
+        "overloaded": "{count} overloaded people left out",
+        "missingSkill": "{count} people without the skills left out",
+        "openToAssign": "Open to assign",
+        "createTask": "Create a task with these needs"
+      },
+      "team": {
+        "empty": "Nobody is working in this project yet.",
+        "hint": "{count} people in the project, busiest first. Click a person to see their schedule."
+      },
+      "risks": {
+        "empty": "No task at risk in this period.",
+        "nobody": "No assignee",
+        "due": "due {date}",
+        "code": {
+          "OVERDUE": "Overdue",
+          "ASSIGNEE_RED": "Assignee overloaded",
+          "ASSIGNEE_YELLOW": "Assignee almost full",
+          "UNASSIGNED_STARTING": "Starting soon, no assignee"
+        }
+      },
+      "clarify": "Which work do you need people for? Name a task code (for example HRM-12) or the skills needed, like the questions below.",
+      "unsupported": "The assistant cannot answer this yet. It answers about who could do the work, load and risks in the project, for example:",
+      "examples": {
+        "thisTask": "Who could take this task?",
+        "findPeople": "Who knows Java at level 2 and is free in the next 2 weeks?",
+        "virtualWork": "Need 2 people with React level 3 next week, about 20 hours",
+        "team": "Who in the project is free next week?",
+        "risks": "Which tasks may be late?"
+      }
+    },
     "profile": {
       "ask": "Suggest with AI",
       "askAgain": "Suggest again",
@@ -5042,7 +5115,7 @@
     },
     "errors": {
       "disabled": "The AI assistant is turned off.",
-      "unavailable": "The AI assistant is unavailable right now. Try again in a few minutes or pick the category yourself."
+      "unavailable": "The AI assistant is unavailable right now (Gemini is busy or out of quota). Try again in a few minutes."
     }
   }
 }

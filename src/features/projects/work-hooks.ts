@@ -32,6 +32,7 @@ import {
   getTasks,
   getWorkCategories,
   getWorklogs,
+  skillsQuery,
   type CandidateQuery,
 } from "./work-api";
 import { useProjectErrorMessage } from "./hooks";
@@ -70,7 +71,16 @@ export const useWorklogs = (id: string | undefined) =>
   useQuery({ queryKey: key("worklogs", id), queryFn: () => getWorklogs(id!), enabled: !!id });
 export const useSuggestions = (id: string | null, params: SuggestionParams = {}) =>
   useQuery({
-    queryKey: key("suggestions", id, params.scope ?? "ALL", params.officeId ?? "", params.outsideLimit ?? 0),
+    queryKey: key(
+      "suggestions",
+      id,
+      params.scope ?? "ALL",
+      params.officeId ?? "",
+      params.outsideLimit ?? 0,
+      skillsQuery(params.skills) ?? "",
+      params.from ?? "",
+      params.to ?? "",
+    ),
     queryFn: () => getSuggestions(id!, params),
     enabled: !!id,
     placeholderData: keepPreviousData,

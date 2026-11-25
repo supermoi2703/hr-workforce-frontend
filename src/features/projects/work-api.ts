@@ -117,9 +117,21 @@ export const addLink = (id: string, targetKey: string, direction: "BLOCKS" | "BL
   http.post<void>(`/api/tasks/${enc(id)}/links`, { targetKey, direction });
 export const removeLink = (id: string, linkId: string) => http.delete<void>(`/api/tasks/${enc(id)}/links/${enc(linkId)}`);
 export const getEvents = (id: string) => http.get<TaskEvent[]>(`/api/tasks/${enc(id)}/events`);
+/** "id:3,id:2" cho query skills của gợi ý người; rỗng thì không gửi. */
+export function skillsQuery(skills: SuggestionParams["skills"]): string | undefined {
+  return skills && skills.length > 0 ? skills.map((skill) => `${skill.skillId}:${skill.minLevel}`).join(",") : undefined;
+}
+
 export const getSuggestions = (id: string, params: SuggestionParams = {}) =>
   http.get<AssigneeSuggestions>(`/api/tasks/${enc(id)}/assignee-suggestions`, {
-    query: { scope: params.scope, officeId: params.officeId ?? undefined, outsideLimit: params.outsideLimit },
+    query: {
+      scope: params.scope,
+      officeId: params.officeId ?? undefined,
+      outsideLimit: params.outsideLimit,
+      skills: skillsQuery(params.skills),
+      from: params.from ?? undefined,
+      to: params.to ?? undefined,
+    },
   });
 export const getMyWork = () => http.get<MyWork>("/api/my-work");
 export const getSkillOptions = () => http.get<SkillOption[]>("/api/skills");
