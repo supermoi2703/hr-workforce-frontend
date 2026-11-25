@@ -8,10 +8,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("metaTitle") };
 }
 
-export default function Page() {
+export default async function Page({ searchParams }: PageProps<"/attendance/face-profiles">) {
+  const withdrawalOnly = (await searchParams).consent === "withdrawal-requested";
   return (
     <RequireAccess access={{ permissions: ["face:manage"] }}>
-      <FaceProfilesPage />
+      <FaceProfilesPage key={String(withdrawalOnly)} withdrawalOnly={withdrawalOnly} />
     </RequireAccess>
   );
 }

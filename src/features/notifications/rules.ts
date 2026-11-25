@@ -31,6 +31,7 @@ const PARAM_KEYS: Record<NotificationType, readonly string[]> = {
   PROJECT_MANAGER_REMOVED: ["projectCode", "effectiveFrom"],
   CONTRACT_EXPIRING: ["contractNumber", "employeeName", "endDate"],
   MISSING_CHECKOUT: ["workDate"],
+  FACE_CONSENT_WITHDRAWAL_REQUESTED: [],
   PAYSLIP_PUBLISHED: ["period", "complaintDeadline"],
   ANNOUNCEMENT_PUBLISHED: ["title"],
   OVERTIME_ASSIGNED: ["taskKey", "workDate", "startTime", "endTime", "assignerName"],

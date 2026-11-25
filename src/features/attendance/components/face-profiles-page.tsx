@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ScanFaceIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -8,7 +9,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/states";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
@@ -21,13 +22,14 @@ import { PunchPhoto } from "./punch-photo";
 const PAGE_SIZE = 20;
 
 /** HR: danh sách nhân viên và trạng thái đăng ký khuôn mặt; đăng ký / đăng ký lại / gỡ. */
-export function FaceProfilesPage() {
+export function FaceProfilesPage({ withdrawalOnly }: { withdrawalOnly: boolean }) {
   const t = useTranslations("Attendance.enroll");
+  const tConsent = useTranslations("FaceConsent.status");
   const errorMessage = useAttendanceErrorMessage();
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(0);
   const debounced = useDebouncedValue(keyword.trim());
-  const profiles = useFaceProfiles(debounced || undefined, page, PAGE_SIZE);
+  const profiles = useFaceProfiles(debounced || undefined, page, PAGE_SIZE, withdrawalOnly);
   const revoke = useRevokeFace();
   const [enrolling, setEnrolling] = useState<EmployeeFaceStatus | null>(null);
   const [viewing, setViewing] = useState<string | null>(null);
@@ -35,15 +37,22 @@ export function FaceProfilesPage() {
   async function confirmRevoke(employee: EmployeeFaceStatus) {
     try {
       await revoke.mutateAsync(employee.employeeId);
-      toast.success(t("revoked", { name: employee.fullName }));
+      toast.success(t(employee.faceConsentStatus === "WITHDRAWAL_REQUESTED" ? "withdrawalCompleted" : "revoked", { name: employee.fullName }));
     } catch (error) {
       toast.error(errorMessage(error));
+      throw error;
     }
   }
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader title={t("title")} description={t("description")} actions={
+        <Link className={buttonVariants({ variant: "outline" })}
+          href={withdrawalOnly ? "/attendance/face-profiles" : "/attendance/face-profiles?consent=withdrawal-requested"}>
+          {t(withdrawalOnly ? "showAll" : "showWithdrawals")}
+        </Link>
+      } />
+      {withdrawalOnly && <h2 className="text-sm font-medium">{t("withdrawalFilter")}</h2>}
 
       <div className="relative max-w-sm">
         <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
@@ -63,7 +72,7 @@ export function FaceProfilesPage() {
       ) : profiles.isError ? (
         <ErrorState error={profiles.error} onRetry={() => profiles.refetch()} />
       ) : profiles.data.content.length === 0 ? (
-        <EmptyState title={t("empty")} />
+        <EmptyState title={t(withdrawalOnly ? "emptyWithdrawals" : "empty")} />
       ) : (
         <div className="rounded-xl border">
           <Table>
@@ -72,56 +81,67 @@ export function FaceProfilesPage() {
                 <TableHead>{t("columns.code")}</TableHead>
                 <TableHead>{t("columns.name")}</TableHead>
                 <TableHead>{t("columns.status")}</TableHead>
+                <TableHead>{t("columns.consent")}</TableHead>
                 <TableHead>{t("columns.enrolledAt")}</TableHead>
                 <TableHead className="text-right">{t("columns.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {profiles.data.content.map((employee) => (
-                <TableRow key={employee.employeeId}>
-                  <TableCell className="tabular-nums">{employee.employeeCode}</TableCell>
-                  <TableCell>
-                    {employee.status === "ACTIVE" ? (
-                      <button type="button" className="text-left underline-offset-4 hover:underline" onClick={() => setViewing(employee.employeeId)}>
-                        {employee.fullName}
-                      </button>
-                    ) : (
-                      employee.fullName
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {employee.status === "ACTIVE" ? (
-                      <Badge variant="success">{t("statusActive", { count: employee.templateCount })}</Badge>
-                    ) : employee.status === "REVOKED" ? (
-                      <Badge variant="secondary">{t("statusRevoked")}</Badge>
-                    ) : (
-                      <Badge variant="outline">{t("statusNone")}</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{formatDateTime(employee.enrolledAt)}</TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <Button size="sm" variant={employee.status === "ACTIVE" ? "outline" : "default"} onClick={() => setEnrolling(employee)}>
-                        <ScanFaceIcon /> {employee.status === "ACTIVE" ? t("reenroll") : t("enroll")}
-                      </Button>
-                      {employee.status === "ACTIVE" && (
-                        <ConfirmDialog
-                          trigger={
-                            <Button size="icon-sm" variant="ghost" aria-label={t("revoke")}>
-                              <Trash2Icon />
-                            </Button>
-                          }
-                          title={t("revokeConfirmTitle", { name: employee.fullName })}
-                          description={t("revokeConfirmDescription")}
-                          confirmLabel={t("revoke")}
-                          destructive
-                          onConfirm={() => confirmRevoke(employee)}
-                        />
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {profiles.data.content.map((employee) => {
+                const active = employee.status === "ACTIVE";
+                const consentStatus = employee.faceConsentStatus ?? "NOT_CONSENTED";
+                const withdrawalRequested = consentStatus === "WITHDRAWAL_REQUESTED";
+                const enrollmentHintId = `enrollment-hint-${employee.employeeId}`;
+                return (
+                  <TableRow key={employee.employeeId}>
+                    <TableCell className="tabular-nums">{employee.employeeCode}</TableCell>
+                    <TableCell>
+                      {active ? (
+                        <button type="button" className="text-left underline-offset-4 hover:underline" onClick={() => setViewing(employee.employeeId)}>
+                          {employee.fullName}
+                        </button>
+                      ) : employee.fullName}
+                    </TableCell>
+                    <TableCell>
+                      {active ? (
+                        <Badge variant="success">{t("statusActive", { count: employee.templateCount })}</Badge>
+                      ) : employee.status === "REVOKED" ? (
+                        <Badge variant="secondary">{t("statusRevoked")}</Badge>
+                      ) : <Badge variant="outline">{t("statusNone")}</Badge>}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={withdrawalRequested ? "warning" : consentStatus === "CURRENT" || consentStatus === "LEGACY" ? "success" : "outline"}>
+                        {tConsent(consentStatus)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{formatDateTime(employee.enrolledAt)}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <Button size="sm" variant={active ? "outline" : "default"} onClick={() => setEnrolling(employee)}
+                          disabled={!employee.canEnroll} aria-describedby={employee.canEnroll ? undefined : enrollmentHintId}>
+                          <ScanFaceIcon /> {t(active ? "reenroll" : "enroll")}
+                        </Button>
+                        {(active || withdrawalRequested) && (
+                          <ConfirmDialog
+                            trigger={withdrawalRequested ? <Button size="sm" variant="outline" /> : (
+                              <Button size="icon-sm" variant="ghost" aria-label={t("revoke")}><Trash2Icon /></Button>
+                            )}
+                            triggerLabel={withdrawalRequested ? t("completeWithdrawal") : undefined}
+                            title={t(withdrawalRequested ? "completeWithdrawalTitle" : "revokeConfirmTitle", { name: employee.fullName })}
+                            description={t(withdrawalRequested ? "completeWithdrawalDescription" : "revokeConfirmDescription")}
+                            confirmLabel={t(withdrawalRequested ? "completeWithdrawal" : "revoke")}
+                            destructive
+                            onConfirm={() => confirmRevoke(employee)}
+                          />
+                        )}
+                      </div>
+                      {!employee.canEnroll && <p id={enrollmentHintId} className="mt-1 text-right text-xs text-muted-foreground">
+                        {t(withdrawalRequested ? "withdrawalBlocksEnroll" : "consentRequiredHint")}
+                      </p>}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
