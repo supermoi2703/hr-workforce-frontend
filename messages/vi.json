@@ -895,10 +895,16 @@
         "unknown": "Không bật được camera."
       }
     },
+    "blink": {
+      "loading": "Đang tải bộ phát hiện chớp mắt…",
+      "guide": "Đặt mặt trong khung, nhìn thẳng vào camera và chớp mắt một lần.",
+      "multipleFaces": "Mỗi lần chỉ một người đứng trước camera.",
+      "error": "Không bật được bộ phát hiện chớp mắt. Hãy bật lại camera hoặc mở lại hộp thoại để thử lại."
+    },
     "personal": {
       "title": "Chấm công bằng khuôn mặt",
-      "description": "Nhìn thẳng vào camera, đặt mặt trong khung rồi bấm Chụp. Hệ thống so với khuôn mặt đã đăng ký của bạn.",
-      "capture": "Chụp và chấm công",
+      "description": "Bấm Bắt đầu chấm công rồi chớp mắt để chụp ảnh. Hệ thống so với khuôn mặt đã đăng ký của bạn.",
+      "capture": "Bắt đầu chấm công",
       "success": "Đã chấm công lúc {time}.",
       "duplicate": "Bạn vừa chấm lúc {time}, không ghi thêm.",
       "score": "Độ khớp {score}.",
@@ -907,13 +913,12 @@
     "kiosk": {
       "metaTitle": "Máy chấm công",
       "title": "Máy chấm công",
-      "description": "Đặt thiết bị cố định ở văn phòng. Ai bước vào khung và đứng yên một chút sẽ được tự động nhận diện.",
+      "description": "Đặt thiết bị cố định ở văn phòng. Máy tự chụp khi có một người bước vào khung và chớp mắt.",
       "start": "Bật máy chấm công",
       "stop": "Tắt camera",
       "fullscreen": "Toàn màn hình",
       "exitFullscreen": "Thoát toàn màn hình",
       "idleHint": "Máy chấm công đang tắt.",
-      "guide": "Mời đứng vào khung và giữ yên",
       "processing": "Đang nhận diện...",
       "welcome": "Xin chào {name}",
       "recordedAt": "Đã chấm công lúc {time}",

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { meanGrayDiff } from "./camera";
 import { failedPhotoIndex, groupByDay, scorePercent } from "./daily";
 import type { Punch } from "./types";
 
@@ -46,12 +45,5 @@ describe("helpers", () => {
   it("đọc số thứ tự ảnh hỏng từ thông báo lỗi đăng ký", () => {
     expect(failedPhotoIndex("photo=2: No face found in the image")).toBe(1);
     expect(failedPhotoIndex("other")).toBeNull();
-  });
-
-  it("đo chênh lệch độ sáng giữa hai khung", () => {
-    const black = new Uint8ClampedArray([0, 0, 0, 255, 0, 0, 0, 255]);
-    const white = new Uint8ClampedArray([255, 255, 255, 255, 255, 255, 255, 255]);
-    expect(meanGrayDiff(black, black)).toBe(0);
-    expect(meanGrayDiff(black, white)).toBe(255);
   });
 });
