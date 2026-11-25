@@ -71,8 +71,8 @@ export function KioskScreen({ token, onTokenRejected }: { token: string; onToken
         finish(result.status === "CONFIRM_REQUIRED" ? { kind: "confirm", result } : { kind: "result", result });
       }
     } catch (error) {
-      if (!signal.aborted && camera.videoRef.current?.srcObject === stream) {
-        finish({ kind: "error", message: errorMessage(error) });
+      if (isKioskTokenRejected(error) || (!signal.aborted && camera.videoRef.current?.srcObject === stream)) {
+        handleKioskError(error);
       }
     }
   }
@@ -96,13 +96,14 @@ export function KioskScreen({ token, onTokenRejected }: { token: string; onToken
     const stream = camera.videoRef.current?.srcObject;
     setState({ kind: "processing" });
     try {
-      finish({ kind: "result", result: await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted, token }) });
+      const result = await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted, token });
+      if (camera.videoRef.current?.srcObject === stream) {
+        finish({ kind: "result", result });
+      }
     } catch (error) {
-      handleKioskError(error);
-      const result = await confirm.mutateAsync({ confirmationId: state.result.confirmationId, accepted });
-      if (camera.videoRef.current?.srcObject === stream) finish({ kind: "result", result });
-    } catch (error) {
-      if (camera.videoRef.current?.srcObject === stream) finish({ kind: "error", message: errorMessage(error) });
+      if (isKioskTokenRejected(error) || camera.videoRef.current?.srcObject === stream) {
+        handleKioskError(error);
+      }
     }
   }
 
