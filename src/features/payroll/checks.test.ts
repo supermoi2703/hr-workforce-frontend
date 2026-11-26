@@ -16,4 +16,10 @@ describe("isSheetWarning", () => {
     expect(isSheetWarning("KPI_MISSING")).toBe(true);
     expect(isSheetWarning("RECIPIENTS")).toBe(false);
   });
+
+  it("F1-4/F1-5 mã chặn gửi duyệt là mã kiểm tra của bước, không phải cảnh báo phiếu", () => {
+    expect(isSheetWarning("INPUTS_CHANGED")).toBe(false);
+    expect(isSheetWarning("CALC_ERRORS")).toBe(false);
+    expect(isSheetWarning("KPI_FIRST_MONTH")).toBe(true);
+  });
 });

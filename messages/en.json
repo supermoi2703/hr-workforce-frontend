@@ -4504,6 +4504,8 @@
       "calcInProgress": "Someone is already calculating this period. Try again in a moment.",
       "lockedForInput": "Inputs cannot be changed: the period is approved or waiting for approval.",
       "noApprover": "No other active account can approve payroll. Ask an administrator to grant the approval permission.",
+      "recalcRequired": "Inputs changed after the last calculation. Recalculate before submitting.",
+      "calcHasErrors": "Some employees got no payslip in the last calculation. Fix the data and recalculate before submitting.",
       "closeBlocked": "The period cannot be closed before the query deadline or while queries are unresolved.",
       "periodExists": "This month already has a payroll period.",
       "periodNotFound": "This payroll period does not exist.",
@@ -4785,6 +4787,7 @@
       "KPI_NOT_LOCKED": "KPI not locked",
       "KPI_NOT_LOCKED_DETAIL": "KPI is not locked. Using the system coefficient {coefficient}.",
       "KPI_MANUAL_OVERRIDE": "Manual KPI override",
+      "KPI_FIRST_MONTH": "First month, no KPI yet: coefficient 1.0 prorated by working days",
       "KPI_MANUAL_OVERRIDE_DETAIL": "The manually entered KPI coefficient replaces the system coefficient ({systemCoefficient}).",
       "KPI_MANUAL_OVERRIDE_NO_SYSTEM": "The manually entered KPI coefficient is in use because the system has no coefficient.",
       "OT_MONTH_CAP": "OT {hours} h exceeds {cap} h/month",
@@ -4809,7 +4812,9 @@
       "RECIPIENTS": "Payslips will be visible to {count} employees",
       "sheetWarning": "{count} payslips: {label}",
       "INVALID_STATUS": "The period is in status {status}; this step is not available yet",
-      "NO_APPROVER": "No one else has approval rights; add a company-wide HR account"
+      "NO_APPROVER": "No one else has approval rights; add a company-wide HR account",
+      "INPUTS_CHANGED": "Inputs changed after the last calculation; recalculate the payroll",
+      "CALC_ERRORS": "{count} employee(s) got no payslip in the last calculation; fix the data and recalculate"
     },
     "review": {
       "metaTitle": "Approve payroll",

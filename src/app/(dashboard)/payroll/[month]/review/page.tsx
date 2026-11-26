@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page({ params }: PageProps<"/payroll/[month]/review">) {
   const { month } = await params;
   return (
-    <RequireAccess access={{ permissions: ["payroll:read"] }}>
+    <RequireAccess access={{ permissions: ["payroll:approve", "payroll:manage"] }}>
       <ReviewPage month={decodeURIComponent(month)} />
     </RequireAccess>
   );

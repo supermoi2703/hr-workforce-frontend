@@ -47,3 +47,11 @@ describe("T1-FE KPI warnings", () => {
     expect(renderLabel("en", { code: "KPI_MANUAL_OVERRIDE" })).toBe("Manual KPI override");
   });
 });
+
+describe("K5-7 first-month KPI warning", () => {
+  it("is in the filter and reads the same rule in vi and en", () => {
+    expect(WARNING_CODES).toContain("KPI_FIRST_MONTH");
+    expect(renderLabel("vi", { code: "KPI_FIRST_MONTH" })).toBe("Tháng đầu vào làm, chưa có KPI: tính hệ số 1,0 theo ngày công");
+    expect(renderLabel("en", { code: "KPI_FIRST_MONTH" })).toBe("First month, no KPI yet: coefficient 1.0 prorated by working days");
+  });
+});
