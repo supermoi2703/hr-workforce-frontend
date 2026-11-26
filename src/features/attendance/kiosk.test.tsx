@@ -7,6 +7,7 @@ import { setAuthAdapter } from "@/lib/auth/auth-adapter";
 import { canAccess } from "@/lib/auth/permissions";
 import type { CurrentUser } from "@/lib/auth/types";
 import en from "../../../messages/en.json";
+import viMessages from "../../../messages/vi.json";
 import { kioskConfirm, kioskScan, listPunches, punchWithMyFace } from "./api";
 import { AttendancePage } from "./components/attendance-page";
 import { usePunches } from "./hooks";
@@ -173,6 +174,18 @@ it("IP-1 từ chối ngoài dải IP mà không yêu cầu ghép lại thiết b
   expect(error).toMatchObject({ status: 403, code: "KIOSK_OUTSIDE_OFFICE_NETWORK" });
   expect(isKioskTokenRejected(error)).toBe(false);
   expect(getKioskToken()).toBe(DEVICE_TOKEN);
+});
+
+it("A1 #7: văn phòng chưa cấu hình mạng ở chế độ ENFORCE giữ token kiosk và có câu báo vi/en", async () => {
+  fetchMock.mockResolvedValueOnce(response({ token: DEVICE_TOKEN }));
+  await pairKioskBrowser("ASDF1234");
+  fetchMock.mockResolvedValueOnce(response(null, 403, "KIOSK_OFFICE_NETWORK_NOT_CONFIGURED"));
+  const error: unknown = await kioskScan(image, DEVICE_TOKEN).catch((failure: unknown) => failure);
+  expect(error).toMatchObject({ status: 403, code: "KIOSK_OFFICE_NETWORK_NOT_CONFIGURED" });
+  expect(isKioskTokenRejected(error)).toBe(false);
+  expect(getKioskToken()).toBe(DEVICE_TOKEN);
+  expect(viMessages.Attendance.errors.kioskOfficeNetworkNotConfigured).toContain("chưa cấu hình mạng");
+  expect(en.Attendance.errors.kioskOfficeNetworkNotConfigured).toContain("not set up");
 });
 
 it("quản lý dải IP theo văn phòng đã chọn", async () => {

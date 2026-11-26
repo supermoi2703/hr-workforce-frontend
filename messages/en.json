@@ -1013,6 +1013,7 @@
       "storageUnavailable": "Photo storage is not available, please try again later.",
       "kioskPairingCodeInvalid": "The pairing code is invalid, expired, or already used. Ask HR for a new code.",
       "kioskOutsideOfficeNetwork": "This kiosk is outside the office network. Connect to the office network and try again.",
+      "kioskOfficeNetworkNotConfigured": "The office network (IP range) is not set up yet. Ask HR to add the office IP range, then try again.",
       "kioskCidrInvalid": "Enter a valid IPv4 or IPv6 range in CIDR notation.",
       "kioskCidrDuplicate": "This IP range already exists for the office."
     }

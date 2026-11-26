@@ -167,6 +167,7 @@ const ERROR_KEYS: Record<string, AttendanceErrorKey> = {
   STORAGE_UNAVAILABLE: "storageUnavailable",
   KIOSK_PAIRING_CODE_INVALID: "kioskPairingCodeInvalid",
   KIOSK_OUTSIDE_OFFICE_NETWORK: "kioskOutsideOfficeNetwork",
+  KIOSK_OFFICE_NETWORK_NOT_CONFIGURED: "kioskOfficeNetworkNotConfigured",
   KIOSK_CIDR_INVALID: "kioskCidrInvalid",
   KIOSK_CIDR_DUPLICATE: "kioskCidrDuplicate",
 };
