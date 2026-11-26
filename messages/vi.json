@@ -1013,6 +1013,7 @@
       "storageUnavailable": "Kho lưu ảnh đang không hoạt động, vui lòng thử lại sau.",
       "kioskPairingCodeInvalid": "Mã ghép không hợp lệ, đã hết hạn hoặc đã được sử dụng. Vui lòng xin mã mới từ HR.",
       "kioskOutsideOfficeNetwork": "Máy chấm công đang ở ngoài mạng văn phòng. Hãy kết nối với mạng văn phòng rồi thử lại.",
+      "kioskOfficeNetworkNotConfigured": "Văn phòng chưa cấu hình mạng (dải IP). Nhờ HR khai dải IP văn phòng rồi thử lại.",
       "kioskCidrInvalid": "Nhập dải IPv4 hoặc IPv6 hợp lệ theo định dạng CIDR.",
       "kioskCidrDuplicate": "Dải IP này đã có trong danh sách của văn phòng."
     }
