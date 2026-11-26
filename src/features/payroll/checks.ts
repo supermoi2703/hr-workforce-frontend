@@ -6,7 +6,8 @@ export function hasBlockers(checks: PeriodChecks | null | undefined): boolean {
 }
 
 /** Mã cảnh báo F1 (dạng "n phiếu: nhãn") khác với mã kiểm tra riêng của bước. */
-export const CHECK_ONLY_CODES = ["TIMESHEET_NOT_LOCKED", "OFFICE_REGION_MISSING", "NO_CONTRACT_WITH_WORK", "PENDING_APPROVAL", "SINGLE_APPROVER", "RECIPIENTS", "INVALID_STATUS", "NO_APPROVER"];
+export const CHECK_ONLY_CODES = ["TIMESHEET_NOT_LOCKED", "OFFICE_REGION_MISSING", "NO_CONTRACT_WITH_WORK", "PENDING_APPROVAL", "SINGLE_APPROVER", "RECIPIENTS", "INVALID_STATUS", "NO_APPROVER",
+  "INPUTS_CHANGED", "CALC_ERRORS"];
 
 export function isSheetWarning(code: string): boolean {
   return !CHECK_ONLY_CODES.includes(code);

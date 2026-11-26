@@ -4504,6 +4504,8 @@
       "calcInProgress": "Đang có người tính lương kỳ này. Thử lại sau ít phút.",
       "lockedForInput": "Không sửa được khoản nhập: kỳ đã duyệt hoặc đang chờ duyệt.",
       "noApprover": "Chưa có tài khoản nào khác được duyệt lương. Nhờ quản trị viên cấp quyền duyệt lương.",
+      "recalcRequired": "Khoản nhập đã đổi sau lần tính cuối. Tính lại lương rồi mới gửi duyệt.",
+      "calcHasErrors": "Lần tính cuối còn người chưa ra phiếu. Sửa dữ liệu, tính lại rồi mới gửi duyệt.",
       "closeBlocked": "Chưa đóng kỳ được: chưa hết hạn thắc mắc hoặc còn thắc mắc chưa xử lý.",
       "periodExists": "Tháng này đã có kỳ lương.",
       "periodNotFound": "Không có kỳ lương này.",
@@ -4785,6 +4787,7 @@
       "KPI_NOT_LOCKED": "KPI chưa khóa",
       "KPI_NOT_LOCKED_DETAIL": "KPI chưa khóa, đang dùng số máy {coefficient}.",
       "KPI_MANUAL_OVERRIDE": "KPI nhập tay",
+      "KPI_FIRST_MONTH": "Tháng đầu vào làm, chưa có KPI: tính hệ số 1,0 theo ngày công",
       "KPI_MANUAL_OVERRIDE_DETAIL": "Hệ số KPI nhập tay thay số hệ thống ({systemCoefficient}).",
       "KPI_MANUAL_OVERRIDE_NO_SYSTEM": "Đang dùng hệ số KPI nhập tay vì hệ thống chưa có số.",
       "OT_MONTH_CAP": "OT {hours} giờ vượt {cap} giờ/tháng",
@@ -4809,7 +4812,9 @@
       "RECIPIENTS": "Phiếu sẽ hiện cho {count} nhân viên",
       "sheetWarning": "{count} phiếu: {label}",
       "INVALID_STATUS": "Kỳ đang ở trạng thái {status}, chưa làm được bước này",
-      "NO_APPROVER": "Không còn ai khác có quyền duyệt; cần thêm tài khoản HR toàn công ty"
+      "NO_APPROVER": "Không còn ai khác có quyền duyệt; cần thêm tài khoản HR toàn công ty",
+      "INPUTS_CHANGED": "Khoản nhập đã đổi sau lần tính cuối; cần tính lại lương",
+      "CALC_ERRORS": "{count} nhân viên chưa ra phiếu ở lần tính cuối; sửa dữ liệu rồi tính lại"
     },
     "review": {
       "metaTitle": "Duyệt bảng lương",

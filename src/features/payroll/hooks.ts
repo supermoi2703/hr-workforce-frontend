@@ -278,6 +278,8 @@ const ERROR_KEYS: Record<string, ErrorKey> = {
   PAYROLL_CALC_IN_PROGRESS: "calcInProgress",
   PAYROLL_PERIOD_LOCKED_FOR_INPUT: "lockedForInput",
   PAYROLL_NO_APPROVER: "noApprover",
+  PAYROLL_RECALC_REQUIRED: "recalcRequired",
+  PAYROLL_CALC_HAS_ERRORS: "calcHasErrors",
   PAYROLL_CLOSE_BLOCKED: "closeBlocked",
   PAYROLL_PERIOD_EXISTS: "periodExists",
   PAYROLL_PERIOD_NOT_FOUND: "periodNotFound",
